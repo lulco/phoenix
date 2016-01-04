@@ -1,0 +1,78 @@
+<?php
+
+namespace Phoenix\QueryBuilder;
+
+class Table
+{
+    protected $name;
+    
+    protected $columns = [];
+    
+    protected $primaryColumns = [];
+    
+    protected $foreignKeys = [];
+    
+    protected $indexes = [];
+    
+    /**
+     * @param string $name
+     * @param mixed $primaryColumn
+     * true - if you want classic autoincrement integer primary column with name id
+     * Column - if you want to define your own column (column is added to list of columns)
+     * string - name of column in list of columns 
+     * array - names of columns in list of columns
+     * false - if your table doesn't have primary key
+     */
+    public function __construct($name, $primaryColumn = true)
+    {
+        $this->name = $name;
+        if ($primaryColumn === true) {
+            $this->columns['id'] = new Column('id', 'integer', false, null, true, null, null, true);
+            $this->primaryColumns[] = 'id';
+        } elseif ($primaryColumn instanceof Column) {
+            $this->columns[$primaryColumn->getName()] = $primaryColumn;
+            $this->primaryColumns[] = $primaryColumn->getName();
+        } elseif (is_string($primaryColumn)) {
+            $this->primaryColumns[] = $primaryColumn;
+        } elseif (is_array($primaryColumn)) {
+            $this->primaryColumns = $primaryColumn;
+        }
+    }
+    
+    public function getName()
+    {
+        return $this->name;
+    }
+    
+    public function addColumn(
+        $name,
+        $type,
+        $allowNull = false,
+        $default = null,
+        $signed = true,
+        $length = null,
+        $decimals = null,
+        $autoincrement = false
+    ) {
+        $this->columns[$name] = new Column($name, $type, $allowNull, $default, $signed, $length, $decimals, $autoincrement);
+        return $this;
+    }
+    
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+    
+    public function getColumn($name)
+    {
+        if (!isset($this->columns[$name])) {
+            throw new \Exception('Column "' . $name . '" not found');
+        }
+        return $this->columns[$name];
+    }
+    
+    public function getPrimaryColumns()
+    {
+        return $this->primaryColumns;
+    }
+}

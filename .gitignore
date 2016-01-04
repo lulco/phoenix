@@ -1,0 +1,6 @@
+/coverage/
+/build/
+/vendor/
+composer.lock
+humbuglog.txt
+humbuglog.json

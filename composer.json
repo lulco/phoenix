@@ -1,0 +1,17 @@
+{
+	"name": "lulco/phoenix",
+	"type": "library",
+	"description": "Database Migrations for PHP",
+	"keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
+	"require": {
+		"php": ">=5.4.0"
+	},
+	"require-dev": {
+		"squizlabs/php_codesniffer": "~2.0",
+		"phpunit/phpunit": "~4.8",
+		"humbug/humbug": "dev-master"
+	},
+	"autoload": {
+		"classmap": ["src/"]
+	}
+}
