@@ -52,6 +52,14 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('total', 'int'));
     }
     
+    public function testAddIndex()
+    {
+        $table = new Table('test');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('title', 'unique'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias']));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['bodytext', 'fulltext']));
+    }
+    
     public function testGetters()
     {
         $table = new Table('test', false);
@@ -65,6 +73,16 @@ class TableTest extends PHPUnit_Framework_TestCase
             $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $column);
         }
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $table->getColumn('title'));
+        
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('title', 'unique'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias']));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['bodytext', 'fulltext']));
+        
+        $indexes = $table->getIndexes();
+        $this->assertCount(3, $indexes);
+        foreach ($indexes as $index) {
+            $this->assertInstanceOf('\Phoenix\QueryBuilder\Index', $index);
+        }
         
         $this->setExpectedException('\Exception', 'Column "unknown_column" not found');
         $table->getColumn('unknown_column');

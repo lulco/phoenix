@@ -28,6 +28,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         }
         $query .= implode(',', $columns);
         $query .= $this->createPrimaryKey($table);
+        $query .= $this->createIndexes($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
         return $query;
     }
@@ -92,5 +93,22 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             $primaryKeys[] = $this->createColumnName($table->getColumn($name));
         }
         return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+    }
+    
+    private function createIndexes(Table $table)
+    {
+        if (empty($table->getIndexes())) {
+            return '';
+        }
+        
+        $indexes = [];
+        foreach ($table->getIndexes() as $index) {
+            $columns = [];
+            foreach ($index->getColumns() as $column) {
+                $columns[] = $this->createColumnName($table->getColumn($column));
+            }
+            $indexes[] = $index->getType() . ' `' . $index->getName() . '` (' . implode(',', $columns) . ')';
+        }
+        return ',' . implode(',', $indexes);
     }
 }

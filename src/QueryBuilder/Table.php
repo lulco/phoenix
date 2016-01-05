@@ -99,4 +99,15 @@ class Table
     {
         return $this->primaryColumns;
     }
+    
+    public function addIndex($columns, $type = Index::TYPE_NORMAL)
+    {
+        $this->indexes[] = new Index($columns, $type);
+        return $this;
+    }
+    
+    public function getIndexes()
+    {
+        return $this->indexes;
+    }
 }
