@@ -4,5 +4,9 @@ namespace Phoenix\QueryBuilder;
 
 interface QueryBuilderInterface
 {
-    public function create();
+    public function createTable();
+    
+    public function dropTable();
+    
+//    public function alterTable();
 }

@@ -2,6 +2,9 @@
 
 namespace Phoenix\QueryBuilder;
 
+use Exception;
+use InvalidArgumentException;
+
 class Table
 {
     protected $name;
@@ -20,22 +23,43 @@ class Table
      * true - if you want classic autoincrement integer primary column with name id
      * Column - if you want to define your own column (column is added to list of columns)
      * string - name of column in list of columns 
-     * array - names of columns in list of columns
-     * false - if your table doesn't have primary key
+     * array of strings - names of columns in list of columns
+     * array of Column - list of own columns (all columns are added to list of columns)
+     * other (false, null) - if your table doesn't have primary key
      */
     public function __construct($name, $primaryColumn = true)
     {
         $this->name = $name;
         if ($primaryColumn === true) {
-            $this->columns['id'] = new Column('id', 'integer', false, null, true, null, null, true);
-            $this->primaryColumns[] = 'id';
-        } elseif ($primaryColumn instanceof Column) {
+            $primaryColumn = new Column('id', 'integer', false, null, true, null, null, true);
+        }
+        
+        if ($primaryColumn) {
+            $this->addPrimary($primaryColumn);
+        }
+    }
+    
+    /**
+     * add primary key(s) to table
+     * @param mixed $primaryColumn
+     * Column - if you want to define your own column (column is added to list of columns)
+     * string - name of column in list of columns 
+     * array of strings - names of columns in list of columns
+     * array of Column - list of own columns (all columns are added to list of columns)
+     */
+    public function addPrimary($primaryColumn)
+    {
+        if ($primaryColumn instanceof Column) {
             $this->columns[$primaryColumn->getName()] = $primaryColumn;
             $this->primaryColumns[] = $primaryColumn->getName();
         } elseif (is_string($primaryColumn)) {
             $this->primaryColumns[] = $primaryColumn;
         } elseif (is_array($primaryColumn)) {
-            $this->primaryColumns = $primaryColumn;
+            foreach ($primaryColumn as $column) {
+                $this->addPrimary($column);
+            }
+        } else {
+            throw new InvalidArgumentException('Unsupported type of primary column');
         }
     }
     
@@ -66,7 +90,7 @@ class Table
     public function getColumn($name)
     {
         if (!isset($this->columns[$name])) {
-            throw new \Exception('Column "' . $name . '" not found');
+            throw new Exception('Column "' . $name . '" not found');
         }
         return $this->columns[$name];
     }

@@ -4,6 +4,11 @@ namespace Phoenix\QueryBuilder;
 
 class Column
 {
+    const TYPE_STRING = 'string';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_BOOLEAN = 'boolean';
+    const TYPE_TEXT = 'text';
+    
     private $name;
     
     private $type;

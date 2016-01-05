@@ -7,13 +7,16 @@ use Exception;
 class MysqlQueryBuilder implements QueryBuilderInterface
 {
     private $typeMap = [
-        'string' => 'varchar(%s)',
-        'integer' => 'int(%s)',
+        Column::TYPE_STRING => 'varchar(%s)',
+        Column::TYPE_INTEGER => 'int(%s)',
+        Column::TYPE_BOOLEAN => 'int(%s)',
+        Column::TYPE_TEXT => 'text',
     ];
     
     private $defaultLength = [
-        'string' => 255,
-        'integer' => 11,
+        Column::TYPE_STRING => 255,
+        Column::TYPE_INTEGER => 11,
+        Column::TYPE_BOOLEAN => 1,
     ];
     
     /** @var Table */
@@ -24,7 +27,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         $this->table = $table;
     }
     
-    public function create()
+    public function createTable()
     {
         $query = 'CREATE TABLE `' . $this->table->getName() . '` (';
         $columns = [];
@@ -37,9 +40,35 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $query;
     }
     
+    public function dropTable()
+    {
+        return 'DROP TABLE `' . $this->table->getName() . '`';
+    }
+    
+//    public function alterTable()
+//    {
+//        ;
+//    }
+    
     private function createColumn(Column $column)
     {
-        return $this->createColumnName($column). ' ' . $this->createType($column) . ($column->allowNull() ? '' : ' NOT NULL') . ($column->isAutoincrement() ? ' AUTO_INCREMENT' : '');
+        $col = $this->createColumnName($column) . ' ' . $this->createType($column);
+        $col .= $column->allowNull() ? '' : ' NOT NULL';
+        if ($column->getDefault() !== null) {
+            $col .= ' DEFAULT ';
+            if ($column->getType() == Column::TYPE_INTEGER) {
+                $col .= $column->getDefault();
+            } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
+                $col .= intval($column->getDefault());
+            } else {
+                $col .= "'" . $column->getDefault() . "'";
+            }
+        } elseif ($column->allowNull() && $column->getDefault() === null) {
+            $col .= ' DEFAULT NULL';
+        }
+        
+        $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
+        return $col;
     }
     
     private function createColumnName(Column $column)
@@ -49,7 +78,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
     
     private function createType(Column $column)
     {
-        return sprintf($this->remapType($column), $column->getLength($this->defaultLength[$column->getType()]));
+        return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
     
     private function remapType(Column $column)
