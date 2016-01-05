@@ -19,30 +19,22 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         Column::TYPE_BOOLEAN => 1,
     ];
     
-    /** @var Table */
-    private $table;
-    
-    public function __construct(Table $table)
+    public function createTable(Table $table)
     {
-        $this->table = $table;
-    }
-    
-    public function createTable()
-    {
-        $query = 'CREATE TABLE `' . $this->table->getName() . '` (';
+        $query = 'CREATE TABLE `' . $table->getName() . '` (';
         $columns = [];
-        foreach ($this->table->getColumns() as $column) {
+        foreach ($table->getColumns() as $column) {
             $columns[] = $this->createColumn($column);
         }
         $query .= implode(',', $columns);
-        $query .= $this->createPrimaryKey();
+        $query .= $this->createPrimaryKey($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
         return $query;
     }
     
-    public function dropTable()
+    public function dropTable(Table $table)
     {
-        return 'DROP TABLE `' . $this->table->getName() . '`';
+        return 'DROP TABLE `' . $table->getName() . '`';
     }
     
 //    public function alterTable()
@@ -89,15 +81,15 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $this->typeMap[$column->getType()];
     }
     
-    private function createPrimaryKey()
+    private function createPrimaryKey(Table $table)
     {
-        if (empty($this->table->getPrimaryColumns())) {
+        if (empty($table->getPrimaryColumns())) {
             return '';
         }
         
         $primaryKeys = [];
-        foreach ($this->table->getPrimaryColumns() as $name) {
-            $primaryKeys[] = $this->createColumnName($this->table->getColumn($name));
+        foreach ($table->getPrimaryColumns() as $name) {
+            $primaryKeys[] = $this->createColumnName($table->getColumn($name));
         }
         return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }

@@ -22,7 +22,7 @@ class Table
      * @param mixed $primaryColumn
      * true - if you want classic autoincrement integer primary column with name id
      * Column - if you want to define your own column (column is added to list of columns)
-     * string - name of column in list of columns 
+     * string - name of column in list of columns
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
@@ -43,7 +43,7 @@ class Table
      * add primary key(s) to table
      * @param mixed $primaryColumn
      * Column - if you want to define your own column (column is added to list of columns)
-     * string - name of column in list of columns 
+     * string - name of column in list of columns
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      */
