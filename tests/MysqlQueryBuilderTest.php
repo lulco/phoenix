@@ -56,7 +56,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testOwnPrimaryKey()
     {
-        $table = new Table('own_primary_key', new Column('identifier', 'string', false, null, true, 32));
+        $table = new Table('own_primary_key', new Column('identifier', 'string', false, null, 32));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new MysqlQueryBuilder();
@@ -66,7 +66,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testMoreOwnPrimaryKeys()
     {
-        $table = new Table('more_own_primary_keys', [new Column('identifier', 'string', false, null, true, 32), new Column('subidentifier', 'string', false, null, true, 32)]);
+        $table = new Table('more_own_primary_keys', [new Column('identifier', 'string', false, null, 32), new Column('subidentifier', 'string', false, null, 32)]);
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new MysqlQueryBuilder();
@@ -77,7 +77,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testOneFieldAsPrimaryKey()
     {
         $table = new Table('one_field_as_pk', 'identifier');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, true, 32));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new MysqlQueryBuilder();
@@ -88,8 +88,8 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreFieldsAsPrimaryKeys()
     {
         $table = new Table('more_fields_as_pk', ['identifier', 'subidentifier']);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, true, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('subidentifier', 'string', false, null, true, 32));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('subidentifier', 'string', false, null, 32));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new MysqlQueryBuilder();
@@ -106,7 +106,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testUnkownColumnAsPrimaryKey()
     {
         $table = new Table('unknown_primary_key', 'unknown');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, true, 32));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new MysqlQueryBuilder();

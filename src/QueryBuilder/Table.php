@@ -31,7 +31,7 @@ class Table
     {
         $this->name = $name;
         if ($primaryColumn === true) {
-            $primaryColumn = new Column('id', 'integer', false, null, true, null, null, true);
+            $primaryColumn = new Column('id', 'integer', false, null, null, null, true, true);
         }
         
         if ($primaryColumn) {
@@ -73,12 +73,12 @@ class Table
         $type,
         $allowNull = false,
         $default = null,
-        $signed = true,
         $length = null,
         $decimals = null,
+        $signed = true,
         $autoincrement = false
     ) {
-        $this->columns[$name] = new Column($name, $type, $allowNull, $default, $signed, $length, $decimals, $autoincrement);
+        $this->columns[$name] = new Column($name, $type, $allowNull, $default, $length, $decimals, $signed, $autoincrement);
         return $this;
     }
     

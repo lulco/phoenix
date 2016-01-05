@@ -30,18 +30,18 @@ class Column
         $type,
         $allowNull = false,
         $default = null,
-        $signed = true,
         $length = null,
         $decimals = null,
+        $signed = true,
         $autoincrement = false
     ) {
         $this->name = $name;
         $this->type = $type;
         $this->allowNull = $allowNull;
         $this->default = $default;
-        $this->signed = $signed;
         $this->length = $length;
         $this->decimals = $decimals;
+        $this->signed = $signed;
         $this->autoincrement = $autoincrement;
     }
     
