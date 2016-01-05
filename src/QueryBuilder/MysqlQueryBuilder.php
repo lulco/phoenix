@@ -107,7 +107,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             foreach ($index->getColumns() as $column) {
                 $columns[] = $this->createColumnName($table->getColumn($column));
             }
-            $indexes[] = $index->getType() . ' `' . $index->getName() . '` (' . implode(',', $columns) . ')';
+            $indexes[] = $index->getType() . ' `' . $index->getName() . '` (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
         }
         return ',' . implode(',', $indexes);
     }

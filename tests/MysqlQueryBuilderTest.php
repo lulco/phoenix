@@ -121,12 +121,12 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting', '', 'btree'));
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias'], 'unique'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('bodytext', 'fulltext'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
         
         $queryCreator = new MysqlQueryBuilder();
-        $expectedQuery = "CREATE TABLE `table_with_indexes` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`),UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;";
+        $expectedQuery = "CREATE TABLE `table_with_indexes` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;";
         $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
     }
     

@@ -100,9 +100,9 @@ class Table
         return $this->primaryColumns;
     }
     
-    public function addIndex($columns, $type = Index::TYPE_NORMAL)
+    public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
     {
-        $this->indexes[] = new Index($columns, $type);
+        $this->indexes[] = new Index($columns, $type, $method);
         return $this;
     }
     
