@@ -12,6 +12,6 @@
 		"humbug/humbug": "dev-master"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"classmap": ["src/", "tests/"]
 	}
 }
