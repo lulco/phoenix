@@ -4,6 +4,7 @@ namespace Phoenix\Migration;
 
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\IncorrectMethodUsageException;
+use Phoenix\QueryBuilder\ForeignKey;
 use Phoenix\QueryBuilder\Index;
 use Phoenix\QueryBuilder\Table;
 
@@ -108,6 +109,15 @@ abstract class AbstractMigration
         return $this;
     }
     
+    final protected function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
+        }
+        $this->table->addForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        return $this;
+    }
+
     final protected function create()
     {
         if ($this->table === null) {

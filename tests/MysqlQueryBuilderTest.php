@@ -130,6 +130,37 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
     }
     
+    public function testForeignKeys()
+    {
+        $table = new Table('table_with_foreign_keys');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQuery = "CREATE TABLE `table_with_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `table_with_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;";
+        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+    }
+    
+    public function testIndexesAndForeignKeys()
+    {
+        $table = new Table('table_with_indexes_and_foreign_keys');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting', '', 'btree'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQuery = "CREATE TABLE `table_with_indexes_and_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH,CONSTRAINT `table_with_indexes_and_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`foreign_id`) ON DELETE SET NULL ON UPDATE SET NULL) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;";
+        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+    }
+    
     public function testDropTable()
     {
         $table = new Table('drop');

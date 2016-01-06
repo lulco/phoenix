@@ -2,7 +2,7 @@
 
 namespace Phoenix\QueryBuilder;
 
-use InvalidArgumentException;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 class Index
 {
@@ -24,12 +24,12 @@ class Index
     {
         $this->type = strtoupper($type);
         if (!in_array($this->type, [self::TYPE_NORMAL, self::TYPE_UNIQUE, self::TYPE_FULLTEXT])) {
-            throw new InvalidArgumentException('Index type "' . $type . '" is not allowed');
+            throw new InvalidArgumentValueException('Index type "' . $type . '" is not allowed');
         }
         
         $this->method = strtoupper($method);
         if (!in_array($this->method, [self::METHOD_DEFAULT, self::METHOD_BTREE, self::METHOD_HASH])) {
-            throw new InvalidArgumentException('Index method "' . $method . '" is not allowed');
+            throw new InvalidArgumentValueException('Index method "' . $method . '" is not allowed');
         }
         
         if (is_array($columns)) {

@@ -110,4 +110,23 @@ class Table
     {
         return $this->indexes;
     }
+    
+    /**
+     * @param string|array $columns
+     * @param string $referencedTable
+     * @param string|array $referencedColumns
+     * @param string $onDelete
+     * @param string $onUpdate
+     * @return Table
+     */
+    public function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+    {
+        $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        return $this;
+    }
+    
+    public function getForeignKeys()
+    {
+        return $this->foreignKeys;
+    }
 }

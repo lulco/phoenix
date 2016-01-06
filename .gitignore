@@ -4,3 +4,4 @@
 composer.lock
 humbuglog.txt
 humbuglog.json
+tests/testing_migrations/

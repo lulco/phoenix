@@ -65,13 +65,13 @@ class IndexTest extends PHPUnit_Framework_TestCase
     
     public function testUnknownType()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Index type "unknown" is not allowed');
+        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Index type "unknown" is not allowed');
         $index = new Index('title', 'unknown');
     }
     
     public function testUnknownMethod()
     {
-        $this->setExpectedException('\InvalidArgumentException', 'Index method "unknown" is not allowed');
+        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Index method "unknown" is not allowed');
         $index = new Index('title', '', 'unknown');
     }
 }

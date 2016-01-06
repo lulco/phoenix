@@ -24,7 +24,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
     
     public function createTable(Table $table)
     {
-        $query = 'CREATE TABLE `' . $table->getName() . '` (';
+        $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
         foreach ($table->getColumns() as $column) {
             $columns[] = $this->createColumn($column);
@@ -32,13 +32,14 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         $query .= implode(',', $columns);
         $query .= $this->createPrimaryKey($table);
         $query .= $this->createIndexes($table);
+        $query .= $this->createForeignKeys($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
         return $query;
     }
     
     public function dropTable(Table $table)
     {
-        return 'DROP TABLE `' . $table->getName() . '`';
+        return 'DROP TABLE ' . $this->escapeString($table->getName());
     }
     
 //    public function alterTable()
@@ -67,10 +68,6 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $col;
     }
     
-    private function createColumnName(Column $column)
-    {
-        return '`' . $column->getName() . '`';
-    }
     
     private function createType(Column $column)
     {
@@ -110,8 +107,43 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             foreach ($index->getColumns() as $column) {
                 $columns[] = $this->createColumnName($table->getColumn($column));
             }
-            $indexes[] = $index->getType() . ' `' . $index->getName() . '` (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
+            $indexes[] = $index->getType() . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
         }
         return ',' . implode(',', $indexes);
+    }
+    
+    private function createForeignKeys(Table $table)
+    {
+        if (empty($table->getForeignKeys())) {
+            return '';
+        }
+        
+        $foreignKeys = [];
+        foreach ($table->getForeignKeys() as $foreignKey) {
+            $columns = [];
+            foreach ($foreignKey->getColumns() as $column) {
+                $columns[] = $this->createColumnName($table->getColumn($column));
+            }
+            $referencedColumns = [];
+            foreach ($foreignKey->getReferencedColumns() as $column) {
+                $referencedColumns[] = $this->escapeString($column);
+            }
+            $fk = 'CONSTRAINT ' . $this->escapeString($table->getName() . '_' . $foreignKey->getName());
+            $fk .= ' FOREIGN KEY (' . implode(',', $columns) . ')';
+            $fk .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
+            $fk .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
+            $foreignKeys[] = $fk;
+        }
+        return ',' . implode(',', $foreignKeys);
+    }
+    
+    private function createColumnName(Column $column)
+    {
+        return $this->escapeString($column->getName());
+    }
+    
+    private function escapeString($string)
+    {
+        return '`' . $string . '`';
     }
 }
