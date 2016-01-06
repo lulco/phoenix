@@ -11,6 +11,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         Column::TYPE_INTEGER => 'int(%s)',
         Column::TYPE_BOOLEAN => 'int(%s)',
         Column::TYPE_TEXT => 'text',
+        Column::TYPE_DATETIME => 'datetime',
     ];
     
     private $defaultLength = [

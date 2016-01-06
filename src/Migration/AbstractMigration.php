@@ -18,28 +18,30 @@ abstract class AbstractMigration
     /** @var AdapterInterface */
     private $adapter;
     
-    public function __construct(AdapterInterface $adapter)
+    final public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
     
-    public function migrate()
+    final public function migrate()
     {
         $this->up();
         $results = [];
         foreach ($this->queries as $query) {
             $results[] = $this->adapter->execute($query);
         }
+        $this->queries = [];
         return $results;
     }
     
-    public function rollback()
+    final public function rollback()
     {
         $this->down();
         $results = [];
         foreach ($this->queries as $query) {
             $results[] = $this->adapter->execute($query);
         }
+        $this->queries = [];
         return $results;
     }
     
@@ -47,12 +49,12 @@ abstract class AbstractMigration
 
     abstract protected function down();
     
-    protected function execute($sql)
+    final protected function execute($sql)
     {
         $this->queries[] = $sql;
     }
 
-    protected function table($name, $primaryColumn = true)
+    final protected function table($name, $primaryColumn = true)
     {
         if ($this->table !== null) {
             throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop() first.');
@@ -61,7 +63,19 @@ abstract class AbstractMigration
         return $this;
     }
     
-    protected function addColumn(
+    /**
+     * @param string $name name of column
+     * @param string $type type of column
+     * @param boolean $allowNull default false
+     * @param mixed $default default null
+     * @param int|null $length length of column, null if you want use default length by column type
+     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
+     * @param boolean $signed default true
+     * @param boolean $autoincrement default false
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function addColumn(
         $name,
         $type,
         $allowNull = false,
@@ -78,7 +92,7 @@ abstract class AbstractMigration
         return $this;
     }
     
-    protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
+    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
@@ -87,7 +101,7 @@ abstract class AbstractMigration
         return $this;
     }
     
-    protected function create()
+    final protected function create()
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
@@ -97,7 +111,7 @@ abstract class AbstractMigration
         $this->table = null;
     }
     
-    protected function drop()
+    final protected function drop()
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
