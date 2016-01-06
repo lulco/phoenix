@@ -12,12 +12,14 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         Column::TYPE_BOOLEAN => 'int(%s)',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATETIME => 'datetime',
+        Column::TYPE_UUID => 'varchar(%s)',
     ];
     
     private $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_INTEGER => 11,
         Column::TYPE_BOOLEAN => 1,
+        Column::TYPE_UUID => 255,
     ];
     
     public function createTable(Table $table)

@@ -9,6 +9,7 @@ class Column
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_TEXT = 'text';
     const TYPE_DATETIME = 'datetime';
+    const TYPE_UUID = 'uuid';
     
     private $name;
     

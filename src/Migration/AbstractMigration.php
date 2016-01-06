@@ -92,6 +92,13 @@ abstract class AbstractMigration
         return $this;
     }
     
+    /**
+     * @param string|array $columns name(s) of column(s)
+     * @param string $type type of index (unique, fulltext) default ''
+     * @param string $method method of index (btree, hash) default ''
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
     final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
     {
         if ($this->table === null) {
