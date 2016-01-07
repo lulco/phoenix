@@ -20,6 +20,9 @@ abstract class AbstractMigration
     /** @var array list of queries to run */
     private $queries = [];
     
+    /** @var array list of executed queries */
+    private $executedQueries = [];
+    
     /** @var AdapterInterface */
     private $adapter;
     
@@ -193,15 +196,18 @@ abstract class AbstractMigration
         try {
             if ($this->useTransaction) {
                 $this->adapter->startTransaction();
+                $this->executedQueries[] = '::start transaction';
             }
             foreach ($this->queries as $query) {
                 $result = $this->adapter->execute($query);
+                $this->executedQueries[] = $query;
                 $queriesExecuted++;
                 $results[] = $result;
             }
             $this->queries = [];
             if ($this->useTransaction) {
                 $this->adapter->commit();
+                $this->executedQueries[] = '::commit';
             }
         } catch (DatabaseQueryExecuteException $e) {
             if ($this->useTransaction) {
@@ -216,6 +222,7 @@ abstract class AbstractMigration
     private function dbRollback($queriesExecuted)
     {
         $this->adapter->rollback();
+        $this->executedQueries[] = '::rollback';
         
         // own rollback for create table
         for ($i = $queriesExecuted - 1; $i >= 0; $i--) {
@@ -223,7 +230,16 @@ abstract class AbstractMigration
                 $queryBuilder = $this->adapter->getQueryBuilder();
                 $query = $queryBuilder->dropTable($this->tables[$i]);
                 $this->adapter->execute($query);
+                $this->executedQueries[] = $query;
             }
         }
+    }
+    
+    /**
+     * @return array
+     */
+    public function getExecutedQueries()
+    {
+        return $this->executedQueries;
     }
 }

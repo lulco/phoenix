@@ -4,7 +4,8 @@
 	"description": "Database Migrations for PHP",
 	"keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
 	"require": {
-		"php": ">=5.4.0"
+		"php": ">=5.4.0",
+		"nette/finder": "~2.3"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "~2.0",

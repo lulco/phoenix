@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests;
 
+use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Database\Adapter\DummyAdapter;
 use Phoenix\Tests\Migration\AddColumnAndAddIndexExceptionsMigration;
 use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
@@ -140,6 +141,14 @@ class MigrationWithDummyAdapterTest extends PHPUnit_Framework_TestCase
             $this->assertTrue(strpos($one, 'Query') === 0);
             $this->assertEquals(substr($one, -8, 8), 'executed');
         }
+        
+        $this->assertCount(4, $migration->getExecutedQueries());
+        
+        $this->assertContains('::start transaction', $migration->getExecutedQueries());
+        $this->assertContains('::commit', $migration->getExecutedQueries());
+        $this->assertNotContains('::rollback', $migration->getExecutedQueries());
+        $this->assertEquals('::start transaction', $migration->getExecutedQueries()[0]);
+        $this->assertEquals('::commit', array_pop($migration->getExecutedQueries()));
     }
     
     public function testRollback()
@@ -148,5 +157,22 @@ class MigrationWithDummyAdapterTest extends PHPUnit_Framework_TestCase
         $migration = new UseTransactionMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException');
         $result = $migration->rollback();
+    }
+    
+    public function testRollbackWithCatchedException()
+    {
+        $adapter = new DummyAdapter();
+        $migration = new UseTransactionMigration($adapter);
+        try {
+            $result = $migration->rollback();
+        } catch (DatabaseQueryExecuteException $e) {
+            
+        }
+        
+        $this->assertCount(5, $migration->getExecutedQueries());
+        $this->assertContains('::start transaction', $migration->getExecutedQueries());
+        $this->assertContains('::rollback', $migration->getExecutedQueries());
+        $this->assertNotContains('::commit', $migration->getExecutedQueries());
+        $this->assertEquals('::start transaction', $migration->getExecutedQueries()[0]);
     }
 }
