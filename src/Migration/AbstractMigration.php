@@ -192,7 +192,6 @@ abstract class AbstractMigration
     private function runQueries()
     {
         $results = [];
-        $queriesExecuted = 0;
         try {
             if ($this->useTransaction) {
                 $this->adapter->startTransaction();
@@ -201,34 +200,36 @@ abstract class AbstractMigration
             foreach ($this->queries as $query) {
                 $result = $this->adapter->execute($query);
                 $this->executedQueries[] = $query;
-                $queriesExecuted++;
                 $results[] = $result;
             }
-            $this->queries = [];
+            
             if ($this->useTransaction) {
                 $this->adapter->commit();
                 $this->executedQueries[] = '::commit';
             }
         } catch (DatabaseQueryExecuteException $e) {
             if ($this->useTransaction) {
-                $this->dbRollback($queriesExecuted);
+                $this->dbRollback();
             }
+            $this->queries = [];
             throw $e;
         }
-        
+        $this->queries = [];
         return $results;
     }
     
-    private function dbRollback($queriesExecuted)
+    private function dbRollback()
     {
+        $queriesExecuted = count($this->executedQueries);
         $this->adapter->rollback();
         $this->executedQueries[] = '::rollback';
         
         // own rollback for create table
-        for ($i = $queriesExecuted - 1; $i >= 0; $i--) {
-            if (isset($this->tables[$i])) {
+        for ($i = $queriesExecuted; $i > 0; $i--) {
+            $queryIndex = $i - 1;
+            if ($this->queries[$queryIndex] && isset($this->tables[$queryIndex])) {
                 $queryBuilder = $this->adapter->getQueryBuilder();
-                $query = $queryBuilder->dropTable($this->tables[$i]);
+                $query = $queryBuilder->dropTable($this->tables[$queryIndex]);
                 $this->adapter->execute($query);
                 $this->executedQueries[] = $query;
             }

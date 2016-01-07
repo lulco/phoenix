@@ -38,6 +38,7 @@ class ClassNameCreator
         
         $pattern = '/namespace (.*?);/s';
         preg_match($pattern, $fileContent, $matches);
-        return isset($matches[1]) ? '\\' . $matches[1] . '\\' : '\\';
+        $namespaceIndex = 1;
+        return isset($matches[$namespaceIndex]) ? '\\' . $matches[$namespaceIndex] . '\\' : '\\';
     }
 }
