@@ -63,11 +63,25 @@ class Table
         }
     }
     
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
     
+    /**
+     * @param string $name name of column
+     * @param string $type type of column
+     * @param boolean $allowNull default false
+     * @param mixed $default default null
+     * @param int|null $length length of column, null if you want use default length by column type
+     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
+     * @param boolean $signed default true
+     * @param boolean $autoincrement default false
+     * @return Table
+     */
     public function addColumn(
         $name,
         $type,
@@ -82,11 +96,19 @@ class Table
         return $this;
     }
     
+    /**
+     * @return Column[]
+     */
     public function getColumns()
     {
         return $this->columns;
     }
     
+    /**
+     * @param string $name
+     * @return Column
+     * @throws Exception if column is not found
+     */
     public function getColumn($name)
     {
         if (!isset($this->columns[$name])) {
@@ -95,17 +117,29 @@ class Table
         return $this->columns[$name];
     }
     
+    /**
+     * @return array
+     */
     public function getPrimaryColumns()
     {
         return $this->primaryColumns;
     }
     
+    /**
+     * @param string|array $columns name(s) of column(s)
+     * @param string $type type of index (unique, fulltext) default ''
+     * @param string $method method of index (btree, hash) default ''
+     * @return Table
+     */
     public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
     {
         $this->indexes[] = new Index($columns, $type, $method);
         return $this;
     }
     
+    /**
+     * @return Index[]
+     */
     public function getIndexes()
     {
         return $this->indexes;

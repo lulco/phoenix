@@ -3,6 +3,7 @@
 namespace Phoenix\Migration;
 
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\IncorrectMethodUsageException;
 use Phoenix\QueryBuilder\ForeignKey;
 use Phoenix\QueryBuilder\Index;
@@ -13,48 +14,75 @@ abstract class AbstractMigration
     /** @var Table */
     private $table = null;
     
+    /** @var array */
+    private $tables = [];
+    
     /** @var array list of queries to run */
     private $queries = [];
     
     /** @var AdapterInterface */
     private $adapter;
     
+    /** @var boolean wrap queries in up / down to transaction */
+    protected $useTransaction = false;  // not working for now :( so I turn it off
+
+    /**
+     * @param AdapterInterface $adapter
+     */
     final public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
     
+    /**
+     * @return array
+     */
     final public function migrate()
     {
         $this->up();
-        $results = [];
-        foreach ($this->queries as $query) {
-            $results[] = $this->adapter->execute($query);
-        }
-        $this->queries = [];
-        return $results;
+        return $this->runQueries();
     }
     
+    /**
+     * @return array
+     */
     final public function rollback()
     {
         $this->down();
-        $results = [];
-        foreach ($this->queries as $query) {
-            $results[] = $this->adapter->execute($query);
-        }
-        $this->queries = [];
-        return $results;
+        return $this->runQueries();
     }
     
+    /**
+     * need override
+     */
     abstract protected function up();
 
+    /**
+     * need override
+     */
     abstract protected function down();
     
+    /**
+     * adds sql to list of queries to execute
+     * @param string $sql
+     */
     final protected function execute($sql)
     {
         $this->queries[] = $sql;
     }
 
+    /**
+     * @param string $name
+     * @param mixed $primaryColumn
+     * true - if you want classic autoincrement integer primary column with name id
+     * Column - if you want to define your own column (column is added to list of columns)
+     * string - name of column in list of columns
+     * array of strings - names of columns in list of columns
+     * array of Column - list of own columns (all columns are added to list of columns)
+     * other (false, null) - if your table doesn't have primary key
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
     final protected function table($name, $primaryColumn = true)
     {
         if ($this->table !== null) {
@@ -109,6 +137,15 @@ abstract class AbstractMigration
         return $this;
     }
     
+    /**
+     * @param string|array $columns
+     * @param string $referencedTable
+     * @param string|array $referencedColumns
+     * @param string $onDelete
+     * @param string $onUpdate
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
     final protected function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
     {
         if ($this->table === null) {
@@ -118,16 +155,27 @@ abstract class AbstractMigration
         return $this;
     }
 
+    /**
+     * generate create table query
+     * @throws IncorrectMethodUsageException if table() was not called first
+     */
     final protected function create()
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
         }
+        
+        $this->tables[count($this->queries)] = $this->table;
+        
         $queryBuilder = $this->adapter->getQueryBuilder();
         $this->queries[] = $queryBuilder->createTable($this->table);
         $this->table = null;
     }
     
+    /**
+     * generates drop table query
+     * @throws IncorrectMethodUsageException if table() was not called first
+     */
     final protected function drop()
     {
         if ($this->table === null) {
@@ -136,5 +184,46 @@ abstract class AbstractMigration
         $queryBuilder = $this->adapter->getQueryBuilder();
         $this->queries[] = $queryBuilder->dropTable($this->table);
         $this->table = null;
+    }
+    
+    private function runQueries()
+    {
+        $results = [];
+        $queriesExecuted = 0;
+        try {
+            if ($this->useTransaction) {
+                $this->adapter->startTransaction();
+            }
+            foreach ($this->queries as $query) {
+                $result = $this->adapter->execute($query);
+                $queriesExecuted++;
+                $results[] = $result;
+            }
+            $this->queries = [];
+            if ($this->useTransaction) {
+                $this->adapter->commit();
+            }
+        } catch (DatabaseQueryExecuteException $e) {
+            if ($this->useTransaction) {
+                $this->dbRollback($queriesExecuted);
+            }
+            throw $e;
+        }
+        
+        return $results;
+    }
+    
+    private function dbRollback($queriesExecuted)
+    {
+        $this->adapter->rollback();
+        
+        // own rollback for create table
+        for ($i = $queriesExecuted - 1; $i >= 0; $i--) {
+            if (isset($this->tables[$i])) {
+                $queryBuilder = $this->adapter->getQueryBuilder();
+                $query = $queryBuilder->dropTable($this->tables[$i]);
+                $this->adapter->execute($query);
+            }
+        }
     }
 }

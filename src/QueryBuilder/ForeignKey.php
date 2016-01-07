@@ -52,31 +52,49 @@ class ForeignKey
         }
     }
     
+    /**
+     * @return string
+     */
     public function getName()
     {
         return implode('_', $this->columns);
     }
-    
+
+    /**
+     * @return array
+     */
     public function getColumns()
     {
         return $this->columns;
     }
     
+    /**
+     * @return string
+     */
     public function getReferencedTable()
     {
         return $this->referencedTable;
     }
-    
+
+    /**
+     * @return array
+     */
     public function getReferencedColumns()
     {
         return $this->referencedColumns;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getOnDelete()
     {
         return $this->onDelete;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getOnUpdate()
     {
         return $this->onUpdate;

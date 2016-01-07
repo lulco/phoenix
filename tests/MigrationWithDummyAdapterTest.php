@@ -4,10 +4,12 @@ namespace Phoenix\Tests;
 
 use Phoenix\Tests\Database\Adapter\DummyAdapter;
 use Phoenix\Tests\Migration\AddColumnAndAddIndexExceptionsMigration;
+use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropTableMigration;
 use Phoenix\Tests\Migration\DoubleUseOfTableExceptionMigration;
 use Phoenix\Tests\Migration\SimpleQueriesMigration;
+use Phoenix\Tests\Migration\UseTransactionMigration;
 use PHPUnit_Framework_TestCase;
 
 class MigrationWithDummyAdapterTest extends PHPUnit_Framework_TestCase
@@ -90,6 +92,27 @@ class MigrationWithDummyAdapterTest extends PHPUnit_Framework_TestCase
         $result = $migration->rollback();
     }
     
+    public function testAddForeignKey()
+    {
+        $adapter = new DummyAdapter();
+        $migration = new AddForeignKeyAndAddForeignKeyExceptionsMigration($adapter);
+        $result = $migration->migrate();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
+    }
+    
+    public function testAddForeignKeyException()
+    {
+        $adapter = new DummyAdapter();
+        $migration = new AddForeignKeyAndAddForeignKeyExceptionsMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method addForeignKey(). Use method table() first.');
+        $result = $migration->rollback();
+    }
+    
     public function testDoubleUseOfTableException()
     {
         $adapter = new DummyAdapter();
@@ -103,6 +126,27 @@ class MigrationWithDummyAdapterTest extends PHPUnit_Framework_TestCase
         $adapter = new DummyAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
+        $result = $migration->rollback();
+    }
+    
+    public function testTransaction()
+    {
+        $adapter = new DummyAdapter();
+        $migration = new UseTransactionMigration($adapter);
+        $result = $migration->migrate();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
+    }
+    
+    public function testRollback()
+    {
+        $adapter = new DummyAdapter();
+        $migration = new UseTransactionMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException');
         $result = $migration->rollback();
     }
 }

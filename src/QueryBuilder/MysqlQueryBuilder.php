@@ -22,6 +22,11 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         Column::TYPE_UUID => 255,
     ];
     
+    /**
+     * generates create table query for mysql
+     * @param Table $table
+     * @return string
+     */
     public function createTable(Table $table)
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
@@ -37,6 +42,11 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $query;
     }
     
+    /**
+     * generates drop table query for mysql
+     * @param Table $table
+     * @return string
+     */
     public function dropTable(Table $table)
     {
         return 'DROP TABLE ' . $this->escapeString($table->getName());

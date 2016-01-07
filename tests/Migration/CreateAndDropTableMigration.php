@@ -12,7 +12,9 @@ class CreateAndDropTableMigration extends AbstractMigration
         $this->table('test_1')
             ->addColumn('title', 'string')
             ->addColumn('alias', 'string')
+            ->addColumn('foreign_key_id', 'integer')
             ->addIndex('alias', Index::TYPE_UNIQUE)
+            ->addForeignKey('foreign_key_id', 'foreign_table')
             ->create();
         
         $this->table('test_2')

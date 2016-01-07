@@ -20,6 +20,12 @@ class Index
     
     private $method;
     
+    /**
+     * @param string|array $columns name(s) of column(s)
+     * @param string $type type of index (unique, fulltext) default ''
+     * @param string $method method of index (btree, hash) default ''
+     * @throws InvalidArgumentValueException if index type or index method is not allowed
+     */
     public function __construct($columns, $type = self::TYPE_NORMAL, $method = self::METHOD_DEFAULT)
     {
         $this->type = strtoupper($type);
@@ -39,21 +45,33 @@ class Index
         }
     }
     
+    /**
+     * @return string
+     */
     public function getName()
     {
         return implode('_', $this->columns);
     }
-    
+
+    /**
+     * @return array
+     */
     public function getColumns()
     {
         return $this->columns;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getType()
     {
         return $this->type ? $this->type . ' INDEX' : 'INDEX';
     }
     
+    /**
+     * @return string
+     */
     public function getMethod()
     {
         return $this->method ? 'USING ' . $this->method : '';

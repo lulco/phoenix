@@ -15,4 +15,10 @@ interface AdapterInterface
      * @return QueryBuilderInterface
      */
     public function getQueryBuilder();
+    
+    public function startTransaction();
+    
+    public function commit();
+    
+    public function rollback();
 }
