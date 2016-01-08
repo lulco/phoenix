@@ -3,7 +3,7 @@
 namespace Phoenix\Tests;
 
 use Phoenix\Exception\DatabaseQueryExecuteException;
-use Phoenix\Tests\Database\Adapter\DummyMysqlAdapter;
+use Phoenix\Tests\Database\Adapter\DummySqliteAdapter;
 use Phoenix\Tests\Migration\AddColumnAndAddIndexExceptionsMigration;
 use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropExceptionsMigration;
@@ -13,11 +13,11 @@ use Phoenix\Tests\Migration\SimpleQueriesMigration;
 use Phoenix\Tests\Migration\UseTransactionMigration;
 use PHPUnit_Framework_TestCase;
 
-class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
+class MigrationWithDummySqliteAdapterTest extends PHPUnit_Framework_TestCase
 {
     public function testSimpleQueries()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new SimpleQueriesMigration($adapter);
         $result = $migration->migrate();
         $this->assertTrue(is_array($result));
@@ -27,7 +27,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(substr($one, -8, 8), 'executed');
         }
         
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new SimpleQueriesMigration($adapter);
         $result = $migration->rollback();
         $this->assertTrue(is_array($result));
@@ -40,7 +40,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testCreateAndDropTable()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new CreateAndDropTableMigration($adapter);
         $result = $migration->migrate();
         $this->assertTrue(is_array($result));
@@ -50,7 +50,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
             $this->assertEquals(substr($one, -8, 8), 'executed');
         }
         
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new CreateAndDropTableMigration($adapter);
         $result = $migration->rollback();
         $this->assertTrue(is_array($result));
@@ -63,7 +63,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testCreateTableException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new CreateAndDropExceptionsMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method create(). Use method table() first.');
         $result = $migration->migrate();
@@ -71,7 +71,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testDropTableException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new CreateAndDropExceptionsMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method drop(). Use method table() first.');
         $result = $migration->rollback();
@@ -79,7 +79,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testAddColumnException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new AddColumnAndAddIndexExceptionsMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method addColumn(). Use method table() first.');
         $result = $migration->migrate();
@@ -87,7 +87,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testAddIndexException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new AddColumnAndAddIndexExceptionsMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method addIndex(). Use method table() first.');
         $result = $migration->rollback();
@@ -95,7 +95,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testAddForeignKey()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new AddForeignKeyAndAddForeignKeyExceptionsMigration($adapter);
         $result = $migration->migrate();
         $this->assertTrue(is_array($result));
@@ -108,7 +108,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testAddForeignKeyException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new AddForeignKeyAndAddForeignKeyExceptionsMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method addForeignKey(). Use method table() first.');
         $result = $migration->rollback();
@@ -116,7 +116,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testDoubleUseOfTableException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
         $result = $migration->migrate();
@@ -124,7 +124,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testTrippleUseOfTableException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
         $result = $migration->rollback();
@@ -132,7 +132,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testTransaction()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new UseTransactionMigration($adapter);
         $result = $migration->migrate();
         $this->assertTrue(is_array($result));
@@ -153,7 +153,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testRollback()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new UseTransactionMigration($adapter);
         $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException');
         $result = $migration->rollback();
@@ -161,7 +161,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testRollbackWithCatchedException()
     {
-        $adapter = new DummyMysqlAdapter();
+        $adapter = new DummySqliteAdapter();
         $migration = new UseTransactionMigration($adapter);
         try {
             $result = $migration->rollback();

@@ -171,7 +171,12 @@ abstract class AbstractMigration
         $this->tables[count($this->queries)] = $this->table;
         
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $this->queries[] = $queryBuilder->createTable($this->table);
+        $query = $queryBuilder->createTable($this->table);
+        if (!is_array($query)) {
+            $query = [$query];
+        }
+        
+        $this->queries = array_merge($this->queries, $query);
         $this->table = null;
     }
     

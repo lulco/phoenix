@@ -5,14 +5,14 @@ namespace Phoenix\Tests;
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Migration\FilesFinder;
 use Phoenix\Migration\Runner;
-use Phoenix\Tests\Database\Adapter\DummyAdapter;
+use Phoenix\Tests\Database\Adapter\DummyMysqlAdapter;
 use PHPUnit_Framework_TestCase;
 
 class RunnerTest extends PHPUnit_Framework_TestCase
 {
     public function testUp()
     {
-        $adapter = new DummyAdapter();
+        $adapter = new DummyMysqlAdapter();
         $runner = new Runner();
         
         $file = __DIR__ . '/../fake/structure/migration_directory_1/20150428140909_first_migration.php';
@@ -44,7 +44,7 @@ class RunnerTest extends PHPUnit_Framework_TestCase
     
     public function testDown()
     {
-        $adapter = new DummyAdapter();
+        $adapter = new DummyMysqlAdapter();
         $runner = new Runner();
         
         $file = __DIR__ . '/../fake/structure/migration_directory_2/20150921111111_fourth_add.php';
@@ -63,7 +63,7 @@ class RunnerTest extends PHPUnit_Framework_TestCase
         $filesFinder->addDirectory(__DIR__ . '/../fake/structure/migration_directory_2');
         $filesFinder->addDirectory(__DIR__ . '/../fake/structure/migration_directory_3');
 
-        $adapter = new DummyAdapter();
+        $adapter = new DummyMysqlAdapter();
         
         $migrations = [];
         foreach ($filesFinder->getFiles() as $file) {

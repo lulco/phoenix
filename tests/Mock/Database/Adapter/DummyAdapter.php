@@ -4,9 +4,8 @@ namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
-use Phoenix\QueryBuilder\MysqlQueryBuilder;
 
-class DummyAdapter implements AdapterInterface
+abstract class DummyAdapter implements AdapterInterface
 {
     private $queryList = [];
     
@@ -17,11 +16,6 @@ class DummyAdapter implements AdapterInterface
         }
         $this->queryList[md5($sql)] = $sql;
         return 'Query ' . $sql . ' executed';
-    }
-
-    public function getQueryBuilder()
-    {
-        return new MysqlQueryBuilder();
     }
 
     public function startTransaction()

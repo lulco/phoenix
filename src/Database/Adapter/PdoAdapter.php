@@ -12,7 +12,7 @@ abstract class PdoAdapter implements AdapterInterface
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
+//        $this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
 //        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     

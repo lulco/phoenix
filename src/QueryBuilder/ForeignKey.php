@@ -28,6 +28,7 @@ class ForeignKey
      * @param string $onDelete
      * @param string $onUpdate
      * @throws InvalidArgumentValueException
+     * @todo create constant default action and use it as default value, then implement in all quer builders (or may be no need because default action must not be set)
      */
     public function __construct($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
     {
