@@ -11,15 +11,22 @@ class ClassNameCreator
     public function __construct($filepath)
     {
         $filename = pathinfo($filepath, PATHINFO_FILENAME);
-        list($datetime, $migrationName) = explode('_', $filename, 2);
+        if (strpos($filename, '_')) {
+            list($datetime, $migrationName) = explode('_', $filename, 2);
+        } else {
+            $datetime = 0;
+            $migrationName = $filename;
+        }
         $this->datetime = $datetime;
-        $this->className = $this->findNamespace($filepath) . str_replace(' ', '', ucwords(str_replace('_', ' ', $migrationName)));
+        $this->className = $this->findNamespace($filepath) . str_replace(' ', '', ucwords(str_replace('_', ' ', $migrationName)));  // TODO find real class name not create it from filename
     }
     
     public function getClassName()
     {
         return $this->className;
     }
+    
+    // full class name
 
     public function getDatetime()
     {

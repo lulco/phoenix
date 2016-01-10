@@ -8,9 +8,19 @@ use Phoenix\Exception\IncorrectMethodUsageException;
 use Phoenix\QueryBuilder\ForeignKey;
 use Phoenix\QueryBuilder\Index;
 use Phoenix\QueryBuilder\Table;
+use ReflectionClass;
 
 abstract class AbstractMigration
 {
+    /** @var string */
+    private $datetime;
+    
+    /** @var string */
+    private $className;
+    
+    /** @var string */
+    private $fullClassName;
+    
     /** @var Table */
     private $table = null;
     
@@ -32,9 +42,37 @@ abstract class AbstractMigration
     /**
      * @param AdapterInterface $adapter
      */
-    final public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
+        $classNameCreator = new ClassNameCreator((new ReflectionClass($this))->getFileName());
+        $this->datetime = $classNameCreator->getDatetime();
+        $this->className = $classNameCreator->getClassName();
+        $this->fullClassName = $classNameCreator->getClassName();
+    }
+    
+    /**
+     * @return string
+     */
+    final public function getDatetime()
+    {
+        return $this->datetime;
+    }
+    
+    /**
+     * @return string
+     */
+    final public function getClassName()
+    {
+        return $this->className;
+    }
+    
+    /**
+     * @return string
+     */
+    final public function getFullClassName()
+    {
+        return $this->fullClassName;
     }
     
     /**

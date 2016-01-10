@@ -25,7 +25,7 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $res = $this->pdo->query($sql);
         if ($res !== false) {
-            return $sql;
+            return $res;
         }
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '. Query ' . $sql . ' fails', $errorInfo[1]);
@@ -33,16 +33,16 @@ abstract class PdoAdapter implements AdapterInterface
 
     public function startTransaction()
     {
-        $this->pdo->beginTransaction();
+        return $this->pdo->beginTransaction();
     }
     
     public function commit()
     {
-        $this->pdo->commit();
+        return $this->pdo->commit();
     }
 
     public function rollback()
     {
-        $this->pdo->rollBack();
+        return $this->pdo->rollBack();
     }
 }
