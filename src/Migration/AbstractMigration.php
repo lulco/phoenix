@@ -163,6 +163,20 @@ abstract class AbstractMigration
     }
     
     /**
+     * @param string $name
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function dropColumn($name)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method dropColumn(). Use method table() first.');
+        }
+        $this->table->dropColumn($name);
+        return $this;
+    }
+    
+    /**
      * @param string|array $columns name(s) of column(s)
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
@@ -175,6 +189,20 @@ abstract class AbstractMigration
             throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
         }
         $this->table->addIndex($columns, $type, $method);
+        return $this;
+    }
+    
+    /**
+     * @param string|array $columns
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function dropIndex($columns)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method dropIndex(). Use method table() first.');
+        }
+        $this->table->dropIndex($columns);
         return $this;
     }
     
@@ -195,9 +223,24 @@ abstract class AbstractMigration
         $this->table->addForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
         return $this;
     }
+    
+    /**
+     * 
+     * @param string|array $columns
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function dropForeignKey($columns)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method dropForeignKey(). Use method table() first.');
+        }
+        $this->table->dropForeignKey($columns);
+        return $this;
+    }
 
     /**
-     * generate create table query
+     * generate create table query / queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */
     final protected function create()
@@ -219,16 +262,40 @@ abstract class AbstractMigration
     }
     
     /**
-     * generates drop table query
+     * generates drop table query / queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */
-    final protected function drop()
+    protected function drop()
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
+        }
+        
+        $queryBuilder = $this->adapter->getQueryBuilder();
+        $query = $queryBuilder->dropTable($this->table);
+        if (!is_array($query)) {
+            $query = [$query];
+        }
+        
+        $this->queries = array_merge($this->queries, $query);
+        $this->table = null;
+    }
+    
+    /**
+     * generates alter table query / queries
+     * @throws IncorrectMethodUsageException if table() was not called first
+     */
+    final protected function save()
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
         }
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $this->queries[] = $queryBuilder->dropTable($this->table);
+        $query = $queryBuilder->alterTable($this->table);
+        if (!is_array($query)) {
+            $query = [$query];
+        }
+        $this->queries = array_merge($this->queries, $query);
         $this->table = null;
     }
     
@@ -240,6 +307,7 @@ abstract class AbstractMigration
                 $this->adapter->startTransaction();
                 $this->executedQueries[] = '::start transaction';
             }
+            
             foreach ($this->queries as $query) {
                 $result = $this->adapter->execute($query);
                 $this->executedQueries[] = $query;

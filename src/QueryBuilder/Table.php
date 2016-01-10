@@ -7,15 +7,21 @@ use InvalidArgumentException;
 
 class Table
 {
-    protected $name;
+    private $name;
     
-    protected $columns = [];
+    private $columns = [];
     
-    protected $primaryColumns = [];
+    private $primaryColumns = [];
     
-    protected $foreignKeys = [];
+    private $foreignKeys = [];
     
-    protected $indexes = [];
+    private $indexes = [];
+    
+    private $columnsToDrop = [];
+    
+    private $foreignKeysToDrop = [];
+    
+    private $indexesToDrop = [];
     
     /**
      * @param string $name
@@ -118,6 +124,25 @@ class Table
     }
     
     /**
+     * 
+     * @param string $name
+     * @return Table
+     */
+    public function dropColumn($name)
+    {
+        $this->columnsToDrop[] = $name;
+        return $this;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getColumnsToDrop()
+    {
+        return $this->columnsToDrop;
+    }
+    
+    /**
      * @return array
      */
     public function getPrimaryColumns()
@@ -147,6 +172,27 @@ class Table
     
     /**
      * @param string|array $columns
+     * @return Table
+     */
+    public function dropIndex($columns)
+    {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        $this->indexesToDrop[] = implode('_', $columns);
+        return $this;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getIndexesToDrop()
+    {
+        return $this->indexesToDrop;
+    }
+    
+    /**
+     * @param string|array $columns
      * @param string $referencedTable
      * @param string|array $referencedColumns
      * @param string $onDelete
@@ -159,8 +205,31 @@ class Table
         return $this;
     }
     
+    /**
+     * @return ForeignKey[]
+     */
     public function getForeignKeys()
     {
         return $this->foreignKeys;
+    }
+    
+    /**
+     * @param string|array $columns
+     */
+    public function dropForeignKey($columns)
+    {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        $this->foreignKeysToDrop[] = $this->getName() . '_' . implode('_', $columns);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getForeignKeysToDrop()
+    {
+        return $this->foreignKeysToDrop;
     }
 }

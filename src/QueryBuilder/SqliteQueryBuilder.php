@@ -16,11 +16,9 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     ];
     
     /**
-     * generates create table query for mysql
+     * generates create table queries for sqlite
      * @param Table $table
-     * @return string
-     *
-     * @todo we need to return array of queries, because of indexes, so we have to refactor this builder to return array
+     * @return string|array string if one query is needed for create table, array if more queries are needed
      */
     public function createTable(Table $table)
     {
@@ -49,7 +47,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     }
     
     /**
-     * generates drop table query for mysql
+     * generates drop table query for sqlite
      * @param Table $table
      * @return string
      */
@@ -58,10 +56,16 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         return 'DROP TABLE ' . $this->escapeString($table->getName());
     }
     
-//    public function alterTable()
-//    {
-//        ;
-//    }
+    /**
+     * @param Table $table
+     * @return array
+     */
+    public function alterTable(Table $table)
+    {
+        $queries = [];
+        // TODO alter table for sqlite
+        return $queries;
+    }
     
     private function createColumn(Column $column, Table $table)
     {
