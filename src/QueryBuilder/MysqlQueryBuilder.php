@@ -7,12 +7,14 @@ use Exception;
 class MysqlQueryBuilder implements QueryBuilderInterface
 {
     private $typeMap = [
-        Column::TYPE_STRING => 'varchar(%s)',
-        Column::TYPE_INTEGER => 'int(%s)',
-        Column::TYPE_BOOLEAN => 'int(%s)',
+        Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_INTEGER => 'int(%d)',
+        Column::TYPE_BOOLEAN => 'int(%d)',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATETIME => 'datetime',
-        Column::TYPE_UUID => 'varchar(%s)',
+        Column::TYPE_UUID => 'varchar(%d)',
+        Column::TYPE_JSON => 'text',
+        Column::TYPE_CHAR => 'char(%d)',
     ];
     
     private $defaultLength = [
@@ -97,7 +99,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         }
         
         if (!empty($table->getIndexes())) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName());
+            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];
             foreach ($table->getIndexes() as $index) {
                 $indexes[] = 'ADD ' . $this->createIndex($index, $table);

@@ -93,7 +93,7 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "more_fields_as_pk" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL DEFAULT SUB,"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));';
+        $expectedQuery = 'CREATE TABLE "more_fields_as_pk" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL DEFAULT \'SUB\',"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));';
         $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
     }
     

@@ -13,6 +13,8 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         Column::TYPE_TEXT => 'TEXT',
         Column::TYPE_DATETIME => 'TEXT',
         Column::TYPE_UUID => 'INTEGER',
+        Column::TYPE_JSON => 'TEXT',
+        Column::TYPE_CHAR => 'TEXT',
     ];
     
     /**
@@ -79,7 +81,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
             } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
                 $col .= intval($column->getDefault());
             } else {
-                $col .= $column->getDefault();
+                $col .= "'" . $column->getDefault() . "'";
             }
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';

@@ -10,6 +10,8 @@ class Column
     const TYPE_TEXT = 'text';
     const TYPE_DATETIME = 'datetime';
     const TYPE_UUID = 'uuid';
+    const TYPE_JSON = 'json';
+    const TYPE_CHAR = 'char';
     
     private $name;
     
