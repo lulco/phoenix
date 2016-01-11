@@ -4,6 +4,7 @@ namespace Phoenix\Tests;
 
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Database\Adapter\DummyMysqlAdapter;
+use Phoenix\Tests\Migration\AlterTableMigration;
 use Phoenix\Tests\Migration\AddColumnAndAddIndexExceptionsMigration;
 use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropExceptionsMigration;
@@ -174,5 +175,28 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertContains('::rollback', $migration->getExecutedQueries());
         $this->assertNotContains('::commit', $migration->getExecutedQueries());
         $this->assertEquals('::start transaction', $migration->getExecutedQueries()[0]);
+    }
+    
+    public function testAlterTable()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new AlterTableMigration($adapter);
+        $result = $migration->migrate();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
+        
+        $adapter = new DummyMysqlAdapter();
+        $migration = new AlterTableMigration($adapter);
+        $result = $migration->rollback();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
     }
 }

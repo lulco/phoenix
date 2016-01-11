@@ -168,4 +168,103 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $expectedQuery = 'DROP TABLE `drop`';
         $this->assertEquals($expectedQuery, $queryCreator->dropTable($table));
     }
+    
+    public function testAlterTable()
+    {
+        // add columns
+        $table = new Table('add_columns');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `add_columns` ADD COLUMN `title` varchar(255) NOT NULL,ADD COLUMN `alias` varchar(255) NOT NULL;'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        
+        // add index
+        $table = new Table('add_index');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('alias', 'unique'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `add_index` ADD UNIQUE INDEX `alias` (`alias`);',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        
+        // add column and index
+        $table = new Table('add_column_and_index');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('alias', 'unique'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `add_column_and_index` ADD COLUMN `alias` varchar(255) NOT NULL;',
+            'ALTER TABLE `add_column_and_index` ADD UNIQUE INDEX `alias` (`alias`);',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        
+        // add foreign key, index, columns
+        $table = new Table('add_columns_index_foreign_key');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `add_columns_index_foreign_key` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL;',
+            'ALTER TABLE `add_columns_index_foreign_key` ADD INDEX `sorting` (`sorting`);',
+            'ALTER TABLE `add_columns_index_foreign_key` ADD CONSTRAINT `add_columns_index_foreign_key_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        
+        // remove columns
+        
+        // remove index
+        
+        // remove foreign key
+        
+        // combination of add / remove column, add / remove index, add / remove foreign key
+        $table = new Table('all_in_one');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropColumn('title'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropIndex('alias'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `all_in_one` DROP INDEX `alias`;',
+            'ALTER TABLE `all_in_one` DROP FOREIGN KEY `all_in_one_foreign_key_to_drop_id`;',
+            'ALTER TABLE `all_in_one` DROP COLUMN `title`;',
+            'ALTER TABLE `all_in_one` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL;',
+            'ALTER TABLE `all_in_one` ADD INDEX `sorting` (`sorting`);',
+            'ALTER TABLE `all_in_one` ADD CONSTRAINT `all_in_one_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        
+        // mixed order of calls add / remove column, add / remove index, add / remove foreign key - output is the same
+        $table = new Table('all_in_one_mixed');
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropColumn('title'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropIndex('alias'));
+        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+                
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `all_in_one_mixed` DROP INDEX `alias`;',
+            'ALTER TABLE `all_in_one_mixed` DROP FOREIGN KEY `all_in_one_mixed_foreign_key_to_drop_id`;',
+            'ALTER TABLE `all_in_one_mixed` DROP COLUMN `title`;',
+            'ALTER TABLE `all_in_one_mixed` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL;',
+            'ALTER TABLE `all_in_one_mixed` ADD INDEX `sorting` (`sorting`);',
+            'ALTER TABLE `all_in_one_mixed` ADD CONSTRAINT `all_in_one_mixed_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+    }
 }
