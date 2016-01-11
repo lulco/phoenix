@@ -2,8 +2,6 @@
 
 namespace Phoenix\Exception;
 
-use Exception;
-
-class DatabaseQueryExecuteException extends Exception
+class DatabaseQueryExecuteException extends PhoenixException
 {
 }

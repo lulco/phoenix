@@ -2,6 +2,8 @@
 
 namespace Phoenix\Config;
 
+use Phoenix\Exception\ConfigException;
+
 class Config
 {
     private $configuration = [
@@ -14,6 +16,13 @@ class Config
     public function __construct(array $configuration)
     {
         $this->configuration = array_merge($this->configuration, $configuration);
+        if (empty($this->configuration['migration_dirs'])) {
+            throw new ConfigException('Empty migration dirs');
+        }
+        
+        if (empty($this->configuration['environments'])) {
+            throw new ConfigException('Empty environments');
+        }
     }
     
     public function getMigrationDirs()

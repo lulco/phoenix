@@ -2,8 +2,6 @@
 
 namespace Phoenix\Exception;
 
-use Exception;
-
-class WrongCommandException extends Exception
+class WrongCommandException extends PhoenixException
 {
 }

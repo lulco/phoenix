@@ -2,28 +2,29 @@
 
 namespace Phoenix\Command;
 
+use Phoenix\Command\AbstractCommand;
+use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RollbackCommand extends AbstractCommand
+class CleanupCommand extends AbstractCommand
 {
     protected function configure()
     {
-        $this->setName('rollback')
-            ->setDescription('Rollback all available migrations');
+        $this->setName('cleanup')
+            ->setDescription('Cleanup - rollback all migrations and delete log table');
         
         parent::configure();
     }
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
-        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, Manager::TARGET_FIRST);
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
         if (empty($migrations)) {
             $output->writeln('');
             $output->writeln('<info>Nothing to rollback</info>');
             $output->writeln('');
-            return;
         }
         
         foreach ($migrations as $migration) {
@@ -34,7 +35,17 @@ class RollbackCommand extends AbstractCommand
             $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
             $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
             $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln('');
         }
+        
+        $filename = __DIR__ . '/../Migration/Init/0_init.php';
+        require_once $filename;
+        $migration = new Init($this->adapter, $this->config->getLogTableName());
+        $migration->rollback();
+        
+        $output->writeln('');
+        $output->writeln('<info>Phoenix cleaned</info>');
+        $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln('');
     }
 }

@@ -26,14 +26,8 @@ class InitCommand extends AbstractCommand
         
         $output->writeln('');
         $output->writeln('<info>Phoenix initialized</info>');
-        if ($output->getVerbosity() !== OutputInterface::VERBOSITY_DEBUG) {
-            $output->writeln('');
-            return;
-        }
-
-        foreach ($migration->getExecutedQueries() as $query) {
-            $output->writeln($query);
-        }
+        $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
         $output->writeln('');
     }
 }

@@ -13,6 +13,10 @@ class Manager
     
     const TYPE_DOWN = 'down';
     
+    const TARGET_FIRST = 'first';
+    
+    const TARGET_ALL = 'all';
+    
     private $config;
     
     private $adapter;
@@ -30,8 +34,10 @@ class Manager
     /**
      * @return AbstractMigration[]
      */
-    public function findMigrationsToExecute($type = self::TYPE_UP)
+    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
     {
+        // TODO check input parameters
+        
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $directory) {
             $filesFinder->addDirectory($directory);
@@ -59,9 +65,8 @@ class Manager
         ksort($migrations);
         if ($type == self::TYPE_DOWN) {
             $migrations = array_reverse($migrations);
-            return [current($migrations)];
         }
-        return $migrations;
+        return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
     }
     
     public function executedMigrations()

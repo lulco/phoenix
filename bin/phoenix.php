@@ -11,6 +11,7 @@ if (!$autoloader()) {
     );
 }
 
+use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
@@ -18,6 +19,7 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 $application->add(new InitCommand());
+$application->add(new CleanupCommand());
 $application->add(new MigrateCommand());
 $application->add(new RollbackCommand());
 $application->run();

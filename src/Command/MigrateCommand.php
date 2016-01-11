@@ -31,15 +31,9 @@ class MigrateCommand extends AbstractCommand
             
             $output->writeln('');
             $output->writeln('<info>Migration ' . $migration->getClassName() . ' executed</info>');
-            if ($output->getVerbosity() !== OutputInterface::VERBOSITY_DEBUG) {
-                $output->writeln('');
-                continue;
-            }
-            
-            foreach ($migration->getExecutedQueries() as $query) {
-                $output->writeln($query);
-            }
-            $output->writeln('');
+            $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+            $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
         }
+        $output->writeln('');
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Phoenix\Exception;
 
-use Exception;
-
-class InvalidArgumentValueException extends Exception
+class InvalidArgumentValueException extends PhoenixException
 {
 }

@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Config\EnvironmentConfig;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 class AdapterFactory
 {
@@ -15,6 +16,7 @@ class AdapterFactory
                 return new MysqlAdapter($pdo);
             case 'sqlite':
                 return new SqliteAdapter($pdo);
+            default: throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "sqlite".');
         }
     }
 }
