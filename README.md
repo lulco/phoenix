@@ -1,2 +1,2 @@
-# phoenix
-Database migrations in PHP
+# Phoenix
+Database migrations for PHP
