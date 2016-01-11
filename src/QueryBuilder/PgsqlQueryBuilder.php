@@ -4,24 +4,21 @@ namespace Phoenix\QueryBuilder;
 
 use Exception;
 
-class MysqlQueryBuilder implements QueryBuilderInterface
+class PgsqlQueryBuilder implements QueryBuilderInterface
 {
     private $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
-        Column::TYPE_INTEGER => 'int(%d)',
-        Column::TYPE_BOOLEAN => 'int(%d)',
+        Column::TYPE_INTEGER => 'int4',
+        Column::TYPE_BOOLEAN => 'bool',
         Column::TYPE_TEXT => 'text',
-        Column::TYPE_DATETIME => 'datetime',
-        Column::TYPE_UUID => 'varchar(%d)',
-        Column::TYPE_JSON => 'text',
+        Column::TYPE_DATETIME => 'timestamp(6)',
+        Column::TYPE_UUID => 'uuid',
+        Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
     ];
     
     private $defaultLength = [
         Column::TYPE_STRING => 255,
-        Column::TYPE_INTEGER => 11,
-        Column::TYPE_BOOLEAN => 1,
-        Column::TYPE_UUID => 36,
         Column::TYPE_CHAR => 255,
     ];
     
@@ -32,17 +29,37 @@ class MysqlQueryBuilder implements QueryBuilderInterface
      */
     public function createTable(Table $table)
     {
+        $queries = [];
+        
+        $primaryKeys = $table->getPrimaryColumns();
+        $autoincrement = false;
+        foreach ($primaryKeys as $primaryKey) {
+            $primaryKeyColumn = $table->getColumn($primaryKey);
+            if ($primaryKeyColumn->isAutoincrement()) {
+                $autoincrement = true;
+                break;
+            }
+        }
+        if ($autoincrement) {
+            $queries[] = 'CREATE SEQUENCE ' . $table->getName() . '_seq;';
+        }
+        
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
         foreach ($table->getColumns() as $column) {
-            $columns[] = $this->createColumn($column);
+            $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
         $query .= $this->createPrimaryKey($table);
-        $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
-        $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
-        return $query;
+        $query .= ');';
+        $queries[] = $query;
+        
+        foreach ($table->getIndexes() as $index) {
+            $queries[] = $this->createIndex($index, $table);
+        }
+        
+        return $queries;
     }
     
     /**
@@ -52,7 +69,11 @@ class MysqlQueryBuilder implements QueryBuilderInterface
      */
     public function dropTable(Table $table)
     {
-        return 'DROP TABLE ' . $this->escapeString($table->getName());
+        return [
+            'DROP TABLE ' . $this->escapeString($table->getName()),
+            'DROP SEQUENCE IF EXISTS ' . $this->escapeString($table->getName() . '_seq'),
+        ];
+        // TODO need to drop indexes ?
     }
     
     /**
@@ -74,7 +95,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         }
         
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP FOREIGN KEY ' . $this->escapeString($foreignKey) . ';';
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($foreignKey) . ';';
         }
         
         if (!empty($table->getColumnsToDrop())) {
@@ -93,7 +114,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
             foreach ($columns as $column) {
-                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column);
+                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
             }
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
@@ -115,27 +136,26 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $queries;
     }
     
-    private function createColumn(Column $column)
+    private function createColumn(Column $column, Table $table)
     {
         $col = $this->createColumnName($column) . ' ' . $this->createType($column);
-        $col .= $column->allowNull() ? '' : ' NOT NULL';
-        if ($column->getDefault() !== null) {
+        if ($column->getDefault() !== null || $column->isAutoincrement()) {
             $col .= ' DEFAULT ';
-            if ($column->getType() == Column::TYPE_INTEGER) {
+            if ($column->isAutoincrement()) {
+                $col .= "nextval('" . $table->getName() . "_seq'::regclass)";
+            } elseif ($column->getType() == Column::TYPE_INTEGER) {
                 $col .= $column->getDefault();
             } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
-                $col .= intval($column->getDefault());
+                $col .= $column->getDefault() ? 'true' : 'false';
             } else {
                 $col .= "'" . $column->getDefault() . "'";
             }
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
-        
-        $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
+        $col .= $column->allowNull() ? '' : ' NOT NULL';
         return $col;
     }
-    
     
     private function createType(Column $column)
     {
@@ -160,20 +180,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         foreach ($table->getPrimaryColumns() as $name) {
             $primaryKeys[] = $this->createColumnName($table->getColumn($name));
         }
-        return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
-    }
-    
-    private function createIndexes(Table $table)
-    {
-        if (empty($table->getIndexes())) {
-            return '';
-        }
-        
-        $indexes = [];
-        foreach ($table->getIndexes() as $index) {
-            $indexes[] = $this->createIndex($index, $table);
-        }
-        return ',' . implode(',', $indexes);
+        return ',CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
     private function createIndex(Index $index, Table $table)
@@ -182,7 +189,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         foreach ($index->getColumns() as $column) {
             $columns[] = $this->escapeString($column);
         }
-        return $index->getType() . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
+        return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
     }
     
     private function createForeignKeys(Table $table)
@@ -222,6 +229,6 @@ class MysqlQueryBuilder implements QueryBuilderInterface
     
     private function escapeString($string)
     {
-        return '`' . $string . '`';
+        return '"' . $string . '"';
     }
 }
