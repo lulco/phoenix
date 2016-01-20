@@ -18,7 +18,7 @@ interface QueryBuilderInterface
     
     /**
      * @param Table $table
-     * @return string|array string if one query is needed for alter table, array if more queries are needed
+     * @return array list of queries
      */
     public function alterTable(Table $table);
 }

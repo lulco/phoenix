@@ -25,14 +25,37 @@ class ClassNameCreator
     {
         return $this->className;
     }
-    
-    // full class name
 
     public function getDatetime()
     {
         return $this->datetime;
     }
 
+    public static function createMigrationName($fullClassName)
+    {
+        $className = array_pop(explode('\\', $fullClassName));
+        $fileName = '';
+		for ($i = 0; $i < strlen($className); $i++) {
+			$char = $className[$i];
+			if ($char == strtoupper($char)) {
+				$fileName .= '_';
+			}
+			$fileName .= strtolower($char);
+		}
+        return date('YmdHis') . $fileName . '.php';
+    }
+    
+    public static function createClassNameAndNamespace($fullClassName)
+    {
+        if (substr($fullClassName, 0, 1) == '\\') {
+            $fullClassName = substr($fullClassName, 1);
+        }
+        $classNameParts = explode('\\', $fullClassName);
+        $className = array_pop($classNameParts);
+        $namespace = implode('\\', $classNameParts);
+        return ['class_name' => $className, 'namespace' => $namespace];
+    }
+    
     private function findNamespace($filepath)
     {
         $fileContent = file_get_contents($filepath);

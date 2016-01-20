@@ -10,6 +10,8 @@ use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropExceptionsMigration;
 use Phoenix\Tests\Migration\CreateAndDropTableMigration;
 use Phoenix\Tests\Migration\DoubleUseOfTableExceptionMigration;
+use Phoenix\Tests\Migration\DropColumnAndDropForeignKeyExceptionsMigration;
+use Phoenix\Tests\Migration\DropIndexAndSaveExceptionsMigration;
 use Phoenix\Tests\Migration\SimpleQueriesMigration;
 use Phoenix\Tests\Migration\UseTransactionMigration;
 use PHPUnit_Framework_TestCase;
@@ -115,11 +117,43 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
         $result = $migration->rollback();
     }
     
+    public function testDropForeignKeyException()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new DropColumnAndDropForeignKeyExceptionsMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method dropForeignKey(). Use method table() first.');
+        $result = $migration->migrate();
+    }
+    
+    public function testDropColumnException()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new DropColumnAndDropForeignKeyExceptionsMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method dropColumn(). Use method table() first.');
+        $result = $migration->rollback();
+    }
+    
+    public function testDropIndexException()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new DropIndexAndSaveExceptionsMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method dropIndex(). Use method table() first.');
+        $result = $migration->migrate();
+    }
+    
+    public function testSaveException()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new DropIndexAndSaveExceptionsMigration($adapter);
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method save(). Use method table() first.');
+        $result = $migration->rollback();
+    }
+    
     public function testDoubleUseOfTableException()
     {
         $adapter = new DummyMysqlAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
-        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         $result = $migration->migrate();
     }
     
@@ -127,7 +161,7 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
     {
         $adapter = new DummyMysqlAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
-        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         $result = $migration->rollback();
     }
     

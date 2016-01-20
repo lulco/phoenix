@@ -3,6 +3,7 @@
 namespace Phoenix\Config;
 
 use Phoenix\Exception\ConfigException;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 class Config
 {
@@ -28,6 +29,19 @@ class Config
     public function getMigrationDirs()
     {
         return $this->configuration['migration_dirs'];
+    }
+    
+    public function getMigrationDir($dir = null)
+    {
+        if ($dir === null) {
+            return current($this->configuration['migration_dirs']);
+        }
+        
+        if (isset($this->configuration['migration_dirs'][$dir])) {
+            return $this->configuration['migration_dirs'][$dir];
+        }
+        
+        throw new InvalidArgumentValueException('Directory "' . $dir . '" doesn\'t exist. Use: ' . implode(', ', array_keys($this->configuration['migration_dirs'])));
     }
     
     public function getLogTableName()

@@ -118,7 +118,7 @@ class MigrationWithDummySqliteAdapterTest extends PHPUnit_Framework_TestCase
     {
         $adapter = new DummySqliteAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
-        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         $result = $migration->migrate();
     }
     
@@ -126,7 +126,7 @@ class MigrationWithDummySqliteAdapterTest extends PHPUnit_Framework_TestCase
     {
         $adapter = new DummySqliteAdapter();
         $migration = new DoubleUseOfTableExceptionMigration($adapter);
-        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop() first.');
+        $this->setExpectedException('\Phoenix\Exception\IncorrectMethodUsageException', 'Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         $result = $migration->rollback();
     }
     

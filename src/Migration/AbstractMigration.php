@@ -127,7 +127,7 @@ abstract class AbstractMigration
     final protected function table($name, $primaryColumn = true)
     {
         if ($this->table !== null) {
-            throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop() first.');
+            throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         }
         $this->table = new Table($name, $primaryColumn);
         return $this;
@@ -288,14 +288,11 @@ abstract class AbstractMigration
     final protected function save()
     {
         if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
+            throw new IncorrectMethodUsageException('Wrong use of method save(). Use method table() first.');
         }
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $query = $queryBuilder->alterTable($this->table);
-        if (!is_array($query)) {
-            $query = [$query];
-        }
-        $this->queries = array_merge($this->queries, $query);
+        $queries = $queryBuilder->alterTable($this->table);
+        $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
     

@@ -14,6 +14,8 @@ class AdapterFactory
         switch ($config->getAdapter()) {
             case 'mysql':
                 return new MysqlAdapter($pdo);
+            case 'pgsql':
+                return new PgsqlAdapter($pdo);
             case 'sqlite':
                 return new SqliteAdapter($pdo);
             default: throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "sqlite".');
