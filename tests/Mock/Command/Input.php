@@ -7,6 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class Input implements InputInterface
 {
+    private $arguments = [];
+    
+    private $options = [];
+    
     public function bind(InputDefinition $definition)
     {
         
@@ -14,12 +18,12 @@ class Input implements InputInterface
 
     public function getArgument($name)
     {
-        
+        return isset($this->arguments[$name]) ? $this->arguments[$name] : null;
     }
 
     public function getArguments()
     {
-        
+        return $this->arguments;
     }
 
     public function getFirstArgument()
@@ -29,12 +33,12 @@ class Input implements InputInterface
 
     public function getOption($name)
     {
-        
+        return isset($this->options[$name]) ? $this->options[$name] : null;
     }
 
     public function getOptions()
     {
-        
+        return $this->options;
     }
 
     public function getParameterOption($values, $default = false)
@@ -44,12 +48,12 @@ class Input implements InputInterface
 
     public function hasArgument($name)
     {
-        
+        return isset($this->arguments[$name]);
     }
 
     public function hasOption($name)
     {
-        
+        return isset($this->options[$name]);
     }
 
     public function hasParameterOption($values)
@@ -59,12 +63,13 @@ class Input implements InputInterface
 
     public function isInteractive()
     {
-        
+
     }
 
     public function setArgument($name, $value)
     {
-        
+        $this->arguments[$name] = $value;
+        return $this;
     }
 
     public function setInteractive($interactive)
@@ -74,12 +79,12 @@ class Input implements InputInterface
 
     public function setOption($name, $value)
     {
-        
+        $this->options[$name] = $value;
+        return $this;
     }
 
     public function validate()
     {
-        
+        return true;
     }
-
 }

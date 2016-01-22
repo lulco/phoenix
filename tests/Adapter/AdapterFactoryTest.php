@@ -17,6 +17,15 @@ class AdapterFactoryTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Adapter\MysqlAdapter', AdapterFactory::instance($config));
     }
     
+    public function testPgsql()
+    {
+        $config = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'dsn' => 'sqlite::memory:',
+        ]);
+        $this->assertInstanceOf('\Phoenix\Database\Adapter\PgsqlAdapter', AdapterFactory::instance($config));
+    }
+    
     public function testSqlite()
     {
         $config = new EnvironmentConfig([

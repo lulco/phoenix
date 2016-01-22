@@ -36,7 +36,7 @@ class Output implements OutputInterface
 
     public function setVerbosity($level)
     {
-        var_dump($level);exit();
+        
     }
 
     public function write($messages, $newline = false, $options = 0)

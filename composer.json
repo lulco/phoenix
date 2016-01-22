@@ -10,6 +10,8 @@
 	"require-dev": {
 		"squizlabs/php_codesniffer": "~2.0",
 		"phpunit/phpunit": "~4.8",
+		"phpmd/phpmd": "^2.3",
+		"sebastian/phpcpd": "^2.0",
 		"humbug/humbug": "dev-master"
 	},
 	"autoload": {

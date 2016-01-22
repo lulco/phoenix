@@ -2,7 +2,8 @@
 
 namespace Phoenix\Command;
 
-use PDO;
+use Phoenix\Command\AbstractCommand;
+use Phoenix\Command\InitCommand;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\AdapterInterface;
