@@ -25,7 +25,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     /**
      * generates create table query for mysql
      * @param Table $table
-     * @return string
+     * @return array
      */
     public function createTable(Table $table)
     {
@@ -41,7 +41,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
             }
         }
         if ($autoincrement) {
-            $queries[] = 'CREATE SEQUENCE ' . $table->getName() . '_seq;';
+            $queries[] = 'CREATE SEQUENCE ' . $this->escapeString($table->getName() . '_seq') . ';';
         }
         
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
@@ -121,13 +121,9 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         }
         
         if (!empty($table->getIndexes())) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
-            $indexes = [];
             foreach ($table->getIndexes() as $index) {
-                $indexes[] = 'ADD ' . $this->createIndex($index, $table);
+                $queries[] = $this->createIndex($index, $table);
             }
-            $query .= implode(',', $indexes) . ';';
-            $queries[] = $query;
         }
         
         foreach ($table->getForeignKeys() as $foreignKey) {
