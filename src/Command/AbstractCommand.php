@@ -68,19 +68,20 @@ abstract class AbstractCommand extends Command
         $this->adapter = AdapterFactory::instance($this->config->getEnvironmentConfig($environment));
         
         $this->manager = new Manager($this->config, $this->adapter);
-        $this->check();
+        $this->check($input, $output);
         
         $this->runCommand($input, $output);
     }
     
-    private function check()
+    private function check(InputInterface $input, OutputInterface $output)
     {
         try {
             $executedMigrations = $this->manager->executedMigrations();
         } catch (DatabaseQueryExecuteException $e) {
             $executedMigrations = false;
             if (!($this instanceof InitCommand)) {
-                throw new WrongCommandException('Phoenix is not initialized, run init command first.');
+                $init = new InitCommand();
+                $init->execute($input, $output);
             }
         }
         

@@ -13,20 +13,6 @@ use PHPUnit_Framework_TestCase;
 
 class CommandTest extends PHPUnit_Framework_TestCase
 {
-    public function testMigrateWithoutInit()
-    {
-        $command = new MigrateCommand();
-        $this->setExpectedException('\Phoenix\Exception\WrongCommandException', 'Phoenix is not initialized, run init command first.');
-        $command->run(new Input(), new Output());
-    }
-    
-    public function testRollbackWithoutInit()
-    {
-        $command = new RollbackCommand();
-        $this->setExpectedException('\Phoenix\Exception\WrongCommandException', 'Phoenix is not initialized, run init command first.');
-        $command->run(new Input(), new Output());
-    }
-    
     public function testInit()
     {
         $command = new InitCommand();
@@ -64,13 +50,13 @@ class CommandTest extends PHPUnit_Framework_TestCase
             ],
             'environments' => [
                 'mysql' => [
-                'adapter' => 'mysql',
-                'host' => 'localhost',
-                'username' => 'root',
-                'password' => '123',
-                'db_name' => 'libs',
-                'charset' => 'utf8',
-            ],
+                    'adapter' => 'mysql',
+                    'host' => 'localhost',
+                    'username' => 'root',
+                    'password' => '123',
+                    'db_name' => 'libs',
+                    'charset' => 'utf8',
+                ],
             ],
         ];
         $this->assertInstanceOf('\Phoenix\Command\AbstractCommand', $command->setConfig($configuration));
