@@ -3,7 +3,7 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
-use Phoenix\Migration\ClassNameCreator;
+use Phoenix\Migration\MigrationNameCreator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,17 +23,17 @@ class CreateCommand extends AbstractCommand
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
         $migration = $input->getArgument('migration');
-        $filename = ClassNameCreator::createMigrationName($migration);
+        $migrationNameCreator = new MigrationNameCreator($migration);
+        $filename = $migrationNameCreator->getFileName();
         $dir = $input->getArgument('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
         
-        $classNameAndNamespace = ClassNameCreator::createClassNameAndNamespace($migration);
         $content = "<?php \n\n";
-        if ($classNameAndNamespace['namespace']) {
-            $content .= "namespace {$classNameAndNamespace['namespace']};\n\n"; 
+        if ($migrationNameCreator->getNamespace()) {
+            $content .= "namespace {$migrationNameCreator->getNamespace()};\n\n"; 
         }
         $content .= "use Phoenix\Migration\AbstractMigration;\n\n";
-        $content .= "class {$classNameAndNamespace['class_name']} extends AbstractMigration\n";
+        $content .= "class {$migrationNameCreator->getClassName()} extends AbstractMigration\n";
         $content .= "{\n    protected function up()\n    {\n        \n    }\n\n";
         $content .= "    protected function down()\n    {\n        \n    }\n}\n";
         file_put_contents($migrationDir . '/' . $filename, $content);

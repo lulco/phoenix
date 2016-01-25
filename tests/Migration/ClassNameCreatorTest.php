@@ -29,39 +29,4 @@ class ClassNameCreatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('\FourthAdd', $creator->getClassName());
         $this->assertEquals('20150921111111', $creator->getDatetime());
     }
-    
-    public function testCreateMigrationName()
-    {
-        $className = 'AddSomethingToTable';
-        $this->assertEquals(date('YmdHis') . '_add_something_to_table.php', ClassNameCreator::createMigrationName($className));
-        $classNameAndNamespace = [
-            'class_name' => 'AddSomethingToTable',
-            'namespace' => '',
-        ];
-        $this->assertEquals($classNameAndNamespace, ClassNameCreator::createClassNameAndNamespace($className));
-        
-        $className = '\AddSomethingToTable';
-        $this->assertEquals(date('YmdHis') . '_add_something_to_table.php', ClassNameCreator::createMigrationName($className));
-        $classNameAndNamespace = [
-            'class_name' => 'AddSomethingToTable',
-            'namespace' => '',
-        ];
-        $this->assertEquals($classNameAndNamespace, ClassNameCreator::createClassNameAndNamespace($className));
-        
-        $className = 'MyNamespace\AddSomethingToTable';
-        $this->assertEquals(date('YmdHis') . '_add_something_to_table.php', ClassNameCreator::createMigrationName($className));
-        $classNameAndNamespace = [
-            'class_name' => 'AddSomethingToTable',
-            'namespace' => 'MyNamespace',
-        ];
-        $this->assertEquals($classNameAndNamespace, ClassNameCreator::createClassNameAndNamespace($className));
-        
-        $className = '\MyNamespace\SecondLevel\AddSomethingToTable';
-        $this->assertEquals(date('YmdHis') . '_add_something_to_table.php', ClassNameCreator::createMigrationName($className));
-        $classNameAndNamespace = [
-            'class_name' => 'AddSomethingToTable',
-            'namespace' => 'MyNamespace\SecondLevel',
-        ];
-        $this->assertEquals($classNameAndNamespace, ClassNameCreator::createClassNameAndNamespace($className));
-    }
 }
