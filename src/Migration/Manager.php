@@ -86,9 +86,7 @@ class Manager
             'classname' => $migration->getFullClassName(),
             'executed_at' => new DateTime(),
         ];
-        
-        // use new insert method and $data array instead of this query
-        $this->adapter->execute('INSERT INTO `' . $this->config->getLogTableName() . '` (`migration_datetime`, `classname`, `executed_at`) VALUES ("' . $migration->getDatetime() . '", "' . addslashes($migration->getFullClassName()) . '", "' . (new DateTime()) . '")');
+        $this->adapter->insert($this->config->getLogTableName(), $data);
     }
     
     public function removeExecution(AbstractMigration $migration)

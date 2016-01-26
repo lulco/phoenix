@@ -42,7 +42,7 @@ class AdapterFactoryTest extends PHPUnit_Framework_TestCase
             'dsn' => 'sqlite::memory:',
         ]);
         
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Unknown adapter "unknown". Use one of value: "mysql", "sqlite".');
+        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Unknown adapter "unknown". Use one of value: "mysql", "pgsql", "sqlite".');
         AdapterFactory::instance($config);
     }
 }

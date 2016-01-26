@@ -18,6 +18,12 @@ abstract class DummyAdapter implements AdapterInterface
         return 'Query ' . $sql . ' executed';
     }
 
+    public function insert($table, array $data)
+    {
+        $sql = 'INSERT INTO ' . $table . '(' . array_keys($data) . ') VALUES (' . implode(', ', $data) . ');';
+        return $this->execute($sql);
+    }
+    
     public function startTransaction()
     {
         return true;

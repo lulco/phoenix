@@ -18,7 +18,8 @@ class AdapterFactory
                 return new PgsqlAdapter($pdo);
             case 'sqlite':
                 return new SqliteAdapter($pdo);
-            default: throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "sqlite".');
+            default:
+                throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
         }
     }
 }

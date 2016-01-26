@@ -124,7 +124,6 @@ class Table
     }
     
     /**
-     * 
      * @param string $name
      * @return Table
      */

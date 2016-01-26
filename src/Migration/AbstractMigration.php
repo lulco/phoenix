@@ -225,7 +225,6 @@ abstract class AbstractMigration
     }
     
     /**
-     * 
      * @param string|array $columns
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException

@@ -30,7 +30,7 @@ class CreateCommand extends AbstractCommand
         
         $content = "<?php \n\n";
         if ($migrationNameCreator->getNamespace()) {
-            $content .= "namespace {$migrationNameCreator->getNamespace()};\n\n"; 
+            $content .= "namespace {$migrationNameCreator->getNamespace()};\n\n";
         }
         $content .= "use Phoenix\Migration\AbstractMigration;\n\n";
         $content .= "class {$migrationNameCreator->getClassName()} extends AbstractMigration\n";

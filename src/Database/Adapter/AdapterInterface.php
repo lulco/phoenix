@@ -12,6 +12,13 @@ interface AdapterInterface
     public function execute($sql);
     
     /**
+     * @param string $table
+     * @param array $data
+     * @return mixed last inserted id
+     */
+    public function insert($table, array $data);
+    
+    /**
      * @return QueryBuilderInterface
      */
     public function getQueryBuilder();

@@ -21,13 +21,13 @@ class MigrationNameCreator
         
         $fileName = '';
         $length = strlen($className);
-		for ($i = 0; $i < $length; $i++) {
-			$char = $className[$i];
-			if ($char == strtoupper($char)) {
-				$fileName .= '_';
-			}
-			$fileName .= strtolower($char);
-		}
+        for ($i = 0; $i < $length; $i++) {
+            $char = $className[$i];
+            if ($char == strtoupper($char)) {
+                $fileName .= '_';
+            }
+            $fileName .= strtolower($char);
+        }
         $this->fileName = date('YmdHis') . $fileName . '.php';
         $this->className = $className;
         $this->namespace = $namespace;
