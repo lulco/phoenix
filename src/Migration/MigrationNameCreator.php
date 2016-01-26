@@ -20,7 +20,8 @@ class MigrationNameCreator
         $namespace = implode('\\', $classNameParts);
         
         $fileName = '';
-		for ($i = 0; $i < strlen($className); $i++) {
+        $length = strlen($className);
+		for ($i = 0; $i < $length; $i++) {
 			$char = $className[$i];
 			if ($char == strtoupper($char)) {
 				$fileName .= '_';

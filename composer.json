@@ -3,6 +3,7 @@
 	"type": "library",
 	"description": "Database Migrations for PHP",
 	"keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
+	"license": "MIT",
 	"require": {
 		"php": ">=5.4.0",
 		"nette/finder": "~2.3"
