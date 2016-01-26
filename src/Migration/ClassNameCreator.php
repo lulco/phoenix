@@ -4,20 +4,17 @@ namespace Phoenix\Migration;
 
 class ClassNameCreator
 {
-    private $datetime;
+    private $datetime = 0;
     
     private $className;
     
     public function __construct($filepath)
     {
         $filename = pathinfo($filepath, PATHINFO_FILENAME);
+        $migrationName = $filename;
         if (strpos($filename, '_')) {
-            list($datetime, $migrationName) = explode('_', $filename, 2);
-        } else {
-            $datetime = 0;
-            $migrationName = $filename;
+            list($this->datetime, $migrationName) = explode('_', $filename, 2);
         }
-        $this->datetime = $datetime;
         $this->className = $this->findNamespace($filepath) . str_replace(' ', '', ucwords(str_replace('_', ' ', $migrationName)));  // TODO find real class name not create it from filename
     }
     

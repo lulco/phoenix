@@ -19,7 +19,7 @@ class MigrationNameCreator
         $className = array_pop($classNameParts);
         $namespace = implode('\\', $classNameParts);
         
-        $this->filename = $this->createFileName($className);
+        $this->fileName = $this->createFileName($className);
         $this->className = $className;
         $this->namespace = $namespace;
     }

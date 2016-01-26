@@ -32,7 +32,7 @@ abstract class PdoAdapter implements AdapterInterface
     public function insert($table, array $data)
     {
         $values = [];
-        foreach ($data as $key => $value) {
+        foreach (array_keys($data) as $key) {
             $values[] = ':' . $key;
         }
         // TODO escape table name
