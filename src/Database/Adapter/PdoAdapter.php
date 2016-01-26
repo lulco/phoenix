@@ -12,8 +12,6 @@ abstract class PdoAdapter implements AdapterInterface
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-//        $this->pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, false);
-//        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     
     /**
@@ -37,6 +35,7 @@ abstract class PdoAdapter implements AdapterInterface
         foreach ($data as $key => $value) {
             $values[] = ':' . $key;
         }
+        // TODO escape table name
         $statement = $this->pdo->prepare('INSERT INTO ' . $table . '(' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $values) . ')');
         $res = $statement->execute($data);
         if ($res !== false) {

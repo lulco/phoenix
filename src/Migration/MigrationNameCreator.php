@@ -19,6 +19,13 @@ class MigrationNameCreator
         $className = array_pop($classNameParts);
         $namespace = implode('\\', $classNameParts);
         
+        $this->filename = $this->createFileName($className);
+        $this->className = $className;
+        $this->namespace = $namespace;
+    }
+    
+    private function createFileName($className)
+    {
         $fileName = '';
         $length = strlen($className);
         for ($i = 0; $i < $length; $i++) {
@@ -28,9 +35,7 @@ class MigrationNameCreator
             }
             $fileName .= strtolower($char);
         }
-        $this->fileName = date('YmdHis') . $fileName . '.php';
-        $this->className = $className;
-        $this->namespace = $namespace;
+        return date('YmdHis') . $fileName . '.php';
     }
     
     public function getClassName()

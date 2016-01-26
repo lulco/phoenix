@@ -6,6 +6,7 @@ use Nette\Utils\DateTime;
 use PDO;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 class Manager
 {
@@ -36,8 +37,26 @@ class Manager
      */
     public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
     {
-        // TODO check input parameters
+        if (!in_array($type, [self::TYPE_UP, self::TYPE_DOWN])) {
+            throw new InvalidArgumentValueException('Type "' . $type . '" is not allowed.');
+        }
         
+        if (!in_array($target, [self::TARGET_ALL, self::TARGET_FIRST])) {
+            throw new InvalidArgumentValueException('Target "' . $target . '" is not allowed.');
+        }
+        
+        $migrations = $this->findMigrations($type);
+        if (empty($migrations)) {
+            return $migrations;
+        }
+        if ($type == self::TYPE_DOWN) {
+            $migrations = array_reverse($migrations);
+        }
+        return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
+    }
+    
+    private function findMigrations($type)
+    {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $directory) {
             $filesFinder->addDirectory($directory);
@@ -57,16 +76,8 @@ class Manager
                 $migrations[$migrationIdentifier] = new $className($this->adapter);
             }
         }
-
-        if (empty($migrations)) {
-            return $migrations;
-        }
-        
         ksort($migrations);
-        if ($type == self::TYPE_DOWN) {
-            $migrations = array_reverse($migrations);
-        }
-        return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
+        return $migrations;
     }
     
     public function executedMigrations()

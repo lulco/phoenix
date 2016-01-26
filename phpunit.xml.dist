@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit bootstrap="vendor/autoload.php">
-	<logging>
+    <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
     <testsuites>
@@ -9,9 +9,9 @@
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
-	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
-			<directory suffix=".php">src/</directory>
-		</whitelist>
-	</filter>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src/</directory>
+        </whitelist>
+    </filter>
 </phpunit>
