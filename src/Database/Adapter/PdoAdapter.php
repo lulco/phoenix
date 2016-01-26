@@ -4,14 +4,19 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Exception\DatabaseQueryExecuteException;
+use Phoenix\QueryBuilder\QueryBuilderInterface;
 
 abstract class PdoAdapter implements AdapterInterface
 {
     private $pdo;
     
+    /** @var QueryBuilderInterface */
+    protected $queryBuilder;
+    
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->getQueryBuilder();
     }
     
     /**
@@ -35,8 +40,8 @@ abstract class PdoAdapter implements AdapterInterface
         foreach (array_keys($data) as $key) {
             $values[] = ':' . $key;
         }
-        // TODO escape table name
-        $statement = $this->pdo->prepare('INSERT INTO ' . $table . '(' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $values) . ')');
+
+        $statement = $this->pdo->prepare('INSERT INTO ' . $this->queryBuilder->escapeString($table) . '(' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $values) . ')');
         $res = $statement->execute($data);
         if ($res !== false) {
             return $this->pdo->lastInsertId();

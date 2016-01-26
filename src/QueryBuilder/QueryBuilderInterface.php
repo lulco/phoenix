@@ -21,4 +21,11 @@ interface QueryBuilderInterface
      * @return array list of queries
      */
     public function alterTable(Table $table);
+    
+    /**
+     * @param string $string
+     * @return string escaped string
+     */
+    public function escapeString($string);
+    
 }

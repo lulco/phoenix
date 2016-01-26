@@ -76,9 +76,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         if ($column->getDefault() !== null && $column->getDefault() !== '') {
             $col .= ' DEFAULT ';
-            if ($column->getType() == Column::TYPE_INTEGER) {
-                $col .= intval($column->getDefault());
-            } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
+            if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BOOLEAN])) {
                 $col .= intval($column->getDefault());
             } else {
                 $col .= "'" . $column->getDefault() . "'";
@@ -162,7 +160,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         return $this->escapeString($column->getName());
     }
     
-    private function escapeString($string)
+    public function escapeString($string)
     {
         return '"' . $string . '"';
     }

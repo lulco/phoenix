@@ -223,7 +223,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         return $this->escapeString($column->getName());
     }
     
-    private function escapeString($string)
+    public function escapeString($string)
     {
         return '"' . $string . '"';
     }
