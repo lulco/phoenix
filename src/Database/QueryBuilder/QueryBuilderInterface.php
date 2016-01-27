@@ -1,6 +1,8 @@
 <?php
 
-namespace Phoenix\QueryBuilder;
+namespace Phoenix\Database\QueryBuilder;
+
+use Phoenix\Database\Element\Table;
 
 interface QueryBuilderInterface
 {

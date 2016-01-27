@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\Element;
 
-use Phoenix\QueryBuilder\Index;
+use Phoenix\Database\Element\Index;
 use PHPUnit_Framework_TestCase;
 
 class IndexTest extends PHPUnit_Framework_TestCase

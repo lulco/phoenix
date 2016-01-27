@@ -1,9 +1,9 @@
 <?php
 
-namespace Phoenix\Tests\Migration;
+namespace Phoenix\Tests\Mock\Migration;
 
 use Phoenix\Migration\AbstractMigration;
-use Phoenix\QueryBuilder\Index;
+use Phoenix\Database\Element\Index;
 
 class CreateAndDropTableMigration extends AbstractMigration
 {

@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\QueryBuilder\PgsqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class PgsqlAdapter extends PdoAdapter
 {

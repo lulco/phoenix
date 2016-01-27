@@ -1,11 +1,11 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Migration;
 
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Migration\FilesFinder;
 use Phoenix\Migration\Runner;
-use Phoenix\Tests\Database\Adapter\DummyMysqlAdapter;
+use Phoenix\Tests\Mock\Database\Adapter\DummyMysqlAdapter;
 use PHPUnit_Framework_TestCase;
 
 class RunnerTest extends PHPUnit_Framework_TestCase

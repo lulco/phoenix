@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\Element;
 
-use Phoenix\QueryBuilder\ForeignKey;
+use Phoenix\Database\Element\ForeignKey;
 use PHPUnit_Framework_TestCase;
 
 class ForeignKeyTest extends PHPUnit_Framework_TestCase

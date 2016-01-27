@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests\Migration;
+namespace Phoenix\Tests\Mock\Migration;
 
 use Phoenix\Migration\AbstractMigration;
 

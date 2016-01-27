@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\EnvironmentConfig;
 use PHPUnit_Framework_TestCase;

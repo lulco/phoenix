@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\QueryBuilder\QueryBuilderInterface;
+use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 interface AdapterInterface
 {

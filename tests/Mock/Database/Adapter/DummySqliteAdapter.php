@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests\Database\Adapter;
+namespace Phoenix\Tests\Mock\Database\Adapter;
 
-use Phoenix\QueryBuilder\SqliteQueryBuilder;
+use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 
 class DummySqliteAdapter extends DummyAdapter
 {

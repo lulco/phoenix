@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests\Command;
+namespace Phoenix\Tests\Mock\Command;
 
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;

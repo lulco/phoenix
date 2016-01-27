@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests\Database\Adapter;
+namespace Phoenix\Tests\Mock\Database\Adapter;
 
-use Phoenix\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class DummyMysqlAdapter extends DummyAdapter
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Migration;
 
 use Phoenix\Migration\MigrationNameCreator;
 use PHPUnit_Framework_TestCase;

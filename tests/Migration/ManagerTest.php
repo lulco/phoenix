@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Migration;
 
 use PDO;
 use Phoenix\Config\Config;

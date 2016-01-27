@@ -1,16 +1,16 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Migration;
 
 use Phoenix\Exception\DatabaseQueryExecuteException;
-use Phoenix\Tests\Database\Adapter\DummySqliteAdapter;
-use Phoenix\Tests\Migration\AddColumnAndAddIndexExceptionsMigration;
-use Phoenix\Tests\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
-use Phoenix\Tests\Migration\CreateAndDropExceptionsMigration;
-use Phoenix\Tests\Migration\CreateAndDropTableMigration;
-use Phoenix\Tests\Migration\DoubleUseOfTableExceptionMigration;
-use Phoenix\Tests\Migration\SimpleQueriesMigration;
-use Phoenix\Tests\Migration\UseTransactionMigration;
+use Phoenix\Tests\Mock\Database\Adapter\DummySqliteAdapter;
+use Phoenix\Tests\Mock\Migration\AddColumnAndAddIndexExceptionsMigration;
+use Phoenix\Tests\Mock\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
+use Phoenix\Tests\Mock\Migration\CreateAndDropExceptionsMigration;
+use Phoenix\Tests\Mock\Migration\CreateAndDropTableMigration;
+use Phoenix\Tests\Mock\Migration\DoubleUseOfTableExceptionMigration;
+use Phoenix\Tests\Mock\Migration\SimpleQueriesMigration;
+use Phoenix\Tests\Mock\Migration\UseTransactionMigration;
 use PHPUnit_Framework_TestCase;
 
 class MigrationWithDummySqliteAdapterTest extends PHPUnit_Framework_TestCase

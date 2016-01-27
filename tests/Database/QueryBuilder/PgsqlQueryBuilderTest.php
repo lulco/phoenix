@@ -1,10 +1,10 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\QueryBuilder;
 
-use Phoenix\QueryBuilder\Column;
-use Phoenix\QueryBuilder\PgsqlQueryBuilder;
-use Phoenix\QueryBuilder\Table;
+use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Table;
+use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use PHPUnit_Framework_TestCase;
 
 class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
@@ -12,7 +12,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testUnsupportedColumnType()
     {
         $table = new Table('unsupported');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'unsupported'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'unsupported'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $this->setExpectedException('\Exception', 'Type "unsupported" is not allowed');
@@ -22,7 +22,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testSimpleCreate()
     {
         $table = new Table('simple');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -35,10 +35,10 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreColumns()
     {
         $table = new Table('more_columns');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string', true));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('total', 'integer', false, 0));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text', false));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string', true));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'integer', false, 0));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text', false));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -51,9 +51,9 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testNoPrimaryKey()
     {
         $table = new Table('no_primary_key', false);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', true));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('total', 'integer', false, 0));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('is_deleted', 'boolean', false, false));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', true));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'integer', false, 0));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('is_deleted', 'boolean', false, false));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -65,7 +65,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testOwnPrimaryKey()
     {
         $table = new Table('own_primary_key', new Column('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -77,7 +77,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreOwnPrimaryKeys()
     {
         $table = new Table('more_own_primary_keys', [new Column('identifier', 'string', false, null, 32), new Column('subidentifier', 'string', false, null, 32)]);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -89,8 +89,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testOneFieldAsPrimaryKey()
     {
         $table = new Table('one_field_as_pk', 'identifier');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -102,9 +102,9 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreFieldsAsPrimaryKeys()
     {
         $table = new Table('more_fields_as_pk', ['identifier', 'subidentifier']);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('subidentifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('subidentifier', 'string', false, null, 32));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -122,8 +122,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testUnkownColumnAsPrimaryKey()
     {
         $table = new Table('unknown_primary_key', 'unknown');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string', false, ''));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new PgsqlQueryBuilder();
         $this->setExpectedException('\Exception', 'Column "unknown" not found');
@@ -133,13 +133,13 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testIndexes()
     {
         $table = new Table('table_with_indexes');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting', '', 'btree'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias'], 'unique'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting', '', 'btree'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -155,10 +155,10 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testForeignKeys()
     {
         $table = new Table('table_with_foreign_keys');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -171,15 +171,15 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testIndexesAndForeignKeys()
     {
         $table = new Table('table_with_indexes_and_foreign_keys');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting', '', 'btree'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias'], 'unique'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting', '', 'btree'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('bodytext', 'fulltext', 'hash'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -207,8 +207,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         // add columns
         $table = new Table('add_columns');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -218,7 +218,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         // add index
         $table = new Table('add_index');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('alias', 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('alias', 'unique'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -228,8 +228,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         // add column and index
         $table = new Table('add_column_and_index');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('alias', 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('alias', 'unique'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -240,10 +240,10 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         // add foreign key, index, columns
         $table = new Table('add_columns_index_foreign_key');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -261,13 +261,13 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         // combination of add / remove column, add / remove index, add / remove foreign key
         $table = new Table('all_in_one');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropColumn('title'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropIndex('alias'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropColumn('title'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropIndex('alias'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
@@ -282,13 +282,13 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         // mixed order of calls add / remove column, add / remove index, add / remove foreign key - output is the same
         $table = new Table('all_in_one_mixed');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('sorting'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropColumn('title'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->dropIndex('alias'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropColumn('title'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropIndex('alias'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
                 
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [

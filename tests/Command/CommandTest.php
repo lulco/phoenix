@@ -1,28 +1,18 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Command;
 
 use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\CreateCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
-use Phoenix\Tests\Command\Input;
-use Phoenix\Tests\Command\Output;
+use Phoenix\Tests\Mock\Command\Input;
+use Phoenix\Tests\Mock\Command\Output;
 use PHPUnit_Framework_TestCase;
 
 class CommandTest extends PHPUnit_Framework_TestCase
-{
-    public function testInit()
-    {
-        $command = new InitCommand();
-        // TODO set custom config
-        $this->assertEquals('init', $command->getName());
-        $command->run(new Input(), new Output());
-        
-        // TODO test if table phoenix_log exists
-    }
-    
+{  
     public function testCreate()
     {
         $command = new CreateCommand();
@@ -112,6 +102,16 @@ class CommandTest extends PHPUnit_Framework_TestCase
             $this->assertEquals('rollback', $command->getName());
             $command->run(new Input(), new Output());
         }
+        
+        // TODO test if table phoenix_log exists and there are no migrations
+    }
+    
+    public function testNothingToRollbackRollback()
+    {
+        $command = new RollbackCommand();
+        // TODO set custom config
+        $this->assertEquals('rollback', $command->getName());
+        $command->run(new Input(), new Output());
         
         // TODO test if table phoenix_log exists and there are no migrations
     }

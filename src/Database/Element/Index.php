@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\QueryBuilder;
+namespace Phoenix\Database\Element;
 
 use Phoenix\Exception\InvalidArgumentValueException;
 

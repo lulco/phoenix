@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Adapter\SqliteAdapter;
@@ -13,7 +13,7 @@ class PdoAdapterTest extends PHPUnit_Framework_TestCase
     {
         $pdo = new PDO('sqlite::memory:');
         $adapter = new SqliteAdapter($pdo);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
         
         $adapter->startTransaction();
         $adapter->execute('CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"sorting" INTEGER NOT NULL);');
@@ -22,11 +22,22 @@ class PdoAdapterTest extends PHPUnit_Framework_TestCase
         $adapter->commit();
     }
     
+    public function testInsert()
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $adapter = new SqliteAdapter($pdo);
+        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        
+        $adapter->execute('CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"sorting" INTEGER NOT NULL);');
+        $adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first', 'sorting' => 1]);
+        $adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second', 'sorting' => 2]);
+    }
+    
     public function testThrowingException()
     {
         $pdo = new PDO('sqlite::memory:');
         $adapter = new SqliteAdapter($pdo);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
         
         $adapter->execute('CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"sorting" INTEGER NOT NULL);');
         $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException', 'SQLSTATE[HY000]: table "phoenix_test_table" already exists. Query CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"sorting" INTEGER NOT NULL); fails', 1);
@@ -37,7 +48,7 @@ class PdoAdapterTest extends PHPUnit_Framework_TestCase
     {
         $pdo = new PDO('sqlite::memory:');
         $adapter = new SqliteAdapter($pdo);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
         
         $adapter->startTransaction();
         try {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests\Database\Adapter;
+namespace Phoenix\Tests\Mock\Database\Adapter;
 
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;

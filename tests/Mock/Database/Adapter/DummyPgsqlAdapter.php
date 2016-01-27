@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests\Database\Adapter;
+namespace Phoenix\Tests\Mock\Database\Adapter;
 
-use Phoenix\QueryBuilder\PgsqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class DummyPgsqlAdapter extends DummyAdapter
 {

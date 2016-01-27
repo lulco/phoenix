@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests\Command;
+namespace Phoenix\Tests\Mock\Command;
 
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;

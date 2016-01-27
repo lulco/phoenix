@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Database\Adapter\AdapterFactory;

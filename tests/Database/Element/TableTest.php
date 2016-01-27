@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests;
+namespace Phoenix\Tests\Database\Element;
 
-use Phoenix\QueryBuilder\Table;
+use Phoenix\Database\Element\Table;
 use PHPUnit_Framework_TestCase;
 
 class TableTest extends PHPUnit_Framework_TestCase
@@ -13,10 +13,10 @@ class TableTest extends PHPUnit_Framework_TestCase
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
         foreach ($columns as $column) {
-            $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $column);
+            $this->assertInstanceOf('\Phoenix\Database\Element\Column', $column);
         }
         $idColumn = $table->getColumn('id');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $idColumn);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Column', $idColumn);
         $this->assertEquals('id', $idColumn->getName());
         $this->assertEquals('integer', $idColumn->getType());
         $this->assertFalse($idColumn->allowNull());
@@ -35,12 +35,12 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testNoPrimaryKeyConstruct()
     {
         $table = new Table('test', false);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
         
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
         foreach ($columns as $column) {
-            $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $column);
+            $this->assertInstanceOf('\Phoenix\Database\Element\Column', $column);
         }
         $this->assertCount(0, $table->getPrimaryColumns());
     }
@@ -48,40 +48,40 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testAddColumn()
     {
         $table = new Table('test');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('total', 'int'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'int'));
     }
     
     public function testAddIndex()
     {
         $table = new Table('test');
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('title', 'unique'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias']));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['bodytext', 'fulltext']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('title', 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['bodytext', 'fulltext']));
     }
     
     public function testGetters()
     {
         $table = new Table('test', false);
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('total', 'int'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'int'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text'));
         
         $columns = $table->getColumns();
         $this->assertCount(3, $columns);
         foreach ($columns as $column) {
-            $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $column);
+            $this->assertInstanceOf('\Phoenix\Database\Element\Column', $column);
         }
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Column', $table->getColumn('title'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Column', $table->getColumn('title'));
         
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex('title', 'unique'));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['title', 'alias']));
-        $this->assertInstanceOf('\Phoenix\QueryBuilder\Table', $table->addIndex(['bodytext', 'fulltext']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('title', 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['bodytext', 'fulltext']));
         
         $indexes = $table->getIndexes();
         $this->assertCount(3, $indexes);
         foreach ($indexes as $index) {
-            $this->assertInstanceOf('\Phoenix\QueryBuilder\Index', $index);
+            $this->assertInstanceOf('\Phoenix\Database\Element\Index', $index);
         }
         
         $this->setExpectedException('\Exception', 'Column "unknown_column" not found');

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\Tests\Database;
+namespace Phoenix\Tests\Mock\Database;
 
 use PDO;
 

@@ -1,8 +1,11 @@
 <?php
 
-namespace Phoenix\QueryBuilder;
+namespace Phoenix\Database\QueryBuilder;
 
 use Exception;
+use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\Table;
 
 class SqliteQueryBuilder implements QueryBuilderInterface
 {

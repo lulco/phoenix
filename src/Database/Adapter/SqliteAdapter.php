@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\QueryBuilder\SqliteQueryBuilder;
+use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 
 class SqliteAdapter extends PdoAdapter
 {

@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
 {

@@ -3,11 +3,11 @@
 namespace Phoenix\Migration;
 
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\Table;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\IncorrectMethodUsageException;
-use Phoenix\QueryBuilder\ForeignKey;
-use Phoenix\QueryBuilder\Index;
-use Phoenix\QueryBuilder\Table;
 use ReflectionClass;
 
 abstract class AbstractMigration
