@@ -25,8 +25,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "simple" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL);';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "simple" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL);'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testMoreColumns()
@@ -38,8 +40,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text', false));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "more_columns" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"bodytext" TEXT NOT NULL);';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "more_columns" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"bodytext" TEXT NOT NULL);'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testNoPrimaryKey()
@@ -50,8 +54,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('is_deleted', 'boolean', false, false));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "no_primary_key" ("title" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"is_deleted" INTEGER NOT NULL DEFAULT 0);';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "no_primary_key" ("title" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"is_deleted" INTEGER NOT NULL DEFAULT 0);'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testOwnPrimaryKey()
@@ -60,8 +66,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "own_primary_key" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "own_primary_key" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testMoreOwnPrimaryKeys()
@@ -70,8 +78,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "more_own_primary_keys" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "more_own_primary_keys" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testOneFieldAsPrimaryKey()
@@ -81,8 +91,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "one_field_as_pk" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "one_field_as_pk" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testMoreFieldsAsPrimaryKeys()
@@ -93,8 +105,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "more_fields_as_pk" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL DEFAULT \'SUB\',"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "more_fields_as_pk" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL DEFAULT \'SUB\',"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testUnsupportedTypeOfPrimaryKeys()
@@ -142,8 +156,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'CREATE TABLE "table_with_foreign_keys" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT NOT NULL,"foreign_table_id" INTEGER NOT NULL,CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT);';
-        $this->assertEquals($expectedQuery, $queryCreator->createTable($table));
+        $expectedQueries = [
+            'CREATE TABLE "table_with_foreign_keys" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT NOT NULL,"foreign_table_id" INTEGER NOT NULL,CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT);'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testIndexesAndForeignKeys()
@@ -171,8 +187,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new Table('drop');
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQuery = 'DROP TABLE "drop"';
-        $this->assertEquals($expectedQuery, $queryCreator->dropTable($table));
+        $expectedQueries = [
+            'DROP TABLE "drop"'
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->dropTable($table));
     }
     
     public function testAlterTable()

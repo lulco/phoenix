@@ -29,7 +29,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     /**
      * generates create table query for mysql
      * @param Table $table
-     * @return array
+     * @return array list of queries
      */
     public function createTable(Table $table)
     {
@@ -69,7 +69,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     /**
      * generates drop table query for mysql
      * @param Table $table
-     * @return string
+     * @return array list of queries
      */
     public function dropTable(Table $table)
     {
@@ -83,7 +83,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     /**
      * generates alter table query for mysql
      * @param Table $table
-     * @return array
+     * @return array list of queries
      */
     public function alterTable(Table $table)
     {

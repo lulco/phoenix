@@ -239,7 +239,7 @@ abstract class AbstractMigration
     }
 
     /**
-     * generate create table query / queries
+     * generate create table queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */
     final protected function create()
@@ -251,17 +251,13 @@ abstract class AbstractMigration
         $this->tables[count($this->queries)] = $this->table;
         
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $query = $queryBuilder->createTable($this->table);
-        if (!is_array($query)) {
-            $query = [$query];
-        }
-        
-        $this->queries = array_merge($this->queries, $query);
+        $queries = $queryBuilder->createTable($this->table);
+        $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
     
     /**
-     * generates drop table query / queries
+     * generates drop table queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */
     protected function drop()
@@ -271,12 +267,8 @@ abstract class AbstractMigration
         }
         
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $query = $queryBuilder->dropTable($this->table);
-        if (!is_array($query)) {
-            $query = [$query];
-        }
-        
-        $this->queries = array_merge($this->queries, $query);
+        $queries = $queryBuilder->dropTable($this->table);
+        $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
     
@@ -334,9 +326,12 @@ abstract class AbstractMigration
         // own rollback for create table
         for ($i = $queriesExecuted; $i > 0; $i--) {
             $queryIndex = $i - 1;
-            if ($this->queries[$queryIndex] && isset($this->tables[$queryIndex])) {
-                $queryBuilder = $this->adapter->getQueryBuilder();
-                $query = $queryBuilder->dropTable($this->tables[$queryIndex]);
+            if (!($this->queries[$queryIndex] && isset($this->tables[$queryIndex]))) {
+                continue;
+            }
+            $queryBuilder = $this->adapter->getQueryBuilder();
+            $queries = $queryBuilder->dropTable($this->tables[$queryIndex]);
+            foreach ($queries as $query) {
                 $this->adapter->execute($query);
                 $this->executedQueries[] = $query;
             }

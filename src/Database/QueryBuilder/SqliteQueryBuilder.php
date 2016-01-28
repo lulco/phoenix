@@ -23,7 +23,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     /**
      * generates create table queries for sqlite
      * @param Table $table
-     * @return string|array string if one query is needed for create table, array if more queries are needed
+     * @return array list of queries
      */
     public function createTable(Table $table)
     {
@@ -38,13 +38,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         $query .= $this->createForeignKeys($table);
         $query .= ');';
         
-        if (empty($table->getIndexes())) {
-            return $query;
-        }
-        
-        $queries = [
-            $query,
-        ];
+        $queries = [$query];
         foreach ($table->getIndexes() as $index) {
             $queries[] = $this->createIndex($index, $table);
         }
@@ -54,16 +48,16 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     /**
      * generates drop table query for sqlite
      * @param Table $table
-     * @return string
+     * @return array list of queries
      */
     public function dropTable(Table $table)
     {
-        return 'DROP TABLE ' . $this->escapeString($table->getName());
+        return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
     
     /**
      * @param Table $table
-     * @return array
+     * @return array list of queries
      */
     public function alterTable(Table $table)
     {

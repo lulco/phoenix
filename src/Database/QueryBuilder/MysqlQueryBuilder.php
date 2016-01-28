@@ -32,7 +32,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
     /**
      * generates create table query for mysql
      * @param Table $table
-     * @return string
+     * @return array list of queries
      */
     public function createTable(Table $table)
     {
@@ -46,23 +46,23 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
-        return $query;
+        return [$query];
     }
     
     /**
      * generates drop table query for mysql
      * @param Table $table
-     * @return string
+     * @return array list of queries
      */
     public function dropTable(Table $table)
     {
-        return 'DROP TABLE ' . $this->escapeString($table->getName());
+        return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
     
     /**
      * generates alter table query for mysql
      * @param Table $table
-     * @return array
+     * @return array list of queries
      */
     public function alterTable(Table $table)
     {

@@ -8,13 +8,13 @@ interface QueryBuilderInterface
 {
     /**
      * @param Table $table
-     * @return string|array string if one query is needed for create table, array if more queries are needed
+     * @return array list of queries
      */
     public function createTable(Table $table);
 
     /**
      * @param Table $table
-     * @return string|array string if one query is needed for drop table, array if more queries are needed
+     * @return array list of queries
      */
     public function dropTable(Table $table);
     
