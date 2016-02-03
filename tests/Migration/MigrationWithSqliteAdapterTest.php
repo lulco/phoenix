@@ -148,7 +148,8 @@ class MigrationWithDummySqliteAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertContains('::commit', $migration->getExecutedQueries());
         $this->assertNotContains('::rollback', $migration->getExecutedQueries());
         $this->assertEquals('::start transaction', $migration->getExecutedQueries()[0]);
-        $this->assertEquals('::commit', array_pop($migration->getExecutedQueries()));
+        $executedQueries = $migration->getExecutedQueries();
+        $this->assertEquals('::commit', array_pop($executedQueries));
     }
     
     public function testRollback()

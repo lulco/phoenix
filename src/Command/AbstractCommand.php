@@ -81,6 +81,7 @@ abstract class AbstractCommand extends Command
             $executedMigrations = false;
             if (!($this instanceof InitCommand)) {
                 $init = new InitCommand();
+                $init->setConfig($this->config->getConfiguration());
                 $init->execute($input, $output);
             }
         }

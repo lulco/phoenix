@@ -26,6 +26,11 @@ class Config
         }
     }
     
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+    
     public function getMigrationDirs()
     {
         return $this->configuration['migration_dirs'];
