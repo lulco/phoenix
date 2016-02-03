@@ -41,6 +41,7 @@ abstract class AbstractCommand extends Command
     protected function configure()
     {
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED);
+        $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL);
     }
     
     /**
@@ -59,6 +60,11 @@ abstract class AbstractCommand extends Command
      */
     final protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($input->getOption('config')) {
+            $configuration = require $input->getOption('config');
+            $this->config = new Config($configuration);
+        }
+        
         if ($this->config === null) {
             $configuration = require __DIR__ . '/../../bin/config.php'; // TODO vymysliet ako sem dostat config array ked to bude napr. neon, yaml, php a ine
             $this->config = new Config($configuration);
