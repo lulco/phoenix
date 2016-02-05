@@ -121,7 +121,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
     
     private function createColumn(Column $column)
     {
-        $col = $this->createColumnName($column) . ' ' . $this->createType($column);
+        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         if ($column->getDefault() !== null) {
             $col .= ' DEFAULT ';
@@ -162,7 +162,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
-            $primaryKeys[] = $this->createColumnName($table->getColumn($name));
+            $primaryKeys[] = $this->escapeString($table->getColumn($name)->getName());
         }
         return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
@@ -217,11 +217,6 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         $fk .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
         $fk .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
         return $fk;
-    }
-    
-    private function createColumnName(Column $column)
-    {
-        return $this->escapeString($column->getName());
     }
     
     public function escapeString($string)

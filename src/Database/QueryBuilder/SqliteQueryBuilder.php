@@ -68,7 +68,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     
     private function createColumn(Column $column, Table $table)
     {
-        $col = $this->createColumnName($column) . ' ' . $this->createType($column);
+        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= $column->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         if ($column->getDefault() !== null && $column->getDefault() !== '') {
@@ -108,7 +108,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         foreach ($table->getPrimaryColumns() as $name) {
             $column = $table->getColumn($name);
             if (!$column->isAutoincrement()) {
-                $primaryKeys[] = $this->createColumnName($column);
+                $primaryKeys[] = $this->escapeString($column->getName());
             }
         }
         if (empty($primaryKeys)) {
@@ -121,7 +121,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
-            $columns[] = $this->createColumnName($table->getColumn($column));
+            $columns[] = $this->escapeString($table->getColumn($column)->getName());
         }
         $query = 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
         return $query;
@@ -137,7 +137,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         foreach ($table->getForeignKeys() as $foreignKey) {
             $columns = [];
             foreach ($foreignKey->getColumns() as $column) {
-                $columns[] = $this->createColumnName($table->getColumn($column));
+                $columns[] = $this->escapeString($table->getColumn($column)->getName());
             }
             $referencedColumns = [];
             foreach ($foreignKey->getReferencedColumns() as $column) {
@@ -150,11 +150,6 @@ class SqliteQueryBuilder implements QueryBuilderInterface
             $foreignKeys[] = $fk;
         }
         return ',' . implode(',', $foreignKeys);
-    }
-    
-    private function createColumnName(Column $column)
-    {
-        return $this->escapeString($column->getName());
     }
     
     public function escapeString($string)

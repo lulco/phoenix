@@ -138,7 +138,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     
     private function createColumn(Column $column, Table $table)
     {
-        $col = $this->createColumnName($column) . ' ' . $this->createType($column);
+        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         if ($column->getDefault() !== null || $column->isAutoincrement()) {
             $col .= ' DEFAULT ';
             if ($column->isAutoincrement()) {
@@ -178,7 +178,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
-            $primaryKeys[] = $this->createColumnName($table->getColumn($name));
+            $primaryKeys[] = $this->escapeString($table->getColumn($name)->getName());
         }
         return ',CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
@@ -220,11 +220,6 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         $fk .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
         $fk .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
         return $fk;
-    }
-    
-    private function createColumnName(Column $column)
-    {
-        return $this->escapeString($column->getName());
     }
     
     public function escapeString($string)
