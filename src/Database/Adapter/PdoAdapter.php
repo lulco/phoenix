@@ -8,6 +8,7 @@ use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 abstract class PdoAdapter implements AdapterInterface
 {
+    /** @var PDO */
     private $pdo;
     
     /** @var QueryBuilderInterface */

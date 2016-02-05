@@ -4,8 +4,10 @@ namespace Phoenix\Migration;
 
 class ClassNameCreator
 {
-    private $datetime = 0;
+    /** @var string */
+    private $datetime = '';
     
+    /** @var string */
     private $className;
     
     public function __construct($filepath)
@@ -17,12 +19,18 @@ class ClassNameCreator
         }
         $this->className = $this->findNamespace($filepath) . str_replace(' ', '', ucwords(str_replace('_', ' ', $migrationName)));  // TODO find real class name not create it from filename
     }
-    
+
+    /**
+     * @return string
+     */
     public function getClassName()
     {
         return $this->className;
     }
 
+    /**
+     * @return string
+     */
     public function getDatetime()
     {
         return $this->datetime;
