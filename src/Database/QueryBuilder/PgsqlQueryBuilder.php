@@ -2,15 +2,15 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Exception;
 use Phoenix\Database\Element\Column;
-use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 
 class PgsqlQueryBuilder implements QueryBuilderInterface
 {
-    private $typeMap = [
+    use CommonQueryBuilder;
+    
+    protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BOOLEAN => 'bool',
@@ -21,7 +21,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         Column::TYPE_CHAR => 'char(%d)',
     ];
     
-    private $defaultLength = [
+    protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
     ];
@@ -34,7 +34,6 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     public function createTable(Table $table)
     {
         $queries = [];
-        
         $primaryKeys = $table->getPrimaryColumns();
         $autoincrement = false;
         foreach ($primaryKeys as $primaryKey) {
@@ -48,17 +47,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
             $queries[] = 'CREATE SEQUENCE ' . $this->escapeString($table->getName() . '_seq') . ';';
         }
         
-        $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
-        $columns = [];
-        foreach ($table->getColumns() as $column) {
-            $columns[] = $this->createColumn($column, $table);
-        }
-        $query .= implode(',', $columns);
-        $query .= $this->createPrimaryKey($table);
-        $query .= $this->createForeignKeys($table);
-        $query .= ');';
-        $queries[] = $query;
-        
+        $queries[] = $this->createTableQuery($table);
         foreach ($table->getIndexes() as $index) {
             $queries[] = $this->createIndex($index, $table);
         }
@@ -77,7 +66,6 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
             'DROP TABLE ' . $this->escapeString($table->getName()),
             'DROP SEQUENCE IF EXISTS ' . $this->escapeString($table->getName() . '_seq'),
         ];
-        // TODO need to drop indexes ?
     }
     
     /**
@@ -89,13 +77,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
     {
         $queries = [];
         if (!empty($table->getIndexesToDrop())) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()). ' ';
-            $indexes = [];
-            foreach ($table->getIndexesToDrop() as $index) {
-                $indexes[] = 'DROP INDEX ' . $this->escapeString($index);
-            }
-            $query .= implode(',', $indexes) . ';';
-            $queries[] = $query;
+            $queries[] = $this->dropIndexes($table);
         }
         
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
@@ -103,13 +85,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         }
         
         if (!empty($table->getColumnsToDrop())) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
-            $columns = [];
-            foreach ($table->getColumnsToDrop() as $column) {
-                $columns[] = 'DROP COLUMN ' . $this->escapeString($column);
-            }
-            $query .= implode(',', $columns) . ';';
-            $queries[] = $query;
+            $queries[] = $this->dropColumns($table);
         }
         
         $columns = $table->getColumns();
@@ -157,19 +133,6 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         return $col;
     }
     
-    private function createType(Column $column)
-    {
-        return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
-    }
-    
-    private function remapType(Column $column)
-    {
-        if (!isset($this->typeMap[$column->getType()])) {
-            throw new Exception('Type "' . $column->getType() . '" is not allowed');
-        }
-        return $this->typeMap[$column->getType()];
-    }
-    
     private function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
@@ -190,36 +153,6 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
             $columns[] = $this->escapeString($column);
         }
         return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
-    }
-    
-    private function createForeignKeys(Table $table)
-    {
-        if (empty($table->getForeignKeys())) {
-            return '';
-        }
-        
-        $foreignKeys = [];
-        foreach ($table->getForeignKeys() as $foreignKey) {
-            $foreignKeys[] = $this->createForeignKey($foreignKey, $table);
-        }
-        return ',' . implode(',', $foreignKeys);
-    }
-    
-    private function createForeignKey(ForeignKey $foreignKey, Table $table)
-    {
-        $columns = [];
-        foreach ($foreignKey->getColumns() as $column) {
-            $columns[] = $this->escapeString($column);
-        }
-        $referencedColumns = [];
-        foreach ($foreignKey->getReferencedColumns() as $column) {
-            $referencedColumns[] = $this->escapeString($column);
-        }
-        $fk = 'CONSTRAINT ' . $this->escapeString($table->getName() . '_' . $foreignKey->getName());
-        $fk .= ' FOREIGN KEY (' . implode(',', $columns) . ')';
-        $fk .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
-        $fk .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
-        return $fk;
     }
     
     public function escapeString($string)

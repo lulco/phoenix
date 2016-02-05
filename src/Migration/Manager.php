@@ -82,7 +82,7 @@ class Manager
     
     public function executedMigrations()
     {
-        $migrations = $this->adapter->execute('SELECT * FROM `' . $this->config->getLogTableName() . '`')->fetchAll(PDO::FETCH_ASSOC);
+        $migrations = $this->adapter->execute('SELECT * FROM ' . $this->adapter->getQueryBuilder()->escapeString($this->config->getLogTableName()))->fetchAll(PDO::FETCH_ASSOC);
         $executedMigrations = [];
         foreach ($migrations as $migration) {
             $executedMigrations[$migration['migration_datetime'] . '|' . $migration['classname']] = $migration;
