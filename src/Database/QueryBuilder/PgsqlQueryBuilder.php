@@ -6,10 +6,8 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 
-class PgsqlQueryBuilder implements QueryBuilderInterface
+class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
-    use CommonQueryBuilder;
-    
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int4',
@@ -112,7 +110,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         return $queries;
     }
     
-    private function createColumn(Column $column, Table $table)
+    protected function createColumn(Column $column, Table $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         if ($column->getDefault() !== null || $column->isAutoincrement()) {
@@ -133,7 +131,7 @@ class PgsqlQueryBuilder implements QueryBuilderInterface
         return $col;
     }
     
-    private function createPrimaryKey(Table $table)
+    protected function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
             return '';

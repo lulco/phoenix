@@ -6,10 +6,8 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 
-class SqliteQueryBuilder implements QueryBuilderInterface
+class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
-    use CommonQueryBuilder;
-    
     protected $typeMap = [
         Column::TYPE_STRING => 'TEXT',
         Column::TYPE_INTEGER => 'INTEGER',
@@ -57,7 +55,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         return $queries;
     }
     
-    private function createColumn(Column $column, Table $table)
+    protected function createColumn(Column $column, Table $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= $column->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
@@ -75,7 +73,7 @@ class SqliteQueryBuilder implements QueryBuilderInterface
         return $col;
     }
     
-    private function createPrimaryKey(Table $table)
+    protected function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
             return '';

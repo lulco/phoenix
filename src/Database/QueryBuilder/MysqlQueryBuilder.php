@@ -6,10 +6,8 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 
-class MysqlQueryBuilder implements QueryBuilderInterface
+class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
-    use CommonQueryBuilder;
-    
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int(%d)',
@@ -39,7 +37,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
         foreach ($table->getColumns() as $column) {
-            $columns[] = $this->createColumn($column);
+            $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
         $query .= $this->createPrimaryKey($table);
@@ -85,7 +83,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
             foreach ($columns as $column) {
-                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column);
+                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
             }
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
@@ -95,7 +93,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];
             foreach ($table->getIndexes() as $index) {
-                $indexes[] = 'ADD ' . $this->createIndex($index, $table);
+                $indexes[] = 'ADD ' . $this->createIndex($index);
             }
             $query .= implode(',', $indexes) . ';';
             $queries[] = $query;
@@ -107,7 +105,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $queries;
     }
     
-    private function createColumn(Column $column)
+    protected function createColumn(Column $column, Table $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= $column->allowNull() ? '' : ' NOT NULL';
@@ -128,7 +126,7 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         return $col;
     }
     
-    private function createPrimaryKey(Table $table)
+    protected function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
             return '';
@@ -149,12 +147,12 @@ class MysqlQueryBuilder implements QueryBuilderInterface
         
         $indexes = [];
         foreach ($table->getIndexes() as $index) {
-            $indexes[] = $this->createIndex($index, $table);
+            $indexes[] = $this->createIndex($index);
         }
         return ',' . implode(',', $indexes);
     }
     
-    private function createIndex(Index $index, Table $table)
+    private function createIndex(Index $index)
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {

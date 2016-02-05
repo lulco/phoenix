@@ -7,9 +7,13 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Table;
 
-trait CommonQueryBuilder
+abstract class CommonQueryBuilder
 {
-    private function createType(Column $column)
+    protected $typeMap = [];
+    
+    protected $defaultLength = [];
+    
+    protected function createType(Column $column)
     {
         return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
@@ -22,7 +26,7 @@ trait CommonQueryBuilder
         return $this->typeMap[$column->getType()];
     }
     
-    private function createTableQuery(Table $table)
+    protected function createTableQuery(Table $table)
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
@@ -36,7 +40,7 @@ trait CommonQueryBuilder
         return $query;
     }
     
-    private function dropIndexes(Table $table)
+    protected function dropIndexes(Table $table)
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $indexes = [];
@@ -47,7 +51,7 @@ trait CommonQueryBuilder
         return $query;
     }
     
-    private function dropColumns(Table $table)
+    protected function dropColumns(Table $table)
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columns = [];
@@ -58,7 +62,7 @@ trait CommonQueryBuilder
         return $query;
     }
     
-    private function createForeignKeys(Table $table)
+    protected function createForeignKeys(Table $table)
     {
         if (empty($table->getForeignKeys())) {
             return '';
@@ -71,7 +75,7 @@ trait CommonQueryBuilder
         return ',' . implode(',', $foreignKeys);
     }
     
-    private function createForeignKey(ForeignKey $foreignKey, Table $table)
+    protected function createForeignKey(ForeignKey $foreignKey, Table $table)
     {
         $columns = [];
         foreach ($foreignKey->getColumns() as $column) {
@@ -81,10 +85,16 @@ trait CommonQueryBuilder
         foreach ($foreignKey->getReferencedColumns() as $column) {
             $referencedColumns[] = $this->escapeString($column);
         }
-        $fk = 'CONSTRAINT ' . $this->escapeString($table->getName() . '_' . $foreignKey->getName());
-        $fk .= ' FOREIGN KEY (' . implode(',', $columns) . ')';
-        $fk .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
-        $fk .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
-        return $fk;
+        $constraint = 'CONSTRAINT ' . $this->escapeString($table->getName() . '_' . $foreignKey->getName());
+        $constraint .= ' FOREIGN KEY (' . implode(',', $columns) . ')';
+        $constraint .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
+        $constraint .= ' ON DELETE ' . $foreignKey->getOnDelete() . ' ON UPDATE ' . $foreignKey->getOnUpdate();
+        return $constraint;
     }
+    
+    abstract public function escapeString($string);
+    
+    abstract protected function createColumn(Column $column, Table $table);
+    
+    abstract protected function createPrimaryKey(Table $table);
 }
