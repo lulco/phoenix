@@ -20,6 +20,12 @@ interface QueryBuilderInterface
     
     /**
      * @param Table $table
+     * @param string $newTableName
+     */
+    public function renameTable(Table $table, $newTableName);
+    
+    /**
+     * @param Table $table
      * @return array list of queries
      */
     public function alterTable(Table $table);

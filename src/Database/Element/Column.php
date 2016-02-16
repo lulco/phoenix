@@ -12,6 +12,7 @@ class Column
     const TYPE_UUID = 'uuid';
     const TYPE_JSON = 'json';
     const TYPE_CHAR = 'char';
+    const TYPE_DECIMAL = 'decimal';
     
     private $name;
     
@@ -109,11 +110,12 @@ class Column
     }
 
     /**
+     * @param integer $default
      * @return int|null
      */
-    public function getDecimals()
+    public function getDecimals($default = null)
     {
-        return $this->decimals;
+        return $this->decimals ?: $default;
     }
     
     /**

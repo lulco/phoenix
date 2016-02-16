@@ -273,6 +273,23 @@ abstract class AbstractMigration
     }
     
     /**
+     * generates rename table queries
+     * @param string $newTableName
+     * @throws IncorrectMethodUsageException
+     */
+    protected function rename($newTableName)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
+        }
+        
+        $queryBuilder = $this->adapter->getQueryBuilder();
+        $queries = $queryBuilder->renameTable($this->table, $newTableName);
+        $this->queries = array_merge($this->queries, $queries);
+        $this->table = null;
+    }
+    
+    /**
      * generates alter table query / queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */

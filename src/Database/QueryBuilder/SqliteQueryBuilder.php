@@ -45,6 +45,17 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     }
     
     /**
+     * generates rename table queries for sqlite
+     * @param Table $table
+     * @param string $newTableName
+     * @return array list of queries
+     */
+    public function renameTable(Table $table, $newTableName)
+    {
+        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
+    }
+    
+    /**
      * @param Table $table
      * @return array list of queries
      */

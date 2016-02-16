@@ -15,6 +15,13 @@ abstract class CommonQueryBuilder
     
     protected function createType(Column $column)
     {
+        if ($column->getType() == Column::TYPE_DECIMAL) {
+            return sprintf(
+                $this->remapType($column),
+                $column->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),
+                $column->getDecimals(isset($this->defaultLength[$column->getType()][1]) ? $this->defaultLength[$column->getType()][1] : null)
+            );
+        }
         return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
     

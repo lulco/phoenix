@@ -25,7 +25,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     ];
     
     /**
-     * generates create table query for mysql
+     * generates create table query for pgsql
      * @param Table $table
      * @return array list of queries
      */
@@ -54,7 +54,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     }
     
     /**
-     * generates drop table query for mysql
+     * generates drop table query for pgsql
      * @param Table $table
      * @return array list of queries
      */
@@ -67,7 +67,18 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     }
     
     /**
-     * generates alter table query for mysql
+     * generates rename table queries for pgsql
+     * @param Table $table
+     * @param string $newTableName
+     * @return array list of queries
+     */
+    public function renameTable(Table $table, $newTableName)
+    {
+        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
+    }
+    
+    /**
+     * generates alter table query for pgsql
      * @param Table $table
      * @return array list of queries
      */

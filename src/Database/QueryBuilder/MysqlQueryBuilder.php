@@ -17,6 +17,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_UUID => 'varchar(%d)',
         Column::TYPE_JSON => 'text',
         Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
     ];
     
     protected $defaultLength = [
@@ -25,6 +26,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_BOOLEAN => 1,
         Column::TYPE_UUID => 36,
         Column::TYPE_CHAR => 255,
+        Column::TYPE_DECIMAL => [10, 0],
     ];
     
     /**
@@ -55,6 +57,17 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function dropTable(Table $table)
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
+    }
+    
+    /**
+     * generates rename table queries for mysql
+     * @param Table $table
+     * @param string $newTableName
+     * @return array list of queries
+     */
+    public function renameTable(Table $table, $newTableName)
+    {
+        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($newTableName) . ';'];
     }
     
     /**
@@ -108,6 +121,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function createColumn(Column $column, Table $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
+        $col .= (!$column->isSigned()) ? ' unsigned' : '';
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         if ($column->getDefault() !== null) {
             $col .= ' DEFAULT ';
