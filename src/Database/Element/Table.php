@@ -37,7 +37,7 @@ class Table
     {
         $this->name = $name;
         if ($primaryColumn === true) {
-            $primaryColumn = new Column('id', 'integer', false, null, null, null, true, true);
+            $primaryColumn = new Column('id', 'integer', ['autoincrement' => true]);
         }
         
         if ($primaryColumn) {
@@ -76,29 +76,14 @@ class Table
     {
         return $this->name;
     }
-    
+
     /**
-     * @param string $name name of column
-     * @param string $type type of column
-     * @param boolean $allowNull default false
-     * @param mixed $default default null
-     * @param int|null $length length of column, null if you want use default length by column type
-     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
-     * @param boolean $signed default true
-     * @param boolean $autoincrement default false
+     * @param Column $column
      * @return Table
      */
-    public function addColumn(
-        $name,
-        $type,
-        $allowNull = false,
-        $default = null,
-        $length = null,
-        $decimals = null,
-        $signed = true,
-        $autoincrement = false
-    ) {
-        $this->columns[$name] = new Column($name, $type, $allowNull, $default, $length, $decimals, $signed, $autoincrement);
+    public function addColumn(Column $column)
+    {
+        $this->columns[$column->getName()] = $column;
         return $this;
     }
     
