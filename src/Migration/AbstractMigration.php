@@ -224,7 +224,8 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
         }
-        $this->table->addIndex($columns, $type, $method);
+        
+        $this->table->addIndex(new Index($columns, $type, $method));
         return $this;
     }
     

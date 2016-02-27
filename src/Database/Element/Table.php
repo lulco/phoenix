@@ -135,14 +135,12 @@ class Table
     }
     
     /**
-     * @param string|array $columns name(s) of column(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
+     * @param Index $index
      * @return Table
      */
-    public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
+    public function addIndex(Index $index)
     {
-        $this->indexes[] = new Index($columns, $type, $method);
+        $this->indexes[] = $index;
         return $this;
     }
     

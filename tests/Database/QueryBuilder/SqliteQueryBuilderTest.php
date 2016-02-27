@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use PHPUnit_Framework_TestCase;
@@ -135,8 +136,8 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
@@ -171,8 +172,8 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting', '', 'btree'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', '', 'btree')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [

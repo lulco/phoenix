@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use PHPUnit_Framework_TestCase;
 
@@ -56,9 +57,9 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testAddIndex()
     {
         $table = new Table('test');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('title', 'unique'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias']));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['bodytext', 'fulltext']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext', 'fulltext'])));
     }
     
     public function testGetters()
@@ -75,9 +76,9 @@ class TableTest extends PHPUnit_Framework_TestCase
         }
         $this->assertInstanceOf('\Phoenix\Database\Element\Column', $table->getColumn('title'));
         
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('title', 'unique'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias']));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['bodytext', 'fulltext']));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext', 'fulltext'])));
         
         $indexes = $table->getIndexes();
         $this->assertCount(3, $indexes);
