@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
@@ -154,7 +155,7 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
@@ -171,7 +172,7 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', '', 'btree')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         

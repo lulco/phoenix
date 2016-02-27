@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
@@ -153,7 +154,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table')));
         
         $queryCreator = new MysqlQueryBuilder();
         $expectedQueries = [
@@ -170,7 +171,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', '', 'btree')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('bodytext', 'fulltext', 'hash')));
@@ -232,7 +233,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_key_id', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_key_id', 'referenced_table')));
         
         $queryCreator = new MysqlQueryBuilder();
         $expectedQueries = [
@@ -255,7 +256,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropColumn('title'));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropIndex('alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_key_id', 'referenced_table')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropForeignKey('foreign_key_to_drop_id'));
         
         $queryCreator = new MysqlQueryBuilder();
@@ -277,7 +278,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropColumn('title'));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->dropIndex('alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_key_id', 'referenced_table')));
                 
         $queryCreator = new MysqlQueryBuilder();
         $expectedQueries = [

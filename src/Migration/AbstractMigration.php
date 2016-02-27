@@ -257,7 +257,7 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
         }
-        $this->table->addForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
         return $this;
     }
     
