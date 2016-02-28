@@ -4,14 +4,15 @@ namespace Phoenix\Tests\Migration;
 
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Mock\Database\Adapter\DummyMysqlAdapter;
-use Phoenix\Tests\Mock\Migration\AlterTableMigration;
 use Phoenix\Tests\Mock\Migration\AddColumnAndAddIndexExceptionsMigration;
 use Phoenix\Tests\Mock\Migration\AddForeignKeyAndAddForeignKeyExceptionsMigration;
+use Phoenix\Tests\Mock\Migration\AlterTableMigration;
 use Phoenix\Tests\Mock\Migration\CreateAndDropExceptionsMigration;
 use Phoenix\Tests\Mock\Migration\CreateAndDropTableMigration;
 use Phoenix\Tests\Mock\Migration\DoubleUseOfTableExceptionMigration;
 use Phoenix\Tests\Mock\Migration\DropColumnAndDropForeignKeyExceptionsMigration;
 use Phoenix\Tests\Mock\Migration\DropIndexAndSaveExceptionsMigration;
+use Phoenix\Tests\Mock\Migration\RenameTableAndChangeColumnsMigration;
 use Phoenix\Tests\Mock\Migration\SimpleQueriesMigration;
 use Phoenix\Tests\Mock\Migration\UseTransactionMigration;
 use PHPUnit_Framework_TestCase;
@@ -226,6 +227,29 @@ class MigrationWithDummyMysqlAdapterTest extends PHPUnit_Framework_TestCase
         
         $adapter = new DummyMysqlAdapter();
         $migration = new AlterTableMigration($adapter);
+        $result = $migration->rollback();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
+    }
+    
+    public function testRenameTableAndChangeColumns()
+    {
+        $adapter = new DummyMysqlAdapter();
+        $migration = new RenameTableAndChangeColumnsMigration($adapter);
+        $result = $migration->migrate();
+        $this->assertTrue(is_array($result));
+        foreach ($result as $one) {
+            $this->assertTrue(is_string($one));
+            $this->assertTrue(strpos($one, 'Query') === 0);
+            $this->assertEquals(substr($one, -8, 8), 'executed');
+        }
+        
+        $adapter = new DummyMysqlAdapter();
+        $migration = new RenameTableAndChangeColumnsMigration($adapter);
         $result = $migration->rollback();
         $this->assertTrue(is_array($result));
         foreach ($result as $one) {

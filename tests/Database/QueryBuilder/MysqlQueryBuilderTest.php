@@ -289,4 +289,30 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }
+    
+    public function testChangeColumn()
+    {
+        $table = new Table('with_columns_to_change');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `with_columns_to_change` CHANGE COLUMN `old_name` `new_name` int(11) NOT NULL,CHANGE COLUMN `no_name_change` `no_name_change` int(11) NOT NULL;',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+    }
+    
+    public function testChangeAddedColumn()
+    {
+        $table = new Table('with_change_added_column');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('old_name', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'string')));
+        
+        $queryCreator = new MysqlQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE `with_change_added_column` ADD COLUMN `new_name` varchar(255) NOT NULL;',
+        ];
+        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+    }
 }

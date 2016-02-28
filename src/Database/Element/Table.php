@@ -23,6 +23,8 @@ class Table
     
     private $indexesToDrop = [];
     
+    private $columnsToChange = [];
+    
     /**
      * @param string $name
      * @param mixed $primaryColumn
@@ -141,6 +143,30 @@ class Table
         return $this->columnsToDrop;
     }
     
+    /**
+     * @param string $oldName
+     * @param Column $newColumn
+     * @return Table
+     */
+    public function changeColumn($oldName, Column $newColumn)
+    {
+        if (isset($this->columns[$oldName])) {
+            $this->columns[$oldName] = $newColumn;
+            return $this;
+        }
+        
+        $this->columnsToChange[$oldName] = $newColumn;
+        return $this;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getColumnsToChange()
+    {
+        return $this->columnsToChange;
+    }
+        
     /**
      * @return array
      */

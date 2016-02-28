@@ -102,6 +102,16 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $query;
         }
         
+        if ($table->getColumnsToChange()) {
+            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+            $columnList = [];
+            foreach ($table->getColumnsToChange() as $oldName => $column) {
+                $columnList[] = 'CHANGE COLUMN ' . $this->escapeString($oldName) . ' ' . $this->createColumn($column, $table);
+            }
+            $query .= implode(',', $columnList) . ';';
+            $queries[] = $query;
+        }
+        
         if (!empty($table->getIndexes())) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];
