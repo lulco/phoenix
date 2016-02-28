@@ -2,14 +2,22 @@
 
 namespace Phoenix\Migration;
 
+use InvalidArgumentException;
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\IncorrectMethodUsageException;
 use ReflectionClass;
+use RuntimeException;
 
+/**
+ * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false, mixed $default=null) @throws IncorrectMethodUsageException
+ * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column 'null', 'default') @throws IncorrectMethodUsageException
+ * @method AbstractMigration addColumn(Column $column)
+ */
 abstract class AbstractMigration
 {
     /** @var string */
@@ -133,32 +141,60 @@ abstract class AbstractMigration
         return $this;
     }
     
-    /**
-     * @param string $name name of column
-     * @param string $type type of column
-     * @param boolean $allowNull default false
-     * @param mixed $default default null
-     * @param int|null $length length of column, null if you want use default length by column type
-     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
-     * @param boolean $signed default true
-     * @param boolean $autoincrement default false
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function addColumn(
-        $name,
-        $type,
-        $allowNull = false,
-        $default = null,
-        $length = null,
-        $decimals = null,
-        $signed = true,
-        $autoincrement = false
-    ) {
+    public function __call($name, $arguments)
+    {
+        if ($name == 'addColumn') {
+            return $this->_addColumn($arguments);
+        }
+        throw new RuntimeException('Method "' . $name . '" not found');
+    }
+    
+    private function _addColumn($arguments)
+    {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addColumn(). Use method table() first.');
         }
-        $this->table->addColumn($name, $type, $allowNull, $default, $length, $decimals, $signed, $autoincrement);
+        
+        if (count($arguments) > 4) {
+            throw new InvalidArgumentException('Too many arguments');
+        }
+        
+        if ($arguments[0] instanceof Column) {
+            return $this->addPreparedColumn($arguments[0]);
+        }
+        
+        if (count($arguments) == 3 && is_array($arguments[2])) {
+            return $this->addComplexColumn($arguments[0], $arguments[1], $arguments[2]);
+        }
+        
+        return $this->addSimpleColumn(
+            $arguments[0],
+            $arguments[1],
+            isset($arguments[2]) ? $arguments[2] : false,
+            isset($arguments[3]) ? $arguments[3] : null
+        );
+    }
+    
+    private function addSimpleColumn(
+        $name,
+        $type,
+        $allowNull = false,
+        $default = null
+    ) {
+        $column = new Column($name, $type, ['null' => $allowNull, 'default' => $default]);
+        $this->addPreparedColumn($column);
+        return $this;
+    }
+    
+    private function addComplexColumn($name, $type, $settings = [])
+    {
+        $column = new Column($name, $type, $settings);
+        return $this->addPreparedColumn($column);
+    }
+    
+    private function addPreparedColumn(Column $column)
+    {
+        $this->table->addColumn($column);
         return $this;
     }
     
@@ -188,7 +224,8 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
         }
-        $this->table->addIndex($columns, $type, $method);
+        
+        $this->table->addIndex(new Index($columns, $type, $method));
         return $this;
     }
     
@@ -220,7 +257,7 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
         }
-        $this->table->addForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
         return $this;
     }
     

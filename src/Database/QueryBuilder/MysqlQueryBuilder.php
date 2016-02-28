@@ -146,6 +146,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $col .= ' DEFAULT NULL';
         }
         
+        if ($column->getAfter()) {
+            $col .= ' AFTER ' . $this->escapeString($column->getAfter());
+        } elseif ($column->isFirst()) {
+            $col .= ' FIRST';
+        }
+        
         $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }

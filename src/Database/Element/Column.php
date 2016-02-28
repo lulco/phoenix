@@ -30,34 +30,29 @@ class Column
     
     private $autoincrement;
     
+    private $after;
+    
+    private $first;
+    
     /**
      * @param string $name name of column
      * @param string $type type of column
-     * @param boolean $allowNull default false
-     * @param mixed $default default null
-     * @param int|null $length length of column, null if you want use default length by column type
-     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
-     * @param boolean $signed default true
-     * @param boolean $autoincrement default false
+     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first
      */
-    public function __construct(
-        $name,
-        $type,
-        $allowNull = false,
-        $default = null,
-        $length = null,
-        $decimals = null,
-        $signed = true,
-        $autoincrement = false
-    ) {
+    public function __construct($name, $type, array $settings = [])
+    {
+        // TODO check allowed settings
+        
         $this->name = $name;
         $this->type = $type;
-        $this->allowNull = $allowNull;
-        $this->default = $default;
-        $this->length = $length;
-        $this->decimals = $decimals;
-        $this->signed = $signed;
-        $this->autoincrement = $autoincrement;
+        $this->allowNull = isset($settings['null']) ? $settings['null']: false;
+        $this->default = isset($settings['default']) ? $settings['default'] : null;
+        $this->length = isset($settings['length']) ? $settings['length'] : null;
+        $this->decimals = isset($settings['decimals']) ? $settings['decimals'] : null;
+        $this->signed = isset($settings['signed']) ? $settings['signed'] : true;
+        $this->autoincrement = isset($settings['autoincrement']) ? $settings['autoincrement'] : false;
+        $this->after = isset($settings['after']) ? $settings['after'] : null;
+        $this->first = isset($settings['first']) ? $settings['first'] : false;
     }
     
     /**
@@ -124,5 +119,21 @@ class Column
     public function isAutoincrement()
     {
         return $this->autoincrement;
+    }
+    
+    /**
+     * @return string|null
+     */
+    public function getAfter()
+    {
+        return $this->after;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function isFirst()
+    {
+        return $this->first;
     }
 }
