@@ -14,7 +14,7 @@ use ReflectionClass;
 use RuntimeException;
 
 /**
- * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column, int|null $length length of column, int|null $decimals number of decimals in decimal/float/double column, boolean $signed signed column, boolean $autoincrement autoincrement column) Adds column to the table @throws IncorrectMethodUsageException
+ * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column, int|null $length=null length of column, int|null $decimals=null number of decimals in decimal/float/double column, boolean $signed=true signed column, boolean $autoincrement=false autoincrement column) Adds column to the table @throws IncorrectMethodUsageException @deprecated since version 1.0.0
  * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table @throws IncorrectMethodUsageException
  * @method AbstractMigration addColumn(Column $column column definition) Adds column to the table - @throws IncorrectMethodUsageException
  * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column) Changes column in the table to new one @throws IncorrectMethodUsageException
@@ -166,9 +166,9 @@ abstract class AbstractMigration
             throw new IncorrectMethodUsageException('Wrong use of method addColumn(). Use method table() first.');
         }
         
-//        if (count($arguments) > 4) {
-//            throw new InvalidArgumentException('Too many arguments');
-//        }
+        if (count($arguments) > 4) {
+            echo 'Method addColumn(string $name, string $type, boolean $allowNull = false, mixed $default = null, int|null $length = null, int|null $decimals = null, boolean $signed = true, boolean $autoincrement = false) will be deprecated in version 1.0.0' . "\n";
+        }
         
         if ($arguments[0] instanceof Column) {
             return $this->addPreparedColumn($arguments[0]);
@@ -182,7 +182,11 @@ abstract class AbstractMigration
             $arguments[0],
             $arguments[1],
             isset($arguments[2]) ? $arguments[2] : false,
-            isset($arguments[3]) ? $arguments[3] : null
+            isset($arguments[3]) ? $arguments[3] : null,
+            isset($arguments[4]) ? $arguments[4] : null,
+            isset($arguments[5]) ? $arguments[5] : null,
+            isset($arguments[6]) ? $arguments[6] : true,
+            isset($arguments[7]) ? $arguments[7] : false
         );
     }
     

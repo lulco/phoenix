@@ -283,7 +283,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
                 
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
-            'ALTER TABLE "all_in_one_mixed" DROP INDEX "alias";',
+            'DROP INDEX "all_in_one_mixed_alias";',
             'ALTER TABLE "all_in_one_mixed" DROP CONSTRAINT "all_in_one_mixed_foreign_key_to_drop_id";',
             'ALTER TABLE "all_in_one_mixed" DROP COLUMN "title";',
             'ALTER TABLE "all_in_one_mixed" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
