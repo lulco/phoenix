@@ -119,17 +119,6 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new Table('more_fields_as_pk', ['identifier', false]);
     }
     
-    public function testUnkownColumnAsPrimaryKey()
-    {
-        $table = new Table('unknown_primary_key', 'unknown');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
-        
-        $queryCreator = new SqliteQueryBuilder();
-        $this->setExpectedException('\Exception', 'Column "unknown" not found');
-        $queryCreator->createTable($table);
-    }
-    
     public function testIndexes()
     {
         $table = new Table('table_with_indexes');
@@ -203,7 +192,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQueries = [];
+        $expectedQueries = [
+            'ALTER TABLE "add_columns" ADD COLUMN "title" TEXT NOT NULL,ADD COLUMN "alias" TEXT NOT NULL;',
+        ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }
 }

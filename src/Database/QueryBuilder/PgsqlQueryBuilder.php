@@ -17,11 +17,13 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
     ];
     
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
+        Column::TYPE_DECIMAL => [10, 0],
     ];
     
     /**
@@ -162,6 +164,17 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $columns[] = $this->escapeString($column);
         }
         return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
+    }
+    
+    protected function dropIndexes(Table $table)
+    {
+        $query = 'DROP INDEX ';
+        $indexes = [];
+        foreach ($table->getIndexesToDrop() as $index) {
+            $indexes[] = $this->escapeString($table->getName() . '_' . $index);
+        }
+        $query .= implode(',', $indexes) . ';';
+        return $query;
     }
     
     public function escapeString($string)

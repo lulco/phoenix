@@ -25,6 +25,8 @@ class Table
     
     private $columnsToChange = [];
     
+    private $dropPrimaryKey = false;
+    
     /**
      * @param string $name
      * @param mixed $primaryColumn
@@ -58,12 +60,12 @@ class Table
     public function addPrimary($primaryColumn)
     {
         if ($primaryColumn instanceof Column) {
-            $this->columns[$primaryColumn->getName()] = $primaryColumn;
-            $this->primaryColumns[] = $primaryColumn->getName();
+            $this->columns = array_merge([$primaryColumn->getName() => $primaryColumn], $this->columns);
+            $this->primaryColumns = array_merge([$primaryColumn->getName() => $primaryColumn->getName()], $this->primaryColumns);
         } elseif (is_string($primaryColumn)) {
-            $this->primaryColumns[] = $primaryColumn;
+            $this->primaryColumns = array_merge([$primaryColumn => $primaryColumn], $this->primaryColumns);
         } elseif (is_array($primaryColumn)) {
-            foreach ($primaryColumn as $column) {
+            foreach (array_reverse($primaryColumn) as $column) {
                 $this->addPrimary($column);
             }
         } else {
@@ -219,6 +221,7 @@ class Table
     
     /**
      * @param string|array $columns
+     * @return Table
      */
     public function dropForeignKey($columns)
     {
@@ -235,5 +238,22 @@ class Table
     public function getForeignKeysToDrop()
     {
         return $this->foreignKeysToDrop;
+    }
+    
+    /**
+     * @return Table
+     */
+    public function dropPrimaryKey()
+    {
+        $this->dropPrimaryKey = true;
+        return $this;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function getPrimaryKeyToDrop()
+    {
+        return $this->dropPrimaryKey;
     }
 }

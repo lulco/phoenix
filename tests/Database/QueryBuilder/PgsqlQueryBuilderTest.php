@@ -121,17 +121,6 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new Table('more_fields_as_pk', ['identifier', false]);
     }
     
-    public function testUnkownColumnAsPrimaryKey()
-    {
-        $table = new Table('unknown_primary_key', 'unknown');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
-        
-        $queryCreator = new PgsqlQueryBuilder();
-        $this->setExpectedException('\Exception', 'Column "unknown" not found');
-        $queryCreator->createTable($table);
-    }
-    
     public function testIndexes()
     {
         $table = new Table('table_with_indexes');
@@ -273,7 +262,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
-            'ALTER TABLE "all_in_one" DROP INDEX "alias";',
+            'DROP INDEX "all_in_one_alias";',
             'ALTER TABLE "all_in_one" DROP CONSTRAINT "all_in_one_foreign_key_to_drop_id";',
             'ALTER TABLE "all_in_one" DROP COLUMN "title";',
             'ALTER TABLE "all_in_one" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',

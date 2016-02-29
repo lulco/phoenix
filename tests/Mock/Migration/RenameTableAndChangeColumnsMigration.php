@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Mock\Migration;
 
+use Phoenix\Database\Element\Column;
 use Phoenix\Migration\AbstractMigration;
 
 class RenameTableAndChangeColumnsMigration extends AbstractMigration
@@ -19,12 +20,12 @@ class RenameTableAndChangeColumnsMigration extends AbstractMigration
     {
         $this->table('test_table')
             ->changeColumn('title', 'new_title', 'string')
-            ->changeColumn('alias', new \Phoenix\Database\Element\Column('alias', 'string'))
+            ->changeColumn('alias', new Column('alias', 'string'))
             ->save();
         
         $this->table('test_table')
             ->changeColumn('new_title', 'title', 'string')
-            ->changeColumn('alias', new \Phoenix\Database\Element\Column('alias', 'string'))
+            ->changeColumn('alias', new Column('alias', 'string'))
             ->save();
     }
 }
