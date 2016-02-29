@@ -37,7 +37,7 @@ class Table
     {
         $this->name = $name;
         if ($primaryColumn === true) {
-            $primaryColumn = new Column('id', 'integer', false, null, null, null, true, true);
+            $primaryColumn = new Column('id', 'integer', ['autoincrement' => true]);
         }
         
         if ($primaryColumn) {
@@ -76,29 +76,14 @@ class Table
     {
         return $this->name;
     }
-    
+
     /**
-     * @param string $name name of column
-     * @param string $type type of column
-     * @param boolean $allowNull default false
-     * @param mixed $default default null
-     * @param int|null $length length of column, null if you want use default length by column type
-     * @param int|null $decimals number of decimals in numeric types (float, double, decimal etc.)
-     * @param boolean $signed default true
-     * @param boolean $autoincrement default false
+     * @param Column $column
      * @return Table
      */
-    public function addColumn(
-        $name,
-        $type,
-        $allowNull = false,
-        $default = null,
-        $length = null,
-        $decimals = null,
-        $signed = true,
-        $autoincrement = false
-    ) {
-        $this->columns[$name] = new Column($name, $type, $allowNull, $default, $length, $decimals, $signed, $autoincrement);
+    public function addColumn(Column $column)
+    {
+        $this->columns[$column->getName()] = $column;
         return $this;
     }
     
@@ -150,14 +135,12 @@ class Table
     }
     
     /**
-     * @param string|array $columns name(s) of column(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
+     * @param Index $index
      * @return Table
      */
-    public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
+    public function addIndex(Index $index)
     {
-        $this->indexes[] = new Index($columns, $type, $method);
+        $this->indexes[] = $index;
         return $this;
     }
     
@@ -191,16 +174,12 @@ class Table
     }
     
     /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
+     * @param ForeignKey $foreignKey
      * @return Table
      */
-    public function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+    public function addForeignKey(ForeignKey $foreignKey)
     {
-        $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        $this->foreignKeys[] = $foreignKey;
         return $this;
     }
     
