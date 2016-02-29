@@ -9,14 +9,21 @@ use Phoenix\Database\Element\Table;
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
     protected $typeMap = [
-        Column::TYPE_STRING => 'TEXT',
-        Column::TYPE_INTEGER => 'INTEGER',
-        Column::TYPE_BOOLEAN => 'INTEGER',
-        Column::TYPE_TEXT => 'TEXT',
-        Column::TYPE_DATETIME => 'TEXT',
-        Column::TYPE_UUID => 'INTEGER',
-        Column::TYPE_JSON => 'TEXT',
-        Column::TYPE_CHAR => 'TEXT',
+        Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_INTEGER => 'integer',
+        Column::TYPE_BOOLEAN => 'boolean',
+        Column::TYPE_TEXT => 'text',
+        Column::TYPE_DATETIME => 'datetime',
+        Column::TYPE_UUID => 'char(36)',
+        Column::TYPE_JSON => 'text',
+        Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+    ];
+    
+    protected $defaultLength = [
+        Column::TYPE_STRING => 255,
+        Column::TYPE_CHAR => 255,
+        Column::TYPE_DECIMAL => [10, 0],
     ];
     
     /**
@@ -62,7 +69,19 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function alterTable(Table $table)
     {
         $queries = [];
-        // TODO alter table for sqlite
+        
+        $columns = $table->getColumns();
+        unset($columns['id']);
+        if (!empty($columns)) {
+            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+            $columnList = [];
+            foreach ($columns as $column) {
+                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
+            }
+            $query .= implode(',', $columnList) . ';';
+            $queries[] = $query;
+        }
+        
         return $queries;
     }
     

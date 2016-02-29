@@ -11,10 +11,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int(%d)',
-        Column::TYPE_BOOLEAN => 'int(%d)',
+        Column::TYPE_BOOLEAN => 'int(1)',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATETIME => 'datetime',
-        Column::TYPE_UUID => 'varchar(%d)',
+        Column::TYPE_UUID => 'char(36)',
         Column::TYPE_JSON => 'text',
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
@@ -23,8 +23,6 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_INTEGER => 11,
-        Column::TYPE_BOOLEAN => 1,
-        Column::TYPE_UUID => 36,
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
     ];
@@ -42,7 +40,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
-        $query .= $this->createPrimaryKey($table);
+        $query .= !empty($table->getPrimaryColumns()) ? ',' . $this->createPrimaryKey($table) : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
@@ -82,6 +80,20 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $this->dropIndexes($table);
         }
         
+        if ($table->getColumnsToChange()) {
+            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+            $columnList = [];
+            foreach ($table->getColumnsToChange() as $oldName => $column) {
+                $columnList[] = 'CHANGE COLUMN ' . $this->escapeString($oldName) . ' ' . $this->createColumn($column, $table);
+            }
+            $query .= implode(',', $columnList) . ';';
+            $queries[] = $query;
+        }
+        
+        if ($table->getPrimaryKeyToDrop()) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY';
+        }
+        
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP FOREIGN KEY ' . $this->escapeString($foreignKey) . ';';
         }
@@ -100,6 +112,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
+        }
+        
+        $primaryColumns = $table->getPrimaryColumns();
+        unset($primaryColumns['id']);
+        if (!empty($primaryColumns)) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($primaryColumns) . ';';
         }
         
         if (!empty($table->getIndexes())) {
@@ -136,6 +154,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $col .= ' DEFAULT NULL';
         }
         
+        if ($column->getAfter() !== null) {
+            $col .= ' AFTER ' . $this->escapeString($column->getAfter());
+        } elseif ($column->isFirst()) {
+            $col .= ' FIRST';
+        }
+        
         $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }
@@ -146,11 +170,20 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             return '';
         }
         
-        $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
-            $primaryKeys[] = $this->escapeString($table->getColumn($name)->getName());
+        return $this->primaryKeyString($table->getPrimaryColumns());
+    }
+    
+    private function primaryKeyString(array $primaryColumns = [])
+    {
+        if (empty($primaryColumns)) {
+            return '';
         }
-        return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+        
+        $primaryKeys = [];
+        foreach ($primaryColumns as $name) {
+            $primaryKeys[] = $this->escapeString($name);
+        }
+        return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
     private function createIndexes(Table $table)

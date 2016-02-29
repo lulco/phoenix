@@ -3,6 +3,8 @@
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use PHPUnit_Framework_TestCase;
@@ -12,7 +14,8 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testUnsupportedColumnType()
     {
         $table = new Table('unsupported');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'unsupported'));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'unsupported')));
         
         $queryCreator = new SqliteQueryBuilder();
         $this->setExpectedException('\Exception', 'Type "unsupported" is not allowed');
@@ -22,11 +25,12 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testSimpleCreate()
     {
         $table = new Table('simple');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "simple" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL);'
+            'CREATE TABLE "simple" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL);'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
@@ -34,113 +38,102 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreColumns()
     {
         $table = new Table('more_columns');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string', true));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'integer', false, 0));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text', false));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string', ['null' => true])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "more_columns" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"bodytext" TEXT NOT NULL);'
+            'CREATE TABLE "more_columns" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" integer NOT NULL DEFAULT 0,"bodytext" text NOT NULL);'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testNoPrimaryKey()
     {
-        $table = new Table('no_primary_key', false);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', true));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('total', 'integer', false, 0));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('is_deleted', 'boolean', false, false));
+        $table = new Table('no_primary_key');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['null' => true])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('is_deleted', 'boolean', ['default' => false])));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "no_primary_key" ("title" TEXT DEFAULT NULL,"total" INTEGER NOT NULL DEFAULT 0,"is_deleted" INTEGER NOT NULL DEFAULT 0);'
+            'CREATE TABLE "no_primary_key" ("title" varchar(255) DEFAULT NULL,"total" integer NOT NULL DEFAULT 0,"is_deleted" boolean NOT NULL DEFAULT 0);'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testOwnPrimaryKey()
     {
-        $table = new Table('own_primary_key', new Column('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
+        $table = new Table('own_primary_key');
+        $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "own_primary_key" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));'
+            'CREATE TABLE "own_primary_key" ("identifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier"));'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testMoreOwnPrimaryKeys()
     {
-        $table = new Table('more_own_primary_keys', [new Column('identifier', 'string', false, null, 32), new Column('subidentifier', 'string', false, null, 32)]);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
+        $table = new Table('more_own_primary_keys');
+        $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "more_own_primary_keys" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
+            'CREATE TABLE "more_own_primary_keys" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testOneFieldAsPrimaryKey()
     {
-        $table = new Table('one_field_as_pk', 'identifier');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
+        $table = new Table('one_field_as_pk');
+        $table->addPrimary('identifier');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "one_field_as_pk" ("identifier" TEXT NOT NULL,"title" TEXT NOT NULL,PRIMARY KEY ("identifier"));'
+            'CREATE TABLE "one_field_as_pk" ("identifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier"));'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
     
     public function testMoreFieldsAsPrimaryKeys()
     {
-        $table = new Table('more_fields_as_pk', ['identifier', 'subidentifier']);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('subidentifier', 'string', false, 'SUB', 32));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
+        $table = new Table('more_fields_as_pk');
+        $table->addPrimary(['identifier', 'subidentifier']);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('subidentifier', 'string', ['default' => 'SUB', 'length' => 32])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "more_fields_as_pk" ("identifier" TEXT NOT NULL,"subidentifier" TEXT NOT NULL DEFAULT \'SUB\',"title" TEXT NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
+            'CREATE TABLE "more_fields_as_pk" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL DEFAULT \'SUB\',"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
-    }
-    
-    public function testUnsupportedTypeOfPrimaryKeys()
-    {
-        $this->setExpectedException('\InvalidArgumentException', 'Unsupported type of primary column');
-        $table = new Table('more_fields_as_pk', ['identifier', false]);
-    }
-    
-    public function testUnkownColumnAsPrimaryKey()
-    {
-        $table = new Table('unknown_primary_key', 'unknown');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('identifier', 'string', false, null, 32));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string', false, ''));
-        
-        $queryCreator = new SqliteQueryBuilder();
-        $this->setExpectedException('\Exception', 'Column "unknown" not found');
-        $queryCreator->createTable($table);
     }
     
     public function testIndexes()
     {
         $table = new Table('table_with_indexes');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "table_with_indexes" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT NOT NULL,"sorting" INTEGER NOT NULL,"bodytext" TEXT NOT NULL);',
+            'CREATE TABLE "table_with_indexes" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" integer NOT NULL,"bodytext" text NOT NULL);',
             'CREATE INDEX "table_with_indexes_sorting" ON "table_with_indexes" ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_title_alias" ON "table_with_indexes" ("title","alias");',
         ];
@@ -150,14 +143,15 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testForeignKeys()
     {
         $table = new Table('table_with_foreign_keys');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table'));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "table_with_foreign_keys" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT NOT NULL,"foreign_table_id" INTEGER NOT NULL,CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT);'
+            'CREATE TABLE "table_with_foreign_keys" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" integer NOT NULL,CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT);'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
@@ -165,18 +159,19 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testIndexesAndForeignKeys()
     {
         $table = new Table('table_with_indexes_and_foreign_keys');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex('sorting', '', 'btree'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(['title', 'alias'], 'unique'));
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', '', 'btree')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'unique')));
         
         $queryCreator = new SqliteQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"alias" TEXT NOT NULL,"sorting" INTEGER NOT NULL,"bodytext" TEXT NOT NULL,"foreign_table_id" INTEGER NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
+            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" integer NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" integer NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_and_foreign_keys_title_alias" ON "table_with_indexes_and_foreign_keys" ("title","alias");',
         ];
@@ -197,11 +192,14 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         // add columns
         $table = new Table('add_columns');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         
         $queryCreator = new SqliteQueryBuilder();
-        $expectedQueries = [];
+        $expectedQueries = [
+            'ALTER TABLE "add_columns" ADD COLUMN "title" varchar(255) NOT NULL,ADD COLUMN "alias" varchar(255) NOT NULL;',
+        ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }
 }
+

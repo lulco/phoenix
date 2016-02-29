@@ -3,7 +3,6 @@
 namespace Phoenix\Migration;
 
 use Nette\Utils\DateTime;
-use PDO;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
@@ -18,8 +17,10 @@ class Manager
     
     const TARGET_ALL = 'all';
     
+    /** @var Config */
     private $config;
     
+    /** @var AdapterInterface */
     private $adapter;
     
     /**
@@ -33,7 +34,10 @@ class Manager
     }
     
     /**
+     * @param string $type up / down
+     * @param string $target all / first
      * @return AbstractMigration[]
+     * @throws InvalidArgumentValueException
      */
     public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
     {
@@ -80,9 +84,13 @@ class Manager
         return $migrations;
     }
     
+    /**
+     * returs executed migrations
+     * @return array
+     */
     public function executedMigrations()
     {
-        $migrations = $this->adapter->execute('SELECT * FROM ' . $this->adapter->getQueryBuilder()->escapeString($this->config->getLogTableName()))->fetchAll(PDO::FETCH_ASSOC);
+        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*');
         $executedMigrations = [];
         foreach ($migrations as $migration) {
             $executedMigrations[$migration['migration_datetime'] . '|' . $migration['classname']] = $migration;
@@ -90,6 +98,10 @@ class Manager
         return $executedMigrations;
     }
 
+    /**
+     * adds migration to log table
+     * @param AbstractMigration $migration
+     */
     public function logExecution(AbstractMigration $migration)
     {
         $data = [
@@ -100,8 +112,15 @@ class Manager
         $this->adapter->insert($this->config->getLogTableName(), $data);
     }
     
+    /**
+     * removes migration from log table
+     * @param AbstractMigration $migration
+     */
     public function removeExecution(AbstractMigration $migration)
     {
-        $this->adapter->execute('DELETE FROM `' . $this->config->getLogTableName() . '` WHERE `classname`="' . addslashes($migration->getFullClassName()) . '" AND `migration_datetime`="' . $migration->getDatetime() . '"');
+        $this->adapter->delete($this->config->getLogTableName(), [
+            'classname' => $migration->getFullClassName(),
+            'migration_datetime' => $migration->getDatetime(),
+        ]);
     }
 }

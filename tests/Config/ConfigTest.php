@@ -17,6 +17,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             'environments' => [
                 'first' => [],
                 'second' => [],
+                'third' => [],
             ],
         ]);
         $this->assertEquals('phoenix_log', $config->getLogTableName());
@@ -24,6 +25,10 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('first', $config->getDefaultEnvironment());
         $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('first'));
         $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('second'));
+        $this->assertTrue(is_array($config->getConfiguration()));
+        $this->assertArrayHasKey('migration_dirs', $config->getConfiguration());
+        $this->assertCount(2, $config->getConfiguration()['migration_dirs']);
+        $this->assertCount(3, $config->getConfiguration()['environments']);
     }
     
     public function testOverridenDefaults()

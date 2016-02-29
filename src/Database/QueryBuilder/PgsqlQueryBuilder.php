@@ -17,11 +17,13 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
     ];
     
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
+        Column::TYPE_DECIMAL => [10, 0],
     ];
     
     /**
@@ -93,6 +95,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($foreignKey) . ';';
         }
         
+        if ($table->getPrimaryKeyToDrop()) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ';';
+        }
+        
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
@@ -113,6 +119,12 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             foreach ($table->getIndexes() as $index) {
                 $queries[] = $this->createIndex($index, $table);
             }
+        }
+        
+        $primaryColumns = $table->getPrimaryColumns();
+        unset($primaryColumns['id']);
+        if (!empty($primaryColumns)) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table, $primaryColumns) . ';';
         }
         
         foreach ($table->getForeignKeys() as $foreignKey) {
@@ -148,11 +160,20 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             return '';
         }
         
-        $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
-            $primaryKeys[] = $this->escapeString($table->getColumn($name)->getName());
+        return ',' . $this->primaryKeyString($table, $table->getPrimaryColumns());
+    }
+    
+    private function primaryKeyString(Table $table, array $primaryColumns = [])
+    {
+        if (empty($primaryColumns)) {
+            return '';
         }
-        return ',CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+        
+        $primaryKeys = [];
+        foreach ($primaryColumns as $name) {
+            $primaryKeys[] = $this->escapeString($name);
+        }
+        return 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
     private function createIndex(Index $index, Table $table)
@@ -162,6 +183,17 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $columns[] = $this->escapeString($column);
         }
         return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
+    }
+    
+    protected function dropIndexes(Table $table)
+    {
+        $query = 'DROP INDEX ';
+        $indexes = [];
+        foreach ($table->getIndexesToDrop() as $index) {
+            $indexes[] = $this->escapeString($table->getName() . '_' . $index);
+        }
+        $query .= implode(',', $indexes) . ';';
+        return $query;
     }
     
     public function escapeString($string)

@@ -19,6 +19,61 @@ interface AdapterInterface
     public function insert($table, array $data);
     
     /**
+     * @param string $table
+     * @param array $data
+     */
+    public function buildInsertQuery($table, array $data);
+    
+    /**
+     * @param string $table
+     * @param array $data
+     * @param array $conditions
+     * @param string $where
+     */
+    public function update($table, array $data, array $conditions = [], $where = '');
+    
+    /**
+     * @param string $table
+     * @param array $data
+     * @param array $conditions
+     * @param string $where
+     */
+    public function buildUpdateQuery($table, array $data, array $conditions = [], $where = '');
+    
+    /**
+     * @param string $table
+     * @param array $conditions
+     * @param string $where
+     */
+    public function delete($table, array $conditions = [], $where = '');
+    
+    /**
+     * @param string $table
+     * @param string $fields
+     * @param array $conditions
+     * @param array $orders
+     * @param array $groups
+     */
+    public function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = []);
+    
+    /**
+     * @param string $table
+     * @param string $fields
+     * @param array $conditions
+     * @param string|null $limit
+     * @param array $orders
+     * @param array $groups
+     */
+    public function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = []);
+    
+    /**
+     * @param string $table
+     * @param array $conditions
+     * @param string $where
+     */
+    public function buildDeleteQuery($table, array $conditions = [], $where = '');
+    
+    /**
      * @return QueryBuilderInterface
      */
     public function getQueryBuilder();
