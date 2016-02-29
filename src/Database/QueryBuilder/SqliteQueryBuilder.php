@@ -17,6 +17,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_UUID => 'INTEGER',
         Column::TYPE_JSON => 'TEXT',
         Column::TYPE_CHAR => 'TEXT',
+        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+    ];
+    
+    protected $defaultLength = [
+        Column::TYPE_DECIMAL => [10, 0],
     ];
     
     /**
@@ -62,7 +67,19 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function alterTable(Table $table)
     {
         $queries = [];
-        // TODO alter table for sqlite
+        
+        $columns = $table->getColumns();
+        unset($columns['id']);
+        if (!empty($columns)) {
+            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+            $columnList = [];
+            foreach ($columns as $column) {
+                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
+            }
+            $query .= implode(',', $columnList) . ';';
+            $queries[] = $query;
+        }
+        
         return $queries;
     }
     

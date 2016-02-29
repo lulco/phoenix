@@ -14,9 +14,12 @@ use ReflectionClass;
 use RuntimeException;
 
 /**
- * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false, mixed $default=null) @throws IncorrectMethodUsageException
- * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column 'null', 'default') @throws IncorrectMethodUsageException
- * @method AbstractMigration addColumn(Column $column)
+ * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column, int|null $length=null length of column, int|null $decimals=null number of decimals in decimal/float/double column, boolean $signed=true signed column, boolean $autoincrement=false autoincrement column) Adds column to the table @throws IncorrectMethodUsageException @deprecated since version 1.0.0
+ * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table @throws IncorrectMethodUsageException
+ * @method AbstractMigration addColumn(Column $column column definition) Adds column to the table - @throws IncorrectMethodUsageException
+ * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column) Changes column in the table to new one @throws IncorrectMethodUsageException
+ * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Changes column in the table to new one @throws IncorrectMethodUsageException
+ * @method AbstractMigration changeColumn(string $oldName old name of column, Column $column new column definition) Changes column in the table to new one @throws IncorrectMethodUsageException
  */
 abstract class AbstractMigration
 {
@@ -31,6 +34,8 @@ abstract class AbstractMigration
     
     /** @var Table */
     private $table = null;
+    
+    private $primaryKey = null;
     
     /** @var array */
     private $tables = [];
@@ -122,7 +127,7 @@ abstract class AbstractMigration
 
     /**
      * @param string $name
-     * @param mixed $primaryColumn
+     * @param mixed $primaryKey available only for create table
      * true - if you want classic autoincrement integer primary column with name id
      * Column - if you want to define your own column (column is added to list of columns)
      * string - name of column in list of columns
@@ -132,12 +137,15 @@ abstract class AbstractMigration
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException
      */
-    final protected function table($name, $primaryColumn = true)
+    final protected function table($name, $primaryKey = true)
     {
         if ($this->table !== null) {
             throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         }
-        $this->table = new Table($name, $primaryColumn);
+        
+        $this->primaryKey = $primaryKey;
+        
+        $this->table = new Table($name);
         return $this;
     }
     
@@ -145,6 +153,9 @@ abstract class AbstractMigration
     {
         if ($name == 'addColumn') {
             return $this->_addColumn($arguments);
+        }
+        if ($name == 'changeColumn') {
+            return $this->_changeColumn($arguments);
         }
         throw new RuntimeException('Method "' . $name . '" not found');
     }
@@ -156,7 +167,7 @@ abstract class AbstractMigration
         }
         
         if (count($arguments) > 4) {
-            throw new InvalidArgumentException('Too many arguments');
+            echo 'Method addColumn(string $name, string $type, boolean $allowNull = false, mixed $default = null, int|null $length = null, int|null $decimals = null, boolean $signed = true, boolean $autoincrement = false) will be deprecated in version 1.0.0' . "\n";
         }
         
         if ($arguments[0] instanceof Column) {
@@ -171,7 +182,11 @@ abstract class AbstractMigration
             $arguments[0],
             $arguments[1],
             isset($arguments[2]) ? $arguments[2] : false,
-            isset($arguments[3]) ? $arguments[3] : null
+            isset($arguments[3]) ? $arguments[3] : null,
+            isset($arguments[4]) ? $arguments[4] : null,
+            isset($arguments[5]) ? $arguments[5] : null,
+            isset($arguments[6]) ? $arguments[6] : true,
+            isset($arguments[7]) ? $arguments[7] : false
         );
     }
     
@@ -179,11 +194,25 @@ abstract class AbstractMigration
         $name,
         $type,
         $allowNull = false,
-        $default = null
+        $default = null,
+        $length = null,
+        $decimals = null,
+        $signed = true,
+        $autoincrement = false
     ) {
-        $column = new Column($name, $type, ['null' => $allowNull, 'default' => $default]);
-        $this->addPreparedColumn($column);
-        return $this;
+        $column = new Column(
+            $name,
+            $type,
+            [
+                'null' => $allowNull,
+                'default' => $default,
+                'length' => $length,
+                'decimals' => $decimals,
+                'signed' => $signed,
+                'autoincrement' => $autoincrement,
+            ]
+        );
+        return $this->addPreparedColumn($column);
     }
     
     private function addComplexColumn($name, $type, $settings = [])
@@ -198,6 +227,51 @@ abstract class AbstractMigration
         return $this;
     }
     
+    private function _changeColumn($arguments)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method changeColumn(). Use method table() first.');
+        }
+        
+        if (count($arguments) > 5) {
+            throw new InvalidArgumentException('Too many arguments');
+        }
+        
+        if ($arguments[1] instanceof Column) {
+            return $this->changePreparedColumn($arguments[0], $arguments[1]);
+        }
+        
+        if (count($arguments) == 4 && is_array($arguments[3])) {
+            return $this->changeComplexColumn($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
+        }
+        
+        return $this->changeSimpleColumn(
+            $arguments[0],
+            $arguments[1],
+            $arguments[2],
+            isset($arguments[3]) ? $arguments[3] : false,
+            isset($arguments[4]) ? $arguments[4] : null
+        );
+    }
+    
+    private function changePreparedColumn($oldName, Column $newColumn)
+    {
+        $this->table->changeColumn($oldName, $newColumn);
+        return $this;
+    }
+
+    private function changeSimpleColumn($oldName, $newName, $newType, $allowNull = false, $default = null)
+    {
+        $newColumn = new Column($newName, $newType, ['null' => $allowNull, 'default' => $default]);
+        return $this->changePreparedColumn($oldName, $newColumn);
+    }
+    
+    private function changeComplexColumn($oldName, $newName, $newType, array $settings = [])
+    {
+        $newColumn = new Column($newName, $newType, $settings);
+        return $this->changePreparedColumn($oldName, $newColumn);
+    }
+
     /**
      * @param string $name
      * @return AbstractMigration
@@ -276,6 +350,37 @@ abstract class AbstractMigration
     }
 
     /**
+     * @param string|array $columns
+     * @return AbstractMigration
+     */
+    final protected function addPrimaryKey($columns)
+    {
+        $this->table->addPrimary($columns);
+        return $this;
+    }
+    
+    /**
+     * @param string|array|Column $column 
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function dropPrimaryKey($column = 'id')
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method dropPrimaryKey(). Use method table() first.');
+        }
+        
+        if (!$column instanceof Column) {
+            $column = new Column($column, 'integer');
+        }
+        
+        
+        $this->table->changeColumn($column->getName(), $column);
+        $this->table->dropPrimaryKey();
+        return $this;
+    }
+    
+    /**
      * generate create table queries
      * @throws IncorrectMethodUsageException if table() was not called first
      */
@@ -284,6 +389,8 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
         }
+        
+        $this->table->addPrimary($this->primaryKey);
         
         $this->tables[count($this->queries)] = $this->table;
         

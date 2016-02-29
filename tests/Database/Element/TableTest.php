@@ -12,6 +12,7 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testDefaultConstruct()
     {
         $table = new Table('test');
+        $table->addPrimary(true);
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
         foreach ($columns as $column) {
@@ -36,7 +37,7 @@ class TableTest extends PHPUnit_Framework_TestCase
     
     public function testNoPrimaryKeyConstruct()
     {
-        $table = new Table('test', false);
+        $table = new Table('test');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         
         $columns = $table->getColumns();
@@ -50,6 +51,7 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testAddColumn()
     {
         $table = new Table('test');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'int')));
     }
@@ -57,6 +59,7 @@ class TableTest extends PHPUnit_Framework_TestCase
     public function testAddIndex()
     {
         $table = new Table('test');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'unique')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext', 'fulltext'])));
@@ -64,7 +67,7 @@ class TableTest extends PHPUnit_Framework_TestCase
     
     public function testGetters()
     {
-        $table = new Table('test', false);
+        $table = new Table('test');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'int')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));

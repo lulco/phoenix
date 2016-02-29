@@ -23,8 +23,20 @@ class Table
     
     private $indexesToDrop = [];
     
+    private $columnsToChange = [];
+    
+    private $dropPrimaryKey = false;
+    
     /**
      * @param string $name
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+    
+    /**
+     * add primary key(s) to table
      * @param mixed $primaryColumn
      * true - if you want classic autoincrement integer primary column with name id
      * Column - if you want to define your own column (column is added to list of columns)
@@ -33,40 +45,31 @@ class Table
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
      */
-    public function __construct($name, $primaryColumn = true)
-    {
-        $this->name = $name;
-        if ($primaryColumn === true) {
-            $primaryColumn = new Column('id', 'integer', ['autoincrement' => true]);
-        }
-        
-        if ($primaryColumn) {
-            $this->addPrimary($primaryColumn);
-        }
-    }
-    
-    /**
-     * add primary key(s) to table
-     * @param mixed $primaryColumn
-     * Column - if you want to define your own column (column is added to list of columns)
-     * string - name of column in list of columns
-     * array of strings - names of columns in list of columns
-     * array of Column - list of own columns (all columns are added to list of columns)
-     */
     public function addPrimary($primaryColumn)
     {
+        if ($primaryColumn === true) {
+            $primaryColumn = new Column('id', 'integer', ['autoincrement' => true]);
+            return $this->addPrimary($primaryColumn);
+        }
+        
         if ($primaryColumn instanceof Column) {
-            $this->columns[$primaryColumn->getName()] = $primaryColumn;
-            $this->primaryColumns[] = $primaryColumn->getName();
-        } elseif (is_string($primaryColumn)) {
-            $this->primaryColumns[] = $primaryColumn;
-        } elseif (is_array($primaryColumn)) {
-            foreach ($primaryColumn as $column) {
+            $this->columns = array_merge([$primaryColumn->getName() => $primaryColumn], $this->columns);
+            $this->primaryColumns = array_merge([$primaryColumn->getName() => $primaryColumn->getName()], $this->primaryColumns);
+            return $this;
+        }
+        
+        if (is_string($primaryColumn)) {
+            $this->primaryColumns = array_merge([$primaryColumn => $primaryColumn], $this->primaryColumns);
+            return $this;
+        }
+        
+        if (is_array($primaryColumn)) {
+            foreach (array_reverse($primaryColumn) as $column) {
                 $this->addPrimary($column);
             }
-        } else {
-            throw new InvalidArgumentException('Unsupported type of primary column');
+            return $this;
         }
+        return $this;
     }
     
     /**
@@ -126,6 +129,30 @@ class Table
         return $this->columnsToDrop;
     }
     
+    /**
+     * @param string $oldName
+     * @param Column $newColumn
+     * @return Table
+     */
+    public function changeColumn($oldName, Column $newColumn)
+    {
+        if (isset($this->columns[$oldName])) {
+            $this->columns[$oldName] = $newColumn;
+            return $this;
+        }
+        
+        $this->columnsToChange[$oldName] = $newColumn;
+        return $this;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getColumnsToChange()
+    {
+        return $this->columnsToChange;
+    }
+        
     /**
      * @return array
      */
@@ -193,6 +220,7 @@ class Table
     
     /**
      * @param string|array $columns
+     * @return Table
      */
     public function dropForeignKey($columns)
     {
@@ -209,5 +237,22 @@ class Table
     public function getForeignKeysToDrop()
     {
         return $this->foreignKeysToDrop;
+    }
+    
+    /**
+     * @return Table
+     */
+    public function dropPrimaryKey()
+    {
+        $this->dropPrimaryKey = true;
+        return $this;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function getPrimaryKeyToDrop()
+    {
+        return $this->dropPrimaryKey;
     }
 }

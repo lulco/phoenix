@@ -45,7 +45,7 @@ class Column
         
         $this->name = $name;
         $this->type = $type;
-        $this->allowNull = isset($settings['null']) ? $settings['null']: false;
+        $this->allowNull = isset($settings['null']) ? $settings['null'] : false;
         $this->default = isset($settings['default']) ? $settings['default'] : null;
         $this->length = isset($settings['length']) ? $settings['length'] : null;
         $this->decimals = isset($settings['decimals']) ? $settings['decimals'] : null;
