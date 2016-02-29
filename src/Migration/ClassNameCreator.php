@@ -13,9 +13,9 @@ class ClassNameCreator
     public function __construct($filepath)
     {
         $filename = pathinfo($filepath, PATHINFO_FILENAME);
-        $migrationName = $filename;
         if (strpos($filename, '_')) {
-            list($this->datetime, $migrationName) = explode('_', $filename, 2);
+            $filenameParts = explode('_', $filename, 2);
+            $this->datetime = $filenameParts[0];
         }
         $this->className = $this->findClassName($filepath);
     }

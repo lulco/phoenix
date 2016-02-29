@@ -2,6 +2,8 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Exception\InvalidArgumentValueException;
+
 class Column
 {
     const TYPE_STRING = 'string';
@@ -14,6 +16,19 @@ class Column
     const TYPE_CHAR = 'char';
     const TYPE_DECIMAL = 'decimal';
     
+    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first'];
+    
+    private $allowedSettingsValues = [
+        'null' => ['is_bool'],
+        'default' => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
+        'length' => ['is_null', 'is_int'],
+        'decimals' => ['is_null', 'is_int'],
+        'signed' => ['is_bool'],
+        'autoincrement' => ['is_bool'],
+        'after' => ['is_null', 'is_string'],
+        'first' => ['is_bool'],
+    ];
+    
     private $name;
     
     private $type;
@@ -22,11 +37,11 @@ class Column
     
     private $default;
     
-    private $signed;
-    
     private $length;
     
     private $decimals;
+    
+    private $signed;
     
     private $autoincrement;
     
@@ -41,7 +56,7 @@ class Column
      */
     public function __construct($name, $type, array $settings = [])
     {
-        // TODO check allowed settings
+        $this->checkSettings($settings);
         
         $this->name = $name;
         $this->type = $type;
@@ -135,5 +150,39 @@ class Column
     public function isFirst()
     {
         return $this->first;
+    }
+    
+    private function checkSettings($settings)
+    {
+        $errors = [];
+        foreach ($settings as $setting => $value) {
+            if (!in_array($setting, $this->allowedSettings)) {
+                $errors[] = 'Setting "' . $setting . '" is not allowed.';
+            }
+            $checkedValue = $this->checkValue($setting, $value);
+            if ($checkedValue !== true) {
+                $errors[] = $checkedValue;
+            }
+        }
+
+        if (empty($errors)) {
+            return true;
+        }
+        
+        throw new InvalidArgumentValueException(implode("\n", $errors));
+    }
+    
+    private function checkValue($setting, $value)
+    {
+        if (!isset($this->allowedSettingsValues[$setting])) {
+            return true;
+        }
+        
+        foreach ($this->allowedSettingsValues[$setting] as $checkFunction) {
+            if (call_user_func($checkFunction, $value) === true) {
+                return true;
+            }
+        }
+        return 'Value "' . $value . '" is not allowed for setting "' . $setting . '".';
     }
 }
