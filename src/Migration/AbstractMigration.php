@@ -127,7 +127,7 @@ abstract class AbstractMigration
 
     /**
      * @param string $name
-     * @param mixed $primaryKey
+     * @param mixed $primaryKey available only for create table
      * true - if you want classic autoincrement integer primary column with name id
      * Column - if you want to define your own column (column is added to list of columns)
      * string - name of column in list of columns
@@ -145,7 +145,7 @@ abstract class AbstractMigration
         
         $this->primaryKey = $primaryKey;
         
-        $this->table = new Table($name, false);
+        $this->table = new Table($name);
         return $this;
     }
     
@@ -390,13 +390,7 @@ abstract class AbstractMigration
             throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
         }
         
-        $primaryKey = $this->primaryKey;
-        if ($primaryKey === true) {
-            $primaryKey = new Column('id', 'integer', ['autoincrement' => true]);
-        }
-        if ($primaryKey) {
-            $this->table->addPrimary($primaryKey);
-        }
+        $this->table->addPrimary($this->primaryKey);
         
         $this->tables[count($this->queries)] = $this->table;
         

@@ -14,6 +14,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testUnsupportedColumnType()
     {
         $table = new Table('unsupported');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'unsupported')));
         
         $queryCreator = new PgsqlQueryBuilder();
@@ -24,6 +25,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testSimpleCreate()
     {
         $table = new Table('simple');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         
         $queryCreator = new PgsqlQueryBuilder();
@@ -37,6 +39,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testMoreColumns()
     {
         $table = new Table('more_columns');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string', ['null' => true])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
@@ -52,7 +55,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testNoPrimaryKey()
     {
-        $table = new Table('no_primary_key', false);
+        $table = new Table('no_primary_key');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['null' => true])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('is_deleted', 'boolean', ['default' => false])));
@@ -66,7 +69,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testOwnPrimaryKey()
     {
-        $table = new Table('own_primary_key', new Column('identifier', 'string', ['length' => 32]));
+        $table = new Table('own_primary_key');
+        $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new PgsqlQueryBuilder();
@@ -78,7 +82,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testMoreOwnPrimaryKeys()
     {
-        $table = new Table('more_own_primary_keys', [new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
+        $table = new Table('more_own_primary_keys');
+        $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
         $queryCreator = new PgsqlQueryBuilder();
@@ -90,7 +95,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testOneFieldAsPrimaryKey()
     {
-        $table = new Table('one_field_as_pk', 'identifier');
+        $table = new Table('one_field_as_pk');
+        $table->addPrimary('identifier');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
         
@@ -103,7 +109,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     
     public function testMoreFieldsAsPrimaryKeys()
     {
-        $table = new Table('more_fields_as_pk', ['identifier', 'subidentifier']);
+        $table = new Table('more_fields_as_pk');
+        $table->addPrimary(['identifier', 'subidentifier']);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('subidentifier', 'string', ['length' => 32])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
@@ -114,16 +121,11 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
-    
-    public function testUnsupportedTypeOfPrimaryKeys()
-    {
-        $this->setExpectedException('\InvalidArgumentException', 'Unsupported type of primary column');
-        $table = new Table('more_fields_as_pk', ['identifier', false]);
-    }
-    
+        
     public function testIndexes()
     {
         $table = new Table('table_with_indexes');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
@@ -146,6 +148,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testForeignKeys()
     {
         $table = new Table('table_with_foreign_keys');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
@@ -162,6 +165,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testIndexesAndForeignKeys()
     {
         $table = new Table('table_with_indexes_and_foreign_keys');
+        $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
