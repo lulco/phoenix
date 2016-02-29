@@ -17,7 +17,7 @@ class ClassNameCreator
         if (strpos($filename, '_')) {
             list($this->datetime, $migrationName) = explode('_', $filename, 2);
         }
-        $this->className = $this->findNamespace($filepath) . str_replace(' ', '', ucwords(str_replace('_', ' ', $migrationName)));  // TODO find real class name not create it from filename
+        $this->className = $this->findClassName($filepath);
     }
 
     /**
@@ -36,7 +36,7 @@ class ClassNameCreator
         return $this->datetime;
     }
 
-    private function findNamespace($filepath)
+    private function findClassName($filepath)
     {
         $fileContent = file_get_contents($filepath);
         
@@ -49,6 +49,12 @@ class ClassNameCreator
         $pattern = '/namespace (.*?);/s';
         preg_match($pattern, $fileContent, $matches);
         $namespaceIndex = 1;
-        return isset($matches[$namespaceIndex]) ? '\\' . $matches[$namespaceIndex] . '\\' : '\\';
+        $namespace = isset($matches[$namespaceIndex]) ? '\\' . $matches[$namespaceIndex] . '\\' : '\\';
+        
+        $pattern = '/class (.*?) /s';
+        preg_match($pattern, $fileContent, $matches);
+        $classNameIndex = 1;
+        $classname = isset($matches[$classNameIndex]) ? $matches[$classNameIndex] : '';
+        return $namespace . $classname;
     }
 }

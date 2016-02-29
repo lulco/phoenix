@@ -1,8 +1,10 @@
 <?php
 
+namespace Fake\Migration;
+
 use Phoenix\Migration\AbstractMigration;
 
-class FirstMigration extends AbstractMigration
+class First extends AbstractMigration
 {
     public function up()
     {

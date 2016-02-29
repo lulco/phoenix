@@ -11,7 +11,7 @@ class ClassNameCreatorTest extends PHPUnit_Framework_TestCase
     {
         $filepath = __DIR__ . '/../fake/structure/migration_directory_1/20150428140909_first_migration.php';
         $creator = new ClassNameCreator($filepath);
-        $this->assertEquals('\FirstMigration', $creator->getClassName());
+        $this->assertEquals('\Fake\Migration\First', $creator->getClassName());
         $this->assertEquals('20150428140909', $creator->getDatetime());
         
         $filepath = __DIR__ . '/../fake/structure/migration_directory_1/20150518091732_second_change_of_something.php';

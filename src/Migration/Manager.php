@@ -34,7 +34,10 @@ class Manager
     }
     
     /**
+     * @param string $type up / down
+     * @param string $target all / first
      * @return AbstractMigration[]
+     * @throws InvalidArgumentValueException
      */
     public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
     {
