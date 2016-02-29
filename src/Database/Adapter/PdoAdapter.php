@@ -62,7 +62,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildInsertQuery($table, array $data)
     {
-        $query = 'INSERT INTO ' . $this->queryBuilder->escapeString($table) . ' ' . $this->createKeys($data) . ' VALUES (' . implode(', ', $this->createValues($data)) . ');';
+        $query = 'INSERT INTO ' . $this->queryBuilder->escapeString(addslashes($table)) . ' ' . $this->createKeys($data) . ' VALUES (' . implode(', ', $this->createValues($data)) . ');';
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
             $statement->bindValue($key, $value);
@@ -87,7 +87,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildUpdateQuery($table, array $data, array $conditions = [], $where = '')
     {
-        $query = 'UPDATE ' . $this->queryBuilder->escapeString($table) . ' SET ';
+        $query = 'UPDATE ' . $this->queryBuilder->escapeString(addslashes($table)) . ' SET ';
         $values = [];
         foreach (array_keys($data) as $key) {
             $values[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key);
@@ -120,7 +120,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildDeleteQuery($table, array $conditions = array(), $where = '')
     {
-        $query = 'DELETE FROM ' . $this->queryBuilder->escapeString($table) . $this->createWhere($conditions, $where);
+        $query = 'DELETE FROM ' . $this->queryBuilder->escapeString(addslashes($table)) . $this->createWhere($conditions, $where);
         $statement = $this->pdo->prepare($query);
         foreach ($conditions as $key => $condition) {
             $statement->bindValue('where_' . $key, $condition);
@@ -148,7 +148,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
-        $query = 'SELECT ' . $fields . ' FROM ' . $this->queryBuilder->escapeString($table);
+        $query = 'SELECT ' . $fields . ' FROM ' . $this->queryBuilder->escapeString(addslashes($table));
         $query .= $this->createWhere($conditions);
         if ($limit) {
             $query .= ' LIMIT ' . $limit;
