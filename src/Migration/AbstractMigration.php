@@ -450,9 +450,42 @@ abstract class AbstractMigration
         $this->table = null;
     }
     
-    final protected function insert($table, $data)
+    /**
+     * adds insert query to list of queries to execute
+     * @param string $table
+     * @param array $data
+     * @return AbstractMigration
+     */
+    final protected function insert($table, array $data)
     {
         $this->execute($this->adapter->buildInsertQuery($table, $data));
+        return $this;
+    }
+    
+    /**
+     * adds update query to list of queries to execute
+     * @param string $table
+     * @param array $data
+     * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
+     * @param string $where additional where added to generated WHERE as is
+     * @return AbstractMigration
+     */
+    final protected function update($table, array $data, array $conditions = [], $where = '')
+    {
+        $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
+        return $this;
+    }
+    
+    /**
+     * adds delete query to list of queries to exectue
+     * @param string $table
+     * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
+     * @param string $where additional where added to generated WHERE as is
+     * @return AbstractMigration
+     */
+    final protected function delete($table, array $conditions = [], $where = '')
+    {
+        $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
         return $this;
     }
     
