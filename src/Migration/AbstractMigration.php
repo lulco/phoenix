@@ -370,12 +370,14 @@ abstract class AbstractMigration
             throw new IncorrectMethodUsageException('Wrong use of method dropPrimaryKey(). Use method table() first.');
         }
         
-        if (!$column instanceof Column) {
+        if (is_string($column)) {
             $column = new Column($column, 'integer');
         }
         
+        if ($column instanceof Column) {
+            $this->table->changeColumn($column->getName(), $column);
+        }
         
-        $this->table->changeColumn($column->getName(), $column);
         $this->table->dropPrimaryKey();
         return $this;
     }
@@ -446,6 +448,12 @@ abstract class AbstractMigration
         $queries = $queryBuilder->alterTable($this->table);
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
+    }
+    
+    final protected function insert($table, $data)
+    {
+        $this->execute($this->adapter->buildInsertQuery($table, $data));
+        return $this;
     }
     
     private function runQueries()

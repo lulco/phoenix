@@ -3,8 +3,9 @@
 namespace Phoenix\Database\Adapter;
 
 use PDO;
-use Phoenix\Exception\DatabaseQueryExecuteException;
+use PDOStatement;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 
 abstract class PdoAdapter implements AdapterInterface
 {
@@ -27,7 +28,12 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function execute($sql)
     {
-        $res = $this->pdo->query($sql);
+        if ($sql instanceof PDOStatement) {
+            $res = $sql->execute();
+        } else {
+            $res = $this->pdo->query($sql);
+        }
+        
         if ($res !== false) {
             return $res;
         }
@@ -37,21 +43,29 @@ abstract class PdoAdapter implements AdapterInterface
 
     public function insert($table, array $data)
     {
-        $values = [];
-        foreach (array_keys($data) as $key) {
-            $values[] = ':' . $key;
-        }
-
-        $query = 'INSERT INTO ' . $this->queryBuilder->escapeString($table) . ' (' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $values) . ')';
-        $statement = $this->pdo->prepare($query);
+        $statement = $this->buildInsertQuery($table, $data);
         if (!$statement) {
-            $this->throwError($query);
+            $this->throwError($statement);
         }
-        $res = $statement->execute($data);
+        $res = $this->execute($statement);
         if ($res !== false) {
             return $this->pdo->lastInsertId();
         }
         $this->throwError($statement->queryString);
+    }
+    
+    public function buildInsertQuery($table, array $data)
+    {
+        $values = [];
+        foreach (array_keys($data) as $key) {
+            $values[] = ':' . $key;
+        }
+        $query = 'INSERT INTO ' . $this->queryBuilder->escapeString($table) . ' (' . implode(', ', array_keys($data)) . ') VALUES (' . implode(', ', $values) . ')';
+        $statement = $this->pdo->prepare($query);
+        foreach ($data as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+        return $statement;
     }
     
     public function startTransaction()

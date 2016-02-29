@@ -20,7 +20,7 @@ class Init extends AbstractMigration
         $this->table($this->logTableName)
             ->addColumn('migration_datetime', 'string')
             ->addColumn('classname', 'string')
-            ->addColumn('executed_at', 'datetime', true)
+            ->addColumn('executed_at', 'datetime')
             ->create();
     }
 

@@ -3,7 +3,6 @@
 namespace Phoenix\Database\Element;
 
 use Exception;
-use InvalidArgumentException;
 
 class Table
 {
