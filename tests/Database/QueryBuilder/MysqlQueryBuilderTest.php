@@ -149,7 +149,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryCreator = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `table_with_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `table_with_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `table_with_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `table_with_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`id`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
@@ -231,7 +231,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $expectedQueries = [
             'ALTER TABLE `add_columns_index_foreign_key` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL;',
             'ALTER TABLE `add_columns_index_foreign_key` ADD INDEX `sorting` (`sorting`);',
-            'ALTER TABLE `add_columns_index_foreign_key` ADD CONSTRAINT `add_columns_index_foreign_key_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE `add_columns_index_foreign_key` ADD CONSTRAINT `add_columns_index_foreign_key_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`);',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
         
@@ -258,7 +258,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'ALTER TABLE `all_in_one` DROP COLUMN `title`;',
             'ALTER TABLE `all_in_one` ADD COLUMN `foreign_key_id` int(11) NOT NULL AFTER `column_before`,ADD COLUMN `sorting` int(11) NOT NULL;',
             'ALTER TABLE `all_in_one` ADD INDEX `sorting` (`sorting`);',
-            'ALTER TABLE `all_in_one` ADD CONSTRAINT `all_in_one_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE `all_in_one` ADD CONSTRAINT `all_in_one_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`);',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
         
@@ -279,7 +279,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'ALTER TABLE `all_in_one_mixed` DROP COLUMN `title`;',
             'ALTER TABLE `all_in_one_mixed` ADD COLUMN `foreign_key_id` int(11) NOT NULL FIRST,ADD COLUMN `sorting` int(11) NOT NULL;',
             'ALTER TABLE `all_in_one_mixed` ADD INDEX `sorting` (`sorting`);',
-            'ALTER TABLE `all_in_one_mixed` ADD CONSTRAINT `all_in_one_mixed_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE `all_in_one_mixed` ADD CONSTRAINT `all_in_one_mixed_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`);',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }

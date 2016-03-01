@@ -157,7 +157,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $queryCreator = new PgsqlQueryBuilder();
         $expectedQueries = [
             'CREATE SEQUENCE "table_with_foreign_keys_seq";',
-            'CREATE TABLE "table_with_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT);'
+            'CREATE TABLE "table_with_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
@@ -244,7 +244,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $expectedQueries = [
             'ALTER TABLE "add_columns_index_foreign_key" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
             'CREATE INDEX "add_columns_index_foreign_key_sorting" ON "add_columns_index_foreign_key" ("sorting");',
-            'ALTER TABLE "add_columns_index_foreign_key" ADD CONSTRAINT "add_columns_index_foreign_key_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE "add_columns_index_foreign_key" ADD CONSTRAINT "add_columns_index_foreign_key_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id");',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
         
@@ -271,7 +271,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'ALTER TABLE "all_in_one" DROP COLUMN "title";',
             'ALTER TABLE "all_in_one" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
             'CREATE INDEX "all_in_one_sorting" ON "all_in_one" ("sorting");',
-            'ALTER TABLE "all_in_one" ADD CONSTRAINT "all_in_one_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE "all_in_one" ADD CONSTRAINT "all_in_one_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id");',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
         
@@ -292,7 +292,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'ALTER TABLE "all_in_one_mixed" DROP COLUMN "title";',
             'ALTER TABLE "all_in_one_mixed" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
             'CREATE INDEX "all_in_one_mixed_sorting" ON "all_in_one_mixed" ("sorting");',
-            'ALTER TABLE "all_in_one_mixed" ADD CONSTRAINT "all_in_one_mixed_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id") ON DELETE RESTRICT ON UPDATE RESTRICT;',
+            'ALTER TABLE "all_in_one_mixed" ADD CONSTRAINT "all_in_one_mixed_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id");',
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }

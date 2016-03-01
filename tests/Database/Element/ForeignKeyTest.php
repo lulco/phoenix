@@ -16,8 +16,8 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('ref_table', $foreignKey->getReferencedTable());
         $this->assertCount(1, $foreignKey->getReferencedColumns());
         $this->assertEquals(['id'], $foreignKey->getReferencedColumns());
-        $this->assertEquals('RESTRICT', $foreignKey->getOnDelete());
-        $this->assertEquals('RESTRICT', $foreignKey->getOnUpdate());
+        $this->assertEquals('', $foreignKey->getOnDelete());
+        $this->assertEquals('', $foreignKey->getOnUpdate());
     }
     
     public function testArray()
@@ -29,6 +29,19 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('ref_table', $foreignKey->getReferencedTable());
         $this->assertCount(2, $foreignKey->getReferencedColumns());
         $this->assertEquals(['t', 'a'], $foreignKey->getReferencedColumns());
+        $this->assertEquals('', $foreignKey->getOnDelete());
+        $this->assertEquals('', $foreignKey->getOnUpdate());
+    }
+    
+    public function testRestrict()
+    {
+        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'RESTRICT');
+        $this->assertEquals('foreign_key_id', $foreignKey->getName());
+        $this->assertCount(1, $foreignKey->getColumns());
+        $this->assertEquals(['foreign_key_id'], $foreignKey->getColumns());
+        $this->assertEquals('foreign_table', $foreignKey->getReferencedTable());
+        $this->assertCount(1, $foreignKey->getReferencedColumns());
+        $this->assertEquals(['id'], $foreignKey->getReferencedColumns());
         $this->assertEquals('RESTRICT', $foreignKey->getOnDelete());
         $this->assertEquals('RESTRICT', $foreignKey->getOnUpdate());
     }

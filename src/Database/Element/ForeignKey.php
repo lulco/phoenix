@@ -6,6 +6,7 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 class ForeignKey
 {
+    const DEFAULT_ACTION = '';
     const RESTRICT = 'RESTRICT';
     const NO_ACTION = 'NO ACTION';
     const CASCADE = 'CASCADE';
@@ -28,9 +29,8 @@ class ForeignKey
      * @param string $onDelete
      * @param string $onUpdate
      * @throws InvalidArgumentValueException
-     * @todo create constant default action and use it as default value, then implement in all quer builders (or may be no need because default action must not be set)
      */
-    public function __construct($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+    public function __construct($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = self::DEFAULT_ACTION, $onUpdate = self::DEFAULT_ACTION)
     {
         if (!is_array($columns)) {
             $columns = [$columns];
@@ -44,11 +44,11 @@ class ForeignKey
         $this->referencedColumns = $referencedColumns;
         
         $this->onDelete = strtoupper($onDelete);
-        if (!in_array($this->onDelete, [self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
+        if (!in_array($this->onDelete, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
             throw new InvalidArgumentValueException('Action "' . $onDelete . '" is not allowed on delete');
         }
         $this->onUpdate = strtoupper($onUpdate);
-        if (!in_array($this->onUpdate, [self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
+        if (!in_array($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
             throw new InvalidArgumentValueException('Action "' . $onUpdate . '" is not allowed on update');
         }
     }
