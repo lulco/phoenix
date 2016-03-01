@@ -7,6 +7,7 @@ use Phoenix\Command\InitCommand;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\WrongCommandException;
 use Phoenix\Migration\Manager;
@@ -60,15 +61,7 @@ abstract class AbstractCommand extends Command
      */
     final protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('config')) {
-            $configuration = require $input->getOption('config');
-            $this->config = new Config($configuration);
-        }
-        
-        if ($this->config === null) {
-            $configuration = require __DIR__ . '/../../bin/config.php'; // TODO vymysliet ako sem dostat config array ked to bude napr. neon, yaml, php a ine
-            $this->config = new Config($configuration);
-        }
+        $this->loadConfig($input);
         
         $environment = $input->getOption('environment') ?: $this->config->getDefaultEnvironment();
         $this->adapter = AdapterFactory::instance($this->config->getEnvironmentConfig($environment));
@@ -77,6 +70,17 @@ abstract class AbstractCommand extends Command
         $this->check($input, $output);
         
         $this->runCommand($input, $output);
+    }
+    
+    private function loadConfig(InputInterface $input)
+    {
+        $configFile = $input->getOption('config') ?: 'config.php';
+        if ($configFile && !file_exists($configFile)) {
+            throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
+        }
+        
+        $configuration = require $configFile;
+        $this->config = new Config($configuration);
     }
     
     private function check(InputInterface $input, OutputInterface $output)
