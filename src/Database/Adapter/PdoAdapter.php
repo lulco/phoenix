@@ -147,7 +147,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
-        $query = sprintf('SELECT %s FROM %s%s%s;', $fields, $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions), $limit ? ' LIMIT ' . $limit : '');
+        $query = sprintf('SELECT %s FROM %s%s%s;', $fields, $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createLimit($limit));
         return $query;
     }
     
@@ -188,6 +188,14 @@ abstract class PdoAdapter implements AdapterInterface
             $cond[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
         }
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
+    }
+    
+    private function createLimit($limit = null)
+    {
+        if (!$limit) {
+            return '';
+        }
+        return sprintf(' LIMIT %s', $limit);
     }
     
     /**
