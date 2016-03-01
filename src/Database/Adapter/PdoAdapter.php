@@ -62,7 +62,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildInsertQuery($table, array $data)
     {
-        $query = 'INSERT INTO ' . $this->queryBuilder->escapeString(addslashes($table)) . ' ' . $this->createKeys($data) . ' VALUES (' . implode(', ', $this->createValues($data)) . ');';
+        $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
             $statement->bindValue($key, $value);
@@ -91,7 +91,7 @@ abstract class PdoAdapter implements AdapterInterface
         foreach (array_keys($data) as $key) {
             $values[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key);
         }
-        $query = sprintf('UPDATE %s SET %s %s;', $this->queryBuilder->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
+        $query = sprintf('UPDATE %s SET %s%s;', $this->queryBuilder->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
             $statement->bindValue($key, $value);
@@ -119,7 +119,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildDeleteQuery($table, array $conditions = array(), $where = '')
     {
-        $query = 'DELETE FROM ' . $this->queryBuilder->escapeString(addslashes($table)) . $this->createWhere($conditions, $where);
+        $query = sprintf('DELETE FROM %s%s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         foreach ($conditions as $key => $condition) {
             $statement->bindValue('where_' . $key, $condition);
@@ -147,11 +147,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
-        $query = 'SELECT ' . $fields . ' FROM ' . $this->queryBuilder->escapeString(addslashes($table));
-        $query .= $this->createWhere($conditions);
-        if ($limit) {
-            $query .= ' LIMIT ' . $limit;
-        }
+        $query = sprintf('SELECT %s FROM %s%s%s;', $fields, $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions), $limit ? ' LIMIT ' . $limit : '');
         return $query;
     }
     
@@ -170,7 +166,7 @@ abstract class PdoAdapter implements AdapterInterface
         foreach (array_keys($data) as $key) {
             $values[] = $this->createValue($key);
         }
-        return $values;
+        return '(' . implode(', ', $values) . ')';
     }
     
     private function createValue($key, $prefix = '')
@@ -183,14 +179,15 @@ abstract class PdoAdapter implements AdapterInterface
         if (empty($conditions) && $where == '') {
             return '';
         }
+        
         if (empty($conditions)) {
-            return ' WHERE ' . $where;
+            return sprintf(' WHERE %s', $where);
         }
         $cond = [];
         foreach (array_keys($conditions) as $key) {
             $cond[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
         }
-        return ' WHERE ' . implode(' AND ', $cond) . ($where ? ' AND ' . $where : '');
+        return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
     }
     
     /**
