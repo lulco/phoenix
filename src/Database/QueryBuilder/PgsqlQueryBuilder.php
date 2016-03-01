@@ -95,7 +95,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($foreignKey) . ';';
         }
         
-        if ($table->getPrimaryKeyToDrop()) {
+        if ($table->hasPrimaryKeyToDrop()) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ';';
         }
         

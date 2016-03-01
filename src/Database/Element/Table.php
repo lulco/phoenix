@@ -250,7 +250,7 @@ class Table
     /**
      * @return boolean
      */
-    public function getPrimaryKeyToDrop()
+    public function hasPrimaryKeyToDrop()
     {
         return $this->dropPrimaryKey;
     }

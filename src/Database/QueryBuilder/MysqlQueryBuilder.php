@@ -90,7 +90,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $query;
         }
         
-        if ($table->getPrimaryKeyToDrop()) {
+        if ($table->hasPrimaryKeyToDrop()) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY';
         }
         
@@ -141,27 +141,42 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= (!$column->isSigned()) ? ' unsigned' : '';
         $col .= $column->allowNull() ? '' : ' NOT NULL';
-        if ($column->getDefault() !== null) {
-            $col .= ' DEFAULT ';
-            if ($column->getType() == Column::TYPE_INTEGER) {
-                $col .= $column->getDefault();
-            } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
-                $col .= intval($column->getDefault());
-            } else {
-                $col .= "'" . $column->getDefault() . "'";
-            }
-        } elseif ($column->allowNull() && $column->getDefault() === null) {
-            $col .= ' DEFAULT NULL';
-        }
-        
-        if ($column->getAfter() !== null) {
-            $col .= ' AFTER ' . $this->escapeString($column->getAfter());
-        } elseif ($column->isFirst()) {
-            $col .= ' FIRST';
-        }
+        $col .= $this->createColumnDefault($column);
+        $col .= $this->createColumnPosition($column);
         
         $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
+    }
+    
+    private function createColumnDefault(Column $column)
+    {
+        if ($column->allowNull() && $column->getDefault() === null) {
+            return ' DEFAULT NULL';
+        }
+        
+        if ($column->getDefault() !== null) {
+            $default = ' DEFAULT ';
+            if ($column->getType() == Column::TYPE_INTEGER) {
+                return $default .= $column->getDefault();
+            }
+            if ($column->getType() == Column::TYPE_BOOLEAN) {
+                return $default .= intval($column->getDefault());
+            }
+            return $default .= "'" . $column->getDefault() . "'";
+        }
+        
+        return '';
+    }
+    
+    private function createColumnPosition(Column $column)
+    {
+        if ($column->getAfter() !== null) {
+            return ' AFTER ' . $this->escapeString($column->getAfter());
+        }
+        if ($column->isFirst()) {
+            return  ' FIRST';
+        }
+        return '';
     }
     
     protected function createPrimaryKey(Table $table)

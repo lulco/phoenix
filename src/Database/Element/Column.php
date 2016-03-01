@@ -33,21 +33,7 @@ class Column
     
     private $type;
     
-    private $allowNull;
-    
-    private $default;
-    
-    private $length;
-    
-    private $decimals;
-    
-    private $signed;
-    
-    private $autoincrement;
-    
-    private $after;
-    
-    private $first;
+    private $settings;
     
     /**
      * @param string $name name of column
@@ -60,14 +46,7 @@ class Column
         
         $this->name = $name;
         $this->type = $type;
-        $this->allowNull = isset($settings['null']) ? $settings['null'] : false;
-        $this->default = isset($settings['default']) ? $settings['default'] : null;
-        $this->length = isset($settings['length']) ? $settings['length'] : null;
-        $this->decimals = isset($settings['decimals']) ? $settings['decimals'] : null;
-        $this->signed = isset($settings['signed']) ? $settings['signed'] : true;
-        $this->autoincrement = isset($settings['autoincrement']) ? $settings['autoincrement'] : false;
-        $this->after = isset($settings['after']) ? $settings['after'] : null;
-        $this->first = isset($settings['first']) ? $settings['first'] : false;
+        $this->settings = $settings;
     }
     
     /**
@@ -91,7 +70,7 @@ class Column
      */
     public function allowNull()
     {
-        return $this->allowNull;
+        return isset($this->settings['null']) ? $this->settings['null'] : false;
     }
 
     /**
@@ -99,7 +78,7 @@ class Column
      */
     public function getDefault()
     {
-        return $this->default;
+        return isset($this->settings['default']) ? $this->settings['default'] : null;
     }
 
     /**
@@ -107,7 +86,7 @@ class Column
      */
     public function isSigned()
     {
-        return $this->signed;
+        return isset($this->settings['signed']) ? $this->settings['signed'] : true;
     }
 
     /**
@@ -116,7 +95,7 @@ class Column
      */
     public function getLength($default = null)
     {
-        return $this->length ?: $default;
+        return isset($this->settings['length']) ? $this->settings['length'] : $default;
     }
 
     /**
@@ -125,7 +104,7 @@ class Column
      */
     public function getDecimals($default = null)
     {
-        return $this->decimals ?: $default;
+        return isset($this->settings['decimals']) ? $this->settings['decimals'] : $default;
     }
     
     /**
@@ -133,7 +112,7 @@ class Column
      */
     public function isAutoincrement()
     {
-        return $this->autoincrement;
+        return isset($this->settings['autoincrement']) ? $this->settings['autoincrement'] : false;
     }
     
     /**
@@ -141,7 +120,7 @@ class Column
      */
     public function getAfter()
     {
-        return $this->after;
+        return isset($this->settings['after']) ? $this->settings['after'] : null;
     }
     
     /**
@@ -149,7 +128,7 @@ class Column
      */
     public function isFirst()
     {
-        return $this->first;
+        return isset($this->settings['first']) ? $this->settings['first'] : false;
     }
     
     private function checkSettings($settings)
