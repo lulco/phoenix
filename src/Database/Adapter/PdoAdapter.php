@@ -87,12 +87,11 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildUpdateQuery($table, array $data, array $conditions = [], $where = '')
     {
-        $query = 'UPDATE ' . $this->queryBuilder->escapeString(addslashes($table)) . ' SET ';
         $values = [];
         foreach (array_keys($data) as $key) {
             $values[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key);
         }
-        $query .= implode(', ', $values) . $this->createWhere($conditions, $where) . ';';
+        $query = sprintf('UPDATE %s SET %s %s;', $this->queryBuilder->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
             $statement->bindValue($key, $value);
