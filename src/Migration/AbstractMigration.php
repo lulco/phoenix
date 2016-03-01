@@ -152,15 +152,15 @@ abstract class AbstractMigration
     public function __call($name, $arguments)
     {
         if ($name == 'addColumn') {
-            return $this->_addColumn($arguments);
+            return $this->addCol($arguments);
         }
         if ($name == 'changeColumn') {
-            return $this->_changeColumn($arguments);
+            return $this->changeCol($arguments);
         }
         throw new RuntimeException('Method "' . $name . '" not found');
     }
     
-    private function _addColumn($arguments)
+    private function addCol($arguments)
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addColumn(). Use method table() first.');
@@ -227,7 +227,7 @@ abstract class AbstractMigration
         return $this;
     }
     
-    private function _changeColumn($arguments)
+    private function changeCol($arguments)
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method changeColumn(). Use method table() first.');
