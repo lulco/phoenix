@@ -74,6 +74,9 @@ abstract class AbstractCommand extends Command
     
     private function loadConfig(InputInterface $input)
     {
+        if ($this->config) {
+            return;
+        }
         $configFile = $input->getOption('config') ?: 'config.php';
         if ($configFile && !file_exists($configFile)) {
             throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
