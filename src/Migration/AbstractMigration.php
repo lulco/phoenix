@@ -290,16 +290,16 @@ abstract class AbstractMigration
      * @param string|array $columns name(s) of column(s)
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
+     * @param string $name name of index
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException
      */
-    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT)
+    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
     {
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
         }
-        
-        $this->table->addIndex(new Index($columns, $type, $method));
+        $this->table->addIndex(new Index($columns, $this->createIndexName($columns, $name), $type, $method));
         return $this;
     }
     
@@ -313,8 +313,34 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method dropIndex(). Use method table() first.');
         }
-        $this->table->dropIndex($columns);
+        $this->table->dropIndex($this->createIndexName($columns));
         return $this;
+    }
+    
+    /**
+     * @param string $indexName
+     * @return AbstractMigration
+     * @throws IncorrectMethodUsageException
+     */
+    final protected function dropIndexByName($indexName)
+    {
+        if ($this->table === null) {
+            throw new IncorrectMethodUsageException('Wrong use of method dropIndexByName(). Use method table() first.');
+        }
+        $this->table->dropIndex($indexName);
+        return $this;
+    }
+    
+    private function createIndexName($columns, $name = null)
+    {
+        if ($name) {
+            return $name;
+        }
+        
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        return 'idx_' . $this->table->getName() . '_' . implode('_', $columns);
     }
     
     /**
@@ -448,6 +474,43 @@ abstract class AbstractMigration
         $queries = $queryBuilder->alterTable($this->table);
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
+    }
+    
+    /**
+     * execute SELECT query and returns result
+     * @param string $sql
+     * @return array
+     */
+    final protected function select($sql)
+    {
+        return $this->adapter->select($sql);
+    }
+    
+    /**
+     * @param string $table
+     * @param string $fields
+     * @param array $conditions
+     * @param array $orders
+     * @param array $groups
+     * @return array
+     */
+    final protected function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = [])
+    {
+        return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
+    }
+    
+    /**
+     * @param string $table
+     * @param string $fields
+     * @param array $conditions
+     * @param int|null $limit
+     * @param array $orders
+     * @param array $groups
+     * @return array
+     */
+    final protected function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = [])
+    {
+        return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
     }
     
     /**

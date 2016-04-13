@@ -16,18 +16,22 @@ class Index
     
     private $columns = [];
     
+    private $name;
+    
     private $type;
     
     private $method;
     
     /**
      * @param string|array $columns name(s) of column(s)
+     * @param string $name name of index
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
      * @throws InvalidArgumentValueException if index type or index method is not allowed
      */
-    public function __construct($columns, $type = self::TYPE_NORMAL, $method = self::METHOD_DEFAULT)
+    public function __construct($columns, $name, $type = self::TYPE_NORMAL, $method = self::METHOD_DEFAULT)
     {
+        $this->name = $name;
         $this->type = strtoupper($type);
         if (!in_array($this->type, [self::TYPE_NORMAL, self::TYPE_UNIQUE, self::TYPE_FULLTEXT])) {
             throw new InvalidArgumentValueException('Index type "' . $type . '" is not allowed');
@@ -50,7 +54,7 @@ class Index
      */
     public function getName()
     {
-        return implode('_', $this->columns);
+        return $this->name;
     }
 
     /**

@@ -179,15 +179,12 @@ class Table
     }
     
     /**
-     * @param string|array $columns
+     * @param string $indexName
      * @return Table
      */
-    public function dropIndex($columns)
+    public function dropIndex($indexName)
     {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        $this->indexesToDrop[] = implode('_', $columns);
+        $this->indexesToDrop[] = $indexName;
         return $this;
     }
     

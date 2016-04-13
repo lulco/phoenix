@@ -60,9 +60,9 @@ class TableTest extends PHPUnit_Framework_TestCase
     {
         $table = new Table('test');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'unique')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext', 'fulltext'])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'title', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'title_alias')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('bodytext', 'bodytext', 'fulltext')));
     }
     
     public function testGetters()
@@ -79,9 +79,9 @@ class TableTest extends PHPUnit_Framework_TestCase
         }
         $this->assertInstanceOf('\Phoenix\Database\Element\Column', $table->getColumn('title'));
         
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'unique')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext', 'fulltext'])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('title', 'title', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'title_alias')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['bodytext'], 'bodytext', 'fulltext')));
         
         $indexes = $table->getIndexes();
         $this->assertCount(3, $indexes);

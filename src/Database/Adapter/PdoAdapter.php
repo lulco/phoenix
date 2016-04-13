@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
+use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
@@ -125,6 +126,17 @@ abstract class PdoAdapter implements AdapterInterface
             $statement->bindValue('where_' . $key, $condition);
         }
         return $statement;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function select($sql)
+    {
+        if (strpos($sql, 'SELECT ') === 0) {
+            return $this->execute($sql)->fetchAll(PDO::FETCH_ASSOC);
+        }
+        throw new InvalidArgumentException('Only select query can be executed in select method');
     }
     
     /**

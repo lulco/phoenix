@@ -1,6 +1,13 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+#### Added
+- possibility to set custom name for index
+- method drop index by name
+- method select to Adapters
+
+#### Changed
+- automatically created names of indexes are now: idx_{tablename}_{implode('_', columns)} - possible BC
 
 ### [0.2.0] - 2016/03/02
 #### Added

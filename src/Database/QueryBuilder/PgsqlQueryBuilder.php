@@ -182,7 +182,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         foreach ($index->getColumns() as $column) {
             $columns[] = $this->escapeString($column);
         }
-        return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($table->getName() . '_' . $index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
+        return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
     }
     
     protected function dropIndexes(Table $table)
@@ -190,7 +190,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query = 'DROP INDEX ';
         $indexes = [];
         foreach ($table->getIndexesToDrop() as $index) {
-            $indexes[] = $this->escapeString($table->getName() . '_' . $index);
+            $indexes[] = $this->escapeString($index);
         }
         $query .= implode(',', $indexes) . ';';
         return $query;

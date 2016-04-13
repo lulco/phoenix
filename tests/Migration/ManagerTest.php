@@ -81,7 +81,7 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         
         $this->initMigration->rollback();
         
-        $this->setExpectedException('Phoenix\Exception\DatabaseQueryExecuteException', 'SQLSTATE[HY000]: no such table: phoenix_log. Query SELECT * FROM "phoenix_log" fails');
+        $this->setExpectedException('Phoenix\Exception\DatabaseQueryExecuteException', 'SQLSTATE[HY000]: no such table: phoenix_log. Query SELECT * FROM "phoenix_log"; fails');
         $this->manager->executedMigrations();
     }
     

@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
+use InvalidArgumentException;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 interface AdapterInterface
@@ -46,6 +47,12 @@ interface AdapterInterface
      * @param string $where
      */
     public function delete($table, array $conditions = [], $where = '');
+    
+    /**
+     * @param string $sql
+     * @return array
+     */
+    public function select($sql);
     
     /**
      * @param string $table
