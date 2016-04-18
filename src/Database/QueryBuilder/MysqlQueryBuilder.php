@@ -11,7 +11,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int(%d)',
-        Column::TYPE_BOOLEAN => 'int(1)',
+        Column::TYPE_BOOLEAN => 'tinyint(1)',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATETIME => 'datetime',
         Column::TYPE_UUID => 'char(36)',
