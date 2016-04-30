@@ -59,7 +59,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryCreator = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `no_primary_key` (`title` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`is_deleted` int(1) NOT NULL DEFAULT 0) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `no_primary_key` (`title` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`is_deleted` tinyint(1) NOT NULL DEFAULT 0) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
         ];
         $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
     }
