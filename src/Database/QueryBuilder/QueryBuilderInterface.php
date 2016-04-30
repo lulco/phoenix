@@ -34,5 +34,5 @@ interface QueryBuilderInterface
      * @param string $string
      * @return string escaped string
      */
-    public function escapeString($string);    
+    public function escapeString($string);
 }
