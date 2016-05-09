@@ -40,7 +40,8 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
-        $query .= !empty($table->getPrimaryColumns()) ? ',' . $this->createPrimaryKey($table) : '';
+        $primaryColumns = $table->getPrimaryColumns();
+        $query .= !empty($primaryColumns) ? ',' . $this->createPrimaryKey($table) : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
