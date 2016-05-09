@@ -28,7 +28,7 @@ class CreateCommand extends AbstractCommand
         $dir = $input->getArgument('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
         
-        $content = "<?php \n\n";
+        $content = "<?php\n\n";
         if ($migrationNameCreator->getNamespace()) {
             $content .= "namespace {$migrationNameCreator->getNamespace()};\n\n";
         }
