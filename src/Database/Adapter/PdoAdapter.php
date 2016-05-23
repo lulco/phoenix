@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use InvalidArgumentException;
+use DateTime;
 use PDO;
 use PDOStatement;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
@@ -66,6 +66,9 @@ abstract class PdoAdapter implements AdapterInterface
         $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
+            if ($value instanceof DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
             $statement->bindValue($key, $value);
         }
         return $statement;
@@ -95,6 +98,9 @@ abstract class PdoAdapter implements AdapterInterface
         $query = sprintf('UPDATE %s SET %s%s;', $this->queryBuilder->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         foreach ($data as $key => $value) {
+            if ($value instanceof DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
             $statement->bindValue($key, $value);
         }
         foreach ($conditions as $key => $condition) {
@@ -118,7 +124,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function buildDeleteQuery($table, array $conditions = array(), $where = '')
+    public function buildDeleteQuery($table, array $conditions = [], $where = '')
     {
         $query = sprintf('DELETE FROM %s%s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
@@ -138,11 +144,11 @@ abstract class PdoAdapter implements AdapterInterface
         }
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function fetch($table, $fields = '*', array $conditions = array(), array $orders = array(), array $groups = array())
+    public function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = [])
     {
         $query = $this->buildFetchQuery($table, $fields, $conditions, 1, $orders, $groups);
         return $this->execute($query)->fetch(PDO::FETCH_ASSOC);
@@ -151,7 +157,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchAll($table, $fields = '*', array $conditions = array(), $limit = null, array $orders = array(), array $groups = array())
+    public function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
         $query = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
         return $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
