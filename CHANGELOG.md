@@ -5,10 +5,13 @@
 - possibility to set custom name for index
 - method drop index by name
 - method select to Adapters
+- added support for using DateTime instances in inserting / updating data
 
 #### Changed
 - automatically created names of indexes are now: idx_{tablename}_{implode('_', columns)} - possible BC
 - boolean db type from int to tinyint in mysql
+- updated version of symfony/console
+- minimal version of PHP to 5.6
 
 ### [0.2.0] - 2016/03/02
 #### Added
@@ -40,7 +43,7 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://git.efabrica.sk/web-components/article-storage/compare/0.2.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.2.0...HEAD
 [0.2.0]: https://github.com/lulco/phoenix/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/lulco/phoenix/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/lulco/phoenix/compare/0.0.0...0.1.0
