@@ -10,7 +10,6 @@
 #### Changed
 - automatically created names of indexes are now: idx_{tablename}_{implode('_', columns)} - possible BC
 - boolean db type from int to tinyint in mysql
-- updated version of symfony/console
 - minimal version of PHP to 5.6
 
 ### [0.2.0] - 2016/03/02
