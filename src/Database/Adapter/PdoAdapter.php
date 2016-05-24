@@ -3,6 +3,7 @@
 namespace Phoenix\Database\Adapter;
 
 use DateTime;
+use InvalidArgumentException;
 use PDO;
 use PDOStatement;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
@@ -245,4 +246,9 @@ abstract class PdoAdapter implements AdapterInterface
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '. Query ' . print_R($query, true) . ' fails', $errorInfo[1]);
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    abstract function tableInfo($table);
 }

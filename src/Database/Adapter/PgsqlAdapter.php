@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
+use LogicException;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class PgsqlAdapter extends PdoAdapter
@@ -15,5 +16,10 @@ class PgsqlAdapter extends PdoAdapter
             $this->queryBuilder = new PgsqlQueryBuilder();
         }
         return $this->queryBuilder;
+    }
+
+    public function tableInfo($table)
+    {
+        throw new LogicException('Not yet implemented');
     }
 }

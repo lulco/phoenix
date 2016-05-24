@@ -104,7 +104,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         
         $columns = $table->getColumns();
-        unset($columns['id']);
+        // unset($columns['id']);
         if (!empty($columns)) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
@@ -122,7 +122,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         
         $primaryColumns = $table->getPrimaryColumns();
-        unset($primaryColumns['id']);
+        // unset($primaryColumns['id']);
         if (!empty($primaryColumns)) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table, $primaryColumns) . ';';
         }

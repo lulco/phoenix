@@ -104,7 +104,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         
         $columns = $table->getColumns();
-        unset($columns['id']);
+        // unset($columns['id']);
         if (!empty($columns)) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
@@ -116,7 +116,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         
         $primaryColumns = $table->getPrimaryColumns();
-        unset($primaryColumns['id']);
+        // unset($primaryColumns['id']);
         if (!empty($primaryColumns)) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($primaryColumns) . ';';
         }

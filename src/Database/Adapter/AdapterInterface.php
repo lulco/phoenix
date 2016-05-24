@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use InvalidArgumentException;
+use Phoenix\Database\Element\Column;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 interface AdapterInterface
@@ -102,4 +102,10 @@ interface AdapterInterface
      * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
     public function rollback();
+    
+    /**
+     * @param string $table
+     * @return Column[]
+     */
+    public function tableInfo($table);
 }

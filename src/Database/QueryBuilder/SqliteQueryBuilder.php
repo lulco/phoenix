@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
@@ -25,6 +26,13 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
     ];
+    
+    private $adapter;
+    
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
     
     /**
      * generates create table queries for sqlite
@@ -71,7 +79,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $queries = [];
         
         $columns = $table->getColumns();
-        unset($columns['id']);
+//        unset($columns['id']);
         if (!empty($columns)) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
@@ -80,6 +88,34 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             }
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
+        }
+        
+        if ($table->getColumnsToChange()) {
+            $oldColumns = $this->adapter->tableInfo($table->getName());
+            $columns = array_merge($oldColumns, $table->getColumnsToChange());
+
+            $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
+            $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
+            
+            $newTable = new Table($table->getName());
+            $primaryColumn = false;
+            $columnNames = [];
+            foreach ($columns as $column) {
+                $columnNames[] = $column->getName();
+                if ($column->isAutoincrement()) {
+                    $primaryColumn = $column;
+                } else {
+                    $newTable->addColumn($column);
+                }
+            }
+            $newTable->addPrimary($primaryColumn);
+            $queries = array_merge($queries, $this->createTable($newTable));
+            
+            // copy data
+            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
+            
+            $tableToDrop = new Table($tmpTableName);
+            $queries = array_merge($queries, $this->dropTable($tableToDrop));
         }
         
         return $queries;
@@ -135,5 +171,5 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function escapeString($string)
     {
         return '"' . $string . '"';
-    }
+    }    
 }
