@@ -171,5 +171,5 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function escapeString($string)
     {
         return '"' . $string . '"';
-    }    
+    }
 }

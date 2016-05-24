@@ -250,5 +250,5 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    abstract function tableInfo($table);
+    abstract public function tableInfo($table);
 }
