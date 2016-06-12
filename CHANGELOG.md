@@ -5,6 +5,8 @@
 #### Added
 - support for yaml and neon configs
 - command execution time for each migration / rollback and total execution time
+- method tableInfo for AdapterInterface
+- support for changing columns in sqlite adapter
 
 #### Updated
 - composer libraries

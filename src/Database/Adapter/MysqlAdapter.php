@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
+use LogicException;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
@@ -15,5 +16,10 @@ class MysqlAdapter extends PdoAdapter
             $this->queryBuilder = new MysqlQueryBuilder();
         }
         return $this->queryBuilder;
+    }
+    
+    public function tableInfo($table)
+    {
+        throw new LogicException('Not yet implemented');
     }
 }

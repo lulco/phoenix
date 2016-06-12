@@ -106,6 +106,13 @@ abstract class CommonQueryBuilder
     
     abstract public function escapeString($string);
     
+    protected function escapeArray(array $array)
+    {
+        return array_map(function ($string) {
+            return $this->escapeString($string);
+        }, $array);
+    }
+    
     abstract protected function createColumn(Column $column, Table $table);
     
     abstract protected function createPrimaryKey(Table $table);
