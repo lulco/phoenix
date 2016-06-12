@@ -71,7 +71,11 @@ abstract class AbstractCommand extends Command
         $this->manager = new Manager($this->config, $this->adapter);
         $this->check($input, $output);
         
+        $start = microtime(true);
         $this->runCommand($input, $output);
+        $output->writeln('');
+        $output->write('<comment>All done. Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+        $output->writeln('');
     }
     
     private function loadConfig(InputInterface $input)

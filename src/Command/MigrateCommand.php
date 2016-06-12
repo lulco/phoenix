@@ -21,19 +21,21 @@ class MigrateCommand extends AbstractCommand
         if (empty($migrations)) {
             $output->writeln('');
             $output->writeln('<info>Nothing to migrate</info>');
-            $output->writeln('');
             return;
         }
         
         foreach ($migrations as $migration) {
+            $output->writeln('');
+            $output->writeln('<info>Migration ' . $migration->getClassName() . ' executing</info>');
+
+            $start = microtime(true);
             $migration->migrate();
+            $output->writeln('<info>Migration ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+
             $this->manager->logExecution($migration);
             
-            $output->writeln('');
-            $output->writeln('<info>Migration ' . $migration->getClassName() . ' executed</info>');
             $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
             $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
         }
-        $output->writeln('');
     }
 }

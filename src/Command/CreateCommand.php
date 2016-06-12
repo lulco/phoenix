@@ -40,6 +40,5 @@ class CreateCommand extends AbstractCommand
         
         $output->writeln('');
         $output->writeln('<info>Migration "' . $migration . '" created</info>');
-        $output->writeln('');
     }
 }

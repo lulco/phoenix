@@ -77,7 +77,7 @@ abstract class AbstractMigration
      */
     final public function getClassName()
     {
-        return $this->className;
+        return ltrim($this->className, '\\');
     }
     
     /**
