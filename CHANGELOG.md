@@ -4,6 +4,8 @@
 
 #### Added
 - support for yaml and neon configs
+- method tableInfo for AdapterInterface
+- support for changing columns in sqlite adapter
 
 #### Updated
 - composer libraries

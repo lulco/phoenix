@@ -79,7 +79,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $queries = [];
         
         $columns = $table->getColumns();
-//        unset($columns['id']);
         if (!empty($columns)) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
