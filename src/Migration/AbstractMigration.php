@@ -14,10 +14,8 @@ use ReflectionClass;
 use RuntimeException;
 
 /**
- * @method AbstractMigration addColumn(string $name name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column, int|null $length=null length of column, int|null $decimals=null number of decimals in decimal/float/double column, boolean $signed=true signed column, boolean $autoincrement=false autoincrement column) Adds column to the table @throws IncorrectMethodUsageException @deprecated since version 1.0.0
  * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table @throws IncorrectMethodUsageException
  * @method AbstractMigration addColumn(Column $column column definition) Adds column to the table - @throws IncorrectMethodUsageException
- * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, boolean $allowNull=false nullable column, mixed $default=null default value for column) Changes column in the table to new one @throws IncorrectMethodUsageException
  * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Changes column in the table to new one @throws IncorrectMethodUsageException
  * @method AbstractMigration changeColumn(string $oldName old name of column, Column $column new column definition) Changes column in the table to new one @throws IncorrectMethodUsageException
  */
@@ -165,57 +163,15 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method addColumn(). Use method table() first.');
         }
-        
-        if (count($arguments) > 4) {
-            echo 'Method addColumn(string $name, string $type, boolean $allowNull = false, mixed $default = null, int|null $length = null, int|null $decimals = null, boolean $signed = true, boolean $autoincrement = false) will be deprecated in version 1.0.0' . "\n";
-        }
-        
+
         if ($arguments[0] instanceof Column) {
             return $this->addPreparedColumn($arguments[0]);
         }
-        
-        if (count($arguments) == 3 && is_array($arguments[2])) {
-            return $this->addComplexColumn($arguments[0], $arguments[1], $arguments[2]);
-        }
-        
-        return $this->addSimpleColumn(
-            $arguments[0],
-            $arguments[1],
-            isset($arguments[2]) ? $arguments[2] : false,
-            isset($arguments[3]) ? $arguments[3] : null,
-            isset($arguments[4]) ? $arguments[4] : null,
-            isset($arguments[5]) ? $arguments[5] : null,
-            isset($arguments[6]) ? $arguments[6] : true,
-            isset($arguments[7]) ? $arguments[7] : false
-        );
+
+        return $this->prepareAndAddColumn($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : []);
     }
     
-    private function addSimpleColumn(
-        $name,
-        $type,
-        $allowNull = false,
-        $default = null,
-        $length = null,
-        $decimals = null,
-        $signed = true,
-        $autoincrement = false
-    ) {
-        $column = new Column(
-            $name,
-            $type,
-            [
-                'null' => $allowNull,
-                'default' => $default,
-                'length' => $length,
-                'decimals' => $decimals,
-                'signed' => $signed,
-                'autoincrement' => $autoincrement,
-            ]
-        );
-        return $this->addPreparedColumn($column);
-    }
-    
-    private function addComplexColumn($name, $type, $settings = [])
+    private function prepareAndAddColumn($name, $type, array $settings = [])
     {
         $column = new Column($name, $type, $settings);
         return $this->addPreparedColumn($column);
@@ -232,26 +188,16 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method changeColumn(). Use method table() first.');
         }
-        
-        if (count($arguments) > 5) {
+
+        if (count($arguments) > 4) {
             throw new InvalidArgumentException('Too many arguments');
         }
-        
+
         if ($arguments[1] instanceof Column) {
             return $this->changePreparedColumn($arguments[0], $arguments[1]);
         }
-        
-        if (count($arguments) == 4 && is_array($arguments[3])) {
-            return $this->changeComplexColumn($arguments[0], $arguments[1], $arguments[2], $arguments[3]);
-        }
-        
-        return $this->changeSimpleColumn(
-            $arguments[0],
-            $arguments[1],
-            $arguments[2],
-            isset($arguments[3]) ? $arguments[3] : false,
-            isset($arguments[4]) ? $arguments[4] : null
-        );
+
+        return $this->prepareAndChangeColumn($arguments[0], $arguments[1], $arguments[2], isset($arguments[3]) ? $arguments[3] : []);
     }
     
     private function changePreparedColumn($oldName, Column $newColumn)
@@ -260,13 +206,7 @@ abstract class AbstractMigration
         return $this;
     }
 
-    private function changeSimpleColumn($oldName, $newName, $newType, $allowNull = false, $default = null)
-    {
-        $newColumn = new Column($newName, $newType, ['null' => $allowNull, 'default' => $default]);
-        return $this->changePreparedColumn($oldName, $newColumn);
-    }
-    
-    private function changeComplexColumn($oldName, $newName, $newType, array $settings = [])
+    private function prepareAndChangeColumn($oldName, $newName, $newType, array $settings = [])
     {
         $newColumn = new Column($newName, $newType, $settings);
         return $this->changePreparedColumn($oldName, $newColumn);
