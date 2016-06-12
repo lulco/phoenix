@@ -22,19 +22,21 @@ class RollbackCommand extends AbstractCommand
         if (empty($migrations)) {
             $output->writeln('');
             $output->writeln('<info>Nothing to rollback</info>');
-            $output->writeln('');
             return;
         }
         
         foreach ($migrations as $migration) {
+            $output->writeln('');
+            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executing</info>');
+            
+            $start = microtime(true);
             $migration->rollback();
+            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+
             $this->manager->removeExecution($migration);
             
-            $output->writeln('');
-            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
             $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
             $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln('');
         }
     }
 }
