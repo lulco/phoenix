@@ -2,6 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for yaml and neon configs
+
+#### Updated
+- composer libraries
+
 ### [0.3.0] - 2016-05-23
 #### Added
 - possibility to set custom name for index

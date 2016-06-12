@@ -1,8 +1,8 @@
 /coverage/
 /build/
 /vendor/
-composer.lock
-humbuglog.txt
-humbuglog.json
-tests/testing_migrations/
-phpmd.html
+/composer.lock
+/humbuglog.txt
+/humbuglog.json
+/testing_migrations/
+/phpmd.html
