@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Removed
+- deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
+
 #### Added
 - support for yaml and neon configs
 - command execution time for each migration / rollback and total execution time
