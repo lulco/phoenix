@@ -5,6 +5,7 @@ namespace Phoenix\Command;
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Config\Config;
+use Phoenix\Config\Parser\ConfigParserFactory;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\ConfigException;
@@ -42,7 +43,8 @@ abstract class AbstractCommand extends Command
     protected function configure()
     {
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED);
-        $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL);
+        $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Path to config file');
+        $this->addOption('config_type', 't', InputOption::VALUE_OPTIONAL, 'Type of config, available values: php, yml, neon');
     }
     
     /**
@@ -77,12 +79,14 @@ abstract class AbstractCommand extends Command
         if ($this->config) {
             return;
         }
-        $configFile = $input->getOption('config') ?: 'config.php';
+        $configFile = $input->getOption('config') ?: 'phoenix.php';
         if ($configFile && !file_exists($configFile)) {
             throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
         }
         
-        $configuration = require $configFile;
+        $type = $input->getOption('config_type') ?: pathinfo($configFile, PATHINFO_EXTENSION);
+        $configParser = ConfigParserFactory::instance($type);
+        $configuration = $configParser->parse($configFile);
         $this->config = new Config($configuration);
     }
     
