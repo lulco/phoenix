@@ -4,6 +4,7 @@
 
 #### Added
 - support for yaml and neon configs
+- command execution time for each migration / rollback and total execution time
 
 #### Updated
 - composer libraries
