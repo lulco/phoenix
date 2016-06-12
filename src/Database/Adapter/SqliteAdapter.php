@@ -31,7 +31,7 @@ class SqliteAdapter extends PdoAdapter
                 'default' => $column['dflt_value'],
                 'autoincrement' => (bool)$column['pk'],
             ];
-            if ($matches) {
+            if (isset($matches[1]) && $matches[1] != '') {
                 $type = $matches[1];
             }
             
