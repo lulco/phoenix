@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [0.4.0] - 2016-06-13
 #### Added
 - support for yaml and neon configs
 - command execution time for each migration / rollback and total execution time
@@ -53,7 +54,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.3.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/lulco/phoenix/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/lulco/phoenix/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/lulco/phoenix/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/lulco/phoenix/compare/0.1.0...0.1.1
