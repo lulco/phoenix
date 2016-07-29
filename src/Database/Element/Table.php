@@ -145,13 +145,13 @@ class Table
     }
     
     /**
-     * @return array
+     * @return Column[]
      */
     public function getColumnsToChange()
     {
         return $this->columnsToChange;
     }
-        
+
     /**
      * @return array
      */

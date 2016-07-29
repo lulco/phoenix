@@ -25,7 +25,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
     ];
-    
+
     /**
      * generates create table query for pgsql
      * @param Table $table
@@ -120,6 +120,15 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
         }
         
+        if ($table->getColumnsToChange()) {
+            foreach ($table->getColumnsToChange() as $oldColumnName => $newColumn) {
+                if ($oldColumnName != $newColumn->getName()) {
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
+                }
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn) . ';';
+            }
+        }
+
         $primaryColumns = $table->getPrimaryColumns();
         if (!empty($primaryColumns)) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table, $primaryColumns) . ';';
