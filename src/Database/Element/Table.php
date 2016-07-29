@@ -66,7 +66,6 @@ class Table
             foreach (array_reverse($primaryColumn) as $column) {
                 $this->addPrimary($column);
             }
-            return $this;
         }
         return $this;
     }
