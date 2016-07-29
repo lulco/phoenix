@@ -26,6 +26,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_DECIMAL => [10, 0],
     ];
 
+    private $typeCastMap = [
+        Column::TYPE_STRING => 'varchar',
+    ];
+
     /**
      * generates create table query for pgsql
      * @param Table $table
@@ -125,7 +129,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($oldColumnName != $newColumn->getName()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
-                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn) . ';';
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn) . ' USING ' . $newColumn->getName() . '::' . (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType()) . ';';
             }
         }
 
