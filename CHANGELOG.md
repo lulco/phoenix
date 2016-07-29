@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- simple changes of column types and names for pgsql
+- simple type casting for pgsql
+
 ### [0.4.0] - 2016-06-13
 #### Added
 - support for yaml and neon configs
