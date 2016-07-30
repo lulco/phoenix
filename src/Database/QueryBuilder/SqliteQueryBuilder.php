@@ -154,7 +154,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         if (empty($primaryKeys)) {
             return '';
         }
-        return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+        return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
     private function createIndex(Index $index, Table $table)

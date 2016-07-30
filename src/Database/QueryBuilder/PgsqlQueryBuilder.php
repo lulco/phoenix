@@ -167,11 +167,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     
     protected function createPrimaryKey(Table $table)
     {
-        if (empty($table->getPrimaryColumns())) {
-            return '';
-        }
-        
-        return ',' . $this->primaryKeyString($table, $table->getPrimaryColumns());
+        return $this->primaryKeyString($table, $table->getPrimaryColumns());
     }
     
     private function primaryKeyString(Table $table, array $primaryColumns = [])

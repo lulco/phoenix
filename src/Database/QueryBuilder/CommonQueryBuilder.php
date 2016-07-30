@@ -41,7 +41,8 @@ abstract class CommonQueryBuilder
             $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
-        $query .= $this->createPrimaryKey($table);
+        $primaryKey = $this->createPrimaryKey($table);
+        $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createForeignKeys($table);
         $query .= ');';
         return $query;
