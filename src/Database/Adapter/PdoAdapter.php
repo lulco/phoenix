@@ -37,7 +37,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
 
         if ($res === false) {
-            $this->throwError($sql);            
+            $this->throwError($sql);
         }
         return $res;
     }
