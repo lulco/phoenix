@@ -3,6 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Added
+- added possibility to create custom templates
 - simple changes of column types and names for pgsql
 - simple type casting for pgsql
 - tests for PdoAdapter
