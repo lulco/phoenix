@@ -40,8 +40,8 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $columns[] = $this->createColumn($column, $table);
         }
         $query .= implode(',', $columns);
-        $primaryColumns = $table->getPrimaryColumns();
-        $query .= !empty($primaryColumns) ? ',' . $this->createPrimaryKey($table) : '';
+        $primaryKey = $this->createPrimaryKey($table);
+        $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
         $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
@@ -92,7 +92,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         
         if ($table->hasPrimaryKeyToDrop()) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY';
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY;';
         }
         
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
@@ -180,10 +180,6 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     
     protected function createPrimaryKey(Table $table)
     {
-        if (empty($table->getPrimaryColumns())) {
-            return '';
-        }
-        
         return $this->primaryKeyString($table->getPrimaryColumns());
     }
     
@@ -193,10 +189,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             return '';
         }
         
-        $primaryKeys = [];
-        foreach ($primaryColumns as $name) {
-            $primaryKeys[] = $this->escapeString($name);
-        }
+        $primaryKeys = $this->escapeArray($primaryColumns);
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
@@ -215,10 +208,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     
     private function createIndex(Index $index)
     {
-        $columns = [];
-        foreach ($index->getColumns() as $column) {
-            $columns[] = $this->escapeString($column);
-        }
+        $columns = $this->escapeArray($index->getColumns());
         return $index->getType() . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
     }
     
