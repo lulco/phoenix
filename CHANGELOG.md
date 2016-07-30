@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Removed
+- deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
+
 #### Added
 - simple changes of column types and names for pgsql
 - simple type casting for pgsql
