@@ -11,15 +11,15 @@ class AdapterFactory
     public static function instance(EnvironmentConfig $config)
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
-        switch ($config->getAdapter()) {
-            case 'mysql':
-                return new MysqlAdapter($pdo);
-            case 'pgsql':
-                return new PgsqlAdapter($pdo);
-            case 'sqlite':
-                return new SqliteAdapter($pdo);
-            default:
-                throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
+        if ($config->getAdapter() == 'mysql') {
+            return new MysqlAdapter($pdo);
         }
+        if ($config->getAdapter() == 'pgsql') {
+            return new PgsqlAdapter($pdo);
+        }
+        if ($config->getAdapter() == 'sqlite') {
+            return new SqliteAdapter($pdo);
+        }
+        throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
     }
 }

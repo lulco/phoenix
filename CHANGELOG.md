@@ -5,6 +5,10 @@
 #### Added
 - simple changes of column types and names for pgsql
 - simple type casting for pgsql
+- tests for PdoAdapter
+
+#### Fixed
+- several bugs in PdoAdapter
 
 ### [0.4.0] - 2016-06-13
 #### Added
