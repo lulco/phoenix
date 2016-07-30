@@ -224,7 +224,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function createOrder(array $orders = [])
     {
-        if (!$orders) {
+        if (empty($orders)) {
             return '';
         }
         $listOfOrders = [];
@@ -241,7 +241,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function createGroup(array $groups = [])
     {
-        if (!$groups) {
+        if (empty($groups)) {
             return '';
         }
         return sprintf(' GROUP BY %s', implode(', ', $groups));
