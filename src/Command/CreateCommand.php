@@ -3,9 +3,11 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
+use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CreateCommand extends AbstractCommand
@@ -15,8 +17,8 @@ class CreateCommand extends AbstractCommand
         $this->setName('create')
             ->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
-            ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in');
-        
+            ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
+            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Path to template');
         parent::configure();
     }
 
@@ -28,16 +30,21 @@ class CreateCommand extends AbstractCommand
         $dir = $input->getArgument('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
         
-        $content = "<?php\n\n";
-        if ($migrationNameCreator->getNamespace()) {
-            $content .= "namespace {$migrationNameCreator->getNamespace()};\n\n";
+        $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
+        if (!file_exists($templatePath)) {
+            throw new PhoenixException('Template "' . $templatePath . '" not found');
         }
-        $content .= "use Phoenix\Migration\AbstractMigration;\n\n";
-        $content .= "class {$migrationNameCreator->getClassName()} extends AbstractMigration\n";
-        $content .= "{\n    protected function up()\n    {\n        \n    }\n\n";
-        $content .= "    protected function down()\n    {\n        \n    }\n}\n";
-        file_put_contents($migrationDir . '/' . $filename, $content);
         
+        $template = file_get_contents($templatePath);
+        $namespace = '';
+        if ($migrationNameCreator->getNamespace()) {
+            $namespace .= "namespace {$migrationNameCreator->getNamespace()};\n\n";
+        }
+        $template = str_replace('###NAMESPACE###', $namespace, $template);
+        $template = str_replace('###CLASSNAME###', $migrationNameCreator->getClassName(), $template);
+        
+        file_put_contents($migrationDir . '/' . $filename, $template);
+
         $output->writeln('');
         $output->writeln('<info>Migration "' . $migration . '" created</info>');
     }
