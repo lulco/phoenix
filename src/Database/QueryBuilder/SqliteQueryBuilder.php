@@ -6,6 +6,7 @@ use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
+use Phoenix\Exception\PhoenixException;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -29,7 +30,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     
     private $adapter;
     
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter = null)
     {
         $this->adapter = $adapter;
     }
@@ -90,6 +91,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         
         if ($table->getColumnsToChange()) {
+            if (is_null($this->adapter)) {
+                throw new PhoenixException('Missing adapter');
+            }
             $oldColumns = $this->adapter->tableInfo($table->getName());
             $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
@@ -154,7 +158,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         if (empty($primaryKeys)) {
             return '';
         }
-        return ',PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+        return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
     private function createIndex(Index $index, Table $table)

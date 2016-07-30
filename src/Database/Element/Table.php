@@ -66,7 +66,6 @@ class Table
             foreach (array_reverse($primaryColumn) as $column) {
                 $this->addPrimary($column);
             }
-            return $this;
         }
         return $this;
     }
@@ -145,13 +144,13 @@ class Table
     }
     
     /**
-     * @return array
+     * @return Column[]
      */
     public function getColumnsToChange()
     {
         return $this->columnsToChange;
     }
-        
+
     /**
      * @return array
      */

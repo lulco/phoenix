@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Database\QueryBuilder;
 
+use PDO;
 use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -242,5 +243,62 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
     }
-}
+    
+    public function testChangeColumn()
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $adapter = new SqliteAdapter($pdo);
 
+        $pdo->query('CREATE TABLE "with_columns_to_change" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"old_name" integer NOT NULL,"no_name_change" integer NOT NULL);');
+        
+        $table = new Table('with_columns_to_change');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+
+        $timestamp = date('YmdHis');
+        $queryBuilder = new SqliteQueryBuilder($adapter);
+        $expectedQueries = [
+            'ALTER TABLE "with_columns_to_change" RENAME TO "_with_columns_to_change_old_' . $timestamp . '";',
+            'CREATE TABLE "with_columns_to_change" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"new_name" integer NOT NULL,"no_name_change" integer NOT NULL);',
+            'INSERT INTO "with_columns_to_change" ("id","new_name","no_name_change") SELECT "id","old_name","no_name_change" FROM "_with_columns_to_change_old_' . $timestamp . '"',
+            'DROP TABLE "_with_columns_to_change_old_' . $timestamp . '"',
+        ];
+        
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+    
+    public function testChangeColumnWithoutAdapter()
+    {
+        $table = new Table('with_columns_to_change');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+
+        $queryBuilder = new SqliteQueryBuilder();
+        
+        $this->setExpectedException('\Phoenix\Exception\PhoenixException', 'Missing adapter');
+        $queryBuilder->alterTable($table);
+    }
+    
+    public function testChangeAddedColumn()
+    {
+        $table = new Table('with_change_added_column');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('old_name', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'string')));
+
+        $queryBuilder = new SqliteQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE "with_change_added_column" ADD COLUMN "new_name" varchar(255) NOT NULL;',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+    
+    public function testRenameTable()
+    {
+        $table = new Table('old_table_name');
+        $queryBuilder = new SqliteQueryBuilder();
+        $expectedQueries = [
+            'ALTER TABLE "old_table_name" RENAME TO "new_table_name";',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table, 'new_table_name'));
+    }
+}

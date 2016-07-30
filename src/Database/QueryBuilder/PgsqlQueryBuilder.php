@@ -25,7 +25,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
     ];
-    
+
+    private $typeCastMap = [
+        Column::TYPE_STRING => 'varchar',
+    ];
+
     /**
      * generates create table query for pgsql
      * @param Table $table
@@ -120,6 +124,15 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
         }
         
+        if ($table->getColumnsToChange()) {
+            foreach ($table->getColumnsToChange() as $oldColumnName => $newColumn) {
+                if ($oldColumnName != $newColumn->getName()) {
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
+                }
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn) . ' USING ' . $newColumn->getName() . '::' . (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType()) . ';';
+            }
+        }
+
         $primaryColumns = $table->getPrimaryColumns();
         if (!empty($primaryColumns)) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table, $primaryColumns) . ';';
@@ -154,11 +167,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     
     protected function createPrimaryKey(Table $table)
     {
-        if (empty($table->getPrimaryColumns())) {
-            return '';
-        }
-        
-        return ',' . $this->primaryKeyString($table, $table->getPrimaryColumns());
+        return $this->primaryKeyString($table, $table->getPrimaryColumns());
     }
     
     private function primaryKeyString(Table $table, array $primaryColumns = [])
