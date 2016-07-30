@@ -36,11 +36,11 @@ abstract class PdoAdapter implements AdapterInterface
             $res = $this->pdo->query($sql);
         }
 
-        if ($res !== false) {
-            return $res;
+        if ($res === false) {
+            $this->throwError($sql);
+            
         }
-
-        $this->throwError($sql);
+        return $res;
     }
 
     /**
@@ -49,14 +49,8 @@ abstract class PdoAdapter implements AdapterInterface
     public function insert($table, array $data)
     {
         $statement = $this->buildInsertQuery($table, $data);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
-        $res = $this->execute($statement);
-        if ($res !== false) {
-            return $this->pdo->lastInsertId();
-        }
-        $this->throwError($statement->queryString);
+        $this->execute($statement);
+        return $this->pdo->lastInsertId();
     }
     
     /**
@@ -154,15 +148,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = [])
     {
-        $query = $this->buildFetchQuery($table, $fields, $conditions, 1, $orders, $groups);
-        $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
-        foreach ($conditions as $key => $condition) {
-            $statement->bindValue('where_' . $key, $condition);
-        }
-
+        $statement = $this->buildFetchQuery($table, $fields, $conditions, 1, $orders, $groups);
         $this->execute($statement);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
@@ -172,15 +158,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
-        $query = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
-        $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
-        foreach ($conditions as $key => $condition) {
-            $statement->bindValue('where_' . $key, $condition);
-        }
-
+        $statement = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
         $this->execute($statement);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -188,7 +166,14 @@ abstract class PdoAdapter implements AdapterInterface
     private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
         $query = sprintf('SELECT %s FROM %s%s%s%s%s;', $fields, $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
-        return $query;
+        $statement = $this->pdo->prepare($query);
+        if (!$statement) {
+            $this->throwError($statement);
+        }
+        foreach ($conditions as $key => $condition) {
+            $statement->bindValue('where_' . $key, $condition);
+        }
+        return $statement;
     }
 
     private function createKeys($data)
