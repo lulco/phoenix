@@ -150,6 +150,23 @@ abstract class CommonQueryBuilder
         return $constraint;
     }
 
+    protected function dropKeys($table, $primaryKeyName, $foreignKeyPrefix)
+    {
+        $queries = [];
+        if ($table->hasPrimaryKeyToDrop()) {
+            $queries[] = $this->dropKeyQuery($table, $primaryKeyName);
+        }
+        foreach ($table->getForeignKeysToDrop() as $foreignKey) {
+            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($foreignKey));
+        }
+        return $queries;
+    }
+    
+    protected function dropKeyQuery($table, $key)
+    {
+        return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
+    }
+    
     abstract public function escapeString($string);
     
     protected function escapeArray(array $array)

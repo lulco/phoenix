@@ -79,32 +79,10 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         $queries = $this->addColumns($table);
         if ($table->getColumnsToChange()) {
-            if (is_null($this->adapter)) {
-                throw new PhoenixException('Missing adapter');
-            }
-            $oldColumns = $this->adapter->tableInfo($table->getName());
-            $columns = array_merge($oldColumns, $table->getColumnsToChange());
-
             $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
             $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
-            
-            $newTable = new Table($table->getName());
-            $primaryColumn = false;
-            $columnNames = [];
-            foreach ($columns as $column) {
-                $columnNames[] = $column->getName();
-                if ($column->isAutoincrement()) {
-                    $primaryColumn = $column;
-                } else {
-                    $newTable->addColumn($column);
-                }
-            }
-            $newTable->addPrimary($primaryColumn);
-            $queries = array_merge($queries, $this->createTable($newTable));
-            
-            // copy data
-            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
-            
+            $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName));
+
             $tableToDrop = new Table($tmpTableName);
             $queries = array_merge($queries, $this->dropTable($tableToDrop));
         }
@@ -153,6 +131,31 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         $query = 'CREATE ' . $index->getType() . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
         return $query;
+    }
+
+    private function createNewTable(Table $table, $tmpTableName)
+    {
+        if (is_null($this->adapter)) {
+            throw new PhoenixException('Missing adapter');
+        }
+        $oldColumns = $this->adapter->tableInfo($table->getName());
+        $columns = array_merge($oldColumns, $table->getColumnsToChange());
+        
+        $newTable = new Table($table->getName());
+        $primaryColumn = false;
+        $columnNames = [];
+        foreach ($columns as $column) {
+            $columnNames[] = $column->getName();
+            if ($column->isAutoincrement()) {
+                $newTable->addPrimary($column);
+                continue;
+            }
+            $newTable->addColumn($column);
+        }
+        
+        $queries = $this->createTable($newTable);
+        $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
+        return $queries;
     }
     
     public function escapeString($string)

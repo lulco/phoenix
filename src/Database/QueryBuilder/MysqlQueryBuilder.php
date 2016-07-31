@@ -88,15 +88,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
         }
-        
-        if ($table->hasPrimaryKeyToDrop()) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY;';
-        }
-        
-        foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP FOREIGN KEY ' . $this->escapeString($foreignKey) . ';';
-        }
-        
+        $queries = array_merge($queries, $this->dropKeys($table, 'PRIMARY KEY', 'FOREIGN KEY'));
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }

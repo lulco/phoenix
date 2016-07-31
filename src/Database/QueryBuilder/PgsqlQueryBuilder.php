@@ -91,14 +91,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function alterTable(Table $table)
     {
         $queries = $this->dropIndexes($table);
-        foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($foreignKey) . ';';
-        }
-        
-        if ($table->hasPrimaryKeyToDrop()) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ';';
-        }
-        
+        $queries = array_merge($queries, $this->dropKeys($table, 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey'), 'CONSTRAINT'));
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
