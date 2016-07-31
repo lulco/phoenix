@@ -41,11 +41,11 @@ class PdoAdapterTest extends PHPUnit_Framework_TestCase
     
     public function testInsert()
     {
-        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $this->adapter->getQueryBuilder());
-        
         $this->adapter->execute('CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"date" TEXT NOT NULL);');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first', 'date' => new DateTime()]));
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second', 'date' => new DateTime()]));
+        
+        $this->assertCount(2, $this->adapter->fetchAll('phoenix_test_table'));
         
         $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException', 'SQLSTATE[HY000]: no such table: phoenix_non_exist_test_table.', 1);
         $this->adapter->insert('phoenix_non_exist_test_table', ['id' => 1, 'title' => 'first', 'date' => new DateTime()]);
@@ -57,6 +57,13 @@ class PdoAdapterTest extends PHPUnit_Framework_TestCase
 
         $this->setExpectedException('\Phoenix\Exception\DatabaseQueryExecuteException', 'SQLSTATE[HY000]: table phoenix_test_table has no column named unknown.', 1);
         $this->adapter->insert('phoenix_test_table', ['id' => 1, 'unknown' => 'first', 'sorting' => 1]);
+    }
+    
+    public function testMultiInsert()
+    {
+        $this->adapter->execute('CREATE TABLE "phoenix_test_table" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"title" TEXT NOT NULL,"date" TEXT NOT NULL);');
+        $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', [['id' => 1, 'title' => 'first', 'date' => new DateTime()], ['id' => 2, 'title' => 'second', 'date' => new DateTime()]]));
+        $this->assertCount(2, $this->adapter->fetchAll('phoenix_test_table'));
     }
     
     public function testThrowingException()
