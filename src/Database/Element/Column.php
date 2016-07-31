@@ -16,7 +16,7 @@ class Column
     const TYPE_CHAR = 'char';
     const TYPE_DECIMAL = 'decimal';
     
-    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first'];
+    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation'];
     
     private $allowedSettingsValues = [
         'null' => ['is_bool'],
@@ -27,6 +27,8 @@ class Column
         'autoincrement' => ['is_bool'],
         'after' => ['is_null', 'is_string'],
         'first' => ['is_bool'],
+        'charset' => ['is_string'],
+        'collation' => ['is_string'],
     ];
     
     private $name;
@@ -131,6 +133,22 @@ class Column
         return isset($this->settings['first']) ? $this->settings['first'] : false;
     }
     
+    /**
+     * @return string|null
+     */
+    public function getCharset()
+    {
+        return isset($this->settings['charset']) ? $this->settings['charset'] : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCollation()
+    {
+        return isset($this->settings['collation']) ? $this->settings['collation'] : null;
+    }
+
     private function checkSettings($settings)
     {
         $errors = [];

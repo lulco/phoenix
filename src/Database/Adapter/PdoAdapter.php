@@ -14,6 +14,8 @@ abstract class PdoAdapter implements AdapterInterface
     /** @var PDO */
     private $pdo;
     
+    private $charset;
+    
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
     
@@ -271,14 +273,31 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->pdo->rollBack();
     }
     
-    private function throwError($query)
+    /**
+     * {@inheritdoc}
+     */
+    public function setCharset($charset)
     {
-        $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+        $this->charset = $charset;
+        return $this;
     }
     
     /**
      * {@inheritdoc}
      */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+   
+    /**
+     * {@inheritdoc}
+     */
     abstract public function tableInfo($table);
+
+    private function throwError($query)
+    {
+        $errorInfo = $this->pdo->errorInfo();
+        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+    }
 }

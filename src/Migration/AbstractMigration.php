@@ -137,7 +137,7 @@ abstract class AbstractMigration
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException
      */
-    final protected function table($name, $primaryKey = true)
+    final protected function table($name, $primaryKey = true, $charset = null, $collation = null)
     {
         if ($this->table !== null) {
             throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop(), save() first.');
@@ -146,6 +146,8 @@ abstract class AbstractMigration
         $this->primaryKey = $primaryKey;
         
         $this->table = new Table($name);
+        $this->table->setCharset($charset ?: $this->adapter->getCharset());
+        $this->table->setCollation($collation);
         return $this;
     }
     

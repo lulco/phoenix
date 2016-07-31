@@ -20,6 +20,35 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertNull($environmentConfig->getPassword());
     }
     
+    public function testAdapterAndConfiguredDsnWithPortAndCharset()
+    {
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'test_adapter',
+            'db_name' => 'test_db_name',
+            'host' => 'test_host',
+            'port' => 'port',
+            'charset' => 'utf8',
+        ]);
+        $this->assertEquals('test_adapter', $environmentConfig->getAdapter());
+        $this->assertEquals('test_adapter:dbname=test_db_name;host=test_host;port=port;charset=utf8', $environmentConfig->getDsn());
+        $this->assertNull($environmentConfig->getUsername());
+        $this->assertNull($environmentConfig->getPassword());
+    }
+    
+    public function testPgsqlAdapterAndConfiguredDsnWithCharset()
+    {
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'db_name' => 'test_db_name',
+            'host' => 'test_host',
+            'charset' => 'utf8',
+        ]);
+        $this->assertEquals('pgsql', $environmentConfig->getAdapter());
+        $this->assertEquals('pgsql:dbname=test_db_name;host=test_host;options=\'--client_encoding=utf8\'', $environmentConfig->getDsn());;
+        $this->assertNull($environmentConfig->getUsername());
+        $this->assertNull($environmentConfig->getPassword());
+    }
+    
     public function testCustomDsn()
     {
         $environmentConfig = new EnvironmentConfig([

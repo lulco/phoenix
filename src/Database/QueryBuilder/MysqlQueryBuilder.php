@@ -44,7 +44,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
-        $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
+        $query .= ')';
+        $query .= $this->createTableCharset($table);
+        $query .= ';';
         return [$query];
     }
     
@@ -139,6 +141,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= (!$column->isSigned()) ? ' unsigned' : '';
+        $col .= $this->createColumnCharset($column);
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createColumnDefault($column);
         $col .= $this->createColumnPosition($column);
@@ -215,5 +218,31 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function escapeString($string)
     {
         return '`' . $string . '`';
+    }
+    
+    private function createColumnCharset(Column $column)
+    {
+        return $this->createCharset($column->getCharset(), $column->getCollation(), ' ');
+    }
+    
+    private function createTableCharset(Table $table)
+    {
+        $tableCharset = $this->createCharset($table->getCharset(), $table->getCollation());
+        return $tableCharset ? ' DEFAULT' . $tableCharset : '';
+    }
+
+    private function createCharset($charset = null, $collation = null, $glue = '=')
+    {
+        $output = '';
+        if (is_null($charset) && is_null($collation)) {
+            return $output;
+        }
+        if ($charset) {
+            $output .= " CHARACTER SET$glue$charset";
+        }
+        if ($collation) {
+            $output .= " COLLATE$glue$collation";
+        }
+        return $output;
     }
 }
