@@ -142,7 +142,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
         
         $newTable = new Table($table->getName());
-        $primaryColumn = false;
         $columnNames = [];
         foreach ($columns as $column) {
             $columnNames[] = $column->getName();
