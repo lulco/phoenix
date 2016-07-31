@@ -8,6 +8,10 @@ class Table
 {
     private $name;
     
+    private $charset;
+    
+    private $collation;
+    
     private $columns = [];
     
     private $primaryColumns = [];
@@ -249,5 +253,41 @@ class Table
     public function hasPrimaryKeyToDrop()
     {
         return $this->dropPrimaryKey;
+    }
+
+    /**
+     * @param string $charset
+     * @return Table
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+        return $this;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+    
+    /**
+     * @param string $collation
+     * @return Table
+     */
+    public function setCollation($collation)
+    {
+        $this->collation = $collation;
+        return $this;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getCollation()
+    {
+        return $this->collation;
     }
 }

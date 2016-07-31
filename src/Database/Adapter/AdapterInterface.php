@@ -108,4 +108,15 @@ interface AdapterInterface
      * @return Column[]
      */
     public function tableInfo($table);
+    
+    /**
+     * @param string $charset
+     * @return AdapterInterface
+     */
+    public function setCharset($charset);
+    
+    /**
+     * @return string
+     */
+    public function getCharset();
 }
