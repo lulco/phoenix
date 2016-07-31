@@ -48,6 +48,21 @@ abstract class CommonQueryBuilder
         return $query;
     }
     
+    protected function addColumns(Table $table)
+    {
+        $columns = $table->getColumns();
+        if (empty($columns)) {
+            return [];
+        }
+        $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+        $columnList = [];
+        foreach ($columns as $column) {
+            $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
+        }
+        $query .= implode(',', $columnList) . ';';
+        return [$query];
+    }
+    
     protected function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
@@ -91,7 +106,6 @@ abstract class CommonQueryBuilder
         return $query;
     }
     
-    
     protected function createForeignKeys(Table $table)
     {
         if (empty($table->getForeignKeys())) {
@@ -103,6 +117,15 @@ abstract class CommonQueryBuilder
             $foreignKeys[] = $this->createForeignKey($foreignKey, $table);
         }
         return ',' . implode(',', $foreignKeys);
+    }
+    
+    protected function addForeignKeys(Table $table)
+    {
+        $queries = [];
+        foreach ($table->getForeignKeys() as $foreignKey) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createForeignKey($foreignKey, $table) . ';';
+        }
+        return $queries;
     }
     
     protected function createForeignKey(ForeignKey $foreignKey, Table $table)
@@ -125,15 +148,6 @@ abstract class CommonQueryBuilder
             $constraint .= ' ON UPDATE ' . $foreignKey->getOnUpdate();
         }
         return $constraint;
-    }
-    
-    protected function addForeignKeys(Table $table)
-    {
-        $queries = [];
-        foreach ($table->getForeignKeys() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createForeignKey($foreignKey, $table) . ';';
-        }
-        return $queries;
     }
 
     abstract public function escapeString($string);

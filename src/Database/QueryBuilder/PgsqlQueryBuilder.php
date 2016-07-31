@@ -102,18 +102,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
-        
-        $columns = $table->getColumns();
-        if (!empty($columns)) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
-            $columnList = [];
-            foreach ($columns as $column) {
-                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
-            }
-            $query .= implode(',', $columnList) . ';';
-            $queries[] = $query;
-        }
-        
+        $queries = array_merge($queries, $this->addColumns($table));
         if (!empty($table->getIndexes())) {
             foreach ($table->getIndexes() as $index) {
                 $queries[] = $this->createIndex($index, $table);

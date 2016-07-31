@@ -77,19 +77,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
      */
     public function alterTable(Table $table)
     {
-        $queries = [];
-        
-        $columns = $table->getColumns();
-        if (!empty($columns)) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
-            $columnList = [];
-            foreach ($columns as $column) {
-                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
-            }
-            $query .= implode(',', $columnList) . ';';
-            $queries[] = $query;
-        }
-        
+        $queries = $this->addColumns($table);
         if ($table->getColumnsToChange()) {
             if (is_null($this->adapter)) {
                 throw new PhoenixException('Missing adapter');
