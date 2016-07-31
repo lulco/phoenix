@@ -97,13 +97,7 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
-        foreach ($data as $key => $value) {
-            if ($value instanceof DateTime) {
-                $value = $value->format('Y-m-d H:i:s');
-            }
-            $statement->bindValue($key, $value);
-        }
-        
+        $this->bindDataValues($statement, $data);
         $this->bindConditions($statement, $conditions);
         return $statement;
     }
