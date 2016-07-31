@@ -3,10 +3,11 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- added possibility to create custom templates
+- possibility to create custom templates
 - support for change charset in mysql (table and also column)
 - simple changes of column types and names for pgsql
 - simple type casting for columns in pgsql
+- support for multi insert
 - support for multi delete (IN condition)
 
 #### Fixed
