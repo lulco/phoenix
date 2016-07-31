@@ -325,7 +325,7 @@ abstract class PdoAdapter implements AdapterInterface
     }
     
     private function bindConditions(PDOStatement $statement, array $conditions = [])
-    {        
+    {
         foreach ($conditions as $key => $condition) {
             if (!is_array($condition)) {
                 $statement->bindValue('where_' . $key, $condition);
@@ -346,7 +346,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
         return false;
     }
-        
+
     private function throwError($query)
     {
         $errorInfo = $this->pdo->errorInfo();
