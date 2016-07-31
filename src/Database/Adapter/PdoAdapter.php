@@ -74,16 +74,6 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
     
-    private function bindDataValues($statement, $data, $prefix = '')
-    {
-        foreach ($data as $key => $value) {
-            if ($value instanceof DateTime) {
-                $value = $value->format('Y-m-d H:i:s');
-            }
-            $statement->bindValue($prefix . $key, $value);
-        }
-    }
-    
     /**
      * {@inheritdoc}
      */
@@ -324,12 +314,16 @@ abstract class PdoAdapter implements AdapterInterface
      */
     abstract public function tableInfo($table);
 
-    private function throwError($query)
+    private function bindDataValues($statement, $data, $prefix = '')
     {
-        $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+        foreach ($data as $key => $value) {
+            if ($value instanceof DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+            $statement->bindValue($prefix . $key, $value);
+        }
     }
- 
+    
     private function bindConditions(PDOStatement $statement, array $conditions = [])
     {        
         foreach ($conditions as $key => $condition) {
@@ -351,5 +345,11 @@ abstract class PdoAdapter implements AdapterInterface
             }
         }
         return false;
+    }
+        
+    private function throwError($query)
+    {
+        $errorInfo = $this->pdo->errorInfo();
+        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
     }
 }
