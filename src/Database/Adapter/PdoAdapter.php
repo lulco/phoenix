@@ -64,13 +64,24 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
+        if (!$this->isMulti($data)) {
+            $this->bindDataValues($statement, $data);
+            return $statement;
+        }
+        foreach ($data as $index => $item) {
+            $this->bindDataValues($statement, $item, 'item_' . $index . '_');
+        }
+        return $statement;
+    }
+    
+    private function bindDataValues($statement, $data, $prefix = '')
+    {
         foreach ($data as $key => $value) {
             if ($value instanceof DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
             }
-            $statement->bindValue($key, $value);
+            $statement->bindValue($prefix . $key, $value);
         }
-        return $statement;
     }
     
     /**
@@ -180,6 +191,9 @@ abstract class PdoAdapter implements AdapterInterface
     private function createKeys($data)
     {
         $keys = [];
+        if ($this->isMulti($data)) {
+            $data = current($data);
+        }
         foreach (array_keys($data) as $key) {
             $keys[] = $this->queryBuilder->escapeString($key);
         }
@@ -188,11 +202,14 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function createValues($data)
     {
-        $values = [];
-        foreach (array_keys($data) as $key) {
-            $values[] = $this->createValue($key);
+        if (!$this->isMulti($data)) {
+            return $this->createValueString($data);
         }
-        return '(' . implode(', ', $values) . ')';
+        $values = [];
+        foreach ($data as $index => $item) {
+            $values[] = $this->createValueString($item, 'item_' . $index . '_');
+        }
+        return implode(', ', $values);
     }
 
     private function createValue($key, $prefix = '')
@@ -200,6 +217,15 @@ abstract class PdoAdapter implements AdapterInterface
         return ':' . $prefix . $key;
     }
 
+    private function createValueString($data, $prefix = '')
+    {
+        $values = [];
+        foreach (array_keys($data) as $key) {
+            $values[] = $this->createValue($key, $prefix);
+        }
+        return '(' . implode(', ', $values) . ')';
+    }
+    
     private function createWhere(array $conditions = [], $where = '')
     {
         if (empty($conditions) && $where == '') {
@@ -299,5 +325,15 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+    }
+
+    private function isMulti($data)
+    {
+        foreach ($data as $item) {
+            if (is_array($item)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
