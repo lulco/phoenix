@@ -10,6 +10,7 @@ class Column
     const TYPE_INTEGER = 'integer';
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_TEXT = 'text';
+    const TYPE_DATE = 'date';
     const TYPE_DATETIME = 'datetime';
     const TYPE_UUID = 'uuid';
     const TYPE_JSON = 'json';

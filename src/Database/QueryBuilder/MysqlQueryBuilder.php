@@ -13,6 +13,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_INTEGER => 'int(%d)',
         Column::TYPE_BOOLEAN => 'tinyint(1)',
         Column::TYPE_TEXT => 'text',
+        Column::TYPE_DATE => 'date',
         Column::TYPE_DATETIME => 'datetime',
         Column::TYPE_UUID => 'char(36)',
         Column::TYPE_JSON => 'text',

@@ -15,6 +15,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_INTEGER => 'integer',
         Column::TYPE_BOOLEAN => 'boolean',
         Column::TYPE_TEXT => 'text',
+        Column::TYPE_DATE => 'date',
         Column::TYPE_DATETIME => 'datetime',
         Column::TYPE_UUID => 'char(36)',
         Column::TYPE_JSON => 'text',

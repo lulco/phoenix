@@ -13,6 +13,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BOOLEAN => 'bool',
         Column::TYPE_TEXT => 'text',
+        Column::TYPE_DATE => 'date',
         Column::TYPE_DATETIME => 'timestamp(6)',
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
