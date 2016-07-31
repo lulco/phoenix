@@ -299,5 +299,5 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
-    }    
+    }
 }
