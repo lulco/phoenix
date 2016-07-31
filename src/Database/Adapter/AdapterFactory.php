@@ -12,14 +12,14 @@ class AdapterFactory
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
         if ($config->getAdapter() == 'mysql') {
-            return new MysqlAdapter($pdo);
+            $adapter = new MysqlAdapter($pdo);
+        } elseif ($config->getAdapter() == 'pgsql') {
+            $adapter = new PgsqlAdapter($pdo);
+        } elseif ($config->getAdapter() == 'sqlite') {
+            $adapter = new SqliteAdapter($pdo);
+        } else {
+            throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
         }
-        if ($config->getAdapter() == 'pgsql') {
-            return new PgsqlAdapter($pdo);
-        }
-        if ($config->getAdapter() == 'sqlite') {
-            return new SqliteAdapter($pdo);
-        }
-        throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
+        return $adapter->setCharset($config->getCharset());
     }
 }

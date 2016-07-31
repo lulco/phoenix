@@ -14,6 +14,8 @@ abstract class PdoAdapter implements AdapterInterface
     /** @var PDO */
     private $pdo;
     
+    private $charset;
+    
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
     
@@ -62,11 +64,12 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
-        foreach ($data as $key => $value) {
-            if ($value instanceof DateTime) {
-                $value = $value->format('Y-m-d H:i:s');
-            }
-            $statement->bindValue($key, $value);
+        if (!$this->isMulti($data)) {
+            $this->bindDataValues($statement, $data);
+            return $statement;
+        }
+        foreach ($data as $index => $item) {
+            $this->bindDataValues($statement, $item, 'item_' . $index . '_');
         }
         return $statement;
     }
@@ -94,15 +97,8 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
-        foreach ($data as $key => $value) {
-            if ($value instanceof DateTime) {
-                $value = $value->format('Y-m-d H:i:s');
-            }
-            $statement->bindValue($key, $value);
-        }
-        foreach ($conditions as $key => $condition) {
-            $statement->bindValue('where_' . $key, $condition);
-        }
+        $this->bindDataValues($statement, $data);
+        $this->bindConditions($statement, $conditions);
         return $statement;
     }
     
@@ -125,9 +121,7 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
-        foreach ($conditions as $key => $condition) {
-            $statement->bindValue('where_' . $key, $condition);
-        }
+        $this->bindConditions($statement, $conditions);
         return $statement;
     }
     
@@ -169,15 +163,16 @@ abstract class PdoAdapter implements AdapterInterface
         if (!$statement) {
             $this->throwError($statement);
         }
-        foreach ($conditions as $key => $condition) {
-            $statement->bindValue('where_' . $key, $condition);
-        }
+        $this->bindConditions($statement, $conditions);
         return $statement;
     }
 
     private function createKeys($data)
     {
         $keys = [];
+        if ($this->isMulti($data)) {
+            $data = current($data);
+        }
         foreach (array_keys($data) as $key) {
             $keys[] = $this->queryBuilder->escapeString($key);
         }
@@ -186,11 +181,14 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function createValues($data)
     {
-        $values = [];
-        foreach (array_keys($data) as $key) {
-            $values[] = $this->createValue($key);
+        if (!$this->isMulti($data)) {
+            return $this->createValueString($data);
         }
-        return '(' . implode(', ', $values) . ')';
+        $values = [];
+        foreach ($data as $index => $item) {
+            $values[] = $this->createValueString($item, 'item_' . $index . '_');
+        }
+        return implode(', ', $values);
     }
 
     private function createValue($key, $prefix = '')
@@ -198,6 +196,15 @@ abstract class PdoAdapter implements AdapterInterface
         return ':' . $prefix . $key;
     }
 
+    private function createValueString($data, $prefix = '')
+    {
+        $values = [];
+        foreach (array_keys($data) as $key) {
+            $values[] = $this->createValue($key, $prefix);
+        }
+        return '(' . implode(', ', $values) . ')';
+    }
+    
     private function createWhere(array $conditions = [], $where = '')
     {
         if (empty($conditions) && $where == '') {
@@ -208,8 +215,16 @@ abstract class PdoAdapter implements AdapterInterface
             return sprintf(' WHERE %s', $where);
         }
         $cond = [];
-        foreach (array_keys($conditions) as $key) {
-            $cond[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+        foreach ($conditions as $key => $value) {
+            if (is_array($value)) {
+                $in = [];
+                foreach ($value as $index => $val) {
+                    $in[] = $this->createValue($key, 'where_' . $index . '_');
+                }
+                $cond[] = $this->queryBuilder->escapeString($key) . ' IN (' . implode(', ', $in) . ')';
+            } else {
+                $cond[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+            }
         }
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
     }
@@ -271,14 +286,64 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->pdo->rollBack();
     }
     
-    private function throwError($query)
+    /**
+     * {@inheritdoc}
+     */
+    public function setCharset($charset)
     {
-        $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+        $this->charset = $charset;
+        return $this;
     }
     
     /**
      * {@inheritdoc}
      */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+   
+    /**
+     * {@inheritdoc}
+     */
     abstract public function tableInfo($table);
+
+    private function bindDataValues($statement, $data, $prefix = '')
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+            $statement->bindValue($prefix . $key, $value);
+        }
+    }
+    
+    private function bindConditions(PDOStatement $statement, array $conditions = [])
+    {
+        foreach ($conditions as $key => $condition) {
+            if (!is_array($condition)) {
+                $statement->bindValue('where_' . $key, $condition);
+            } else {
+                foreach ($condition as $index => $cond) {
+                    $statement->bindValue('where_' . $index . '_' . $key, $cond);
+                }
+            }
+        }
+    }
+
+    private function isMulti($data)
+    {
+        foreach ($data as $item) {
+            if (is_array($item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function throwError($query)
+    {
+        $errorInfo = $this->pdo->errorInfo();
+        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+    }
 }

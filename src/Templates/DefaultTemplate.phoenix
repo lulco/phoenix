@@ -1,0 +1,16 @@
+<?php
+
+###NAMESPACE###use Phoenix\Migration\AbstractMigration;
+
+class ###CLASSNAME### extends AbstractMigration
+{
+    protected function up()
+    {
+        
+    }
+
+    protected function down()
+    {
+        
+    }
+}

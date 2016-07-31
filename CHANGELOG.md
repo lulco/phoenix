@@ -6,9 +6,12 @@
 - deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
 
 #### Added
+- possibility to create custom templates
+- support for change charset in mysql (table and also column)
 - simple changes of column types and names for pgsql
-- simple type casting for pgsql
-- tests for PdoAdapter
+- simple type casting for columns in pgsql
+- support for multi insert
+- support for multi delete (IN condition)
 
 #### Fixed
 - several bugs in PdoAdapter

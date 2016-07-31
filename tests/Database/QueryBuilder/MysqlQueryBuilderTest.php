@@ -25,11 +25,12 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new Table('simple');
         $table->addPrimary(true);
+        $table->setCharset('utf8');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            'CREATE TABLE `simple` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;'
+            'CREATE TABLE `simple` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET=utf8;'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -38,15 +39,17 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new Table('more_columns');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $table->setCharset('utf8');
+        $table->setCollation('utf8_general_ci');
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['charset' => 'utf16'])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string', ['null' => true])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text', ['collation' => 'utf8_slovak_ci'])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('price', 'decimal', ['length' => 8, 'decimals' => 2])));
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `more_columns` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`bodytext` text NOT NULL,`price` decimal(8,2) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `more_columns` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) CHARACTER SET utf16 NOT NULL,`alias` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`bodytext` text COLLATE utf8_slovak_ci NOT NULL,`price` decimal(8,2) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -54,13 +57,14 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testNoPrimaryKey()
     {
         $table = new Table('no_primary_key');
+        $table->setCharset('utf16');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['null' => true])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('is_deleted', 'boolean', ['default' => false])));
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `no_primary_key` (`title` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`is_deleted` tinyint(1) NOT NULL DEFAULT 0) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `no_primary_key` (`title` varchar(255) DEFAULT NULL,`total` int(11) NOT NULL DEFAULT 0,`is_deleted` tinyint(1) NOT NULL DEFAULT 0) DEFAULT CHARACTER SET=utf16;"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -73,7 +77,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `own_primary_key` (`identifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `own_primary_key` (`identifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -86,7 +90,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `more_own_primary_keys` (`identifier` varchar(32) NOT NULL,`subidentifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`,`subidentifier`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `more_own_primary_keys` (`identifier` varchar(32) NOT NULL,`subidentifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`,`subidentifier`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -100,7 +104,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `one_field_as_pk` (`identifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `one_field_as_pk` (`identifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -115,7 +119,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `more_fields_as_pk` (`identifier` varchar(32) NOT NULL,`subidentifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`,`subidentifier`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `more_fields_as_pk` (`identifier` varchar(32) NOT NULL,`subidentifier` varchar(32) NOT NULL,`title` varchar(255) NOT NULL DEFAULT '',PRIMARY KEY (`identifier`,`subidentifier`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -134,7 +138,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `table_with_indexes` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `table_with_indexes` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH);"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -150,7 +154,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `table_with_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `table_with_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`id`)) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `table_with_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `table_with_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`id`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -171,7 +175,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `table_with_indexes_and_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH,CONSTRAINT `table_with_indexes_and_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`foreign_id`) ON DELETE SET NULL ON UPDATE SET NULL) DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;"
+            "CREATE TABLE `table_with_indexes_and_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH,CONSTRAINT `table_with_indexes_and_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`foreign_id`) ON DELETE SET NULL ON UPDATE SET NULL);"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }

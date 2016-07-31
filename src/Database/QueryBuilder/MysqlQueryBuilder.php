@@ -44,7 +44,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
-        $query .= ') DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;';
+        $query .= ')';
+        $query .= $this->createTableCharset($table);
+        $query .= ';';
         return [$query];
     }
     
@@ -76,11 +78,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
      */
     public function alterTable(Table $table)
     {
-        $queries = [];
-        if (!empty($table->getIndexesToDrop())) {
-            $queries[] = $this->dropIndexes($table);
-        }
-        
+        $queries = $this->dropIndexes($table);
         if ($table->getColumnsToChange()) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
@@ -90,35 +88,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
         }
-        
-        if ($table->hasPrimaryKeyToDrop()) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP PRIMARY KEY;';
-        }
-        
-        foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP FOREIGN KEY ' . $this->escapeString($foreignKey) . ';';
-        }
-        
+        $queries = array_merge($queries, $this->dropKeys($table, 'PRIMARY KEY', 'FOREIGN KEY'));
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
-        
-        $columns = $table->getColumns();
-        if (!empty($columns)) {
-            $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
-            $columnList = [];
-            foreach ($columns as $column) {
-                $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
-            }
-            $query .= implode(',', $columnList) . ';';
-            $queries[] = $query;
-        }
-        
-        $primaryColumns = $table->getPrimaryColumns();
-        if (!empty($primaryColumns)) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($primaryColumns) . ';';
-        }
-        
+        $queries = array_merge($queries, $this->addColumns($table));
+        $queries = array_merge($queries, $this->addPrimaryKey($table));
         if (!empty($table->getIndexes())) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];
@@ -128,10 +103,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $query .= implode(',', $indexes) . ';';
             $queries[] = $query;
         }
-        
-        foreach ($table->getForeignKeys() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createForeignKey($foreignKey, $table) . ';';
-        }
+        $queries = array_merge($queries, $this->addForeignKeys($table));
         return $queries;
     }
     
@@ -139,6 +111,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
         $col .= (!$column->isSigned()) ? ' unsigned' : '';
+        $col .= $this->createColumnCharset($column);
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createColumnDefault($column);
         $col .= $this->createColumnPosition($column);
@@ -178,18 +151,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return '';
     }
     
-    protected function createPrimaryKey(Table $table)
+    protected function primaryKeyString(Table $table)
     {
-        return $this->primaryKeyString($table->getPrimaryColumns());
-    }
-    
-    private function primaryKeyString(array $primaryColumns = [])
-    {
-        if (empty($primaryColumns)) {
-            return '';
-        }
-        
-        $primaryKeys = $this->escapeArray($primaryColumns);
+        $primaryKeys = $this->escapeArray($table->getPrimaryColumns());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     
@@ -215,5 +179,31 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function escapeString($string)
     {
         return '`' . $string . '`';
+    }
+    
+    private function createColumnCharset(Column $column)
+    {
+        return $this->createCharset($column->getCharset(), $column->getCollation(), ' ');
+    }
+    
+    private function createTableCharset(Table $table)
+    {
+        $tableCharset = $this->createCharset($table->getCharset(), $table->getCollation());
+        return $tableCharset ? ' DEFAULT' . $tableCharset : '';
+    }
+
+    private function createCharset($charset = null, $collation = null, $glue = '=')
+    {
+        $output = '';
+        if (is_null($charset) && is_null($collation)) {
+            return $output;
+        }
+        if ($charset) {
+            $output .= " CHARACTER SET$glue$charset";
+        }
+        if ($collation) {
+            $output .= " COLLATE$glue$collation";
+        }
+        return $output;
     }
 }

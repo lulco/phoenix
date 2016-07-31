@@ -48,15 +48,51 @@ abstract class CommonQueryBuilder
         return $query;
     }
     
+    protected function addColumns(Table $table)
+    {
+        $columns = $table->getColumns();
+        if (empty($columns)) {
+            return [];
+        }
+        $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+        $columnList = [];
+        foreach ($columns as $column) {
+            $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
+        }
+        $query .= implode(',', $columnList) . ';';
+        return [$query];
+    }
+    
+    protected function createPrimaryKey(Table $table)
+    {
+        if (empty($table->getPrimaryColumns())) {
+            return '';
+        }
+        return $this->primaryKeyString($table);
+    }
+    
+    protected function addPrimaryKey(Table $table)
+    {
+        $queries = [];
+        $primaryColumns = $table->getPrimaryColumns();
+        if (!empty($primaryColumns)) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table) . ';';
+        }
+        return $queries;
+    }
+    
     protected function dropIndexes(Table $table)
     {
+        if (empty($table->getIndexesToDrop())) {
+            return [];
+        }
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $indexes = [];
         foreach ($table->getIndexesToDrop() as $index) {
             $indexes[] = 'DROP INDEX ' . $this->escapeString($index);
         }
         $query .= implode(',', $indexes) . ';';
-        return $query;
+        return [$query];
     }
     
     protected function dropColumns(Table $table)
@@ -83,6 +119,15 @@ abstract class CommonQueryBuilder
         return ',' . implode(',', $foreignKeys);
     }
     
+    protected function addForeignKeys(Table $table)
+    {
+        $queries = [];
+        foreach ($table->getForeignKeys() as $foreignKey) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createForeignKey($foreignKey, $table) . ';';
+        }
+        return $queries;
+    }
+    
     protected function createForeignKey(ForeignKey $foreignKey, Table $table)
     {
         $columns = [];
@@ -104,6 +149,23 @@ abstract class CommonQueryBuilder
         }
         return $constraint;
     }
+
+    protected function dropKeys($table, $primaryKeyName, $foreignKeyPrefix)
+    {
+        $queries = [];
+        if ($table->hasPrimaryKeyToDrop()) {
+            $queries[] = $this->dropKeyQuery($table, $primaryKeyName);
+        }
+        foreach ($table->getForeignKeysToDrop() as $foreignKey) {
+            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($foreignKey));
+        }
+        return $queries;
+    }
+    
+    protected function dropKeyQuery($table, $key)
+    {
+        return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
+    }
     
     abstract public function escapeString($string);
     
@@ -116,5 +178,5 @@ abstract class CommonQueryBuilder
     
     abstract protected function createColumn(Column $column, Table $table);
     
-    abstract protected function createPrimaryKey(Table $table);
+    abstract protected function primaryKeyString(Table $table);
 }
