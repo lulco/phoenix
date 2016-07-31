@@ -78,11 +78,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
      */
     public function alterTable(Table $table)
     {
-        $queries = [];
-        if (!empty($table->getIndexesToDrop())) {
-            $queries[] = $this->dropIndexes($table);
-        }
-        
+        $queries = $this->dropIndexes($table);
         if ($table->getColumnsToChange()) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
@@ -115,12 +111,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $query .= implode(',', $columnList) . ';';
             $queries[] = $query;
         }
-        
-        $primaryColumns = $table->getPrimaryColumns();
-        if (!empty($primaryColumns)) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($primaryColumns) . ';';
-        }
-        
+        $queries = array_merge($queries, $this->addPrimaryKey($table));
         if (!empty($table->getIndexes())) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];
@@ -130,10 +121,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $query .= implode(',', $indexes) . ';';
             $queries[] = $query;
         }
-        
-        foreach ($table->getForeignKeys() as $foreignKey) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createForeignKey($foreignKey, $table) . ';';
-        }
+        $queries = array_merge($queries, $this->addForeignKeys($table));
         return $queries;
     }
     
@@ -181,18 +169,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return '';
     }
     
-    protected function createPrimaryKey(Table $table)
+    protected function primaryKeyString(Table $table)
     {
-        return $this->primaryKeyString($table->getPrimaryColumns());
-    }
-    
-    private function primaryKeyString(array $primaryColumns = [])
-    {
-        if (empty($primaryColumns)) {
-            return '';
-        }
-        
-        $primaryKeys = $this->escapeArray($primaryColumns);
+        $primaryKeys = $this->escapeArray($table->getPrimaryColumns());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
     

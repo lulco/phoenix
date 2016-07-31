@@ -141,13 +141,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         return $col;
     }
-    
-    protected function createPrimaryKey(Table $table)
+
+    protected function primaryKeyString(Table $table)
     {
-        if (empty($table->getPrimaryColumns())) {
-            return '';
-        }
-        
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
             $column = $table->getColumn($name);
