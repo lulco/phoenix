@@ -52,7 +52,31 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
-    
+
+    public function testAllTypes()
+    {
+        $table = new Table('all_types');
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_uuid', 'uuid')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_bigint', 'biginteger')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_string', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_char', 'char')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_text', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_json', 'json')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_float', 'float', ['length' => 10, 'decimals' => 3])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_boolean', 'boolean')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_datetime', 'datetime')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_date', 'date')));
+        
+        $queryBuilder = new PgsqlQueryBuilder();
+        $expectedQueries = [
+            'CREATE SEQUENCE "all_types_seq";',
+            'CREATE TABLE "all_types" ("id" int4 DEFAULT nextval(\'all_types_seq\'::regclass) NOT NULL,"col_uuid" uuid NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_text" text NOT NULL,"col_json" json NOT NULL,"col_float" real NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
     public function testNoPrimaryKey()
     {
         $table = new Table('no_primary_key');

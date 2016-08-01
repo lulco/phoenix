@@ -23,9 +23,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $this->setExpectedException('\Exception', 'Type "unsupported" is not allowed');
-        $queryCreator->createTable($table);
+        $queryBuilder->createTable($table);
     }
 
     public function testSimpleCreate()
@@ -37,11 +37,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "simple" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL);'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testMoreColumns()
@@ -56,11 +56,37 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "more_columns" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" integer NOT NULL DEFAULT 0,"bodytext" text NOT NULL);'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+    
+    public function testAllTypes()
+    {
+        $table = new Table('all_types');
+        $table->addPrimary(true);
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_uuid', 'uuid')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_bigint', 'biginteger')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_string', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_char', 'char')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_text', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_json', 'json')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_float', 'float', ['length' => 10, 'decimals' => 3])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_boolean', 'boolean')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_datetime', 'datetime')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_date', 'date')));
+        
+        $pdo = new FakePdo();
+        $adapter = new SqliteAdapter($pdo);
+        
+        $queryBuilder = new SqliteQueryBuilder($adapter);
+        $expectedQueries = [
+            'CREATE TABLE "all_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"col_uuid" char(36) NOT NULL,"col_bigint" bigint NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_text" text NOT NULL,"col_json" text NOT NULL,"col_float" float NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_boolean" boolean NOT NULL,"col_datetime" datetime NOT NULL,"col_date" date NOT NULL);'
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testNoPrimaryKey()
@@ -73,11 +99,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "no_primary_key" ("title" varchar(255) DEFAULT NULL,"total" integer NOT NULL DEFAULT 0,"is_deleted" boolean NOT NULL DEFAULT 0);'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testOwnPrimaryKey()
@@ -89,11 +115,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "own_primary_key" ("identifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier"));'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testMoreOwnPrimaryKeys()
@@ -105,11 +131,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "more_own_primary_keys" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testOneFieldAsPrimaryKey()
@@ -122,11 +148,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "one_field_as_pk" ("identifier" varchar(32) NOT NULL,"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier"));'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testMoreFieldsAsPrimaryKeys()
@@ -140,11 +166,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "more_fields_as_pk" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL DEFAULT \'SUB\',"title" varchar(255) NOT NULL,PRIMARY KEY ("identifier","subidentifier"));'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testIndexes()
@@ -161,13 +187,13 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_indexes" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" integer NOT NULL,"bodytext" text NOT NULL);',
             'CREATE INDEX "table_with_indexes_sorting" ON "table_with_indexes" ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_title_alias" ON "table_with_indexes" ("title","alias");',
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testForeignKeys()
@@ -182,11 +208,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_foreign_keys" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" integer NOT NULL,CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testIndexesAndForeignKeys()
@@ -205,13 +231,13 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" integer NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" integer NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_and_foreign_keys_title_alias" ON "table_with_indexes_and_foreign_keys" ("title","alias");',
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->createTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
     
     public function testDropTable()
@@ -220,11 +246,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'DROP TABLE "drop"'
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->dropTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));
     }
     
     public function testAlterTable()
@@ -237,11 +263,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
         
-        $queryCreator = new SqliteQueryBuilder($adapter);
+        $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
             'ALTER TABLE "add_columns" ADD COLUMN "title" varchar(255) NOT NULL,ADD COLUMN "alias" varchar(255) NOT NULL;',
         ];
-        $this->assertEquals($expectedQueries, $queryCreator->alterTable($table));
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
     
     public function testChangeColumn()
