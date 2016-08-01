@@ -100,11 +100,8 @@ class Manager
      */
     public function logExecution(AbstractMigration $migration)
     {
-        $data = [
-            'migration_datetime' => $migration->getDatetime(),
-            'classname' => $migration->getFullClassName(),
-            'executed_at' => new DateTime(),
-        ];
+        $data = $this->createData($migration);
+        $data['executed_at'] = new DateTime();
         $this->adapter->insert($this->config->getLogTableName(), $data);
     }
     
@@ -114,9 +111,14 @@ class Manager
      */
     public function removeExecution(AbstractMigration $migration)
     {
-        $this->adapter->delete($this->config->getLogTableName(), [
+        $this->adapter->delete($this->config->getLogTableName(), $this->createData($migration));
+    }
+    
+    private function createData(AbstractMigration $migration)
+    {
+        return [
             'classname' => $migration->getFullClassName(),
             'migration_datetime' => $migration->getDatetime(),
-        ]);
+        ];
     }
 }
