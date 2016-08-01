@@ -4,6 +4,7 @@ namespace Phoenix\Command;
 
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class RollbackCommand extends AbstractCommand
@@ -11,6 +12,7 @@ class RollbackCommand extends AbstractCommand
     protected function configure()
     {
         $this->setName('rollback')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
             ->setDescription('Rollback all available migrations');
         
         parent::configure();
@@ -18,7 +20,8 @@ class RollbackCommand extends AbstractCommand
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
-        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, Manager::TARGET_FIRST);
+        $target = $input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target);
         if (empty($migrations)) {
             $output->writeln('');
             $output->writeln('<info>Nothing to rollback</info>');
