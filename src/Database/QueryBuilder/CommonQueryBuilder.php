@@ -150,7 +150,7 @@ abstract class CommonQueryBuilder
         return $constraint;
     }
 
-    protected function dropKeys($table, $primaryKeyName, $foreignKeyPrefix)
+    protected function dropKeys(Table $table, $primaryKeyName, $foreignKeyPrefix)
     {
         $queries = [];
         if ($table->hasPrimaryKeyToDrop()) {
@@ -162,7 +162,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
     
-    protected function dropKeyQuery($table, $key)
+    protected function dropKeyQuery(Table $table, $key)
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
     }

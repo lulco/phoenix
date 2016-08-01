@@ -2,10 +2,13 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
 class ForeignKey
 {
+    use ParamsCheckerBehavior;
+    
     const DEFAULT_ACTION = '';
     const RESTRICT = 'RESTRICT';
     const NO_ACTION = 'NO ACTION';
@@ -42,15 +45,12 @@ class ForeignKey
             $referencedColumns = [$referencedColumns];
         }
         $this->referencedColumns = $referencedColumns;
-        
+
         $this->onDelete = strtoupper($onDelete);
-        if (!in_array($this->onDelete, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
-            throw new InvalidArgumentValueException('Action "' . $onDelete . '" is not allowed on delete');
-        }
+        $this->inArray($this->onDelete, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onDelete . '" is not allowed on delete');
+        
         $this->onUpdate = strtoupper($onUpdate);
-        if (!in_array($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL])) {
-            throw new InvalidArgumentValueException('Action "' . $onUpdate . '" is not allowed on update');
-        }
+        $this->inArray($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onUpdate . '" is not allowed on update');
     }
     
     /**
