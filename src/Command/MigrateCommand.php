@@ -2,40 +2,35 @@
 
 namespace Phoenix\Command;
 
+use Phoenix\Migration\AbstractMigration;
+use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrateCommand extends AbstractCommand
+class MigrateCommand extends AbstractRunCommand
 {
+    protected $noMigrationsFoundMessage = 'Nothing to migrate';
+
+    protected $migrationInfoPrefix = 'Migration';
+
     protected function configure()
     {
         $this->setName('migrate')
-            ->setDescription('Run all available migrations');
-        
+            ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
+            ->setDescription('Run migrations');
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function findMigrations(InputInterface $input)
     {
-        $migrations = $this->manager->findMigrationsToExecute();
-        if (empty($migrations)) {
-            $output->writeln('');
-            $output->writeln('<info>Nothing to migrate</info>');
-            return;
-        }
-        
-        foreach ($migrations as $migration) {
-            $output->writeln('');
-            $output->writeln('<info>Migration ' . $migration->getClassName() . ' executing</info>');
+        $target = $input->getOption('first') ? Manager::TARGET_FIRST : Manager::TARGET_ALL;
+        return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target);
+    }
 
-            $start = microtime(true);
-            $migration->migrate();
-            $output->writeln('<info>Migration ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
-
-            $this->manager->logExecution($migration);
-            
-            $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
-        }
+    protected function runMigration(AbstractMigration $migration)
+    {
+        $migration->migrate();
+        $this->manager->logExecution($migration);
     }
 }
