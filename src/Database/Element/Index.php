@@ -2,10 +2,13 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
 class Index
 {
+    use ParamsCheckerBehavior;
+    
     const TYPE_NORMAL = '';
     const TYPE_UNIQUE = 'UNIQUE';
     const TYPE_FULLTEXT = 'FULLTEXT';
@@ -33,20 +36,12 @@ class Index
     {
         $this->name = $name;
         $this->type = strtoupper($type);
-        if (!in_array($this->type, [self::TYPE_NORMAL, self::TYPE_UNIQUE, self::TYPE_FULLTEXT])) {
-            throw new InvalidArgumentValueException('Index type "' . $type . '" is not allowed');
-        }
-        
+        $this->inArray($this->type, [self::TYPE_NORMAL, self::TYPE_UNIQUE, self::TYPE_FULLTEXT], 'Index type "' . $type . '" is not allowed');
+
         $this->method = strtoupper($method);
-        if (!in_array($this->method, [self::METHOD_DEFAULT, self::METHOD_BTREE, self::METHOD_HASH])) {
-            throw new InvalidArgumentValueException('Index method "' . $method . '" is not allowed');
-        }
-        
-        if (is_array($columns)) {
-            $this->columns = $columns;
-        } elseif (is_string($columns)) {
-            $this->columns[] = $columns;
-        }
+        $this->inArray($this->method, [self::METHOD_DEFAULT, self::METHOD_BTREE, self::METHOD_HASH], 'Index method "' . $method . '" is not allowed');
+
+        $this->columns = is_array($columns) ? $columns : [$columns];
     }
     
     /**

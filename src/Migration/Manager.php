@@ -6,15 +6,16 @@ use Nette\Utils\DateTime;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
+use Phoenix\Behavior\ParamsCheckerBehavior;
 
 class Manager
 {
-    const TYPE_UP = 'up';
+    use ParamsCheckerBehavior;
     
+    const TYPE_UP = 'up';
     const TYPE_DOWN = 'down';
     
-    const TARGET_FIRST = 'first';
-    
+    const TARGET_FIRST = 'first';    
     const TARGET_ALL = 'all';
     
     /** @var Config */
@@ -41,14 +42,9 @@ class Manager
      */
     public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
     {
-        if (!in_array($type, [self::TYPE_UP, self::TYPE_DOWN])) {
-            throw new InvalidArgumentValueException('Type "' . $type . '" is not allowed.');
-        }
-        
-        if (!in_array($target, [self::TARGET_ALL, self::TARGET_FIRST])) {
-            throw new InvalidArgumentValueException('Target "' . $target . '" is not allowed.');
-        }
-        
+        $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
+        $this->inArray($target, [self::TARGET_ALL, self::TARGET_FIRST], 'Target "' . $target . '" is not allowed.');
+
         $migrations = $this->findMigrations($type);
         if (empty($migrations)) {
             return $migrations;
