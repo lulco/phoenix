@@ -14,16 +14,16 @@ class Manager
     
     const TYPE_UP = 'up';
     const TYPE_DOWN = 'down';
-    
-    const TARGET_FIRST = 'first';    
+
+    const TARGET_FIRST = 'first';
     const TARGET_ALL = 'all';
-    
+
     /** @var Config */
     private $config;
-    
+
     /** @var AdapterInterface */
     private $adapter;
-    
+
     /**
      * @param Config $config
      * @param AdapterInterface $adapter
