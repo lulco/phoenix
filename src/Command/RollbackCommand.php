@@ -2,41 +2,34 @@
 
 namespace Phoenix\Command;
 
+use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends AbstractCommand
+class RollbackCommand extends AbstractRunCommand
 {
+    protected $noMigrationsFoundMessage = 'Nothing to rollback';
+
+    protected $migrationInfoPrefix = 'Rollback for migration';
+
     protected function configure()
     {
         $this->setName('rollback')
-            ->setDescription('Rollback all available migrations');
-        
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
+            ->setDescription('Rollback migrations');
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function findMigrations(InputInterface $input)
     {
-        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, Manager::TARGET_FIRST);
-        if (empty($migrations)) {
-            $output->writeln('');
-            $output->writeln('<info>Nothing to rollback</info>');
-            return;
-        }
-        
-        foreach ($migrations as $migration) {
-            $output->writeln('');
-            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executing</info>');
-            
-            $start = microtime(true);
-            $migration->rollback();
-            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+        $target = $input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
+        return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target);
+    }
 
-            $this->manager->removeExecution($migration);
-            
-            $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
-        }
+    protected function runMigration(AbstractMigration $migration)
+    {
+        $migration->rollback();
+        $this->manager->removeExecution($migration);
     }
 }
