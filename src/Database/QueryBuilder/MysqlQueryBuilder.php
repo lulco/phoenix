@@ -11,6 +11,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int(%d)',
+        Column::TYPE_BIG_INTEGER => 'bigint(%d)',
         Column::TYPE_BOOLEAN => 'tinyint(1)',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATE => 'date',
@@ -19,13 +20,16 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_JSON => 'text',
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+        Column::TYPE_FLOAT => 'float(%d,%d)',
     ];
-    
+
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_INTEGER => 11,
+        Column::TYPE_BIG_INTEGER => 20,
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
+        Column::TYPE_FLOAT => [10, 0],
     ];
     
     /**

@@ -11,6 +11,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'int4',
+        Column::TYPE_BIG_INTEGER => 'int8',
         Column::TYPE_BOOLEAN => 'bool',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATE => 'date',
@@ -19,6 +20,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+        Column::TYPE_FLOAT => 'real',
     ];
     
     protected $defaultLength = [

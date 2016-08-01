@@ -13,6 +13,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_INTEGER => 'integer',
+        Column::TYPE_BIG_INTEGER => 'bigint',
         Column::TYPE_BOOLEAN => 'boolean',
         Column::TYPE_TEXT => 'text',
         Column::TYPE_DATE => 'date',
@@ -21,6 +22,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_JSON => 'text',
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+        Column::TYPE_FLOAT => 'float',
     ];
     
     protected $defaultLength = [

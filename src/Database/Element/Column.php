@@ -8,6 +8,7 @@ class Column
 {
     const TYPE_STRING = 'string';
     const TYPE_INTEGER = 'integer';
+    const TYPE_BIG_INTEGER = 'biginteger';
     const TYPE_BOOLEAN = 'boolean';
     const TYPE_TEXT = 'text';
     const TYPE_DATE = 'date';
@@ -16,7 +17,8 @@ class Column
     const TYPE_JSON = 'json';
     const TYPE_CHAR = 'char';
     const TYPE_DECIMAL = 'decimal';
-    
+    const TYPE_FLOAT = 'float';
+
     private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation'];
     
     private $allowedSettingsValues = [
