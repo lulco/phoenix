@@ -3,6 +3,7 @@
 namespace Phoenix\Migration;
 
 use InvalidArgumentException;
+use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -565,7 +566,7 @@ abstract class AbstractMigration
             
             foreach ($this->queries as $query) {
                 $result = $this->adapter->execute($query);
-                $this->executedQueries[] = $query;
+                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
                 $results[] = $result;
             }
             
@@ -600,7 +601,7 @@ abstract class AbstractMigration
             $queries = $queryBuilder->dropTable($this->tables[$queryIndex]);
             foreach ($queries as $query) {
                 $this->adapter->execute($query);
-                $this->executedQueries[] = $query;
+                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
             }
         }
     }
