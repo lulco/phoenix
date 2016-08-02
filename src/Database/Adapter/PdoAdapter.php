@@ -32,12 +32,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function execute($sql)
     {
-        if ($sql instanceof PDOStatement) {
-            $res = $sql->execute();
-        } else {
-            $res = $this->pdo->query($sql);
-        }
-
+        $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
         if ($res === false) {
             $this->throwError($sql);
         }
@@ -216,17 +211,22 @@ abstract class PdoAdapter implements AdapterInterface
         }
         $cond = [];
         foreach ($conditions as $key => $value) {
-            if (is_array($value)) {
-                $in = [];
-                foreach ($value as $index => $val) {
-                    $in[] = $this->createValue($key, 'where_' . $index . '_');
-                }
-                $cond[] = $this->queryBuilder->escapeString($key) . ' IN (' . implode(', ', $in) . ')';
-            } else {
-                $cond[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
-            }
+            $cond[] = $this->addCondition($key, $value);
         }
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
+    }
+    
+    private function addCondition($key, $value)
+    {
+        if (!is_array($value)) {
+            return $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+        }
+        $inConditions = [];
+        foreach (array_keys($value) as $index) {
+            $inConditions[] = $this->createValue($key, 'where_' . $index . '_');
+        }
+        return $this->queryBuilder->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
+        
     }
 
     private function createLimit($limit = null)
@@ -321,16 +321,21 @@ abstract class PdoAdapter implements AdapterInterface
     private function bindConditions(PDOStatement $statement, array $conditions = [])
     {
         foreach ($conditions as $key => $condition) {
-            if (!is_array($condition)) {
-                $statement->bindValue('where_' . $key, $condition);
-            } else {
-                foreach ($condition as $index => $cond) {
-                    $statement->bindValue('where_' . $index . '_' . $key, $cond);
-                }
-            }
+            $this->bindCondition($statement, $key, $condition);
         }
     }
 
+    private function bindCondition(PDOStatement $statement, $key, $condition)
+    {
+        if (!is_array($condition)) {
+            $statement->bindValue('where_' . $key, $condition);
+            return;
+        }
+        foreach ($condition as $index => $cond) {
+            $statement->bindValue('where_' . $index . '_' . $key, $cond);
+        }
+    }
+    
     private function isMulti($data)
     {
         foreach ($data as $item) {

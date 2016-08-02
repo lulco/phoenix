@@ -67,4 +67,24 @@ class Output implements OutputInterface
         
         return isset($this->messages[$verbosity]) ? $this->messages[$verbosity] : [];
     }
+
+    public function isDebug()
+    {
+        
+    }
+
+    public function isQuiet()
+    {
+        
+    }
+
+    public function isVerbose()
+    {
+        
+    }
+
+    public function isVeryVerbose()
+    {
+        
+    }
 }

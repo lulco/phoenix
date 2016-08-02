@@ -12,6 +12,7 @@
 
 #### Fixed
 - several bugs in PdoAdapter
+- output for executed queries in commands
 
 ### [0.4.0] - 2016-06-13
 #### Added

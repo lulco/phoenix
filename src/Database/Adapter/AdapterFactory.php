@@ -8,8 +8,14 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 class AdapterFactory
 {
+    private static $instances = [];
+
     public static function instance(EnvironmentConfig $config)
     {
+        $configHash = md5(json_encode($config->getConfiguration()));
+        if (isset(self::$instances[$configHash])) {
+            return self::$instances[$configHash];
+        }
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
         if ($config->getAdapter() == 'mysql') {
             $adapter = new MysqlAdapter($pdo);
@@ -20,6 +26,8 @@ class AdapterFactory
         } else {
             throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
         }
-        return $adapter->setCharset($config->getCharset());
+        $adapter->setCharset($config->getCharset());
+        self::$instances[$configHash] = $adapter;
+        return $adapter;
     }
 }
