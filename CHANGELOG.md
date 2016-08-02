@@ -4,10 +4,12 @@
 
 ### [0.5.0] - 2016-08-03
 #### Added
-- possibility to create custom templates
+- column types date, bigint, float
 - support for change charset in mysql (per table and also per column)
-- simple changes of column types and names for pgsql
-- simple type casting for columns in pgsql
+- possibility to create custom templates
+- option "first" for migrate command
+- option "all" for rollback command
+- simple altering tables for pgsql: changes of column names, types and type casting for columns
 - support for multi insert
 - support for multi delete (IN condition)
 
