@@ -226,7 +226,6 @@ abstract class PdoAdapter implements AdapterInterface
             $inConditions[] = $this->createValue($key, 'where_' . $index . '_');
         }
         return $this->queryBuilder->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
-        
     }
 
     private function createLimit($limit = null)
