@@ -2,9 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+### [0.5.0] - 2016-08-03
 #### Added
 - possibility to create custom templates
-- support for change charset in mysql (table and also column)
+- support for change charset in mysql (per table and also per column)
 - simple changes of column types and names for pgsql
 - simple type casting for columns in pgsql
 - support for multi insert
@@ -12,7 +13,7 @@
 
 #### Fixed
 - several bugs in PdoAdapter
-- output for executed queries in commands
+- output for executed queries in commands (Option -vvv)
 
 ### [0.4.0] - 2016-06-13
 #### Added
@@ -66,7 +67,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.4.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/lulco/phoenix/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/lulco/phoenix/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/lulco/phoenix/compare/0.1.1...0.2.0
