@@ -18,8 +18,10 @@ class Column
     const TYPE_CHAR = 'char';
     const TYPE_DECIMAL = 'decimal';
     const TYPE_FLOAT = 'float';
+    const TYPE_ENUM = 'enum';
+    const TYPE_SET = 'set';
 
-    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation'];
+    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation', 'values'];
     
     private $allowedSettingsValues = [
         'null' => ['is_bool'],
@@ -32,6 +34,7 @@ class Column
         'first' => ['is_bool'],
         'charset' => ['is_string'],
         'collation' => ['is_string'],
+        'values' => ['is_array'],
     ];
     
     private $name;
@@ -152,6 +155,11 @@ class Column
         return isset($this->settings['collation']) ? $this->settings['collation'] : null;
     }
 
+    public function getValues()
+    {
+        return isset($this->settings['values']) ? $this->settings['values'] : null;
+    }
+    
     private function checkSettings($settings)
     {
         $errors = [];

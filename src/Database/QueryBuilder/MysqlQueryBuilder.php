@@ -21,6 +21,8 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float(%d,%d)',
+        Column::TYPE_ENUM => 'enum(%s)',
+        Column::TYPE_SET => 'set(%s)',
     ];
 
     protected $defaultLength = [
