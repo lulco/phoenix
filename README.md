@@ -13,7 +13,7 @@ Framework agnostic database migrations for PHP.
 - Validation all settings in migration before executing first query
 - Multiple migration directories
 - Migrate up and down
-- Namespaces
+- Namespaces in migration classes
 - Own migration templates
 - Easy integration to any PHP application
 
@@ -72,7 +72,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `create` - create migration
 - `migrate` - run migrations
 - `rollback` - rollback migrations
-- `cleanup` - cleanup - rollback all migrations and delete log table
+- `cleanup` - rollback all migrations and delete log table
 
 You can run each command with `--help` option to get more information about it.
 
@@ -85,7 +85,7 @@ Create command `php vendor/bin/phoenix create [options] [--] <migration> [<dir>]
 ```
 php vendor/bin/phoenix create "FirstDir\MyFirstMigration" second
 ```
-This will create PHP class `FirstDir\MyFirstMigration` in file named `{timestamp}_my_first_migration.php` where `{timestamp}` representing actual timestamp in format `YmdHis` e.g. `20160919082117`. This file will be created in migration directory `second` which is configured as `__DIR__ . '/../second_dir'` (see configuration above).
+This will create PHP class `FirstDir\MyFirstMigration` in file named `{timestamp}_my_first_migration.php` where `{timestamp}` represents actual timestamp in format `YmdHis` e.g. `20160919082117`. This file will be created in migration directory `second` which is configured as `__DIR__ . '/../second_dir'` (see configuration example above).
 
 `create` command creates a skeleton of migration file, which looks like this:
 ```
@@ -111,7 +111,7 @@ class MyFirstMigration extends AbstractMigration
 
 Now you need to implement both methods: `up()`, which is used when command `migrate` is executed and `down()`, which is used when command `rollback` is executed. In general: if you create table in `up()` method, you have to drop this table in `down()` method and vice versa.
 
-Let say we need to execute this query:
+Let say you need to execute this query:
 ```
 CREATE TABLE `first_table` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -124,7 +124,7 @@ CREATE TABLE `first_table` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
-We need to implement `up()` method in our migration as below:
+You need to implement `up()` method in your migration class as below:
 ```
 <?php
 
@@ -156,10 +156,10 @@ Implementation of correspondent `down()` method which drops table `first_table` 
     }
 ```
 
-Now we can run `migrate` command to execute our first migration.
+Now you can run `migrate` command to execute your first migration.
 
 ### Migrate command
-Migrate command `php vendor/bin/phoenix migrate` executes all available migrations. In our case we will see output like this:
+Migrate command `php vendor/bin/phoenix migrate` executes all available migrations. In this case you will see output like this:
 ```
 php vendor/bin/phoenix migrate
 
@@ -169,7 +169,7 @@ Migration FirstDir\MyFirstMigration executed. Took 0.0308s
 All done. Took 0.0786s
 ```
 
-If we run this command again, there will be no migrations to execute, so the output looks like this:
+If you run this command again, there will be no migrations to execute, so the output looks like this:
 
 ```
 php vendor/bin/phoenix migrate
@@ -179,10 +179,10 @@ Nothing to migrate
 All done. Took 0.0451s
 ```
 
-If we want to rollback changes (e.g. we found out we forgot add some column or index), we can run `rollback` command, update migration and then run `migrate` command again. Keep in mind that the best practice is to run `rollback` command before updating migration.
+If you want to rollback changes (e.g. you found out that you forgot add some column or index), you can run `rollback` command, update migration and then run `migrate` command again. Keep in mind that the best practice is to run `rollback` command before updating migration.
 
 ### Rollback command
-Rollback command `php vendor/bin/phoenix rollback` rollbacks last executed migration. In our case we will see output like this:
+Rollback command `php vendor/bin/phoenix rollback` rollbacks last executed migration. In this case you will see output like this:
 ```
 php vendor/bin/phoenix rollback
 
@@ -192,7 +192,7 @@ Rollback for migration FirstDir\MyFirstMigration executed. Took 0.0108s
 All done. Took 0.0594s
 ```
 
-If we run this command again, there will be no migrations to rollback, so the output looks like this:
+If you run this command again, there will be no migrations to rollback, so the output looks like this:
 ```
 php vendor/bin/phoenix rollback
 
