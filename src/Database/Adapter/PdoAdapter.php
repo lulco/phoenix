@@ -13,18 +13,18 @@ abstract class PdoAdapter implements AdapterInterface
 {
     /** @var PDO */
     private $pdo;
-    
+
     private $charset;
-    
+
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
-    
+
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
         $this->getQueryBuilder();
     }
-    
+
     /**
      * @param string|PDOStatement $sql
      * @return PDOStatement|boolean
@@ -48,7 +48,7 @@ abstract class PdoAdapter implements AdapterInterface
         $this->execute($statement);
         return $this->pdo->lastInsertId();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -68,7 +68,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
         return $statement;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -77,7 +77,7 @@ abstract class PdoAdapter implements AdapterInterface
         $statement = $this->buildUpdateQuery($table, $data, $conditions, $where);
         return $this->execute($statement);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -96,7 +96,7 @@ abstract class PdoAdapter implements AdapterInterface
         $this->bindConditions($statement, $conditions);
         return $statement;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -105,7 +105,7 @@ abstract class PdoAdapter implements AdapterInterface
         $statement = $this->buildDeleteQuery($table, $conditions, $where);
         return $this->execute($statement);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -119,7 +119,7 @@ abstract class PdoAdapter implements AdapterInterface
         $this->bindConditions($statement, $conditions);
         return $statement;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -140,7 +140,7 @@ abstract class PdoAdapter implements AdapterInterface
         $this->execute($statement);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -199,13 +199,13 @@ abstract class PdoAdapter implements AdapterInterface
         }
         return '(' . implode(', ', $values) . ')';
     }
-    
+
     private function createWhere(array $conditions = [], $where = '')
     {
         if (empty($conditions) && $where == '') {
             return '';
         }
-        
+
         if (empty($conditions)) {
             return sprintf(' WHERE %s', $where);
         }
@@ -215,7 +215,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
     }
-    
+
     private function addCondition($key, $value)
     {
         if (!is_array($value)) {
@@ -268,7 +268,7 @@ abstract class PdoAdapter implements AdapterInterface
     {
         return $this->pdo->beginTransaction();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -284,7 +284,7 @@ abstract class PdoAdapter implements AdapterInterface
     {
         return $this->pdo->rollBack();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -293,7 +293,7 @@ abstract class PdoAdapter implements AdapterInterface
         $this->charset = $charset;
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -301,7 +301,7 @@ abstract class PdoAdapter implements AdapterInterface
     {
         return $this->charset;
     }
-   
+
     /**
      * {@inheritdoc}
      */
@@ -313,10 +313,10 @@ abstract class PdoAdapter implements AdapterInterface
             if ($value instanceof DateTime) {
                 $value = $value->format('Y-m-d H:i:s');
             }
-            $statement->bindValue($prefix . $key, $value);
+            $statement->bindValue($prefix . $key, $this->createRealValue($value));
         }
     }
-    
+
     private function bindConditions(PDOStatement $statement, array $conditions = [])
     {
         foreach ($conditions as $key => $condition) {
@@ -334,15 +334,15 @@ abstract class PdoAdapter implements AdapterInterface
             $statement->bindValue('where_' . $index . '_' . $key, $cond);
         }
     }
-    
+
     private function isMulti($data)
     {
         foreach ($data as $item) {
-            if (is_array($item)) {
-                return true;
+            if (!is_array($item)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private function throwError($query)
@@ -350,4 +350,6 @@ abstract class PdoAdapter implements AdapterInterface
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
     }
+
+    abstract protected function createRealValue($value);
 }

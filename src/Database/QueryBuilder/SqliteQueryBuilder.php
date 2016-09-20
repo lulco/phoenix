@@ -23,21 +23,23 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float',
+        Column::TYPE_ENUM => 'varchar(255)',    // tmp hack
+        Column::TYPE_SET => 'varchar(255)',    // tmp hack
     ];
-    
+
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
     ];
-    
+
     private $adapter;
-    
+
     public function __construct(AdapterInterface $adapter = null)
     {
         $this->adapter = $adapter;
     }
-    
+
     /**
      * generates create table queries for sqlite
      * @param Table $table
@@ -52,7 +54,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         return $queries;
     }
-    
+
     /**
      * generates drop table query for sqlite
      * @param Table $table
@@ -62,7 +64,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
-    
+
     /**
      * generates rename table queries for sqlite
      * @param Table $table
@@ -73,7 +75,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
     }
-    
+
     /**
      * @param Table $table
      * @return array list of queries
@@ -89,13 +91,13 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             $tableToDrop = new Table($tmpTableName);
             $queries = array_merge($queries, $this->dropTable($tableToDrop));
         }
-        
+
         return $queries;
     }
-    
+
     protected function createColumn(Column $column, Table $table)
     {
-        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
+        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= $column->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         if ($column->getDefault() !== null && $column->getDefault() !== '') {
@@ -125,7 +127,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
-    
+
     private function createIndex(Index $index, Table $table)
     {
         $columns = [];
@@ -143,7 +145,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         $oldColumns = $this->adapter->tableInfo($table->getName());
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
-        
+
         $newTable = new Table($table->getName());
         $columnNames = [];
         foreach ($columns as $column) {
@@ -154,14 +156,24 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             }
             $newTable->addColumn($column);
         }
-        
+
         $queries = $this->createTable($newTable);
         $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
         return $queries;
     }
-    
+
     public function escapeString($string)
     {
         return '"' . $string . '"';
+    }
+
+    protected function createEnumSetColumn(Column $column, Table $table)
+    {
+        return sprintf(
+            $this->remapType($column),
+            implode(',', array_map(function ($value) {
+                return "'$value'";
+            }, $column->getValues()))
+        );
     }
 }

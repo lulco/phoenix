@@ -24,7 +24,7 @@ class Init extends AbstractMigration
             ->addIndex('sorting')
             ->addForeignKey('t1_fk', 'table_1', 'id')
             ->create();
-        
+
         $this->table('table_3', 'identifier')
             ->addColumn('identifier', 'uuid')
             ->addColumn('t1_fk', 'integer')
@@ -32,7 +32,7 @@ class Init extends AbstractMigration
             ->addForeignKey('t1_fk', 'table_1', 'id')
             ->addForeignKey('t2_fk', 'table_2', 'id')
             ->create();
-        
+
         $this->table('all_types', 'identifier')
             ->addColumn('identifier', 'uuid')
             ->addColumn('col_integer', 'integer')

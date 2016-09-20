@@ -34,12 +34,17 @@ class SqliteAdapter extends PdoAdapter
             if (isset($matches[1]) && $matches[1] != '') {
                 $type = $matches[1];
             }
-            
+
             if ($type == 'varchar') {
                 $type = 'string';
             }
             $tableInfo[$column['name']] = new Column($column['name'], $type, $settings);
         }
         return $tableInfo;
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? implode(',', $value) : $value;
     }
 }

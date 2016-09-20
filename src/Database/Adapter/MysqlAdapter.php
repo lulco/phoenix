@@ -17,9 +17,14 @@ class MysqlAdapter extends PdoAdapter
         }
         return $this->queryBuilder;
     }
-    
+
     public function tableInfo($table)
     {
         throw new LogicException('Not yet implemented');
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? implode(',', $value) : $value;
     }
 }
