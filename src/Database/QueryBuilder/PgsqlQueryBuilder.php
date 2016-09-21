@@ -128,7 +128,12 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($oldColumnName != $newColumn->getName()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
-                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType()) . ';';
+                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+                    $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
+                } else {
+                    $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
+                }
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . $cast . ';';
             }
         }
         $queries = array_merge($queries, $this->addPrimaryKey($table));

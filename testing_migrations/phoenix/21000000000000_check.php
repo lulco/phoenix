@@ -10,10 +10,10 @@ class Check extends AbstractMigration
     public function up()
     {
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 4) {
+        if (count($logs) != 5) {
             throw new Exception('Wrong count');
         }
-        
+
         $tableColumns = [
             'table_1' => [
                 'id', 'title', 'alias', 'is_active', 'bodytext'
@@ -25,7 +25,7 @@ class Check extends AbstractMigration
                 'identifier', 't1_fk', 't2_fk',
             ],
         ];
-        
+
         foreach ($tableColumns as $table => $columns) {
             $items = $this->fetchAll($table);
             if (!$items) {
@@ -43,7 +43,7 @@ class Check extends AbstractMigration
             }
         }
     }
-    
+
     public function down()
     {
     }
