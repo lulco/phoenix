@@ -23,8 +23,8 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float',
-        Column::TYPE_ENUM => 'varchar(255)',    // tmp hack
-        Column::TYPE_SET => 'varchar(255)',    // tmp hack
+        Column::TYPE_ENUM => 'varchar(255) CHECK(%s IN (%s))',
+        Column::TYPE_SET => 'varchar(255) CHECK(%s IN (%s))',
     ];
 
     protected $defaultLength = [
@@ -169,11 +169,35 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     protected function createEnumSetColumn(Column $column, Table $table)
     {
-        return sprintf(
-            $this->remapType($column),
-            implode(',', array_map(function ($value) {
+        if ($column->getType() == Column::TYPE_ENUM) {
+            $values = implode(',', array_map(function ($value) {
                 return "'$value'";
-            }, $column->getValues()))
-        );
+            }, $column->getValues()));
+        } elseif ($column->getType() === Column::TYPE_SET) {
+            $combinations = [];
+            $this->createSetCombinations($column->getValues(), '', $combinations);
+            $values = implode(',', array_map(function ($value) {
+                return "'$value'";
+            }, $combinations));
+        }
+        return sprintf($this->remapType($column), $column->getName(), $values);
+    }
+
+    private function createSetCombinations($arr, $tmpString, &$combinations)
+    {
+        if ($tmpString != '') {
+            $combinations[] = $tmpString;
+        }
+
+        for ($i = 0; $i < sizeof($arr); ++$i) {
+            $arrcopy = $arr;
+            $elem = array_splice($arrcopy, $i, 1);
+            $combination = $tmpString ? $tmpString . ',' . $elem[0] : $elem[0];
+            if (sizeof($arrcopy) > 0) {
+                $this->createSetCombinations($arrcopy, $combination, $combinations);
+            } else {
+                $combinations[] = $combination;
+            }
+        }
     }
 }
