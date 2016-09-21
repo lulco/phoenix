@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\MediaLibrary;
+namespace Phoenix\TestingMigrations;
 
 use Exception;
 use Phoenix\Migration\AbstractMigration;
@@ -13,7 +13,7 @@ class Check extends AbstractMigration
         if (count($logs) != 4) {
             throw new Exception('Wrong count');
         }
-        
+
         $tableColumns = [
             'table_1' => [
                 'id', 'title', 'alias', 'is_active', 'bodytext'
@@ -25,7 +25,7 @@ class Check extends AbstractMigration
                 'identifier', 't1_fk', 't2_fk',
             ],
         ];
-        
+
         foreach ($tableColumns as $table => $columns) {
             $items = $this->fetchAll($table);
             if (!$items) {
@@ -43,7 +43,7 @@ class Check extends AbstractMigration
             }
         }
     }
-    
+
     public function down()
     {
     }
