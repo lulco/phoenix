@@ -169,18 +169,15 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     protected function createEnumSetColumn(Column $column, Table $table)
     {
+        $values = [];
         if ($column->getType() == Column::TYPE_ENUM) {
-            $values = implode(',', array_map(function ($value) {
-                return "'$value'";
-            }, $column->getValues()));
+            $values = $column->getValues();
         } elseif ($column->getType() === Column::TYPE_SET) {
-            $combinations = [];
-            $this->createSetCombinations($column->getValues(), '', $combinations);
-            $values = implode(',', array_map(function ($value) {
-                return "'$value'";
-            }, $combinations));
+            $this->createSetCombinations($column->getValues(), '', $values);
         }
-        return sprintf($this->remapType($column), $column->getName(), $values);
+        return sprintf($this->remapType($column), $column->getName(), implode(',', array_map(function ($value) {
+            return "'$value'";
+        }, $values)));
     }
 
     private function createSetCombinations($arr, $tmpString, &$combinations)
@@ -189,7 +186,8 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             $combinations[] = $tmpString;
         }
 
-        for ($i = 0; $i < sizeof($arr); ++$i) {
+        $count = count($arr);
+        for ($i = 0; $i < $count; ++$i) {
             $arrcopy = $arr;
             $elem = array_splice($arrcopy, $i, 1);
             $combination = $tmpString ? $tmpString . ',' . $elem[0] : $elem[0];
