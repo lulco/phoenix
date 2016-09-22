@@ -13,8 +13,9 @@ class ConfigParsersTest extends PHPUnit_Framework_TestCase
             'php' => 'phoenix.php',
             'yml' => 'phoenix.yml',
             'neon' => 'phoenix.neon',
+            'json' => 'phoenix.json',
         ];
-        
+
         foreach ($configs as $type => $file) {
             $configParser = ConfigParserFactory::instance($type);
             $filename = __DIR__ . '/../../example/' . $file;

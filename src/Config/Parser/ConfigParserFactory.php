@@ -18,6 +18,9 @@ class ConfigParserFactory
         if ($type === 'neon') {
             return new NeonConfigParser();
         }
+        if ($type === 'json') {
+            return new JsonConfigParser();
+        }
         throw new ConfigException('Unknown config type "' . $type . '"');
     }
 }

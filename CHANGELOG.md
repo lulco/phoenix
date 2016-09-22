@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for json config file
+
 ### [0.5.0] - 2016-08-03
 #### Added
 - column types date, bigint, float
