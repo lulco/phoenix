@@ -27,9 +27,11 @@ class MigrateCommand extends AbstractRunCommand
         return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target);
     }
 
-    protected function runMigration(AbstractMigration $migration)
+    protected function runMigration(AbstractMigration $migration, $dry = false)
     {
-        $migration->migrate();
-        $this->manager->logExecution($migration);
+        $migration->migrate($dry);
+        if (!$dry) {
+            $this->manager->logExecution($migration);
+        }
     }
 }

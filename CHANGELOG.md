@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Dry run - execute migrate or rollback command without real executing queries. Commands just print queries which will be executed
+
 ### [0.5.0] - 2016-08-03
 #### Added
 - column types date, bigint, float
