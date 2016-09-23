@@ -43,10 +43,10 @@ foreach (array_keys($configuration['environments']) as $environment) {
     echo "Adapter: $environment\n";
     $config = new Config($configuration);
     $adapter = AdapterFactory::instance($config->getEnvironmentConfig($environment));
-    
+
     $initMigration = new Init($adapter, $config->getLogTableName());
     $initMigration->migrate();
-    
+
     $manager = new Manager($config, $adapter);
     $migrations = $manager->findMigrationsToExecute();
     foreach ($migrations as $migration) {
@@ -56,7 +56,7 @@ foreach (array_keys($configuration['environments']) as $environment) {
         $manager->removeExecution($migration);
         $migration->migrate();
         $manager->logExecution($migration);
-        print_R($migration->getExecutedQueries());
+//        print_R($migration->getExecutedQueries());
     }
     echo "All OK\n\n";
 }

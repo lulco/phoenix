@@ -5,6 +5,9 @@
 #### Fixed
 - Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
 
+#### Added
+- support for json config file
+
 ### [0.5.0] - 2016-08-03
 #### Added
 - column types date, bigint, float
