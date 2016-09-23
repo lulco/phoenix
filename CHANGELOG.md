@@ -2,8 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
+
 #### Added
-- Status command - list of migrations already executed and list of migrations to execute
+- support for json config file
+- status command - list of migrations already executed and list of migrations to execute
 
 ### [0.5.0] - 2016-08-03
 #### Added
