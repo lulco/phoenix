@@ -126,4 +126,28 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
 
         $this->assertGreaterThan(count($messagesFirst[0]), count($messagesAll[0]));
     }
+
+    public function testDryRun()
+    {
+        $input = new Input();
+        $output = new Output();
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $input->setOption('dry', true);
+        $input->setOption('first', true);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages();
+        $dryMigrationExecuting = $messages[0][6];
+        $dryMigrationExecuted = $messages[0][7];
+        $dryQueries = array_slice($messages[0], 8, -3);
+
+        $input = new Input();
+        $output = new Output();
+        $input->setOption('first', true);
+        $command->run($input, $output);
+
+        $realRunMessages = $output->getMessages();
+        $this->assertEquals($dryQueries, $realRunMessages[OutputInterface::VERBOSITY_DEBUG]);
+    }
 }

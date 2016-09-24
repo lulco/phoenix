@@ -162,4 +162,41 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<info>Nothing to rollback</info>' . "\n", $messages[0][1]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
+
+    public function testDryRun()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $input = new Input();
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $input = new Input();
+        $input->setOption('dry', true);
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $dryMessages = $output->getMessages();
+        $dryQueries = array_slice($dryMessages[0], 3, -3);
+
+        $this->assertTrue(is_array($dryMessages));
+        $this->assertArrayHasKey(0, $dryMessages);
+        $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
+
+        $input = new Input();
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages();
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+        $this->assertEquals($dryQueries, $messages[OutputInterface::VERBOSITY_DEBUG]);
+    }
 }
