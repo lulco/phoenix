@@ -8,6 +8,7 @@
 #### Added
 - support for json config file
 - status command - list of migrations already executed and list of migrations to execute
+- dry run - execute migrate or rollback command without real executing queries. Commands just print queries which would be executed
 
 ### [0.5.0] - 2016-08-03
 #### Added

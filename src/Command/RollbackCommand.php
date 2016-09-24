@@ -27,9 +27,11 @@ class RollbackCommand extends AbstractRunCommand
         return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target);
     }
 
-    protected function runMigration(AbstractMigration $migration)
+    protected function runMigration(AbstractMigration $migration, $dry = false)
     {
-        $migration->rollback();
-        $this->manager->removeExecution($migration);
+        $migration->rollback($dry);
+        if (!$dry) {
+            $this->manager->removeExecution($migration);
+        }
     }
 }
