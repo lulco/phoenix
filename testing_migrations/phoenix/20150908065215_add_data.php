@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\MediaLibrary;
+namespace Phoenix\TestingMigrations;
 
 use Nette\Utils\DateTime;
 use Phoenix\Migration\AbstractMigration;

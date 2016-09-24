@@ -2,6 +2,15 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
+
+#### Added
+- support for json config file
+- status command - list of migrations already executed and list of migrations to execute
+- dry run - execute migrate or rollback command without real executing queries. Commands just print queries which would be executed
+- enum and set column types
+
 ### [0.5.0] - 2016-08-03
 #### Added
 - column types date, bigint, float

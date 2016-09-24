@@ -90,21 +90,23 @@ abstract class AbstractMigration
     }
 
     /**
+     * @param boolean $dry Only create query strings, do not execute
      * @return array
      */
-    final public function migrate()
+    final public function migrate($dry = false)
     {
         $this->up();
-        return $this->runQueries();
+        return $this->runQueries($dry);
     }
 
     /**
+     * @param boolean $dry Only create query strings, do not execute
      * @return array
      */
-    final public function rollback()
+    final public function rollback($dry = false)
     {
         $this->down();
-        return $this->runQueries();
+        return $this->runQueries($dry);
     }
 
     /**
@@ -555,22 +557,30 @@ abstract class AbstractMigration
         return $this;
     }
 
-    private function runQueries()
+    /**
+     *
+     * @param boolean $dry do not execute query
+     * @return array
+     * @throws DatabaseQueryExecuteException
+     */
+    private function runQueries($dry = false)
     {
         $results = [];
         try {
-            if ($this->useTransaction) {
+            if ($this->useTransaction && !$dry) {
                 $this->adapter->startTransaction();
                 $this->executedQueries[] = '::start transaction';
             }
 
             foreach ($this->queries as $query) {
-                $result = $this->adapter->execute($query);
+                if (!$dry) {
+                    $result = $this->adapter->execute($query);
+                    $results[] = $result;
+                }
                 $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
-                $results[] = $result;
             }
 
-            if ($this->useTransaction) {
+            if ($this->useTransaction && !$dry) {
                 $this->adapter->commit();
                 $this->executedQueries[] = '::commit';
             }

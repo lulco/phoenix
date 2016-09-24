@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\MediaLibrary;
+namespace Phoenix\TestingMigrations;
 
 use Exception;
 use Phoenix\Migration\AbstractMigration;
