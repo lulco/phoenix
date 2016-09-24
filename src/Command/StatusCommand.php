@@ -23,34 +23,36 @@ class StatusCommand extends AbstractCommand
         $executedMigrations = $this->manager->executedMigrations();
 
         $output->writeln('<comment>Executed migrations</comment>');
-        if (!$executedMigrations) {
+        if (empty($executedMigrations)) {
             $output->writeln('<info>No executed migrations</info>');
         } else {
-            $table = new Table($output);
-            $table->setHeaders(['Class name']);
             $rows = [];
             foreach ($executedMigrations as $migration) {
-                $rows[] = [ltrim($migration['classname'], '\\')];
+                $rows[] = [ltrim($migration['classname'], '\\'), $migration['executed_at']];
             }
-            $table->setRows($rows);
-            $table->render();
+            $this->printTable(['Class name', 'Executed at'], $rows, $output);
         }
 
         $output->writeln('');
 
         $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_UP);
         $output->writeln('<comment>Migrations to execute</comment>');
-        if (!$migrations) {
+        if (empty($migrations)) {
             $output->writeln('<info>No migrations to execute</info>');
         } else {
-            $table = new Table($output);
-            $table->setHeaders(['Class name']);
             $rows = [];
             foreach ($migrations as $migration) {
                 $rows[] = [$migration->getClassName()];
             }
-            $table->setRows($rows);
-            $table->render();
+            $this->printTable(['Class name'], $rows, $output);
         }
+    }
+
+    private function printTable(array $headers, array $rows, OutputInterface $output)
+    {
+        $table = new Table($output);
+        $table->setHeaders($headers);
+        $table->setRows($rows);
+        $table->render();
     }
 }
