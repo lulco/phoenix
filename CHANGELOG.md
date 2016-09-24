@@ -7,6 +7,7 @@
 
 #### Added
 - support for json config file
+- status command - list of migrations already executed and list of migrations to execute
 
 ### [0.5.0] - 2016-08-03
 #### Added

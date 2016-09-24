@@ -13,8 +13,7 @@ class CleanupCommand extends AbstractCommand
     protected function configure()
     {
         $this->setName('cleanup')
-            ->setDescription('Cleanup - rollback all migrations and delete log table');
-        
+            ->setDescription('Rollback all migrations and delete log table');
         parent::configure();
     }
 
@@ -26,22 +25,22 @@ class CleanupCommand extends AbstractCommand
             $output->writeln('<info>Nothing to rollback</info>');
             $output->writeln('');
         }
-        
+
         foreach ($migrations as $migration) {
             $migration->rollback();
             $this->manager->removeExecution($migration);
-            
+
             $output->writeln('');
             $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
             $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
             $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
         }
-        
+
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
         require_once $filename;
         $migration = new Init($this->adapter, $this->config->getLogTableName());
         $migration->rollback();
-        
+
         $output->writeln('');
         $output->writeln('<info>Phoenix cleaned</info>');
         $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
