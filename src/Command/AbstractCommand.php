@@ -83,7 +83,16 @@ abstract class AbstractCommand extends Command
         if ($this->config) {
             return;
         }
-        $configFile = $input->getOption('config') ?: 'phoenix.php';
+
+        $configFile = $input->getOption('config');
+        if (!$configFile) {
+            $configFile = $this->getDefaultConfig();
+        }
+
+        if (!$configFile) {
+            throw new ConfigException('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
+        }
+
         if ($configFile && !file_exists($configFile)) {
             throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
         }
@@ -92,6 +101,22 @@ abstract class AbstractCommand extends Command
         $configParser = ConfigParserFactory::instance($type);
         $configuration = $configParser->parse($configFile);
         $this->config = new Config($configuration);
+    }
+
+    private function getDefaultConfig()
+    {
+        $defaultConfigFiles = [
+            'phoenix.php',
+            'phoenix.yml',
+            'phoenix.neon',
+            'phoenix.json',
+        ];
+        foreach ($defaultConfigFiles as $defaultConfigFile) {
+            if (file_exists($defaultConfigFile)) {
+                return $defaultConfigFile;
+            }
+        }
+        return null;
     }
 
     private function check(InputInterface $input, OutputInterface $output)

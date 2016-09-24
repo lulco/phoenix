@@ -1,6 +1,6 @@
 <?php
 
-namespace Phoenix\MediaLibrary;
+namespace Phoenix\TestingMigrations;
 
 use Nette\Utils\DateTime;
 use Phoenix\Migration\AbstractMigration;
@@ -14,7 +14,7 @@ class AddData extends AbstractMigration
             'title' => 'First item',
             'alias' => 'first-item',
         ]);
-        
+
         $this->insert('table_1', [
             [
                 'id' => 2,
@@ -27,7 +27,7 @@ class AddData extends AbstractMigration
                 'alias' => 'third-item',
             ]
         ]);
-        
+
         $this->insert('table_2', [
             'id' => 1,
             'title' => 'T2 First item',
@@ -35,7 +35,7 @@ class AddData extends AbstractMigration
             't1_fk' => 1,
             'created_at' => new DateTime(),
         ]);
-        
+
         $this->insert('table_2', [
             'id' => 2,
             'title' => 'T2 Second item',
@@ -43,22 +43,22 @@ class AddData extends AbstractMigration
             't1_fk' => 3,
             'created_at' => new DateTime(),
         ]);
-        
+
         $this->insert('table_3', [
             'identifier' => '6fedffa4-897e-41b1-ba00-185b7c1726d2',
             't1_fk' => 3,
         ]);
-        
+
         $this->insert('table_3', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465b',
             't1_fk' => 1,
             't2_fk' => 1,
         ]);
-        
+
         $this->update('table_1', [
             'title' => 'Renamed second item'
         ], ['id' => 2]);
-        
+
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c',
             'col_integer' => 50,
@@ -74,7 +74,7 @@ class AddData extends AbstractMigration
             'col_date' => (new DateTime())->format('Y-m-d'),
         ]);
     }
-    
+
     protected function down()
     {
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c']);

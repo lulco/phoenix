@@ -11,7 +11,7 @@ use Phoenix\Behavior\ParamsCheckerBehavior;
 class Manager
 {
     use ParamsCheckerBehavior;
-    
+
     const TYPE_UP = 'up';
     const TYPE_DOWN = 'down';
 
@@ -33,7 +33,7 @@ class Manager
         $this->config = $config;
         $this->adapter = $adapter;
     }
-    
+
     /**
      * @param string $type up / down
      * @param string $target all / first
@@ -54,7 +54,7 @@ class Manager
         }
         return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
     }
-    
+
     private function findMigrations($type)
     {
         $filesFinder = new FilesFinder();
@@ -63,7 +63,7 @@ class Manager
         }
 
         $executedMigrations = $this->executedMigrations();
-                
+
         $migrations = [];
         foreach ($filesFinder->getFiles() as $file) {
             require_once $file;
@@ -79,7 +79,7 @@ class Manager
         ksort($migrations);
         return $migrations;
     }
-    
+
     /**
      * returs executed migrations
      * @return array
@@ -104,7 +104,7 @@ class Manager
         $data['executed_at'] = new DateTime();
         $this->adapter->insert($this->config->getLogTableName(), $data);
     }
-    
+
     /**
      * removes migration from log table
      * @param AbstractMigration $migration
@@ -113,7 +113,7 @@ class Manager
     {
         $this->adapter->delete($this->config->getLogTableName(), $this->createData($migration));
     }
-    
+
     private function createData(AbstractMigration $migration)
     {
         return [
