@@ -10,6 +10,11 @@ class EnvironmentConfig
     {
         $this->configuration = $configuration;
     }
+
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
     
     public function getAdapter()
     {

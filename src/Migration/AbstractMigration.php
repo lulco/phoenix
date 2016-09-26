@@ -3,6 +3,7 @@
 namespace Phoenix\Migration;
 
 use InvalidArgumentException;
+use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -23,30 +24,30 @@ abstract class AbstractMigration
 {
     /** @var string */
     private $datetime;
-    
+
     /** @var string */
     private $className;
-    
+
     /** @var string */
     private $fullClassName;
-    
+
     /** @var Table */
     private $table = null;
-    
+
     private $primaryKey = null;
-    
+
     /** @var array */
     private $tables = [];
-    
+
     /** @var array list of queries to run */
     private $queries = [];
-    
+
     /** @var array list of executed queries */
     private $executedQueries = [];
-    
+
     /** @var AdapterInterface */
     private $adapter;
-    
+
     /** @var boolean wrap queries in up / down to transaction */
     protected $useTransaction = false;  // not working for now :( so I turn it off
 
@@ -61,7 +62,7 @@ abstract class AbstractMigration
         $this->className = $classNameCreator->getClassName();
         $this->fullClassName = $classNameCreator->getClassName();
     }
-    
+
     /**
      * @return string
      */
@@ -69,7 +70,7 @@ abstract class AbstractMigration
     {
         return $this->datetime;
     }
-    
+
     /**
      * @return string
      */
@@ -77,7 +78,7 @@ abstract class AbstractMigration
     {
         return ltrim($this->className, '\\');
     }
-    
+
     /**
      * @return string
      */
@@ -85,25 +86,27 @@ abstract class AbstractMigration
     {
         return $this->fullClassName;
     }
-    
+
     /**
+     * @param boolean $dry Only create query strings, do not execute
      * @return array
      */
-    final public function migrate()
+    final public function migrate($dry = false)
     {
         $this->up();
-        return $this->runQueries();
+        return $this->runQueries($dry);
     }
-    
+
     /**
+     * @param boolean $dry Only create query strings, do not execute
      * @return array
      */
-    final public function rollback()
+    final public function rollback($dry = false)
     {
         $this->down();
-        return $this->runQueries();
+        return $this->runQueries($dry);
     }
-    
+
     /**
      * need override
      */
@@ -113,7 +116,7 @@ abstract class AbstractMigration
      * need override
      */
     abstract protected function down();
-    
+
     /**
      * adds sql to list of queries to execute
      * @param string $sql
@@ -140,15 +143,15 @@ abstract class AbstractMigration
         if ($this->table !== null) {
             throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop(), save() first.');
         }
-        
+
         $this->primaryKey = $primaryKey;
-        
+
         $this->table = new Table($name);
         $this->table->setCharset($charset ?: $this->adapter->getCharset());
         $this->table->setCollation($collation);
         return $this;
     }
-    
+
     public function __call($name, $arguments)
     {
         if ($name == 'addColumn') {
@@ -159,7 +162,7 @@ abstract class AbstractMigration
         }
         throw new RuntimeException('Method "' . $name . '" not found');
     }
-    
+
     private function addCol($arguments)
     {
         if ($this->table === null) {
@@ -172,19 +175,19 @@ abstract class AbstractMigration
 
         return $this->prepareAndAddColumn($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : []);
     }
-    
+
     private function prepareAndAddColumn($name, $type, array $settings = [])
     {
         $column = new Column($name, $type, $settings);
         return $this->addPreparedColumn($column);
     }
-    
+
     private function addPreparedColumn(Column $column)
     {
         $this->table->addColumn($column);
         return $this;
     }
-    
+
     private function changeCol($arguments)
     {
         if ($this->table === null) {
@@ -201,7 +204,7 @@ abstract class AbstractMigration
 
         return $this->prepareAndChangeColumn($arguments[0], $arguments[1], $arguments[2], isset($arguments[3]) ? $arguments[3] : []);
     }
-    
+
     private function changePreparedColumn($oldName, Column $newColumn)
     {
         $this->table->changeColumn($oldName, $newColumn);
@@ -227,7 +230,7 @@ abstract class AbstractMigration
         $this->table->dropColumn($name);
         return $this;
     }
-    
+
     /**
      * @param string|array $columns name(s) of column(s)
      * @param string $type type of index (unique, fulltext) default ''
@@ -244,7 +247,7 @@ abstract class AbstractMigration
         $this->table->addIndex(new Index($columns, $this->createIndexName($columns, $name), $type, $method));
         return $this;
     }
-    
+
     /**
      * @param string|array $columns
      * @return AbstractMigration
@@ -258,7 +261,7 @@ abstract class AbstractMigration
         $this->table->dropIndex($this->createIndexName($columns));
         return $this;
     }
-    
+
     /**
      * @param string $indexName
      * @return AbstractMigration
@@ -272,19 +275,19 @@ abstract class AbstractMigration
         $this->table->dropIndex($indexName);
         return $this;
     }
-    
+
     private function createIndexName($columns, $name = null)
     {
         if ($name) {
             return $name;
         }
-        
+
         if (!is_array($columns)) {
             $columns = [$columns];
         }
         return 'idx_' . $this->table->getName() . '_' . implode('_', $columns);
     }
-    
+
     /**
      * @param string|array $columns
      * @param string $referencedTable
@@ -302,7 +305,7 @@ abstract class AbstractMigration
         $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
         return $this;
     }
-    
+
     /**
      * @param string|array $columns
      * @return AbstractMigration
@@ -326,7 +329,7 @@ abstract class AbstractMigration
         $this->table->addPrimary($columns);
         return $this;
     }
-    
+
     /**
      * @param string|array|Column $column
      * @return AbstractMigration
@@ -337,19 +340,19 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method dropPrimaryKey(). Use method table() first.');
         }
-        
+
         if (is_string($column)) {
             $column = new Column($column, 'integer');
         }
-        
+
         if ($column instanceof Column) {
             $this->table->changeColumn($column->getName(), $column);
         }
-        
+
         $this->table->dropPrimaryKey();
         return $this;
     }
-    
+
     /**
      * generate create table queries
      * @throws IncorrectMethodUsageException if table() was not called first
@@ -359,17 +362,17 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
         }
-        
+
         $this->table->addPrimary($this->primaryKey);
-        
+
         $this->tables[count($this->queries)] = $this->table;
-        
+
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = $queryBuilder->createTable($this->table);
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
-    
+
     /**
      * generates drop table queries
      * @throws IncorrectMethodUsageException if table() was not called first
@@ -379,13 +382,13 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
         }
-        
+
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = $queryBuilder->dropTable($this->table);
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
-    
+
     /**
      * generates rename table queries
      * @param string $newTableName
@@ -396,13 +399,13 @@ abstract class AbstractMigration
         if ($this->table === null) {
             throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
         }
-        
+
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = $queryBuilder->renameTable($this->table, $newTableName);
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
-    
+
     /**
      * generates alter table query / queries
      * @throws IncorrectMethodUsageException if table() was not called first
@@ -417,7 +420,7 @@ abstract class AbstractMigration
         $this->queries = array_merge($this->queries, $queries);
         $this->table = null;
     }
-    
+
     /**
      * execute SELECT query and returns result
      * @param string $sql
@@ -427,7 +430,7 @@ abstract class AbstractMigration
     {
         return $this->adapter->select($sql);
     }
-    
+
     /**
      * @param string $table
      * @param string $fields
@@ -440,7 +443,7 @@ abstract class AbstractMigration
     {
         return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
     }
-    
+
     /**
      * @param string $table
      * @param string $fields
@@ -454,7 +457,7 @@ abstract class AbstractMigration
     {
         return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
     }
-    
+
     /**
      * adds insert query to list of queries to execute
      * @param string $table
@@ -466,7 +469,7 @@ abstract class AbstractMigration
         $this->execute($this->adapter->buildInsertQuery($table, $data));
         return $this;
     }
-    
+
     /**
      * adds update query to list of queries to execute
      * @param string $table
@@ -480,7 +483,7 @@ abstract class AbstractMigration
         $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
         return $this;
     }
-    
+
     /**
      * adds delete query to list of queries to exectue
      * @param string $table
@@ -493,23 +496,31 @@ abstract class AbstractMigration
         $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
         return $this;
     }
-    
-    private function runQueries()
+
+    /**
+     *
+     * @param boolean $dry do not execute query
+     * @return array
+     * @throws DatabaseQueryExecuteException
+     */
+    private function runQueries($dry = false)
     {
         $results = [];
         try {
-            if ($this->useTransaction) {
+            if ($this->useTransaction && !$dry) {
                 $this->adapter->startTransaction();
                 $this->executedQueries[] = '::start transaction';
             }
-            
+
             foreach ($this->queries as $query) {
-                $result = $this->adapter->execute($query);
-                $this->executedQueries[] = $query;
-                $results[] = $result;
+                if (!$dry) {
+                    $result = $this->adapter->execute($query);
+                    $results[] = $result;
+                }
+                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
             }
-            
-            if ($this->useTransaction) {
+
+            if ($this->useTransaction && !$dry) {
                 $this->adapter->commit();
                 $this->executedQueries[] = '::commit';
             }
@@ -523,13 +534,13 @@ abstract class AbstractMigration
         $this->queries = [];
         return $results;
     }
-    
+
     private function dbRollback()
     {
         $queriesExecuted = count($this->executedQueries);
         $this->adapter->rollback();
         $this->executedQueries[] = '::rollback';
-        
+
         // own rollback for create table
         for ($i = $queriesExecuted; $i > 0; $i--) {
             $queryIndex = $i - 1;
@@ -540,11 +551,11 @@ abstract class AbstractMigration
             $queries = $queryBuilder->dropTable($this->tables[$queryIndex]);
             foreach ($queries as $query) {
                 $this->adapter->execute($query);
-                $this->executedQueries[] = $query;
+                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
             }
         }
     }
-    
+
     /**
      * @return array
      */

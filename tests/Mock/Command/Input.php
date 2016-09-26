@@ -41,7 +41,7 @@ class Input implements InputInterface
         return $this->options;
     }
 
-    public function getParameterOption($values, $default = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false)
     {
         
     }
@@ -56,7 +56,7 @@ class Input implements InputInterface
         return isset($this->options[$name]);
     }
 
-    public function hasParameterOption($values)
+    public function hasParameterOption($values, $onlyParams = false)
     {
         
     }

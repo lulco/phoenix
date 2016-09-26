@@ -8,35 +8,38 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Output implements OutputInterface
 {
     private $messages = [];
-    
+
+    private $formatter;
+
     public function getFormatter()
     {
-        
+        return $this->formatter;
     }
 
     public function getVerbosity()
     {
-        
+
     }
 
     public function isDecorated()
     {
-        
+
     }
 
     public function setDecorated($decorated)
     {
-        
+
     }
 
     public function setFormatter(OutputFormatterInterface $formatter)
     {
-        
+        $this->formatter = $formatter;
+        return $this;
     }
 
     public function setVerbosity($level)
     {
-        
+
     }
 
     public function write($messages, $newline = false, $options = 0)
@@ -58,13 +61,33 @@ class Output implements OutputInterface
             $this->messages[$options][] = $message . "\n";
         }
     }
-    
+
     public function getMessages($verbosity = null)
     {
         if ($verbosity === null) {
             return $this->messages;
         }
-        
+
         return isset($this->messages[$verbosity]) ? $this->messages[$verbosity] : [];
+    }
+
+    public function isDebug()
+    {
+
+    }
+
+    public function isQuiet()
+    {
+
+    }
+
+    public function isVerbose()
+    {
+
+    }
+
+    public function isVeryVerbose()
+    {
+
     }
 }

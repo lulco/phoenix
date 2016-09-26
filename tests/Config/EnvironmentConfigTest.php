@@ -9,11 +9,13 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
 {
     public function testAdapterAndConfiguredDsn()
     {
-        $environmentConfig = new EnvironmentConfig([
+        $config = [
             'adapter' => 'test_adapter',
             'db_name' => 'test_db_name',
             'host' => 'test_host',
-        ]);
+        ];
+        $environmentConfig = new EnvironmentConfig($config);
+        $this->assertEquals($config, $environmentConfig->getConfiguration());
         $this->assertEquals('test_adapter', $environmentConfig->getAdapter());
         $this->assertEquals('test_adapter:dbname=test_db_name;host=test_host', $environmentConfig->getDsn());
         $this->assertNull($environmentConfig->getUsername());
@@ -22,13 +24,15 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
     
     public function testAdapterAndConfiguredDsnWithPortAndCharset()
     {
-        $environmentConfig = new EnvironmentConfig([
+        $config = [
             'adapter' => 'test_adapter',
             'db_name' => 'test_db_name',
             'host' => 'test_host',
             'port' => 'port',
             'charset' => 'utf8',
-        ]);
+        ];
+        $environmentConfig = new EnvironmentConfig($config);
+        $this->assertEquals($config, $environmentConfig->getConfiguration());
         $this->assertEquals('test_adapter', $environmentConfig->getAdapter());
         $this->assertEquals('test_adapter:dbname=test_db_name;host=test_host;port=port;charset=utf8', $environmentConfig->getDsn());
         $this->assertNull($environmentConfig->getUsername());

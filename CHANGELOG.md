@@ -5,16 +5,28 @@
 #### Removed
 - deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
 
+#### Fixed
+- Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
+
 #### Added
+- support for json config file
+- status command - list of migrations already executed and list of migrations to execute
+- dry run - execute migrate or rollback command without real executing queries. Commands just print queries which would be executed
+
+### [0.5.0] - 2016-08-03
+#### Added
+- column types date, bigint, float
+- support for change charset in mysql (per table and also per column)
 - possibility to create custom templates
-- support for change charset in mysql (table and also column)
-- simple changes of column types and names for pgsql
-- simple type casting for columns in pgsql
+- option "first" for migrate command
+- option "all" for rollback command
+- simple altering tables for pgsql: changes of column names, types and type casting for columns
 - support for multi insert
 - support for multi delete (IN condition)
 
 #### Fixed
 - several bugs in PdoAdapter
+- output for executed queries in commands (Option -vvv)
 
 ### [0.4.0] - 2016-06-13
 #### Added
@@ -68,7 +80,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.4.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/lulco/phoenix/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/lulco/phoenix/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/lulco/phoenix/compare/0.1.1...0.2.0
