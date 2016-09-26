@@ -28,12 +28,9 @@ class SqliteAdapter extends PdoAdapter
             $type = $column['type'];
             $settings = [
                 'null' => !$column['notnull'],
-                'default' => $column['dflt_value'],
+                'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
                 'autoincrement' => (bool)$column['pk'] && $column['type'] == 'integer',
             ];
-
-            // TODO - find enum and set types and CHECK functions in them
-            // only way I found is to parse result of query SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'
 
             if (isset($matches[1]) && $matches[1] != '') {
                 $type = $matches[1];
@@ -41,15 +38,15 @@ class SqliteAdapter extends PdoAdapter
 
             if ($type == 'varchar') {
                 $type = Column::TYPE_STRING;
-            }
-
-            if ($type == 'bigint') {
+            } elseif ($type == 'bigint') {
                 $type = Column::TYPE_BIG_INTEGER;
+            } elseif ($type == 'enum') {
+                $sql = $this->execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'")->fetch(PDO::FETCH_COLUMN);
+                preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
+                $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
             }
-
             $tableInfo[$column['name']] = new Column($column['name'], $type, $settings);
         }
-
         return $tableInfo;
     }
 
