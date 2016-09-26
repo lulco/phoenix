@@ -72,11 +72,29 @@ class AddData extends AbstractMigration
             'col_boolean' => true,
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),
+            'col_enum' => 'xxx',
+            'col_set' => ['yyy', 'zzz'],
+        ]);
+
+        $this->insert('all_types', [
+            'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d',
+            'col_integer' => 150,
+            'col_bigint' => 9876543210,
+            'col_string' => 'string',
+            'col_char' => 'char',
+            'col_text' => 'text',
+            'col_json' => json_encode(['json' => 'my new json']),
+            'col_float' => 3.1415,
+            'col_decimal' => 3.1415,
+            'col_boolean' => true,
+            'col_datetime' => new DateTime(),
+            'col_date' => (new DateTime())->format('Y-m-d'),
         ]);
     }
 
     protected function down()
     {
+        $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d']);
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c']);
         $this->delete('table_3', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465b']);
         $this->delete('table_3', ['identifier' => '6fedffa4-897e-41b1-ba00-185b7c1726d2']);

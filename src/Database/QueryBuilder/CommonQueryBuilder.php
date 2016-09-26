@@ -10,10 +10,10 @@ use Phoenix\Database\Element\Table;
 abstract class CommonQueryBuilder
 {
     protected $typeMap = [];
-    
+
     protected $defaultLength = [];
-    
-    protected function createType(Column $column)
+
+    protected function createType(Column $column, Table $table)
     {
         if (in_array($column->getType(), [Column::TYPE_DECIMAL, Column::TYPE_FLOAT])) {
             return sprintf(
@@ -21,10 +21,12 @@ abstract class CommonQueryBuilder
                 $column->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),
                 $column->getDecimals(isset($this->defaultLength[$column->getType()][1]) ? $this->defaultLength[$column->getType()][1] : null)
             );
+        } elseif (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+            return $this->createEnumSetColumn($column, $table);
         }
         return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
-    
+
     protected function remapType(Column $column)
     {
         if (!isset($this->typeMap[$column->getType()])) {
@@ -32,7 +34,7 @@ abstract class CommonQueryBuilder
         }
         return $this->typeMap[$column->getType()];
     }
-    
+
     protected function createTableQuery(Table $table)
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
@@ -47,7 +49,7 @@ abstract class CommonQueryBuilder
         $query .= ');';
         return $query;
     }
-    
+
     protected function addColumns(Table $table)
     {
         $columns = $table->getColumns();
@@ -62,7 +64,7 @@ abstract class CommonQueryBuilder
         $query .= implode(',', $columnList) . ';';
         return [$query];
     }
-    
+
     protected function createPrimaryKey(Table $table)
     {
         if (empty($table->getPrimaryColumns())) {
@@ -70,7 +72,7 @@ abstract class CommonQueryBuilder
         }
         return $this->primaryKeyString($table);
     }
-    
+
     protected function addPrimaryKey(Table $table)
     {
         $queries = [];
@@ -80,7 +82,7 @@ abstract class CommonQueryBuilder
         }
         return $queries;
     }
-    
+
     protected function dropIndexes(Table $table)
     {
         if (empty($table->getIndexesToDrop())) {
@@ -94,7 +96,7 @@ abstract class CommonQueryBuilder
         $query .= implode(',', $indexes) . ';';
         return [$query];
     }
-    
+
     protected function dropColumns(Table $table)
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
@@ -105,20 +107,20 @@ abstract class CommonQueryBuilder
         $query .= implode(',', $columns) . ';';
         return $query;
     }
-    
+
     protected function createForeignKeys(Table $table)
     {
         if (empty($table->getForeignKeys())) {
             return '';
         }
-        
+
         $foreignKeys = [];
         foreach ($table->getForeignKeys() as $foreignKey) {
             $foreignKeys[] = $this->createForeignKey($foreignKey, $table);
         }
         return ',' . implode(',', $foreignKeys);
     }
-    
+
     protected function addForeignKeys(Table $table)
     {
         $queries = [];
@@ -127,7 +129,7 @@ abstract class CommonQueryBuilder
         }
         return $queries;
     }
-    
+
     protected function createForeignKey(ForeignKey $foreignKey, Table $table)
     {
         $columns = [];
@@ -161,22 +163,24 @@ abstract class CommonQueryBuilder
         }
         return $queries;
     }
-    
+
     protected function dropKeyQuery(Table $table, $key)
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
     }
-    
+
     abstract public function escapeString($string);
-    
+
     protected function escapeArray(array $array)
     {
         return array_map(function ($string) {
             return $this->escapeString($string);
         }, $array);
     }
-    
+
     abstract protected function createColumn(Column $column, Table $table);
-    
+
     abstract protected function primaryKeyString(Table $table);
+
+    abstract protected function createEnumSetColumn(Column $column, Table $table);
 }

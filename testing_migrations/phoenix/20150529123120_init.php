@@ -46,6 +46,8 @@ class Init extends AbstractMigration
             ->addColumn('col_boolean', 'boolean')
             ->addColumn('col_datetime', 'datetime')
             ->addColumn('col_date', 'date')
+            ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->create();
     }
 

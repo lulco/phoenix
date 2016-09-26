@@ -10,7 +10,7 @@ class Check extends AbstractMigration
     public function up()
     {
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 4) {
+        if (count($logs) != 5) {
             throw new Exception('Wrong count');
         }
 

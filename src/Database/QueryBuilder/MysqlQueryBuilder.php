@@ -21,6 +21,8 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float(%d,%d)',
+        Column::TYPE_ENUM => 'enum(%s)',
+        Column::TYPE_SET => 'set(%s)',
     ];
 
     protected $defaultLength = [
@@ -31,7 +33,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_DECIMAL => [10, 0],
         Column::TYPE_FLOAT => [10, 0],
     ];
-    
+
     /**
      * generates create table query for mysql
      * @param Table $table
@@ -54,7 +56,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query .= ';';
         return [$query];
     }
-    
+
     /**
      * generates drop table query for mysql
      * @param Table $table
@@ -64,7 +66,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
-    
+
     /**
      * generates rename table queries for mysql
      * @param Table $table
@@ -75,7 +77,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($newTableName) . ';'];
     }
-    
+
     /**
      * generates alter table query for mysql
      * @param Table $table
@@ -111,26 +113,26 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = array_merge($queries, $this->addForeignKeys($table));
         return $queries;
     }
-    
+
     protected function createColumn(Column $column, Table $table)
     {
-        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column);
+        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= (!$column->isSigned()) ? ' unsigned' : '';
         $col .= $this->createColumnCharset($column);
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createColumnDefault($column);
         $col .= $this->createColumnPosition($column);
-        
+
         $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }
-    
+
     private function createColumnDefault(Column $column)
     {
         if ($column->allowNull() && $column->getDefault() === null) {
             return ' DEFAULT NULL';
         }
-        
+
         if ($column->getDefault() !== null) {
             $default = ' DEFAULT ';
             if ($column->getType() == Column::TYPE_INTEGER) {
@@ -141,10 +143,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
             return $default .= "'" . $column->getDefault() . "'";
         }
-        
+
         return '';
     }
-    
+
     private function createColumnPosition(Column $column)
     {
         if ($column->getAfter() !== null) {
@@ -155,42 +157,42 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         return '';
     }
-    
+
     protected function primaryKeyString(Table $table)
     {
         $primaryKeys = $this->escapeArray($table->getPrimaryColumns());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
-    
+
     private function createIndexes(Table $table)
     {
         if (empty($table->getIndexes())) {
             return '';
         }
-        
+
         $indexes = [];
         foreach ($table->getIndexes() as $index) {
             $indexes[] = $this->createIndex($index);
         }
         return ',' . implode(',', $indexes);
     }
-    
+
     private function createIndex(Index $index)
     {
         $columns = $this->escapeArray($index->getColumns());
         return $index->getType() . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
     }
-    
+
     public function escapeString($string)
     {
         return '`' . $string . '`';
     }
-    
+
     private function createColumnCharset(Column $column)
     {
         return $this->createCharset($column->getCharset(), $column->getCollation(), ' ');
     }
-    
+
     private function createTableCharset(Table $table)
     {
         $tableCharset = $this->createCharset($table->getCharset(), $table->getCollation());
@@ -210,5 +212,15 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $output .= " COLLATE$glue$collation";
         }
         return $output;
+    }
+
+    protected function createEnumSetColumn(Column $column, Table $table)
+    {
+        return sprintf(
+            $this->remapType($column),
+            implode(',', array_map(function ($value) {
+                return "'$value'";
+            }, $column->getValues()))
+        );
     }
 }
