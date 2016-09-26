@@ -2,9 +2,11 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
+use Phoenix\Exception\PhoenixException;
 
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -34,6 +36,13 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private $typeCastMap = [
         Column::TYPE_STRING => 'varchar',
     ];
+
+    private $adapter;
+
+    public function __construct(AdapterInterface $adapter = null)
+    {
+        $this->adapter = $adapter;
+    }
 
     /**
      * generates create table query for pgsql
@@ -129,7 +138,16 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
                 if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+                    if ($this->adapter === null) {
+                        throw new PhoenixException('Missing adapter');
+                    }
+
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
+
+                    $tableInfo = $this->adapter->tableInfo($table->getName());
+                    foreach (array_diff($newColumn->getValues(), $tableInfo[$oldColumnName]->getValues()) as $newValue) {
+                        $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
+                    }
                 } else {
                     $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
                 }

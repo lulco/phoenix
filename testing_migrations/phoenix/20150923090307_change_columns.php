@@ -16,7 +16,6 @@ class ChangeColumns extends AbstractMigration
             ->changeColumn('sorting', 'new_sorting', 'integer')
             ->save();
 
-        // TODO otestovat co sa stane ked zmazeme nejaku value z enum / setu, ktora sa pouziva - asi by to malo hodit restrikciu ale mam pocit ze mysql na to dlabe
         $this->table('all_types')
             ->changeColumn('col_enum', 'col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz', 'qqq'], 'null' => true])
             ->changeColumn('col_set', 'col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz', 'qqq'], 'null' => true])

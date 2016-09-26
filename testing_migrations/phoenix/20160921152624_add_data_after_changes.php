@@ -22,8 +22,8 @@ class AddDataAfterChanges extends AbstractMigration
             'col_boolean' => true,
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),
-            'col_enum' => 'zzz',    // TODO pouzit qqq aby sme otestovali ci sa nastavil novy novy typ
-            'col_set' => ['yyy', 'zzz'],    // TODO pouzit qqq aby sme otestovali ci sa nastavil novy novy typ
+            'col_enum' => 'qqq',
+            'col_set' => ['yyy', 'qqq'],
         ]);
     }
 
