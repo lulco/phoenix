@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Removed
+- deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
+
 #### Fixed
 - Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
 
