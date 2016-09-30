@@ -14,12 +14,12 @@ class CreateCommand extends AbstractCommand
 {
     protected function configure()
     {
+		parent::configure();
         $this->setName('create')
             ->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
             ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Path to template');
-        parent::configure();
     }
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
