@@ -15,10 +15,10 @@ class RollbackCommand extends AbstractRunCommand
 
     protected function configure()
     {
+		parent::configure();
         $this->setName('rollback')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
             ->setDescription('Rollback migrations');
-        parent::configure();
     }
 
     protected function findMigrations(InputInterface $input)
