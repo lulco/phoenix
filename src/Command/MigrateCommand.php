@@ -15,7 +15,7 @@ class MigrateCommand extends AbstractRunCommand
 
     protected function configure()
     {
-		parent::configure();
+        parent::configure();
         $this->setName('migrate')
             ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
             ->setDescription('Run migrations');

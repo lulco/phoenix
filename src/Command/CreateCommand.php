@@ -14,7 +14,7 @@ class CreateCommand extends AbstractCommand
 {
     protected function configure()
     {
-		parent::configure();
+        parent::configure();
         $this->setName('create')
             ->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
