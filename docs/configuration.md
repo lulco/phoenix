@@ -65,31 +65,61 @@ environments:
     password: pass
     db_name: my_production_db
     charset: utf8
-default_environment:local
+default_environment: local
 ```
 
 #### phoenix.neon
 ```
 log_table_name: my_phoenix_log
 migration_dirs:
-	first: '%%ACTUAL_DIR%%/first'
-	second: '%%ACTUAL_DIR%%/second'
+    first: '%%ACTUAL_DIR%%/first'
+    second: '%%ACTUAL_DIR%%/second'
 environments:
-	local:
-		adapter: mysql
-		host: localhost
-		username: user
-		password: pass
-		db_name: my_db
-		charset: utf8
-	production
-		adapter: mysql
-		host: production_host
-		username: user
-		password: pass
-		db_name: my_production_db
-		charset: utf8
-default_environment:local
+    local:
+        adapter: mysql
+        host: localhost
+        username: user
+        password: pass
+        db_name: my_db
+        charset: utf8
+    production
+        adapter: mysql
+        host: production_host
+        username: user
+        password: pass
+        db_name: my_production_db
+        charset: utf8
+default_environment: local
 ```
 
 Configuration files of types yml and neon are pretty similar. The only difference is that in yml type you have to use 2 or 4 spaces for indentation, but no tabs, while in neon type the tabs are allowed.
+
+#### phoenix.json
+```
+{
+    "log_table_name": "my_phoenix_log",
+    "migration_dirs": {
+        "first": "%%ACTUAL_DIR%%/first"
+        "second": "%%ACTUAL_DIR%%/second"
+    },
+    "environments": {
+        "local": {
+            "adapter": "mysql",
+            "host": "localhost",
+            "username": "user",
+            "password": "pass",
+            "db_name": "my_db"
+            "charset": "utf8"
+        },
+        "production": {
+            "adapter": "mysql",
+            "host": "production_host",
+            "username": "user",
+            "password": "pass",
+            "db_name": "my_production_db",
+            "charset": "utf8"
+        }
+    },
+    "default_environment": "local"
+}
+```

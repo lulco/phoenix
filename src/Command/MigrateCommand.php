@@ -18,7 +18,7 @@ class MigrateCommand extends AbstractRunCommand
         parent::configure();
         $this->setName('migrate')
             ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
-            ->setDescription('Run migrations');       
+            ->setDescription('Run migrations');
     }
 
     protected function findMigrations(InputInterface $input)
