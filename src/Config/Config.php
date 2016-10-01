@@ -8,10 +8,10 @@ use Phoenix\Exception\InvalidArgumentValueException;
 class Config
 {
     private $configuration = [
-        'migration_dirs' => [],
-        'default_environment' => '',
         'log_table_name' => 'phoenix_log',
+        'migration_dirs' => [],
         'environments' => [],
+        'default_environment' => '',
     ];
     
     public function __construct(array $configuration)
