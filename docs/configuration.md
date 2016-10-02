@@ -99,7 +99,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
 {
     "log_table_name": "my_phoenix_log",
     "migration_dirs": {
-        "first": "%%ACTUAL_DIR%%/first"
+        "first": "%%ACTUAL_DIR%%/first",
         "second": "%%ACTUAL_DIR%%/second"
     },
     "environments": {
@@ -108,7 +108,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
             "host": "localhost",
             "username": "user",
             "password": "pass",
-            "db_name": "my_db"
+            "db_name": "my_db",
             "charset": "utf8"
         },
         "production": {
