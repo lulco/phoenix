@@ -1,6 +1,5 @@
 ## Columns
 
-|------------|------------|---------------|----------|
 | Type       | MySQL      | PostgreSQL    | SQLite   |
 |------------|------------|---------------|----------|
 | string     | varchar    | varchar       | varchar  |
@@ -17,4 +16,3 @@
 | json       | text       | json          | text     |
 | enum       | enum       | custom type   | enum     |
 | set        | set        | custom type[] | enum     |
-|------------|------------|---------------|----------|
