@@ -7,11 +7,11 @@
 	"require": {
 		"php": ">=5.6.0",
 		"symfony/console": "^2.8|^3.1",
-		"nette/finder": "^2.3",
-		"nette/neon": "^2.3",
-		"symfony/yaml": "^3.1"
+		"nette/finder": "^2.3"
 	},
 	"require-dev": {
+		"nette/neon": "^2.3",
+		"symfony/yaml": "^3.1",
 		"squizlabs/php_codesniffer": "^2.0",
 		"phpunit/phpunit": "^5.4",
 		"phpmd/phpmd": "^2.3",
@@ -22,5 +22,9 @@
 	},
 	"autoload-dev": {
 		"classmap": ["tests/"]
+	},
+	"suggest": {
+		"nette/neon": "Allows use *.neon file as config file and class Phoenix\\Config\\Parser\\NeonConfigParser to parse it",
+		"symfony/yaml": "Allows use *.yml / *.yaml file as config file and class Phoenix\\Config\\Parser\\YamlConfigParser to parse it"
 	}
 }
