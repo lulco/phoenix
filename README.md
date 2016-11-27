@@ -73,6 +73,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `create` - create migration
 - `migrate` - run migrations
 - `rollback` - rollback migrations
+- `status` - list of migrations already executed and list of migrations to execute
 - `cleanup` - rollback all migrations and delete log table
 
 You can run each command with `--help` option to get more information about it.
@@ -202,8 +203,29 @@ Nothing to rollback
 All done. Took 0.0401s
 ```
 
+### Status command
+Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:
+
+```
+Executed migrations
++---------------------------------------------+---------------------+
+| Class name                                  | Executed at         |
++---------------------------------------------+---------------------+
+| FirstDir\MyFirstMigration                   | 2016-09-26 06:49:49 |
++---------------------------------------------+---------------------+
+
+Migrations to execute
++----------------------------------------+
+| Class name                             |
++----------------------------------------+
+| FirstDir\MySecondMigration             |
++----------------------------------------+
+
+All done. Took 0.2016s
+```
+
 ### Cleanup command
-Cleanup command `php vendor/bin/phoenix cleanup` rollbacks all executed migrations and delete log table. After executing this command, the application is in state as before executing `init` command
+Cleanup command `php vendor/bin/phoenix cleanup` rollbacks all executed migrations and delete log table. After executing this command, the application is in state as before executing `init` command.
 
 ```
 php bin/phoenix cleanup
