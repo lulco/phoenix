@@ -1,6 +1,8 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+#### Added
+- Added support for changing column settings (allowNull, default) in pgsql
 
 ### [0.6.0] - 2016-09-26
 #### Removed

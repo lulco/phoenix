@@ -344,12 +344,24 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new Table('with_columns_to_change');
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
         $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('default_null_change', new Column('default_null_change', 'string', ['null' => true])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('default_null_with_value_change', new Column('default_null_with_value_change', 'string', ['null' => true, 'default' => 'default_value'])));
 
         $queryBuilder = new PgsqlQueryBuilder();
         $expectedQueries = [
             'ALTER TABLE "with_columns_to_change" RENAME COLUMN "old_name" TO "new_name";',
             'ALTER TABLE "with_columns_to_change" ALTER COLUMN "new_name" TYPE int4 USING new_name::integer;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "new_name" SET NOT NULL;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "new_name" DROP DEFAULT;',
             'ALTER TABLE "with_columns_to_change" ALTER COLUMN "no_name_change" TYPE int4 USING no_name_change::integer;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "no_name_change" SET NOT NULL;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "no_name_change" DROP DEFAULT;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_change" TYPE varchar(255) USING default_null_change::varchar;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_change" DROP NOT NULL;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_change" SET DEFAULT NULL;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_with_value_change" TYPE varchar(255) USING default_null_with_value_change::varchar;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_with_value_change" DROP NOT NULL;',
+            'ALTER TABLE "with_columns_to_change" ALTER COLUMN "default_null_with_value_change" SET DEFAULT \'default_value\';',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
