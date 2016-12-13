@@ -152,6 +152,14 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
                 }
                 $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . $cast . ';';
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . ($newColumn->allowNull() ? 'DROP' : 'SET') . ' NOT NULL;';
+                if ($newColumn->getDefault() === null && $newColumn->allowNull()) {
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
+                } elseif ($newColumn->getDefault()) {
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn, $table) . ';';
+                } else {
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
+                }
             }
         }
         $queries = array_merge($queries, $this->addPrimaryKey($table));
@@ -163,21 +171,27 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         if ($column->getDefault() !== null || $column->isAutoincrement()) {
-            $col .= ' DEFAULT ';
-            if ($column->isAutoincrement()) {
-                $col .= "nextval('" . $table->getName() . "_seq'::regclass)";
-            } elseif ($column->getType() == Column::TYPE_INTEGER) {
-                $col .= $column->getDefault();
-            } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
-                $col .= $column->getDefault() ? 'true' : 'false';
-            } else {
-                $col .= "'" . $column->getDefault() . "'";
-            }
+            $col .= ' DEFAULT ' . $this->escapeDefault($column, $table);
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
         $col .= $column->allowNull() ? '' : ' NOT NULL';
         return $col;
+    }
+
+    private function escapeDefault(Column $column, Table $table)
+    {
+        if ($column->isAutoincrement()) {
+            $default = "nextval('" . $table->getName() . "_seq'::regclass)";
+        } elseif ($column->getType() == Column::TYPE_INTEGER) {
+            $default = $column->getDefault();
+        } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
+            $default = $column->getDefault() ? 'true' : 'false';
+        } else {
+            $default = "'" . $column->getDefault() . "'";
+        }
+
+        return $default;
     }
 
     protected function primaryKeyString(Table $table)
