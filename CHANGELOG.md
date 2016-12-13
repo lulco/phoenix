@@ -1,8 +1,10 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
-#### Added
-- Added support for changing column settings (allowNull, default) in pgsql
+
+### [0.6.1] - 2016-12-13
+#### Fixed
+- Fixed support for changing column settings (allowNull, default) in pgsql
 
 ### [0.6.0] - 2016-09-26
 #### Removed
@@ -84,7 +86,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.6.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.6.1...HEAD
+[0.6.1]: https://github.com/lulco/phoenix/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/lulco/phoenix/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/lulco/phoenix/compare/0.3.0...0.4.0
