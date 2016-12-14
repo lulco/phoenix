@@ -18,7 +18,7 @@ sudo: false
 before_script:
     - travis_retry composer self-update
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
-    - if [[ $PHP = hhvm ]]; then travis_retry composer remove nette/neon; fi
+    - if [[ $PHP = hhvm ]]; then travis_retry composer remove nette/neon --no-interaction; fi
 
 script:
     - mkdir -p build/logs
