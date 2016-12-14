@@ -6,7 +6,7 @@ use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
-use Phoenix\Config\Parser\NeonConfigParser;
+use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Mock\Command\Input;
 use Phoenix\Tests\Mock\Command\Output;
@@ -23,8 +23,8 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $parser = new NeonConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.neon');
+        $parser = new PhpConfigParser();
+        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
 
         $cleanup = new CleanupCommand();
         $cleanup->setConfig($this->configuration);
@@ -64,14 +64,14 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new RollbackCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.neon');
+        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
         $command->run($this->input, $this->output);
     }
 
     public function testNothingToRollbackWithoutInitializing()
     {
         $command = new RollbackCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.neon');
+        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();

@@ -4,7 +4,7 @@ namespace Phoenix\Tests\Config;
 
 use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\MigrateCommand;
-use Phoenix\Config\Parser\NeonConfigParser;
+use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Mock\Command\Input;
 use Phoenix\Tests\Mock\Command\Output;
@@ -21,8 +21,8 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $parser = new NeonConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.neon');
+        $parser = new PhpConfigParser();
+        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
 
         $cleanup = new CleanupCommand();
         $cleanup->setConfig($this->configuration);
@@ -62,7 +62,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new MigrateCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.neon');
+        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
