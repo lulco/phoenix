@@ -24,7 +24,7 @@
 		"classmap": ["tests/"]
 	},
 	"suggest": {
-		"nette/neon": "Allows use *.neon file as config file and class Phoenix\\Config\\Parser\\NeonConfigParser to parse it",
+		"nette/neon": "Allows use *.neon file as config file and class Phoenix\\Config\\Parser\\NeonConfigParser to parse it. Not works on HHVM.",
 		"symfony/yaml": "Allows use *.yml / *.yaml file as config file and class Phoenix\\Config\\Parser\\YamlConfigParser to parse it"
 	}
 }
