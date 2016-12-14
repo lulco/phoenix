@@ -10,13 +10,14 @@ php:
 
 sudo: false
 
-matrix:
-    allow_failures:
-        - php: hhvm
-        - php: 7.1
+#matrix:
+#    allow_failures:
+#        - php: hhvm
+#        - php: 7.1
 
 before_script:
     - travis_retry composer self-update
+    - if [[ ! $PHP = hhvm* ]]; then composer remove nette/neon; fi
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
 
 script:
