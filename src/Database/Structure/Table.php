@@ -1,32 +1,11 @@
 <?php
 
-namespace Phoenix\Database\Element;
+namespace Phoenix\Database\Structure;
 
 use Exception;
-use InvalidArgumentException;
-use Phoenix\Exception\IncorrectMethodUsageException;
-use RuntimeException;
 
-/**
- * @method Table addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table
- * @method Table addColumn(Column $column column definition) Adds column to the table
- * @method Table changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Changes column in the table to new one
- * @method Table changeColumn(string $oldName old name of column, Column $column new column definition) Changes column in the table to new one
- */
 class Table
 {
-    const ACTION_CREATE = 'create';
-
-    const ACTION_ALTER = 'alter';
-
-    const ACTION_RENAME = 'rename';
-
-    const ACTION_DROP = 'drop';
-
-    private $action = self::ACTION_CREATE;
-
-    private $tmpPrimaryKey;
-
     private $name;
 
     private $charset;
@@ -54,72 +33,9 @@ class Table
     /**
      * @param string $name
      */
-    public function __construct($name, $primaryKey)
+    public function __construct($name)
     {
         $this->name = $name;
-        $this->tmpPrimaryKey = $primaryKey;
-    }
-
-    public function __call($name, $arguments)
-    {
-        if ($name == 'addColumn') {
-            return $this->addCol($arguments);
-        }
-        if ($name == 'changeColumn') {
-            return $this->changeCol($arguments);
-        }
-        throw new RuntimeException('Method "' . $name . '" not found');
-    }
-
-    private function addCol($arguments)
-    {
-        if ($arguments[0] instanceof Column) {
-            return $this->addPreparedColumn($arguments[0]);
-        }
-
-        return $this->prepareAndAddColumn($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : []);
-    }
-
-    private function prepareAndAddColumn($name, $type, array $settings = [])
-    {
-        $column = new Column($name, $type, $settings);
-        return $this->addPreparedColumn($column);
-    }
-
-    private function addPreparedColumn(Column $column)
-    {
-        $this->columns[$column->getName()] = $column;
-        return $this;
-    }
-
-    private function changeCol($arguments)
-    {
-        if (count($arguments) > 4) {
-            throw new InvalidArgumentException('Too many arguments');
-        }
-
-        if ($arguments[1] instanceof Column) {
-            return $this->changePreparedColumn($arguments[0], $arguments[1]);
-        }
-
-        return $this->prepareAndChangeColumn($arguments[0], $arguments[1], $arguments[2], isset($arguments[3]) ? $arguments[3] : []);
-    }
-
-    private function prepareAndChangeColumn($oldName, $newName, $newType, array $settings = [])
-    {
-        $newColumn = new Column($newName, $newType, $settings);
-        return $this->changePreparedColumn($oldName, $newColumn);
-    }
-
-    private function changePreparedColumn($oldName, Column $newColumn)
-    {
-        if (isset($this->columns[$oldName])) {
-            $this->columns[$oldName] = $newColumn;
-            return $this;
-        }
-
-        $this->columnsToChange[$oldName] = $newColumn;
-        return $this;
     }
 
     /**
@@ -167,6 +83,16 @@ class Table
     }
 
     /**
+     * @param Column $column
+     * @return Table
+     */
+    public function addColumn(Column $column)
+    {
+        $this->columns[$column->getName()] = $column;
+        return $this;
+    }
+
+    /**
      * @return Column[]
      */
     public function getColumns()
@@ -206,6 +132,22 @@ class Table
     }
 
     /**
+     * @param string $oldName
+     * @param Column $newColumn
+     * @return Table
+     */
+    public function changeColumn($oldName, Column $newColumn)
+    {
+        if (isset($this->columns[$oldName])) {
+            $this->columns[$oldName] = $newColumn;
+            return $this;
+        }
+
+        $this->columnsToChange[$oldName] = $newColumn;
+        return $this;
+    }
+
+    /**
      * @return Column[]
      */
     public function getColumnsToChange()
@@ -222,15 +164,11 @@ class Table
     }
 
     /**
-     * @param string|array $columns name(s) of column(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
-     * @param string $name name of index
+     * @param Index $index
      * @return Table
      */
-    public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
+    public function addIndex(Index $index)
     {
-        $index = new Index($columns, $this->createIndexName($columns, $name), $type, $method);
         $this->indexes[] = $index;
         return $this;
     }
@@ -262,16 +200,12 @@ class Table
     }
 
     /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
+     * @param ForeignKey $foreignKey
      * @return Table
      */
-    public function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+    public function addForeignKey(ForeignKey $foreignKey)
     {
-        $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
+        $this->foreignKeys[] = $foreignKey;
         return $this;
     }
 
@@ -355,41 +289,5 @@ class Table
     public function getCollation()
     {
         return $this->collation;
-    }
-
-    public function create()
-    {
-        $this->action = self::ACTION_CREATE;
-        $this->addPrimary($this->tmpPrimaryKey);
-        return $this;
-    }
-
-    public function save()
-    {
-        $this->action = self::ACTION_ALTER;
-        return $this;
-    }
-
-    public function drop()
-    {
-        $this->action = self::ACTION_DROP;
-        return $this;
-    }
-
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    private function createIndexName($columns, $name = '')
-    {
-        if ($name) {
-            return $name;
-        }
-
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
 }

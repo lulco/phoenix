@@ -14,12 +14,6 @@ use Phoenix\Exception\IncorrectMethodUsageException;
 use ReflectionClass;
 use RuntimeException;
 
-/**
- * @method AbstractMigration addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table @throws IncorrectMethodUsageException
- * @method AbstractMigration addColumn(Column $column column definition) Adds column to the table - @throws IncorrectMethodUsageException
- * @method AbstractMigration changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Changes column in the table to new one @throws IncorrectMethodUsageException
- * @method AbstractMigration changeColumn(string $oldName old name of column, Column $column new column definition) Changes column in the table to new one @throws IncorrectMethodUsageException
- */
 abstract class AbstractMigration
 {
     /** @var string */
@@ -30,6 +24,8 @@ abstract class AbstractMigration
 
     /** @var string */
     private $fullClassName;
+
+    private $something = [];    // TODO vymysliet nazov
 
     /** @var Table */
     private $table = null;
@@ -94,6 +90,7 @@ abstract class AbstractMigration
     final public function migrate($dry = false)
     {
         $this->up();
+        $this->prepare();
         return $this->runQueries($dry);
     }
 
@@ -104,6 +101,7 @@ abstract class AbstractMigration
     final public function rollback($dry = false)
     {
         $this->down();
+        $this->prepare();
         return $this->runQueries($dry);
     }
 
@@ -116,6 +114,25 @@ abstract class AbstractMigration
      * need override
      */
     abstract protected function down();
+
+    private function prepare()
+    {
+        $queryBuilder = $this->adapter->getQueryBuilder();
+        foreach ($this->something as $something) {
+            $queries = null;
+            if ($something->getAction() === Table::ACTION_CREATE) {
+                $queries = $queryBuilder->createTable($something);
+            } elseif ($something->getAction() === Table::ACTION_ALTER) {
+                $queries = $queryBuilder->alterTable($something);
+            } elseif ($something->getAction() === Table::ACTION_DROP) {
+                $queries = $queryBuilder->dropTable($something);
+            }
+            if ($queries === null) {
+                throw new InvalidArgumentException('Unknown action ' . $something->getAction());
+            }
+            $this->queries = array_merge($this->queries, $queries);
+        }
+    }
 
     /**
      * adds sql to list of queries to execute
@@ -135,86 +152,16 @@ abstract class AbstractMigration
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
+     * @return Table
      */
     final protected function table($name, $primaryKey = true, $charset = null, $collation = null)
     {
-        if ($this->table !== null) {
-            throw new IncorrectMethodUsageException('Wrong use of method table(). Use one of methods create(), drop(), save() first.');
-        }
+        $table = new Table($name, $primaryKey);
+        $table->setCharset($charset ?: $this->adapter->getCharset());
+        $table->setCollation($collation);
 
-        $this->primaryKey = $primaryKey;
-
-        $this->table = new Table($name);
-        $this->table->setCharset($charset ?: $this->adapter->getCharset());
-        $this->table->setCollation($collation);
-        return $this;
-    }
-
-    public function __call($name, $arguments)
-    {
-        if ($name == 'addColumn') {
-            return $this->addCol($arguments);
-        }
-        if ($name == 'changeColumn') {
-            return $this->changeCol($arguments);
-        }
-        throw new RuntimeException('Method "' . $name . '" not found');
-    }
-
-    private function addCol($arguments)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method addColumn(). Use method table() first.');
-        }
-
-        if ($arguments[0] instanceof Column) {
-            return $this->addPreparedColumn($arguments[0]);
-        }
-
-        return $this->prepareAndAddColumn($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : []);
-    }
-
-    private function prepareAndAddColumn($name, $type, array $settings = [])
-    {
-        $column = new Column($name, $type, $settings);
-        return $this->addPreparedColumn($column);
-    }
-
-    private function addPreparedColumn(Column $column)
-    {
-        $this->table->addColumn($column);
-        return $this;
-    }
-
-    private function changeCol($arguments)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method changeColumn(). Use method table() first.');
-        }
-
-        if (count($arguments) > 4) {
-            throw new InvalidArgumentException('Too many arguments');
-        }
-
-        if ($arguments[1] instanceof Column) {
-            return $this->changePreparedColumn($arguments[0], $arguments[1]);
-        }
-
-        return $this->prepareAndChangeColumn($arguments[0], $arguments[1], $arguments[2], isset($arguments[3]) ? $arguments[3] : []);
-    }
-
-    private function changePreparedColumn($oldName, Column $newColumn)
-    {
-        $this->table->changeColumn($oldName, $newColumn);
-        return $this;
-    }
-
-    private function prepareAndChangeColumn($oldName, $newName, $newType, array $settings = [])
-    {
-        $newColumn = new Column($newName, $newType, $settings);
-        return $this->changePreparedColumn($oldName, $newColumn);
+        $this->something[] = $table;
+        return $table;
     }
 
     /**
@@ -239,14 +186,14 @@ abstract class AbstractMigration
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException
      */
-    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
-        }
-        $this->table->addIndex(new Index($columns, $this->createIndexName($columns, $name), $type, $method));
-        return $this;
-    }
+//    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
+//    {
+//        if ($this->table === null) {
+//            throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
+//        }
+//        $this->table->addIndex(new Index($columns, $this->createIndexName($columns, $name), $type, $method));
+//        return $this;
+//    }
 
     /**
      * @param string|array $columns
@@ -276,17 +223,7 @@ abstract class AbstractMigration
         return $this;
     }
 
-    private function createIndexName($columns, $name = null)
-    {
-        if ($name) {
-            return $name;
-        }
 
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        return 'idx_' . $this->table->getName() . '_' . implode('_', $columns);
-    }
 
     /**
      * @param string|array $columns
@@ -297,14 +234,14 @@ abstract class AbstractMigration
      * @return AbstractMigration
      * @throws IncorrectMethodUsageException
      */
-    final protected function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
-        }
-        $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
-        return $this;
-    }
+//    final protected function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
+//    {
+//        if ($this->table === null) {
+//            throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
+//        }
+//        $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
+//        return $this;
+//    }
 
     /**
      * @param string|array $columns
@@ -528,9 +465,11 @@ abstract class AbstractMigration
             if ($this->useTransaction) {
                 $this->dbRollback();
             }
+            $this->something = [];
             $this->queries = [];
             throw $e;
         }
+        $this->something = [];
         $this->queries = [];
         return $results;
     }
