@@ -4,7 +4,6 @@ namespace Phoenix\Tests\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Adapter\MysqlAdapter;
-use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Tests\Mock\Database\FakePdo;
 use PHPUnit_Framework_TestCase;

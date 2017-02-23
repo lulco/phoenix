@@ -4,7 +4,7 @@ namespace Phoenix\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 
 class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -36,10 +36,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     /**
      * generates create table query for mysql
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function createTable(Table $table)
+    public function createTable(MigrationTable $table)
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
@@ -59,31 +59,31 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     /**
      * generates drop table query for mysql
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function dropTable(Table $table)
+    public function dropTable(MigrationTable $table)
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
 
     /**
      * generates rename table queries for mysql
-     * @param Table $table
+     * @param MigrationTable $table
      * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(Table $table, $newTableName)
+    public function renameTable(MigrationTable $table, $newTableName)
     {
         return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($newTableName) . ';'];
     }
 
     /**
      * generates alter table query for mysql
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function alterTable(Table $table)
+    public function alterTable(MigrationTable $table)
     {
         $queries = $this->dropIndexes($table);
         if ($table->getColumnsToChange()) {
@@ -114,7 +114,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    protected function createColumn(Column $column, Table $table)
+    protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= (!$column->isSigned()) ? ' unsigned' : '';
@@ -158,13 +158,13 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return '';
     }
 
-    protected function primaryKeyString(Table $table)
+    protected function primaryKeyString(MigrationTable $table)
     {
         $primaryKeys = $this->escapeArray($table->getPrimaryColumns());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 
-    private function createIndexes(Table $table)
+    private function createIndexes(MigrationTable $table)
     {
         if (empty($table->getIndexes())) {
             return '';
@@ -193,7 +193,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $this->createCharset($column->getCharset(), $column->getCollation(), ' ');
     }
 
-    private function createTableCharset(Table $table)
+    private function createTableCharset(MigrationTable $table)
     {
         $tableCharset = $this->createCharset($table->getCharset(), $table->getCollation());
         return $tableCharset ? ' DEFAULT' . $tableCharset : '';
@@ -214,7 +214,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $output;
     }
 
-    protected function createEnumSetColumn(Column $column, Table $table)
+    protected function createEnumSetColumn(Column $column, MigrationTable $table)
     {
         return sprintf(
             $this->remapType($column),
