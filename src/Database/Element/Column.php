@@ -163,6 +163,9 @@ class Column
         return isset($this->settings['collation']) ? $this->settings['collation'] : null;
     }
 
+    /**
+     * @return array|null
+     */
     public function getValues()
     {
         return isset($this->settings['values']) ? $this->settings['values'] : null;

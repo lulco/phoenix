@@ -130,7 +130,7 @@ class MigrationTable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getNewName()
     {
