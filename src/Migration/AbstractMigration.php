@@ -5,17 +5,16 @@ namespace Phoenix\Migration;
 use InvalidArgumentException;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
-use Phoenix\Database\Element\Column;
-use Phoenix\Database\Element\ForeignKey;
-use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
+use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
-use Phoenix\Exception\IncorrectMethodUsageException;
 use ReflectionClass;
-use RuntimeException;
 
 abstract class AbstractMigration
 {
+    /** @var AdapterInterface */
+    private $adapter;
+
     /** @var string */
     private $datetime;
 
@@ -25,27 +24,11 @@ abstract class AbstractMigration
     /** @var string */
     private $fullClassName;
 
-    private $something = [];    // TODO vymysliet nazov
-
-    /** @var Table */
-    private $table = null;
-
-    private $primaryKey = null;
-
     /** @var array */
-    private $tables = [];
-
-    /** @var array list of queries to run */
-    private $queries = [];
+    private $queriesToExecute = [];
 
     /** @var array list of executed queries */
     private $executedQueries = [];
-
-    /** @var AdapterInterface */
-    private $adapter;
-
-    /** @var boolean wrap queries in up / down to transaction */
-    protected $useTransaction = false;  // not working for now :( so I turn it off
 
     /**
      * @param AdapterInterface $adapter
@@ -89,9 +72,10 @@ abstract class AbstractMigration
      */
     final public function migrate($dry = false)
     {
+        $this->reset();
         $this->up();
-        $this->prepare();
-        return $this->runQueries($dry);
+        $queries = $this->prepare();
+        return $this->runQueries($queries, $dry);
     }
 
     /**
@@ -100,38 +84,10 @@ abstract class AbstractMigration
      */
     final public function rollback($dry = false)
     {
+        $this->reset();
         $this->down();
-        $this->prepare();
-        return $this->runQueries($dry);
-    }
-
-    /**
-     * need override
-     */
-    abstract protected function up();
-
-    /**
-     * need override
-     */
-    abstract protected function down();
-
-    private function prepare()
-    {
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        foreach ($this->something as $something) {
-            $queries = null;
-            if ($something->getAction() === Table::ACTION_CREATE) {
-                $queries = $queryBuilder->createTable($something);
-            } elseif ($something->getAction() === Table::ACTION_ALTER) {
-                $queries = $queryBuilder->alterTable($something);
-            } elseif ($something->getAction() === Table::ACTION_DROP) {
-                $queries = $queryBuilder->dropTable($something);
-            }
-            if ($queries === null) {
-                throw new InvalidArgumentException('Unknown action ' . $something->getAction());
-            }
-            $this->queries = array_merge($this->queries, $queries);
-        }
+        $queries = $this->prepare();
+        return $this->runQueries($queries, $dry);
     }
 
     /**
@@ -140,7 +96,7 @@ abstract class AbstractMigration
      */
     final protected function execute($sql)
     {
-        $this->queries[] = $sql;
+        $this->queriesToExecute[] = $sql;
     }
 
     /**
@@ -160,202 +116,8 @@ abstract class AbstractMigration
         $table->setCharset($charset ?: $this->adapter->getCharset());
         $table->setCollation($collation);
 
-        $this->something[] = $table;
+        $this->queriesToExecute[] = $table;
         return $table;
-    }
-
-    /**
-     * @param string $name
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function dropColumn($name)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method dropColumn(). Use method table() first.');
-        }
-        $this->table->dropColumn($name);
-        return $this;
-    }
-
-    /**
-     * @param string|array $columns name(s) of column(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
-     * @param string $name name of index
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-//    final protected function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
-//    {
-//        if ($this->table === null) {
-//            throw new IncorrectMethodUsageException('Wrong use of method addIndex(). Use method table() first.');
-//        }
-//        $this->table->addIndex(new Index($columns, $this->createIndexName($columns, $name), $type, $method));
-//        return $this;
-//    }
-
-    /**
-     * @param string|array $columns
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function dropIndex($columns)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method dropIndex(). Use method table() first.');
-        }
-        $this->table->dropIndex($this->createIndexName($columns));
-        return $this;
-    }
-
-    /**
-     * @param string $indexName
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function dropIndexByName($indexName)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method dropIndexByName(). Use method table() first.');
-        }
-        $this->table->dropIndex($indexName);
-        return $this;
-    }
-
-
-
-    /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-//    final protected function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::RESTRICT, $onUpdate = ForeignKey::RESTRICT)
-//    {
-//        if ($this->table === null) {
-//            throw new IncorrectMethodUsageException('Wrong use of method addForeignKey(). Use method table() first.');
-//        }
-//        $this->table->addForeignKey(new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate));
-//        return $this;
-//    }
-
-    /**
-     * @param string|array $columns
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function dropForeignKey($columns)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method dropForeignKey(). Use method table() first.');
-        }
-        $this->table->dropForeignKey($columns);
-        return $this;
-    }
-
-    /**
-     * @param string|array $columns
-     * @return AbstractMigration
-     */
-    final protected function addPrimaryKey($columns)
-    {
-        $this->table->addPrimary($columns);
-        return $this;
-    }
-
-    /**
-     * @param string|array|Column $column
-     * @return AbstractMigration
-     * @throws IncorrectMethodUsageException
-     */
-    final protected function dropPrimaryKey($column = 'id')
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method dropPrimaryKey(). Use method table() first.');
-        }
-
-        if (is_string($column)) {
-            $column = new Column($column, 'integer');
-        }
-
-        if ($column instanceof Column) {
-            $this->table->changeColumn($column->getName(), $column);
-        }
-
-        $this->table->dropPrimaryKey();
-        return $this;
-    }
-
-    /**
-     * generate create table queries
-     * @throws IncorrectMethodUsageException if table() was not called first
-     */
-    final protected function create()
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method create(). Use method table() first.');
-        }
-
-        $this->table->addPrimary($this->primaryKey);
-
-        $this->tables[count($this->queries)] = $this->table;
-
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        $queries = $queryBuilder->createTable($this->table);
-        $this->queries = array_merge($this->queries, $queries);
-        $this->table = null;
-    }
-
-    /**
-     * generates drop table queries
-     * @throws IncorrectMethodUsageException if table() was not called first
-     */
-    protected function drop()
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
-        }
-
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        $queries = $queryBuilder->dropTable($this->table);
-        $this->queries = array_merge($this->queries, $queries);
-        $this->table = null;
-    }
-
-    /**
-     * generates rename table queries
-     * @param string $newTableName
-     * @throws IncorrectMethodUsageException
-     */
-    protected function rename($newTableName)
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method drop(). Use method table() first.');
-        }
-
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        $queries = $queryBuilder->renameTable($this->table, $newTableName);
-        $this->queries = array_merge($this->queries, $queries);
-        $this->table = null;
-    }
-
-    /**
-     * generates alter table query / queries
-     * @throws IncorrectMethodUsageException if table() was not called first
-     */
-    final protected function save()
-    {
-        if ($this->table === null) {
-            throw new IncorrectMethodUsageException('Wrong use of method save(). Use method table() first.');
-        }
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        $queries = $queryBuilder->alterTable($this->table);
-        $this->queries = array_merge($this->queries, $queries);
-        $this->table = null;
     }
 
     /**
@@ -440,59 +202,21 @@ abstract class AbstractMigration
      * @return array
      * @throws DatabaseQueryExecuteException
      */
-    private function runQueries($dry = false)
+    private function runQueries(array $queries, $dry = false)
     {
         $results = [];
         try {
-            if ($this->useTransaction && !$dry) {
-                $this->adapter->startTransaction();
-                $this->executedQueries[] = '::start transaction';
-            }
-
-            foreach ($this->queries as $query) {
+            foreach ($queries as $query) {
                 if (!$dry) {
                     $result = $this->adapter->execute($query);
                     $results[] = $result;
                 }
                 $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
             }
-
-            if ($this->useTransaction && !$dry) {
-                $this->adapter->commit();
-                $this->executedQueries[] = '::commit';
-            }
         } catch (DatabaseQueryExecuteException $e) {
-            if ($this->useTransaction) {
-                $this->dbRollback();
-            }
-            $this->something = [];
-            $this->queries = [];
             throw $e;
         }
-        $this->something = [];
-        $this->queries = [];
         return $results;
-    }
-
-    private function dbRollback()
-    {
-        $queriesExecuted = count($this->executedQueries);
-        $this->adapter->rollback();
-        $this->executedQueries[] = '::rollback';
-
-        // own rollback for create table
-        for ($i = $queriesExecuted; $i > 0; $i--) {
-            $queryIndex = $i - 1;
-            if (!($this->queries[$queryIndex] && isset($this->tables[$queryIndex]))) {
-                continue;
-            }
-            $queryBuilder = $this->adapter->getQueryBuilder();
-            $queries = $queryBuilder->dropTable($this->tables[$queryIndex]);
-            foreach ($queries as $query) {
-                $this->adapter->execute($query);
-                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
-            }
-        }
     }
 
     /**
@@ -501,5 +225,52 @@ abstract class AbstractMigration
     public function getExecutedQueries()
     {
         return $this->executedQueries;
+    }
+
+    /**
+     * need override
+     */
+    abstract protected function up();
+
+    /**
+     * need override
+     */
+    abstract protected function down();
+
+    private function reset()
+    {
+        $this->executedQueries = [];
+        $this->queriesToExecute = [];
+    }
+
+    private function prepare()
+    {
+        $queryBuilder = $this->adapter->getQueryBuilder();
+        $queries = [];
+        foreach ($this->queriesToExecute as $queryToExecute) {
+            if (!($queryToExecute instanceof Table)) {
+                $queries[] = $queryToExecute;
+                continue;
+            }
+
+            $tableQueries = $this->prepareTableQueries($queryToExecute, $queryBuilder);
+            $queries = array_merge($queries, $tableQueries);
+        }
+        return $queries;
+    }
+
+    private function prepareTableQueries(Table $table, QueryBuilderInterface $queryBuilder)
+    {
+        $tableQueries = null;
+        if ($table->getAction() === Table::ACTION_CREATE) {
+            $tableQueries = $queryBuilder->createTable($table);
+        } elseif ($table->getAction() === Table::ACTION_ALTER) {
+            $tableQueries = $queryBuilder->alterTable($table);
+        } elseif ($table->getAction() === Table::ACTION_RENAME) {
+            $tableQueries = $queryBuilder->renameTable($table, $table->getNewName());
+        } elseif ($table->getAction() === Table::ACTION_DROP) {
+            $tableQueries = $queryBuilder->dropTable($table);
+        }
+        return $tableQueries;
     }
 }

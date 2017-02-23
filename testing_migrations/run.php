@@ -20,22 +20,22 @@ $configuration = [
             'password' => '123',
             'charset' => 'utf8',
         ],
-//        'sqlite_file' => [
-//            'adapter' => 'sqlite',
-//            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
-//        ],
-//        'sqlite' => [
-//            'adapter' => 'sqlite',
-//            'dsn' => 'sqlite::memory:',
-//        ],
-//        'pgsql' => [
-//            'adapter' => 'pgsql',
-//            'db_name' => 'libs',
-//            'host' => 'localhost',
-//            'username' => 'postgres',
-//            'password' => '123',
-//            'charset' => 'utf8',
-//        ],
+        'sqlite_file' => [
+            'adapter' => 'sqlite',
+            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
+        ],
+        'sqlite' => [
+            'adapter' => 'sqlite',
+            'dsn' => 'sqlite::memory:',
+        ],
+        'pgsql' => [
+            'adapter' => 'pgsql',
+            'db_name' => 'libs',
+            'host' => 'localhost',
+            'username' => 'postgres',
+            'password' => '123',
+            'charset' => 'utf8',
+        ],
     ],
 ];
 
@@ -52,10 +52,8 @@ foreach (array_keys($configuration['environments']) as $environment) {
     foreach ($migrations as $migration) {
         $migration->migrate();
         $manager->logExecution($migration);
-        print_R($migration->getExecutedQueries());
         $migration->rollback();
         $manager->removeExecution($migration);
-        print_R($migration->getExecutedQueries());
         $migration->migrate();
         $manager->logExecution($migration);
         print_R($migration->getExecutedQueries());

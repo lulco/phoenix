@@ -4,7 +4,6 @@ namespace Phoenix\Database\Element;
 
 use Exception;
 use InvalidArgumentException;
-use Phoenix\Exception\IncorrectMethodUsageException;
 use RuntimeException;
 
 /**
@@ -28,6 +27,8 @@ class Table
     private $tmpPrimaryKey;
 
     private $name;
+
+    private $newName;
 
     private $charset;
 
@@ -54,7 +55,7 @@ class Table
     /**
      * @param string $name
      */
-    public function __construct($name, $primaryKey)
+    public function __construct($name, $primaryKey = true)
     {
         $this->name = $name;
         $this->tmpPrimaryKey = $primaryKey;
@@ -167,6 +168,14 @@ class Table
     }
 
     /**
+     * @return string
+     */
+    public function getNewName()
+    {
+        return $this->newName;
+    }
+
+    /**
      * @return Column[]
      */
     public function getColumns()
@@ -244,10 +253,20 @@ class Table
     }
 
     /**
+     * @param string|array $columns
+     * @return Table
+     */
+    public function dropIndex($columns)
+    {
+        $indexName = $this->createIndexName($columns);
+        return $this->dropIndexByName($indexName);
+    }
+
+    /**
      * @param string $indexName
      * @return Table
      */
-    public function dropIndex($indexName)
+    public function dropIndexByName($indexName)
     {
         $this->indexesToDrop[] = $indexName;
         return $this;
@@ -361,19 +380,22 @@ class Table
     {
         $this->action = self::ACTION_CREATE;
         $this->addPrimary($this->tmpPrimaryKey);
-        return $this;
     }
 
     public function save()
     {
         $this->action = self::ACTION_ALTER;
-        return $this;
     }
 
     public function drop()
     {
         $this->action = self::ACTION_DROP;
-        return $this;
+    }
+
+    public function rename($newName)
+    {
+        $this->action = self::ACTION_RENAME;
+        $this->newName = $newName;
     }
 
     public function getAction()
