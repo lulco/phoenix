@@ -2,7 +2,6 @@
 
 namespace Phoenix\Migration;
 
-use InvalidArgumentException;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\MigrationTable;
