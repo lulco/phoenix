@@ -3,8 +3,6 @@
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
-use Phoenix\Database\Element\ForeignKey;
-use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use PHPUnit_Framework_TestCase;
