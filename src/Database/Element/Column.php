@@ -22,7 +22,7 @@ class Column
     const TYPE_SET = 'set';
 
     private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation', 'values'];
-    
+
     private $allowedSettingsValues = [
         'null' => ['is_bool'],
         'default' => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
@@ -36,13 +36,13 @@ class Column
         'collation' => ['is_string'],
         'values' => ['is_array'],
     ];
-    
+
     private $name;
-    
+
     private $type;
-    
+
     private $settings;
-    
+
     /**
      * @param string $name name of column
      * @param string $type type of column
@@ -51,12 +51,12 @@ class Column
     public function __construct($name, $type, array $settings = [])
     {
         $this->checkSettings($settings);
-        
+
         $this->name = $name;
         $this->type = $type;
         $this->settings = $settings;
     }
-    
+
     /**
      * @return string
      */
@@ -72,7 +72,15 @@ class Column
     {
         return $this->type;
     }
-    
+
+    /**
+     * @return array
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
     /**
      * @return boolean
      */
@@ -114,7 +122,7 @@ class Column
     {
         return isset($this->settings['decimals']) ? $this->settings['decimals'] : $default;
     }
-    
+
     /**
      * @return boolean
      */
@@ -122,7 +130,7 @@ class Column
     {
         return isset($this->settings['autoincrement']) ? $this->settings['autoincrement'] : false;
     }
-    
+
     /**
      * @return string|null
      */
@@ -130,7 +138,7 @@ class Column
     {
         return isset($this->settings['after']) ? $this->settings['after'] : null;
     }
-    
+
     /**
      * @return boolean
      */
@@ -138,7 +146,7 @@ class Column
     {
         return isset($this->settings['first']) ? $this->settings['first'] : false;
     }
-    
+
     /**
      * @return string|null
      */
@@ -159,7 +167,7 @@ class Column
     {
         return isset($this->settings['values']) ? $this->settings['values'] : null;
     }
-    
+
     private function checkSettings($settings)
     {
         $errors = [];
@@ -176,16 +184,16 @@ class Column
         if (empty($errors)) {
             return true;
         }
-        
+
         throw new InvalidArgumentValueException(implode("\n", $errors));
     }
-    
+
     private function checkValue($setting, $value)
     {
         if (!isset($this->allowedSettingsValues[$setting])) {
             return true;
         }
-        
+
         foreach ($this->allowedSettingsValues[$setting] as $checkFunction) {
             if (call_user_func($checkFunction, $value) === true) {
                 return true;

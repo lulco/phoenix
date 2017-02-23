@@ -3,15 +3,7 @@
 namespace Phoenix\Database\Element;
 
 use Exception;
-use InvalidArgumentException;
-use RuntimeException;
 
-/**
- * @method Table addColumn(string $name name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Adds column to the table
- * @method Table addColumn(Column $column column definition) Adds column to the table
- * @method Table changeColumn(string $oldName old name of column, string $name new name of column, string $type type of column, array $settings=[] settings for column ('null'; 'default'; 'length'; 'decimals'; 'signed'; 'autoincrement'; 'after'; 'first';)) Changes column in the table to new one
- * @method Table changeColumn(string $oldName old name of column, Column $column new column definition) Changes column in the table to new one
- */
 class MigrationTable
 {
     const ACTION_CREATE = 'create';
@@ -61,59 +53,29 @@ class MigrationTable
         $this->tmpPrimaryKey = $primaryKey;
     }
 
-    public function __call($name, $arguments)
-    {
-        if ($name == 'addColumn') {
-            return $this->addCol($arguments);
-        }
-        if ($name == 'changeColumn') {
-            return $this->changeCol($arguments);
-        }
-        throw new RuntimeException('Method "' . $name . '" not found');
-    }
-
-    private function addCol($arguments)
-    {
-        if ($arguments[0] instanceof Column) {
-            return $this->addPreparedColumn($arguments[0]);
-        }
-
-        return $this->prepareAndAddColumn($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : []);
-    }
-
-    private function prepareAndAddColumn($name, $type, array $settings = [])
+    /**
+     * @param string $name
+     * @param string $type
+     * @param array $settings
+     * @return MigrationTable
+     */
+    public function addColumn($name, $type, array $settings = [])
     {
         $column = new Column($name, $type, $settings);
-        return $this->addPreparedColumn($column);
-    }
-
-    private function addPreparedColumn(Column $column)
-    {
         $this->columns[$column->getName()] = $column;
         return $this;
     }
 
-    private function changeCol($arguments)
+    /**
+     * @param string $oldName
+     * @param string $newName
+     * @param string $type
+     * @param array $settings
+     * @return MigrationTable
+     */
+    public function changeColumn($oldName, $newName, $type, array $settings = [])
     {
-        if (count($arguments) > 4) {
-            throw new InvalidArgumentException('Too many arguments');
-        }
-
-        if ($arguments[1] instanceof Column) {
-            return $this->changePreparedColumn($arguments[0], $arguments[1]);
-        }
-
-        return $this->prepareAndChangeColumn($arguments[0], $arguments[1], $arguments[2], isset($arguments[3]) ? $arguments[3] : []);
-    }
-
-    private function prepareAndChangeColumn($oldName, $newName, $newType, array $settings = [])
-    {
-        $newColumn = new Column($newName, $newType, $settings);
-        return $this->changePreparedColumn($oldName, $newColumn);
-    }
-
-    private function changePreparedColumn($oldName, Column $newColumn)
-    {
+        $newColumn = new Column($newName, $type, $settings);
         if (isset($this->columns[$oldName])) {
             $this->columns[$oldName] = $newColumn;
             return $this;

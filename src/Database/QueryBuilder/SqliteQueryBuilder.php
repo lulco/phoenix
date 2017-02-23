@@ -154,7 +154,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
                 $newTable->addPrimary($column);
                 continue;
             }
-            $newTable->addColumn($column);
+            $newTable->addColumn($column->getName(), $column->getType(), $column->getSettings());
         }
 
         $queries = $this->createTable($newTable);
