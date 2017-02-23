@@ -5,7 +5,7 @@ namespace Phoenix\Database\QueryBuilder;
 use Exception;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 
 abstract class CommonQueryBuilder
 {
@@ -13,7 +13,7 @@ abstract class CommonQueryBuilder
 
     protected $defaultLength = [];
 
-    protected function createType(Column $column, Table $table)
+    protected function createType(Column $column, MigrationTable $table)
     {
         if (in_array($column->getType(), [Column::TYPE_DECIMAL, Column::TYPE_FLOAT])) {
             return sprintf(
@@ -35,7 +35,7 @@ abstract class CommonQueryBuilder
         return $this->typeMap[$column->getType()];
     }
 
-    protected function createTableQuery(Table $table)
+    protected function createTableQuery(MigrationTable $table)
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
@@ -50,7 +50,7 @@ abstract class CommonQueryBuilder
         return $query;
     }
 
-    protected function addColumns(Table $table)
+    protected function addColumns(MigrationTable $table)
     {
         $columns = $table->getColumns();
         if (empty($columns)) {
@@ -65,7 +65,7 @@ abstract class CommonQueryBuilder
         return [$query];
     }
 
-    protected function createPrimaryKey(Table $table)
+    protected function createPrimaryKey(MigrationTable $table)
     {
         if (empty($table->getPrimaryColumns())) {
             return '';
@@ -73,7 +73,7 @@ abstract class CommonQueryBuilder
         return $this->primaryKeyString($table);
     }
 
-    protected function addPrimaryKey(Table $table)
+    protected function addPrimaryKey(MigrationTable $table)
     {
         $queries = [];
         $primaryColumns = $table->getPrimaryColumns();
@@ -83,7 +83,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function dropIndexes(Table $table)
+    protected function dropIndexes(MigrationTable $table)
     {
         if (empty($table->getIndexesToDrop())) {
             return [];
@@ -97,7 +97,7 @@ abstract class CommonQueryBuilder
         return [$query];
     }
 
-    protected function dropColumns(Table $table)
+    protected function dropColumns(MigrationTable $table)
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columns = [];
@@ -108,7 +108,7 @@ abstract class CommonQueryBuilder
         return $query;
     }
 
-    protected function createForeignKeys(Table $table)
+    protected function createForeignKeys(MigrationTable $table)
     {
         if (empty($table->getForeignKeys())) {
             return '';
@@ -121,7 +121,7 @@ abstract class CommonQueryBuilder
         return ',' . implode(',', $foreignKeys);
     }
 
-    protected function addForeignKeys(Table $table)
+    protected function addForeignKeys(MigrationTable $table)
     {
         $queries = [];
         foreach ($table->getForeignKeys() as $foreignKey) {
@@ -130,7 +130,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function createForeignKey(ForeignKey $foreignKey, Table $table)
+    protected function createForeignKey(ForeignKey $foreignKey, MigrationTable $table)
     {
         $columns = [];
         foreach ($foreignKey->getColumns() as $column) {
@@ -152,7 +152,7 @@ abstract class CommonQueryBuilder
         return $constraint;
     }
 
-    protected function dropKeys(Table $table, $primaryKeyName, $foreignKeyPrefix)
+    protected function dropKeys(MigrationTable $table, $primaryKeyName, $foreignKeyPrefix)
     {
         $queries = [];
         if ($table->hasPrimaryKeyToDrop()) {
@@ -164,7 +164,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function dropKeyQuery(Table $table, $key)
+    protected function dropKeyQuery(MigrationTable $table, $key)
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
     }
@@ -178,9 +178,9 @@ abstract class CommonQueryBuilder
         }, $array);
     }
 
-    abstract protected function createColumn(Column $column, Table $table);
+    abstract protected function createColumn(Column $column, MigrationTable $table);
 
-    abstract protected function primaryKeyString(Table $table);
+    abstract protected function primaryKeyString(MigrationTable $table);
 
-    abstract protected function createEnumSetColumn(Column $column, Table $table);
+    abstract protected function createEnumSetColumn(Column $column, MigrationTable $table);
 }

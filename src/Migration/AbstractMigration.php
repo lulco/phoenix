@@ -5,7 +5,7 @@ namespace Phoenix\Migration;
 use InvalidArgumentException;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use ReflectionClass;
@@ -108,11 +108,11 @@ abstract class AbstractMigration
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
-     * @return Table
+     * @return MigrationTable
      */
     final protected function table($name, $primaryKey = true, $charset = null, $collation = null)
     {
-        $table = new Table($name, $primaryKey);
+        $table = new MigrationTable($name, $primaryKey);
         $table->setCharset($charset ?: $this->adapter->getCharset());
         $table->setCollation($collation);
 
@@ -248,27 +248,27 @@ abstract class AbstractMigration
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
-            if (!($queryToExecute instanceof Table)) {
+            if (!($queryToExecute instanceof MigrationTable)) {
                 $queries[] = $queryToExecute;
                 continue;
             }
 
-            $tableQueries = $this->prepareTableQueries($queryToExecute, $queryBuilder);
+            $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
             $queries = array_merge($queries, $tableQueries);
         }
         return $queries;
     }
 
-    private function prepareTableQueries(Table $table, QueryBuilderInterface $queryBuilder)
+    private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder)
     {
         $tableQueries = null;
-        if ($table->getAction() === Table::ACTION_CREATE) {
+        if ($table->getAction() === MigrationTable::ACTION_CREATE) {
             $tableQueries = $queryBuilder->createTable($table);
-        } elseif ($table->getAction() === Table::ACTION_ALTER) {
+        } elseif ($table->getAction() === MigrationTable::ACTION_ALTER) {
             $tableQueries = $queryBuilder->alterTable($table);
-        } elseif ($table->getAction() === Table::ACTION_RENAME) {
+        } elseif ($table->getAction() === MigrationTable::ACTION_RENAME) {
             $tableQueries = $queryBuilder->renameTable($table, $table->getNewName());
-        } elseif ($table->getAction() === Table::ACTION_DROP) {
+        } elseif ($table->getAction() === MigrationTable::ACTION_DROP) {
             $tableQueries = $queryBuilder->dropTable($table);
         }
         return $tableQueries;

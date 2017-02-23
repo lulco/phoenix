@@ -5,9 +5,7 @@ namespace Phoenix\Tests\Database\QueryBuilder;
 use PDO;
 use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Database\Element\Column;
-use Phoenix\Database\Element\ForeignKey;
-use Phoenix\Database\Element\Index;
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use Phoenix\Tests\Mock\Database\FakePdo;
 use PHPUnit_Framework_TestCase;
@@ -16,9 +14,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
     public function testUnsupportedColumnType()
     {
-        $table = new Table('unsupported');
+        $table = new MigrationTable('unsupported');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'unsupported')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'unsupported'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -30,9 +28,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testSimpleCreate()
     {
-        $table = new Table('simple');
+        $table = new MigrationTable('simple');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -46,12 +44,12 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testMoreColumns()
     {
-        $table = new Table('more_columns');
+        $table = new MigrationTable('more_columns');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string', ['null' => true])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('total', 'integer', ['default' => 0]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -65,22 +63,22 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testAllTypes()
     {
-        $table = new Table('all_types');
+        $table = new MigrationTable('all_types');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_uuid', 'uuid')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_int', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_bigint', 'biginteger')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_string', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_char', 'char')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_text', 'text')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_json', 'json')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_float', 'float', ['length' => 10, 'decimals' => 3])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_boolean', 'boolean')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_datetime', 'datetime')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_date', 'date')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_uuid', 'uuid'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_boolean', 'boolean'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_datetime', 'datetime'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_date', 'date'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']]));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -94,10 +92,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testNoPrimaryKey()
     {
-        $table = new Table('no_primary_key');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['null' => true])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('total', 'integer', ['default' => 0])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('is_deleted', 'boolean', ['default' => false])));
+        $table = new MigrationTable('no_primary_key');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('total', 'integer', ['default' => 0]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('is_deleted', 'boolean', ['default' => false]));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -111,9 +109,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testOwnPrimaryKey()
     {
-        $table = new Table('own_primary_key');
+        $table = new MigrationTable('own_primary_key');
         $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -127,9 +125,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testMoreOwnPrimaryKeys()
     {
-        $table = new Table('more_own_primary_keys');
+        $table = new MigrationTable('more_own_primary_keys');
         $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -143,10 +141,10 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testOneFieldAsPrimaryKey()
     {
-        $table = new Table('one_field_as_pk');
+        $table = new MigrationTable('one_field_as_pk');
         $table->addPrimary('identifier');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('identifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -160,11 +158,11 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testMoreFieldsAsPrimaryKeys()
     {
-        $table = new Table('more_fields_as_pk');
+        $table = new MigrationTable('more_fields_as_pk');
         $table->addPrimary(['identifier', 'subidentifier']);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('identifier', 'string', ['length' => 32])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('subidentifier', 'string', ['default' => 'SUB', 'length' => 32])));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string', ['default' => ''])));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('identifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('subidentifier', 'string', ['default' => 'SUB', 'length' => 32]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -178,14 +176,14 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testIndexes()
     {
-        $table = new Table('table_with_indexes');
+        $table = new MigrationTable('table_with_indexes');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', 'table_with_indexes_sorting')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'table_with_indexes_title_alias', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', '', 'table_with_indexes_sorting'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_title_alias'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -201,12 +199,12 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testForeignKeys()
     {
-        $table = new Table('table_with_foreign_keys');
+        $table = new MigrationTable('table_with_foreign_keys');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_table_id', 'second_table'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -220,16 +218,16 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testIndexesAndForeignKeys()
     {
-        $table = new Table('table_with_indexes_and_foreign_keys');
+        $table = new MigrationTable('table_with_indexes_and_foreign_keys');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('sorting', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('bodytext', 'text')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('foreign_table_id', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addForeignKey(new ForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index('sorting', 'table_with_indexes_and_foreign_keys_sorting', '', 'btree')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addIndex(new Index(['title', 'alias'], 'table_with_indexes_and_foreign_keys_title_alias', 'unique')));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', 'btree', 'table_with_indexes_and_foreign_keys_sorting'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_and_foreign_keys_title_alias'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -243,9 +241,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testDropTable()
+    public function testDropMigrationTable()
     {
-        $table = new Table('drop');
+        $table = new MigrationTable('drop');
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
 
@@ -256,12 +254,12 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));
     }
 
-    public function testAlterTable()
+    public function testAlterMigrationTable()
     {
         // add columns
-        $table = new Table('add_columns');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('title', 'string')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('alias', 'string')));
+        $table = new MigrationTable('add_columns');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
 
         $pdo = new FakePdo();
         $adapter = new SqliteAdapter($pdo);
@@ -280,9 +278,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $pdo->query('CREATE TABLE "with_columns_to_change" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"old_name" integer NOT NULL,"no_name_change" integer NOT NULL);');
 
-        $table = new Table('with_columns_to_change');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+        $table = new MigrationTable('with_columns_to_change');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('old_name', 'new_name', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('no_name_change', 'no_name_change', 'integer'));
 
         $timestamp = date('YmdHis');
         $queryBuilder = new SqliteQueryBuilder($adapter);
@@ -298,9 +296,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChangeColumnWithoutAdapter()
     {
-        $table = new Table('with_columns_to_change');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('no_name_change', new Column('no_name_change', 'integer')));
+        $table = new MigrationTable('with_columns_to_change');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('old_name', 'new_name', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('no_name_change', 'no_name_change', 'integer'));
 
         $queryBuilder = new SqliteQueryBuilder();
 
@@ -310,9 +308,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testChangeAddedColumn()
     {
-        $table = new Table('with_change_added_column');
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->addColumn(new Column('old_name', 'integer')));
-        $this->assertInstanceOf('\Phoenix\Database\Element\Table', $table->changeColumn('old_name', new Column('new_name', 'string')));
+        $table = new MigrationTable('with_change_added_column');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('old_name', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('old_name', 'new_name', 'string'));
 
         $queryBuilder = new SqliteQueryBuilder();
         $expectedQueries = [
@@ -321,9 +319,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
-    public function testRenameTable()
+    public function testRenameMigrationTable()
     {
-        $table = new Table('old_table_name');
+        $table = new MigrationTable('old_table_name');
         $queryBuilder = new SqliteQueryBuilder();
         $expectedQueries = [
             'ALTER TABLE "old_table_name" RENAME TO "new_table_name";',

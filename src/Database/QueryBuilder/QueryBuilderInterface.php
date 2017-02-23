@@ -2,34 +2,34 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 
 interface QueryBuilderInterface
 {
     /**
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function createTable(Table $table);
+    public function createTable(MigrationTable $table);
 
     /**
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function dropTable(Table $table);
-    
+    public function dropTable(MigrationTable $table);
+
     /**
-     * @param Table $table
+     * @param MigrationTable $table
      * @param string $newTableName
      */
-    public function renameTable(Table $table, $newTableName);
-    
+    public function renameTable(MigrationTable $table, $newTableName);
+
     /**
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function alterTable(Table $table);
-    
+    public function alterTable(MigrationTable $table);
+
     /**
      * @param string $string
      * @return string escaped string

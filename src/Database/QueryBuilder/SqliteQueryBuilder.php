@@ -5,7 +5,7 @@ namespace Phoenix\Database\QueryBuilder;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
-use Phoenix\Database\Element\Table;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Exception\PhoenixException;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
@@ -42,10 +42,10 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     /**
      * generates create table queries for sqlite
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function createTable(Table $table)
+    public function createTable(MigrationTable $table)
     {
         $queries = [];
         $queries[] = $this->createTableQuery($table);
@@ -57,30 +57,30 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     /**
      * generates drop table query for sqlite
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function dropTable(Table $table)
+    public function dropTable(MigrationTable $table)
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
 
     /**
      * generates rename table queries for sqlite
-     * @param Table $table
+     * @param MigrationTable $table
      * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(Table $table, $newTableName)
+    public function renameTable(MigrationTable $table, $newTableName)
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
     }
 
     /**
-     * @param Table $table
+     * @param MigrationTable $table
      * @return array list of queries
      */
-    public function alterTable(Table $table)
+    public function alterTable(MigrationTable $table)
     {
         $queries = $this->addColumns($table);
         if ($table->getColumnsToChange()) {
@@ -88,14 +88,14 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
             $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName));
 
-            $tableToDrop = new Table($tmpTableName);
+            $tableToDrop = new MigrationTable($tmpTableName);
             $queries = array_merge($queries, $this->dropTable($tableToDrop));
         }
 
         return $queries;
     }
 
-    protected function createColumn(Column $column, Table $table)
+    protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= $column->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
@@ -113,7 +113,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $col;
     }
 
-    protected function primaryKeyString(Table $table)
+    protected function primaryKeyString(MigrationTable $table)
     {
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
@@ -128,7 +128,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 
-    private function createIndex(Index $index, Table $table)
+    private function createIndex(Index $index, MigrationTable $table)
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
@@ -138,7 +138,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $query;
     }
 
-    private function createNewTable(Table $table, $tmpTableName)
+    private function createNewTable(MigrationTable $table, $tmpTableName)
     {
         if (is_null($this->adapter)) {
             throw new PhoenixException('Missing adapter');
@@ -146,7 +146,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $oldColumns = $this->adapter->tableInfo($table->getName());
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
-        $newTable = new Table($table->getName());
+        $newTable = new MigrationTable($table->getName());
         $columnNames = [];
         foreach ($columns as $column) {
             $columnNames[] = $column->getName();
@@ -167,7 +167,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return '"' . $string . '"';
     }
 
-    protected function createEnumSetColumn(Column $column, Table $table)
+    protected function createEnumSetColumn(Column $column, MigrationTable $table)
     {
         $values = [];
         if ($column->getType() == Column::TYPE_ENUM) {
