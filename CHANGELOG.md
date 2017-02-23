@@ -2,6 +2,15 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
+
+#### Added
+- added method getSettings to Column
+
+#### Removed
+- removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
+
 ### [0.6.1] - 2016-12-13
 #### Fixed
 - Fixed support for changing column settings (allowNull, default) in pgsql
