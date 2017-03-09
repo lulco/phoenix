@@ -19,6 +19,11 @@ class PgsqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
+    protected function loadStructure()
+    {
+        return new \Phoenix\Database\Element\Structure();
+    }
+    
     public function tableInfo($table)
     {
         $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);

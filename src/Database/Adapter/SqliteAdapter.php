@@ -19,6 +19,11 @@ class SqliteAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
+    protected function loadStructure()
+    {
+        return new \Phoenix\Database\Element\Structure();
+    }
+    
     public function tableInfo($table)
     {
         $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);

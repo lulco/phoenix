@@ -7,6 +7,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Table;
 use PHPUnit_Framework_TestCase;
 
 class MigrationTableTest extends PHPUnit_Framework_TestCase
@@ -249,5 +250,36 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($table->drop());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_DROP, $table->getAction());
+    }
+
+    public function testToTable()
+    {
+        $migrationTable = new MigrationTable('test');
+        $migrationTable->setCharset('my_charset');
+        $migrationTable->setCollation('my_collation');
+        $migrationTable->addColumn('title', 'string');
+        $migrationTable->addColumn('alias', 'string');
+        $migrationTable->addColumn('fk_table1_id', 'integer');
+        $migrationTable->addIndex('alias', Index::TYPE_UNIQUE);
+        $migrationTable->addForeignKey('fk_table1_id', 'table1');
+        $migrationTable->create();
+
+        $table = $migrationTable->toTable();
+        $this->assertCount(4, $migrationTable->getColumns());
+        $this->assertCount(1, $migrationTable->getIndexes());
+        $this->assertCount(1, $migrationTable->getForeignKeys());
+
+        $this->assertInstanceOf(Table::class, $table);
+        $this->assertEquals($migrationTable->getName(), $table->getName());
+        $this->assertEquals($migrationTable->getCharset(), $table->getCharset());
+        $this->assertEquals($migrationTable->getCollation(), $table->getCollation());
+        $this->assertEquals($migrationTable->getPrimaryColumns(), $table->getPrimary());
+        $this->assertCount(count($migrationTable->getColumns()), $table->getColumns());
+        $this->assertCount(count($migrationTable->getIndexes()), $table->getIndexes());
+        $this->assertCount(count($migrationTable->getForeignKeys()), $table->getForeignKeys());
+        $this->assertEquals($migrationTable->getColumn('id'), $table->getColumn('id'));
+        $this->assertEquals($migrationTable->getColumn('title'), $table->getColumn('title'));
+        $this->assertEquals($migrationTable->getColumn('alias'), $table->getColumn('alias'));
+        $this->assertEquals($migrationTable->getColumn('fk_table1_id'), $table->getColumn('fk_table1_id'));
     }
 }

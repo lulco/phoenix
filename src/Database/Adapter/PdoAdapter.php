@@ -6,6 +6,7 @@ use DateTime;
 use InvalidArgumentException;
 use PDO;
 use PDOStatement;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
@@ -18,6 +19,9 @@ abstract class PdoAdapter implements AdapterInterface
 
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
+
+    /** @var Structure */
+    private $structure;
 
     public function __construct(PDO $pdo)
     {
@@ -305,7 +309,24 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
+    public function getStructure()
+    {
+        if ($this->structure === null) {
+            $this->structure = $this->loadStructure();
+        }
+        return $this->structure;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     abstract public function tableInfo($table);
+
+    /**
+     * Load structure of database
+     * @return Structure
+     */
+    abstract protected function loadStructure();
 
     private function bindDataValues($statement, $data, $prefix = '')
     {

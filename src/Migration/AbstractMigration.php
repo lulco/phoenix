@@ -245,6 +245,7 @@ abstract class AbstractMigration
     private function prepare()
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
+        $structure = $this->adapter->getStructure();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
             if (!($queryToExecute instanceof MigrationTable)) {
@@ -252,7 +253,9 @@ abstract class AbstractMigration
                 continue;
             }
 
+            $queryToExecute = $structure->prepare($queryToExecute);
             $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
+            $structure->update($queryToExecute);
             $queries = array_merge($queries, $tableQueries);
         }
         return $queries;

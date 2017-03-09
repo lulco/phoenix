@@ -18,6 +18,11 @@ class MysqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
+    protected function loadStructure()
+    {
+        return new \Phoenix\Database\Element\Structure();
+    }
+
     public function tableInfo($table)
     {
         throw new LogicException('Not yet implemented');
@@ -27,4 +32,5 @@ class MysqlAdapter extends PdoAdapter
     {
         return is_array($value) ? implode(',', $value) : $value;
     }
+
 }
