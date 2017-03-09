@@ -3,6 +3,7 @@
 namespace Phoenix\Database\Adapter;
 
 use LogicException;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
@@ -20,7 +21,7 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadStructure()
     {
-        return new \Phoenix\Database\Element\Structure();
+        return new Structure();
     }
 
     public function tableInfo($table)
@@ -32,5 +33,4 @@ class MysqlAdapter extends PdoAdapter
     {
         return is_array($value) ? implode(',', $value) : $value;
     }
-
 }
