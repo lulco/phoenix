@@ -4,6 +4,7 @@
 
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
+- migration dir in create command is required if there are more then one migration dir registered
 
 #### Added
 - added method getSettings to Column
