@@ -1,39 +1,17 @@
 <?php
 
-namespace Phoenix\Tests\Config;
+namespace Phoenix\Tests\Command\RollbackCommand;
 
-use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
-use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
-use Phoenix\Tests\Mock\Command\Input;
+use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class RollbackCommandTest extends PHPUnit_Framework_TestCase
+abstract class RollbackCommandTest extends BaseCommandTest
 {
-    private $input;
-
-    private $output;
-
-    private $configuration;
-
-    protected function setUp()
-    {
-        $parser = new PhpConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
-
-        $cleanup = new CleanupCommand();
-        $cleanup->setConfig($this->configuration);
-        $cleanup->run(new Input(), new Output());
-
-        $this->input = new Input();
-        $this->output = new Output();
-    }
-
     public function testDefaultName()
     {
         $command = new RollbackCommand();
@@ -64,14 +42,14 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new RollbackCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
     }
 
     public function testNothingToRollbackWithoutInitializing()
     {
         $command = new RollbackCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
@@ -84,7 +62,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
 
     public function testNothingToRollbackWithInitializing()
     {
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new InitCommand();
         $command->setConfig($this->configuration);
@@ -107,7 +85,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new RollbackCommand();
         $command->setConfig($this->configuration);
@@ -119,7 +97,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $this->assertCount(6, $messages[0]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new RollbackCommand();
         $command->setConfig($this->configuration);
@@ -138,7 +116,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $input->setOption('all', true);
         $output = new Output();
         $command = new RollbackCommand();
@@ -150,7 +128,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $messages);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new RollbackCommand();
         $command->setConfig($this->configuration);
@@ -169,13 +147,13 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new RollbackCommand();
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $input->setOption('dry', true);
         $output = new Output();
         $command = new RollbackCommand();
@@ -189,7 +167,7 @@ class RollbackCommandTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(0, $dryMessages);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new RollbackCommand();
         $command->setConfig($this->configuration);

@@ -13,7 +13,7 @@ class InitCommand extends AbstractCommand
     {
         $this->setName('init')
             ->setDescription('Initialize phoenix');
-        
+
         parent::configure();
     }
 
@@ -23,7 +23,7 @@ class InitCommand extends AbstractCommand
         require_once $filename;
         $migration = new Init($this->adapter, $this->config->getLogTableName());
         $migration->migrate();
-        
+
         $output->writeln('');
         $output->writeln('<info>Phoenix initialized</info>');
         $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);

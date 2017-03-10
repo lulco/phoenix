@@ -1,37 +1,16 @@
 <?php
 
-namespace Phoenix\Tests\Config;
+namespace Phoenix\Tests\Command\MigrateCommand;
 
 use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\MigrateCommand;
-use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
-use Phoenix\Tests\Mock\Command\Input;
+use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrateCommandTest extends PHPUnit_Framework_TestCase
+abstract class MigrateCommandTest extends BaseCommandTest
 {
-    private $input;
-
-    private $output;
-
-    private $configuration;
-
-    protected function setUp()
-    {
-        $parser = new PhpConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
-
-        $cleanup = new CleanupCommand();
-        $cleanup->setConfig($this->configuration);
-        $cleanup->run(new Input(), new Output());
-
-        $this->input = new Input();
-        $this->output = new Output();
-    }
-
     public function testDefaultName()
     {
         $command = new MigrateCommand();
@@ -62,7 +41,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new MigrateCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
@@ -91,7 +70,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command->run($input, $output);
 
@@ -107,7 +86,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
 
-        $input = new Input();
+        $input = $this->createInput();
         $input->setOption('first', true);
         $output = new Output();
         $command->run($input, $output);
@@ -119,7 +98,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
 
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command->run($input, $output);
         $messagesAll = $output->getMessages();
@@ -129,7 +108,7 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
 
     public function testDryRun()
     {
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -138,11 +117,12 @@ class MigrateCommandTest extends PHPUnit_Framework_TestCase
         $command->run($input, $output);
 
         $messages = $output->getMessages();
+
         $dryMigrationExecuting = $messages[0][6];
         $dryMigrationExecuted = $messages[0][7];
         $dryQueries = array_slice($messages[0], 8, -3);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $input->setOption('first', true);
         $command->run($input, $output);

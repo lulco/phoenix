@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit bootstrap="vendor/autoload.php">
-    <logging>
+    <php>
+		<env name="PHOENIX_MYSQL_HOST" value="localhost"/>
+		<env name="PHOENIX_MYSQL_USERNAME" value="root"/>
+		<env name="PHOENIX_MYSQL_PASSWORD" value=""/>
+		<env name="PHOENIX_MYSQL_DATABASE" value="phoenix"/>
+		<env name="PHOENIX_MYSQL_CHARSET" value="utf8"/>
+		
+		<env name="PHOENIX_PGSQL_HOST" value="localhost"/>
+		<env name="PHOENIX_PGSQL_USERNAME" value="postgres"/>
+		<env name="PHOENIX_PGSQL_PASSWORD" value=""/>
+		<env name="PHOENIX_PGSQL_DATABASE" value="phoenix"/>
+		<env name="PHOENIX_PGSQL_CHARSET" value="utf8"/>
+	</php>
+	<logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
     </logging>
     <testsuites>
