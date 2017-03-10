@@ -23,14 +23,14 @@ class EnvironmentConfig
 
     public function getDsn()
     {
-        if (isset($this->configuration['dsn']) && $this->configuration['dsn']) {
+        if ($this->checkConfigValue('dsn')) {
             return $this->configuration['dsn'];
         }
         $dsn = $this->configuration['adapter'] . ':dbname=' . $this->configuration['db_name'] . ';host=' . $this->configuration['host'];
-        if (isset($this->configuration['port']) && $this->configuration['port']) {
+        if ($this->checkConfigValue('port')) {
             $dsn .= ';port=' . $this->configuration['port'];
         }
-        if (isset($this->configuration['charset']) && $this->configuration['charset']) {
+        if ($this->checkConfigValue('charset')) {
             if ($this->configuration['adapter'] == 'pgsql') {
                 $dsn .= ';options=\'--client_encoding=' . $this->configuration['charset'] . '\'';
             } else {
@@ -53,5 +53,10 @@ class EnvironmentConfig
     public function getCharset()
     {
         return isset($this->configuration['charset']) ? $this->configuration['charset'] : 'utf8';
+    }
+
+    private function checkConfigValue($key)
+    {
+        return isset($this->configuration[$key]) && $this->configuration[$key];
     }
 }

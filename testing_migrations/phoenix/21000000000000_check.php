@@ -10,12 +10,17 @@ class Check extends AbstractMigration
     public function up()
     {
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 5) {
+        if (count($logs) != 6) {
             throw new Exception('Wrong count');
         }
 
+        $res = $this->select('SELECT COUNT(*) AS log_count FROM phoenix_log');
+        if (count($logs) != $res[0]['log_count']) {
+            throw new Exception('Counts don\'t match');
+        }
+
         $tableColumns = [
-            'table_1' => [
+            'renamed_table_1' => [
                 'id', 'title', 'alias', 'is_active', 'bodytext'
             ],
             'table_2' => [
@@ -27,6 +32,10 @@ class Check extends AbstractMigration
         ];
 
         foreach ($tableColumns as $table => $columns) {
+            $firstItem = $this->fetch($table);
+            if (count($firstItem) != count($columns)) {
+                throw new Exception('Wrong number of columns in first item');
+            }
             $items = $this->fetchAll($table);
             if (!$items) {
                 throw new Exception('No data in table "' . $table . '"');
