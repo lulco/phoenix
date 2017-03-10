@@ -1,38 +1,15 @@
 <?php
 
-namespace Phoenix\Tests\Config;
+namespace Phoenix\Tests\Command\InitCommand;
 
-use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
-use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\WrongCommandException;
-use Phoenix\Tests\Mock\Command\Input;
-use Phoenix\Tests\Mock\Command\Output;
-use PHPUnit_Framework_TestCase;
+use Phoenix\Tests\Command\BaseCommandTest;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitCommandTest extends PHPUnit_Framework_TestCase
+abstract class InitCommandTest extends BaseCommandTest
 {
-    private $input;
-
-    private $output;
-
-    private $configuration;
-
-    protected function setUp()
-    {
-        $parser = new PhpConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
-
-        $cleanup = new CleanupCommand();
-        $cleanup->setConfig($this->configuration);
-        $cleanup->run(new Input(), new Output());
-
-        $this->input = new Input();
-        $this->output = new Output();
-    }
-
     public function testDefaultName()
     {
         $command = new InitCommand();
@@ -63,16 +40,17 @@ class InitCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new InitCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
+
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertCount(5, $messages[0]);
         $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
-        $this->assertCount(2, $messages[OutputInterface::VERBOSITY_DEBUG]);
+        $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
     public function testSetCustomConfig()
@@ -87,7 +65,7 @@ class InitCommandTest extends PHPUnit_Framework_TestCase
         $this->assertCount(5, $messages[0]);
         $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
-        $this->assertCount(2, $messages[OutputInterface::VERBOSITY_DEBUG]);
+        $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
     public function testMultipleInitialization()

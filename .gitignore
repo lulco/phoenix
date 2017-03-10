@@ -7,3 +7,4 @@
 /phpmd.html
 /testing_migrations/run.sh
 /testing_migrations/phoenix.sqlite
+/tests_local.sh

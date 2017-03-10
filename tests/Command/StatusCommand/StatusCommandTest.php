@@ -1,38 +1,21 @@
 <?php
 
-namespace Phoenix\Tests\Config;
+namespace Phoenix\Tests\Command\StatusCommand;
 
-use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\StatusCommand;
-use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Exception\ConfigException;
-use Phoenix\Tests\Mock\Command\Formatter;
-use Phoenix\Tests\Mock\Command\Input;
+use Phoenix\Tests\Command\BaseCommandTest;
+use Phoenix\Tests\Helpers\Command\Formatter;
 use Phoenix\Tests\Mock\Command\Output;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StatusCommandTest extends PHPUnit_Framework_TestCase
+abstract class StatusCommandTest extends BaseCommandTest
 {
-    private $input;
-
-    private $output;
-
-    private $configuration;
-
     protected function setUp()
     {
-        $parser = new PhpConfigParser();
-        $this->configuration = $parser->parse(__DIR__ . '/../../example/phoenix.php');
-
-        $cleanup = new CleanupCommand();
-        $cleanup->setConfig($this->configuration);
-        $cleanup->run(new Input(), new Output());
-
-        $this->input = new Input();
-        $this->output = new Output();
+        parent::setUp();
         $this->output->setFormatter(new Formatter());
     }
 
@@ -66,14 +49,14 @@ class StatusCommandTest extends PHPUnit_Framework_TestCase
     public function testUserConfigFile()
     {
         $command = new StatusCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
     }
 
     public function testStatusWithoutInitializing()
     {
         $command = new StatusCommand();
-        $this->input->setOption('config', __DIR__ . '/../../example/phoenix.php');
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
@@ -90,7 +73,7 @@ class StatusCommandTest extends PHPUnit_Framework_TestCase
 
     public function testStatusWithInitializing()
     {
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new InitCommand();
         $command->setConfig($this->configuration);
@@ -112,7 +95,7 @@ class StatusCommandTest extends PHPUnit_Framework_TestCase
 
     public function testStatusAfterOneExecutedMigration()
     {
-        $input = new Input();
+        $input = $this->createInput();
         $input->setOption('first', true);
         $output = new Output();
         $command = new MigrateCommand();
@@ -136,13 +119,13 @@ class StatusCommandTest extends PHPUnit_Framework_TestCase
 
     public function testStatusAfterAllMigrationsExecuted()
     {
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new InitCommand();
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $input = new Input();
+        $input = $this->createInput();
         $output = new Output();
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);

@@ -14,7 +14,7 @@ return [
             'host' => 'localhost',
             'username' => 'root',
             'password' => '123',
-            'db_name' => 'libs',
+            'db_name' => 'phoenix',
             'charset' => 'utf8',
         ],
     ],

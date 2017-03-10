@@ -14,7 +14,7 @@ $configuration = [
     'environments' => [
         'mysql' => [
             'adapter' => 'mysql',
-            'db_name' => 'libs',
+            'db_name' => 'phoenix',
             'host' => 'localhost',
             'username' => 'root',
             'password' => '123',
@@ -30,7 +30,7 @@ $configuration = [
         ],
         'pgsql' => [
             'adapter' => 'pgsql',
-            'db_name' => 'libs',
+            'db_name' => 'phoenix',
             'host' => 'localhost',
             'username' => 'postgres',
             'password' => '123',
@@ -56,7 +56,7 @@ foreach (array_keys($configuration['environments']) as $environment) {
         $manager->removeExecution($migration);
         $migration->migrate();
         $manager->logExecution($migration);
-        print_R($migration->getExecutedQueries());
+//        print_R($migration->getExecutedQueries());
     }
     echo "All OK\n\n";
 }
