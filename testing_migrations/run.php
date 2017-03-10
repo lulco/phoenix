@@ -14,7 +14,7 @@ $configuration = [
     'environments' => [
         'mysql' => [
             'adapter' => 'mysql',
-            'db_name' => 'libs',
+            'db_name' => 'phoenix',
             'host' => 'localhost',
             'username' => 'root',
             'password' => '123',
@@ -30,7 +30,7 @@ $configuration = [
         ],
         'pgsql' => [
             'adapter' => 'pgsql',
-            'db_name' => 'libs',
+            'db_name' => 'phoenix',
             'host' => 'localhost',
             'username' => 'postgres',
             'password' => '123',
