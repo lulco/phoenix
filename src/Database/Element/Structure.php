@@ -109,9 +109,13 @@ class Structure
      */
     public function getTable($tableName)
     {
-        return isset($this->tables[$tableName]) ? $this->tables[$tableName] : null;
+        return $this->tableExists($tableName) ? $this->tables[$tableName] : null;
     }
 
+    /**
+     * @param string $tableName
+     * @return boolean
+     */
     private function tableExists($tableName)
     {
         return isset($this->tables[$tableName]);

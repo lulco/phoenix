@@ -143,7 +143,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         if (is_null($this->adapter)) {
             throw new PhoenixException('Missing adapter');
         }
-        $oldColumns = $this->adapter->tableInfo($table->getName());
+        $oldColumns = $this->adapter->tableInfo($table->getName())->getColumns();
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
         $newTable = new MigrationTable($table->getName());

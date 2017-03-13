@@ -4,6 +4,8 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 
 class SqliteAdapter extends PdoAdapter
@@ -21,13 +23,21 @@ class SqliteAdapter extends PdoAdapter
 
     protected function loadStructure()
     {
-        return new \Phoenix\Database\Element\Structure();
+        $structure = new Structure();
+        $tables = $this->execute("SELECT * FROM sqlite_master WHERE type='table'")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($tables as $table) {
+            $migrationTable = $this->tableInfo($table['name']);
+            if ($migrationTable) {
+                $structure->update($migrationTable);
+            }
+        }
+        return $structure;
     }
-    
+
     public function tableInfo($table)
     {
         $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
-        $tableInfo = [];
+        $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
             $type = $column['type'];
@@ -50,9 +60,9 @@ class SqliteAdapter extends PdoAdapter
                 preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
                 $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
             }
-            $tableInfo[$column['name']] = new Column($column['name'], $type, $settings);
+            $migrationTable->addColumn($column['name'], $type, $settings);
         }
-        return $tableInfo;
+        return $migrationTable;
     }
 
     protected function createRealValue($value)

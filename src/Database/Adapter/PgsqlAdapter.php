@@ -4,6 +4,8 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class PgsqlAdapter extends PdoAdapter
@@ -21,13 +23,22 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadStructure()
     {
-        return new \Phoenix\Database\Element\Structure();
+        $database = $this->execute('SELECT current_database()')->fetchColumn();
+        $structure = new Structure();
+        $tables = $this->execute("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '$database' AND table_schema='public' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($tables as $table) {
+            $migrationTable = $this->tableInfo($table['table_name']);
+            if ($migrationTable) {
+                $structure->update($migrationTable);
+            }
+        }
+        return $structure;
     }
-    
+
     public function tableInfo($table)
     {
         $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
-        $tableInfo = [];
+        $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             $type = $column['data_type'];
             $settings = [
@@ -45,9 +56,9 @@ class PgsqlAdapter extends PdoAdapter
                 $enumType = $table . '__' . $column['column_name'];
                 $settings['values'] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
             }
-            $tableInfo[$column['column_name']] = new Column($column['column_name'], $type, $settings);
+            $migrationTable->addColumn($column['column_name'], $type, $settings);
         }
-        return $tableInfo;
+        return $migrationTable;
     }
 
     protected function createRealValue($value)

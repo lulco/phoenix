@@ -2,7 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
@@ -106,7 +106,7 @@ interface AdapterInterface
 
     /**
      * @param string $table
-     * @return Column[]
+     * @return MigrationTable
      */
     public function tableInfo($table);
 

@@ -17,11 +17,6 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertNull($structure->getTable('some_table'));
     }
 
-    public function testPrepare()
-    {
-
-    }
-
     public function testAddRenameAndDropSimpleTable()
     {
         $structure = new Structure();

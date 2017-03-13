@@ -21,7 +21,7 @@ abstract class PdoAdapter implements AdapterInterface
     protected $queryBuilder;
 
     /** @var Structure */
-    private $structure;
+    private $structure = null;
 
     public function __construct(PDO $pdo)
     {

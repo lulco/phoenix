@@ -145,7 +145,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
 
                     $tableInfo = $this->adapter->tableInfo($table->getName());
-                    foreach (array_diff($newColumn->getValues(), $tableInfo[$oldColumnName]->getValues()) as $newValue) {
+                    foreach (array_diff($newColumn->getValues(), $tableInfo->getColumn($oldColumnName)->getValues()) as $newValue) {
                         $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
                     }
                 } else {
