@@ -2,8 +2,6 @@
 
 namespace Phoenix\Database\Element;
 
-use Exception;
-
 class MigrationTable
 {
     const ACTION_CREATE = 'create';
@@ -148,14 +146,10 @@ class MigrationTable
     /**
      * @param string $name
      * @return Column
-     * @throws Exception if column is not found
      */
     public function getColumn($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new Exception('Column "' . $name . '" not found');
-        }
-        return $this->columns[$name];
+        return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
     /**

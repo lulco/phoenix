@@ -2,8 +2,6 @@
 
 namespace Phoenix\Database\Element;
 
-use Exception;
-
 class Table
 {
     private $name;
@@ -94,7 +92,7 @@ class Table
      * @param Column $column
      * @return Table
      */
-    public function addColumn($column)
+    public function addColumn(Column $column)
     {
         $this->columns[$column->getName()] = $column;
         return $this;
@@ -111,14 +109,10 @@ class Table
     /**
      * @param string $name
      * @return Column
-     * @throws Exception if column is not found
      */
     public function getColumn($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new Exception('Column "' . $name . '" not found');
-        }
-        return $this->columns[$name];
+        return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
     /**

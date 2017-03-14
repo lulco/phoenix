@@ -39,7 +39,20 @@ class Structure
                         throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
                     }
                 }
-                // TODO change columns, drop columns, foreign keys, indexes, etc.
+                foreach ($migrationTable->getColumnsToDrop() as $columnName) {
+                    if (!$table->getColumn($columnName)) {
+                        throw new StructureException('Column "' . $columnName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
+                    }
+                }
+                foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
+                    if (!$table->getColumn($oldName)) {
+                        throw new StructureException('Column "' . $oldName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
+                    }
+                    if ($column->getName() != $oldName && $table->getColumn($column->getName())) {
+                        throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
+                    }
+                }
+                // TODO foreign keys, indexes, etc.
                 break;
             case MigrationTable::ACTION_RENAME:
                 if (!$this->tableExists($migrationTable->getName())) {
@@ -49,8 +62,6 @@ class Structure
                     throw new StructureException('Table "' . $migrationTable->getNewName() . '" already exists');
                 }
                 break;
-            default:
-                throw new StructureException('Unknown action "' . $migrationTable->getAction() . '"');
         }
 
         return $migrationTable;
@@ -89,8 +100,6 @@ class Structure
             foreach ($migrationTable->getForeignKeys() as $foreignKey) {
                 $table->addForeignKey($foreignKey);
             }
-        } else {
-            throw new StructureException('Action "' . $migrationTable->getAction() . '" is not implemented yet');
         }
         return $this;
     }
@@ -116,7 +125,7 @@ class Structure
      * @param string $tableName
      * @return boolean
      */
-    private function tableExists($tableName)
+    public function tableExists($tableName)
     {
         return isset($this->tables[$tableName]);
     }

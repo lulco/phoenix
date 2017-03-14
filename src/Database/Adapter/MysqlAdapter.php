@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Exception\DatabaseQueryExecuteException;
@@ -43,7 +44,7 @@ class MysqlAdapter extends PdoAdapter
             // TODO maybe we should use select table from information schema instead of this
             return null;
         }
-        $migrationTable = new \Phoenix\Database\Element\MigrationTable($table);
+        $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             $type = $column['Type'];
             preg_match('/(.*?)\((.*?)\)/', $column['Type'], $matches);

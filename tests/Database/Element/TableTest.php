@@ -114,9 +114,6 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Column::class, $table->getColumn('bodytext'));
         $this->assertInstanceOf(Column::class, $table->getColumn('fk_table1_id'));
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Column "unknown_column" not found');
-        $table->getColumn('unknown_column');
+        $this->assertNull($table->getColumn('unknown_column'));
     }
-
 }
