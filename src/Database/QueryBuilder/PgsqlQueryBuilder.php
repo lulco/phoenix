@@ -209,7 +209,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         foreach ($index->getColumns() as $column) {
             $columns[] = $this->escapeString($column);
         }
-        return 'CREATE ' . $index->getType() . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . (!$index->getMethod() ? '' : ' ' . $index->getMethod()) . ' (' . implode(',', $columns) . ');';
+        $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
+        $indexMethod = $index->getMethod() ? ' USING ' . $index->getMethod() : '';
+        return 'CREATE ' . $indexType . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . $indexMethod . ' (' . implode(',', $columns) . ');';
     }
 
     protected function dropIndexes(MigrationTable $table)
