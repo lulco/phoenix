@@ -8,23 +8,23 @@ use Phoenix\Exception\InvalidArgumentValueException;
 class Index
 {
     use ParamsCheckerBehavior;
-    
+
     const TYPE_NORMAL = '';
     const TYPE_UNIQUE = 'UNIQUE';
     const TYPE_FULLTEXT = 'FULLTEXT';
-    
+
     const METHOD_DEFAULT = '';
     const METHOD_BTREE = 'BTREE';
     const METHOD_HASH = 'HASH';
-    
+
     private $columns = [];
-    
+
     private $name;
-    
+
     private $type;
-    
+
     private $method;
-    
+
     /**
      * @param string|array $columns name(s) of column(s)
      * @param string $name name of index
@@ -43,7 +43,7 @@ class Index
 
         $this->columns = is_array($columns) ? $columns : [$columns];
     }
-    
+
     /**
      * @return string
      */
@@ -65,14 +65,14 @@ class Index
      */
     public function getType()
     {
-        return $this->type ? $this->type . ' INDEX' : 'INDEX';
+        return $this->type;
     }
-    
+
     /**
      * @return string
      */
     public function getMethod()
     {
-        return $this->method ? 'USING ' . $this->method : '';
+        return $this->method;
     }
 }
