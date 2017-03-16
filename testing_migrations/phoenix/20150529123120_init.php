@@ -2,6 +2,7 @@
 
 namespace Phoenix\TestingMigrations;
 
+use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Migration\AbstractMigration;
 
 class Init extends AbstractMigration
@@ -13,8 +14,14 @@ class Init extends AbstractMigration
             ->addColumn('alias', 'string', ['length' => 100])
             ->addColumn('is_active', 'boolean', ['default' => false])
             ->addColumn('bodytext', 'text', ['null' => true])
+            ->addColumn('self_fk', 'integer', ['null' => true])
             ->addIndex('alias', 'unique')
+            ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
             ->create();
+
+//        $this->table('table_1')
+//
+//            ->save();
 
         $this->table('table_2')
             ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_slovak_ci'])

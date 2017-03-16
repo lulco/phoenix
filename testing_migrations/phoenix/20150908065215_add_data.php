@@ -20,11 +20,13 @@ class AddData extends AbstractMigration
                 'id' => 2,
                 'title' => 'Second item',
                 'alias' => 'second-item',
+                'self_fk' => 1,
             ],
             [
                 'id' => 3,
                 'title' => 'Third item',
                 'alias' => 'third-item',
+                'self_fk' => 2,
             ]
         ]);
 
