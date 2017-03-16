@@ -21,7 +21,7 @@ class Check extends AbstractMigration
 
         $tableColumns = [
             'renamed_table_1' => [
-                'id', 'title', 'alias', 'is_active', 'bodytext'
+                'id', 'title', 'alias', 'is_active', 'bodytext', 'self_fk'
             ],
             'table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at'
