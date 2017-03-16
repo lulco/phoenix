@@ -204,16 +204,12 @@ abstract class AbstractMigration
     private function runQueries(array $queries, $dry = false)
     {
         $results = [];
-        try {
-            foreach ($queries as $query) {
-                if (!$dry) {
-                    $result = $this->adapter->execute($query);
-                    $results[] = $result;
-                }
-                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
+        foreach ($queries as $query) {
+            if (!$dry) {
+                $result = $this->adapter->execute($query);
+                $results[] = $result;
             }
-        } catch (DatabaseQueryExecuteException $e) {
-            throw $e;
+            $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
         }
         return $results;
     }

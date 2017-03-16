@@ -19,10 +19,6 @@ class Init extends AbstractMigration
             ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
             ->create();
 
-//        $this->table('table_1')
-//
-//            ->save();
-
         $this->table('table_2')
             ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_slovak_ci'])
             ->addColumn('sorting', 'integer', ['default' => 100])

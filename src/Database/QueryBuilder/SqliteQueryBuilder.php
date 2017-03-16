@@ -2,11 +2,10 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Exception\PhoenixException;
+use Phoenix\Database\Element\Structure;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -33,11 +32,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_DECIMAL => [10, 0],
     ];
 
-    private $adapter;
+    private $structure;
 
-    public function __construct(AdapterInterface $adapter = null)
+    public function __construct(Structure $structure)
     {
-        $this->adapter = $adapter;
+        $this->structure = $structure;
     }
 
     /**
@@ -141,10 +140,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     private function createNewTable(MigrationTable $table, $tmpTableName)
     {
-        if (is_null($this->adapter)) {
-            throw new PhoenixException('Missing adapter');
-        }
-        $oldColumns = $this->adapter->tableInfo($table->getName())->getColumns();
+        $oldColumns = $this->structure->getTable($table->getName())->getColumns();
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
         $newTable = new MigrationTable($table->getName());

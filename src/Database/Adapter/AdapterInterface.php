@@ -105,12 +105,6 @@ interface AdapterInterface
     public function rollback();
 
     /**
-     * @param string $table
-     * @return MigrationTable
-     */
-    public function tableInfo($table);
-
-    /**
      * @param string $charset
      * @return AdapterInterface
      */

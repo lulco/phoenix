@@ -16,7 +16,7 @@ class PgsqlAdapter extends PdoAdapter
     public function getQueryBuilder()
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new PgsqlQueryBuilder($this);
+            $this->queryBuilder = new PgsqlQueryBuilder($this->getStructure());
         }
         return $this->queryBuilder;
     }
@@ -35,7 +35,7 @@ class PgsqlAdapter extends PdoAdapter
         return $structure;
     }
 
-    public function tableInfo($table)
+    private function tableInfo($table)
     {
         $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
@@ -64,5 +64,10 @@ class PgsqlAdapter extends PdoAdapter
     protected function createRealValue($value)
     {
         return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
     }
 }

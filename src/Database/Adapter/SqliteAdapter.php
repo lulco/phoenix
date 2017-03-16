@@ -16,7 +16,7 @@ class SqliteAdapter extends PdoAdapter
     public function getQueryBuilder()
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new SqliteQueryBuilder($this);
+            $this->queryBuilder = new SqliteQueryBuilder($this->getStructure());
         }
         return $this->queryBuilder;
     }
@@ -34,9 +34,9 @@ class SqliteAdapter extends PdoAdapter
         return $structure;
     }
 
-    public function tableInfo($table)
+    private function tableInfo($table)
     {
-        $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute('PRAGMA table_info(' . $this->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
@@ -68,5 +68,10 @@ class SqliteAdapter extends PdoAdapter
     protected function createRealValue($value)
     {
         return is_array($value) ? implode(',', $value) : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
     }
 }

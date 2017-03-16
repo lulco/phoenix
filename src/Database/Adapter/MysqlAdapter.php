@@ -36,14 +36,9 @@ class MysqlAdapter extends PdoAdapter
         return $structure;
     }
 
-    public function tableInfo($table)
+    private function tableInfo($table)
     {
-        try {
-            $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
-        } catch (DatabaseQueryExecuteException $e) {
-            // TODO maybe we should use select table from information schema instead of this
-            return null;
-        }
+        $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             $type = $column['Type'];
@@ -89,5 +84,10 @@ class MysqlAdapter extends PdoAdapter
     protected function createRealValue($value)
     {
         return is_array($value) ? implode(',', $value) : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '`' . $string . '`';
     }
 }
