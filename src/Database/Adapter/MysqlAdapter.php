@@ -7,7 +7,6 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
-use Phoenix\Exception\DatabaseQueryExecuteException;
 
 class MysqlAdapter extends PdoAdapter
 {

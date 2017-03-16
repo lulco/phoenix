@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
