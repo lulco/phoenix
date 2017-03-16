@@ -97,7 +97,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [
             'DROP TABLE ' . $this->escapeString($table->getName()) . ';',
             'DROP SEQUENCE IF EXISTS ' . $this->escapeString($table->getName() . '_seq') . ';',
-            'DELETE FROM ' . $this->escapeString('pg_type') . ' WHERE ' . $this->escapeString('typname') . ' LIKE \'' . $table->getName() . '__%\';',
+            sprintf("DELETE FROM %s WHERE %s LIKE '%s';", $this->escapeString('pg_type'), $this->escapeString('typname'), $table->getName() . '__%'),
         ];
     }
 
@@ -140,7 +140,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
                     $tableInfo = $this->structure->getTable($table->getName());
                     foreach (array_diff($tableInfo->getColumn($oldColumnName)->getValues(), $newColumn->getValues()) as $newValue) {
-                        $queries[] = 'DELETE FROM pg_enum WHERE enumlabel = \'' . $newValue . '\' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = \'' . $table->getName() . '__' . $newColumn->getName() . '\')';
+                        $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
                     }
                     foreach (array_diff($newColumn->getValues(), $tableInfo->getColumn($oldColumnName)->getValues()) as $newValue) {
                         $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
