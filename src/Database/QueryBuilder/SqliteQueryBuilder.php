@@ -134,7 +134,8 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         foreach ($index->getColumns() as $column) {
             $columns[] = $this->escapeString($table->getColumn($column)->getName());
         }
-        $query = 'CREATE ' . $index->getType() . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
+        $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
+        $query = 'CREATE ' . $indexType . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
         return $query;
     }
 

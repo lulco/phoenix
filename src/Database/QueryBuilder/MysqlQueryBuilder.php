@@ -180,7 +180,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private function createIndex(Index $index)
     {
         $columns = $this->escapeArray($index->getColumns());
-        return $index->getType() . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . (!$index->getMethod() ? '' : ' ' . $index->getMethod());
+        $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
+        $indexMethod = $index->getMethod() ? ' USING ' . $index->getMethod() : '';
+        return $indexType . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . $indexMethod;
     }
 
     public function escapeString($string)
