@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
@@ -62,6 +63,22 @@ class SqliteAdapter extends PdoAdapter
             }
             $migrationTable->addColumn($column['name'], $type, $settings);
         }
+
+        $indexList = $this->execute("PRAGMA INDEX_LIST ('$table');")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($indexList as $index) {
+            $type = $index['unique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
+            $indexColumns = [];
+            foreach ($this->execute("PRAGMA index_info('{$index['name']}');") as $indexColumn) {
+                $indexColumns[$indexColumn['seqno']] = $indexColumn['name'];
+            }
+            ksort($indexColumns);
+            $migrationTable->addIndex($indexColumns, $type, Index::METHOD_DEFAULT, $index['name']);
+        }
+
+
+
+        // TODO foreign keys
+
         return $migrationTable;
     }
 

@@ -3,6 +3,8 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
@@ -327,6 +329,74 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $structure->prepare($migrationTable);
     }
 
+    public function testPrepareDropIndex()
+    {
+        $structure = $this->prepareComplexStructure();
+        $this->assertTrue($structure->tableExists('test_1'));
+        $testTable = $structure->getTable('test_1');
+        $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertInstanceOf(Index::class, $testTable->getIndex('alias'));
+
+        $migrationTable = new MigrationTable('test_1');
+        $migrationTable->dropIndexByName('alias');
+        $migrationTable->save();
+
+        $preparedMigrationTable = $structure->prepare($migrationTable);
+        $this->assertInstanceOf(MigrationTable::class, $preparedMigrationTable);
+        $this->assertEquals($preparedMigrationTable, $migrationTable);
+    }
+
+    public function testPrepareDropNonExistingIndex()
+    {
+        $structure = $this->prepareComplexStructure();
+        $this->assertTrue($structure->tableExists('test_1'));
+        $testTable = $structure->getTable('test_1');
+        $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertNull($testTable->getIndex('non_existing_index'));
+
+        $migrationTable = new MigrationTable('test_1');
+        $migrationTable->dropIndexByName('non_existing_index');
+        $migrationTable->save();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage("Index 'non_existing_index' doesn't exist in table 'test_1'");
+        $structure->prepare($migrationTable);
+    }
+
+    public function testPrepareDropForeignKey()
+    {
+        $structure = $this->prepareComplexStructure();
+        $this->assertTrue($structure->tableExists('test_2'));
+        $testTable = $structure->getTable('test_2');
+        $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertInstanceOf(ForeignKey::class, $testTable->getForeignKey('fk_test_1_id'));
+
+        $migrationTable = new MigrationTable('test_2');
+        $migrationTable->dropForeignKey('fk_test_1_id');
+        $migrationTable->save();
+
+        $preparedMigrationTable = $structure->prepare($migrationTable);
+        $this->assertInstanceOf(MigrationTable::class, $preparedMigrationTable);
+        $this->assertEquals($preparedMigrationTable, $migrationTable);
+    }
+
+    public function testPrepareDropNonExistingForeignKey()
+    {
+        $structure = $this->prepareComplexStructure();
+        $this->assertTrue($structure->tableExists('test_2'));
+        $testTable = $structure->getTable('test_2');
+        $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertNull($testTable->getForeignKey('non_existing_fk'));
+
+        $migrationTable = new MigrationTable('test_2');
+        $migrationTable->dropForeignKey('non_existing_fk');
+        $migrationTable->save();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage("Foreign key 'non_existing_fk' doesn't exist in table 'test_2'");
+        $structure->prepare($migrationTable);
+    }
+
     private function prepareSimpleStructure()
     {
         $structure = new Structure();
@@ -335,6 +405,27 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $migrationTable->addColumn('alias', 'string');
         $migrationTable->create();
         $this->assertInstanceOf(Structure::class, $structure->update($migrationTable));
+        return $structure;
+    }
+
+    private function prepareComplexStructure()
+    {
+        $structure = new Structure();
+        $migrationTable = new MigrationTable('test_1');
+        $migrationTable->addColumn('title', 'string');
+        $migrationTable->addColumn('alias', 'string');
+        $migrationTable->addIndex('alias', Index::TYPE_UNIQUE, Index::METHOD_DEFAULT, 'alias');
+        $migrationTable->create();
+        $this->assertInstanceOf(Structure::class, $structure->update($migrationTable));
+
+        $migrationTable2 = new MigrationTable('test_2');
+        $migrationTable2->addColumn('title', 'string');
+        $migrationTable2->addColumn('bodytext', 'text');
+        $migrationTable2->addColumn('fk_test_1_id', 'integer');
+        $migrationTable2->addForeignKey('fk_test_1_id', 'test_1');
+        $migrationTable2->create();
+        $this->assertInstanceOf(Structure::class, $structure->update($migrationTable2));
+
         return $structure;
     }
 }

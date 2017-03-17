@@ -51,6 +51,7 @@ class Init extends AbstractMigration
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addIndex(['col_string', 'col_integer'])
             ->create();
     }
 

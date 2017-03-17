@@ -13,7 +13,7 @@ class Structure
     /**
      * @param MigrationTable $migrationTable
      * @return MigrationTable
-     * @throws StructureException - if some error occured - e.g. table already exists
+     * @throws StructureException - if some error occured - e.g. table which should be created already exists
      */
     public function prepare(MigrationTable $migrationTable)
     {
@@ -52,7 +52,26 @@ class Structure
                         throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
                     }
                 }
-                // TODO foreign keys, indexes, etc.
+                foreach ($migrationTable->getForeignKeys() as $foreignKey) {
+                    if ($table->getForeignKey($foreignKey->getName())) {
+                        throw new StructureException("Foreign key '{$foreignKey->getName()}' already exists in table '{$table->getName()}'");
+                    }
+                }
+                foreach ($migrationTable->getForeignKeysToDrop() as $foreignKeyName) {
+                    if (!$table->getForeignKey($foreignKeyName)) {
+                        throw new StructureException("Foreign key '$foreignKeyName' doesn't exist in table '{$table->getName()}'");
+                    }
+                }
+                foreach ($migrationTable->getIndexes() as $index) {
+                    if ($table->getIndex($index->getName())) {
+                        throw new StructureException("Index '{$index->getName()}' already exists in table '{$table->getName()}'");
+                    }
+                }
+                foreach ($migrationTable->getIndexesToDrop() as $indexName) {
+                    if (!$table->getIndex($indexName)) {
+                        throw new StructureException("Index '$indexName' doesn't exist in table '{$table->getName()}'");
+                    }
+                }
                 break;
             case MigrationTable::ACTION_RENAME:
                 if (!$this->tableExists($migrationTable->getName())) {

@@ -267,7 +267,7 @@ class MigrationTable
         if (!is_array($columns)) {
             $columns = [$columns];
         }
-        $this->foreignKeysToDrop[] = $this->getName() . '_' . implode('_', $columns);
+        $this->foreignKeysToDrop[] = implode('_', $columns);
         return $this;
     }
 

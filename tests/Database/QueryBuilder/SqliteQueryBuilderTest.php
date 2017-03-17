@@ -224,15 +224,25 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
     public function testAlterMigrationTable()
     {
+        $table = new MigrationTable('add_columns');
+        $table->create();
+        $this->structure->update($table);
+
         // add columns
         $table = new MigrationTable('add_columns');
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
 
         $queryBuilder = new SqliteQueryBuilder($this->structure);
+
+        $timestamp = date('YmdHis');
         $expectedQueries = [
-            'ALTER TABLE "add_columns" ADD COLUMN "title" varchar(255) NOT NULL,ADD COLUMN "alias" varchar(255) NOT NULL;',
+            'ALTER TABLE "add_columns" RENAME TO "_add_columns_old_' . $timestamp . '";',
+            'CREATE TABLE "add_columns" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL);',
+            'INSERT INTO "add_columns" ("id") SELECT "id" FROM "_add_columns_old_' . $timestamp . '"',
+            'DROP TABLE "_add_columns_old_' . $timestamp . '"',
         ];
+
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
@@ -266,12 +276,23 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChangeAddedColumn()
     {
         $table = new MigrationTable('with_change_added_column');
+        $table->addColumn('title', 'string');
+        $table->create();
+
+        $this->structure->update($table);
+
+        $table = new MigrationTable('with_change_added_column');
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('old_name', 'integer'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('old_name', 'new_name', 'string'));
 
         $queryBuilder = new SqliteQueryBuilder($this->structure);
+
+        $timestamp = date('YmdHis');
         $expectedQueries = [
-            'ALTER TABLE "with_change_added_column" ADD COLUMN "new_name" varchar(255) NOT NULL;',
+            'ALTER TABLE "with_change_added_column" RENAME TO "_with_change_added_column_old_' . $timestamp . '";',
+            'CREATE TABLE "with_change_added_column" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL,"new_name" varchar(255) NOT NULL);',
+            'INSERT INTO "with_change_added_column" ("id","title") SELECT "id","title" FROM "_with_change_added_column_old_' . $timestamp . '"',
+            'DROP TABLE "_with_change_added_column_old_' . $timestamp . '"',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }

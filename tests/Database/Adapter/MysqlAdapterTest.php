@@ -75,5 +75,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Structure::class, $structure);
         $this->assertCount(1, $structure->getTables());
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
+
+        // TODO test indexes, foreign keys, more tables
     }
 }
