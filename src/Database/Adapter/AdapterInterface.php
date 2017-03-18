@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\Adapter;
 
-use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
@@ -103,12 +102,6 @@ interface AdapterInterface
      * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
     public function rollback();
-
-    /**
-     * @param string $table
-     * @return MigrationTable
-     */
-    public function tableInfo($table);
 
     /**
      * @param string $charset

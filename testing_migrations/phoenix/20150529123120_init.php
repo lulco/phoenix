@@ -19,10 +19,6 @@ class Init extends AbstractMigration
             ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
             ->create();
 
-//        $this->table('table_1')
-//
-//            ->save();
-
         $this->table('table_2')
             ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_slovak_ci'])
             ->addColumn('sorting', 'integer', ['default' => 100])
@@ -55,6 +51,7 @@ class Init extends AbstractMigration
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addIndex(['col_string', 'col_integer'])
             ->create();
     }
 

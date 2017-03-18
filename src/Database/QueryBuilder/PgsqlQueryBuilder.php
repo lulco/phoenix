@@ -2,11 +2,10 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Exception\PhoenixException;
+use Phoenix\Database\Element\Structure;
 
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -37,11 +36,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_STRING => 'varchar',
     ];
 
-    private $adapter;
+    private $structure;
 
-    public function __construct(AdapterInterface $adapter = null)
+    public function __construct(Structure $structure)
     {
-        $this->adapter = $adapter;
+        $this->structure = $structure;
     }
 
     /**
@@ -98,7 +97,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [
             'DROP TABLE ' . $this->escapeString($table->getName()) . ';',
             'DROP SEQUENCE IF EXISTS ' . $this->escapeString($table->getName() . '_seq') . ';',
-            'DELETE FROM ' . $this->escapeString('pg_type') . ' WHERE ' . $this->escapeString('typname') . ' LIKE \'' . $table->getName() . '__%\';',
+            sprintf("DELETE FROM %s WHERE %s LIKE '%s';", $this->escapeString('pg_type'), $this->escapeString('typname'), $table->getName() . '__%'),
         ];
     }
 
@@ -138,13 +137,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
                 if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
-                    if ($this->adapter === null) {
-                        throw new PhoenixException('Missing adapter');
-                    }
-
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
-
-                    $tableInfo = $this->adapter->tableInfo($table->getName());
+                    $tableInfo = $this->structure->getTable($table->getName());
+                    foreach (array_diff($tableInfo->getColumn($oldColumnName)->getValues(), $newColumn->getValues()) as $newValue) {
+                        $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
+                    }
                     foreach (array_diff($newColumn->getValues(), $tableInfo->getColumn($oldColumnName)->getValues()) as $newValue) {
                         $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
                     }

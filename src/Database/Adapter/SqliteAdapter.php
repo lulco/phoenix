@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
@@ -16,7 +17,7 @@ class SqliteAdapter extends PdoAdapter
     public function getQueryBuilder()
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new SqliteQueryBuilder($this);
+            $this->queryBuilder = new SqliteQueryBuilder($this->getStructure());
         }
         return $this->queryBuilder;
     }
@@ -34,9 +35,9 @@ class SqliteAdapter extends PdoAdapter
         return $structure;
     }
 
-    public function tableInfo($table)
+    private function tableInfo($table)
     {
-        $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute('PRAGMA table_info(' . $this->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
         foreach ($columns as $column) {
             preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
@@ -62,11 +63,32 @@ class SqliteAdapter extends PdoAdapter
             }
             $migrationTable->addColumn($column['name'], $type, $settings);
         }
+
+        $indexList = $this->execute("PRAGMA INDEX_LIST ('$table');")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($indexList as $index) {
+            $type = $index['unique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
+            $indexColumns = [];
+            foreach ($this->execute("PRAGMA index_info('{$index['name']}');") as $indexColumn) {
+                $indexColumns[$indexColumn['seqno']] = $indexColumn['name'];
+            }
+            ksort($indexColumns);
+            $migrationTable->addIndex($indexColumns, $type, Index::METHOD_DEFAULT, $index['name']);
+        }
+
+
+
+        // TODO foreign keys
+
         return $migrationTable;
     }
 
     protected function createRealValue($value)
     {
         return is_array($value) ? implode(',', $value) : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
     }
 }

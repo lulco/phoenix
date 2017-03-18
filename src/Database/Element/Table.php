@@ -148,6 +148,15 @@ class Table
     }
 
     /**
+     * @param string $name
+     * @return Index|null
+     */
+    public function getIndex($name)
+    {
+        return isset($this->indexes[$name]) ? $this->indexes[$name] : null;
+    }
+
+    /**
      * @return Index[]
      */
     public function getIndexes()
@@ -173,6 +182,15 @@ class Table
     {
         $this->foreignKeys[$foreignKey->getName()] = $foreignKey;
         return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return ForeignKey|null
+     */
+    public function getForeignKey($name)
+    {
+        return isset($this->foreignKeys[$name]) ? $this->foreignKeys[$name] : null;
     }
 
     /**
