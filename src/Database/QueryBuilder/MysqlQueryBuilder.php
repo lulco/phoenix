@@ -10,6 +10,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 {
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_TINY_INTEGER => 'tinyint(%d)',
+        Column::TYPE_SMALL_INTEGER => 'smallint(%d)',
+        Column::TYPE_MEDIUM_INTEGER => 'mediumint(%d)',
         Column::TYPE_INTEGER => 'int(%d)',
         Column::TYPE_BIG_INTEGER => 'bigint(%d)',
         Column::TYPE_BOOLEAN => 'tinyint(1)',
@@ -28,6 +31,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
+        Column::TYPE_TINY_INTEGER => 4,
+        Column::TYPE_SMALL_INTEGER => 6,
+        Column::TYPE_MEDIUM_INTEGER => 9,
         Column::TYPE_INTEGER => 11,
         Column::TYPE_BIG_INTEGER => 20,
         Column::TYPE_CHAR => 255,

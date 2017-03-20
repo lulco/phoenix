@@ -63,6 +63,9 @@ class AddData extends AbstractMigration
 
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c',
+            'col_tinyinteger' => 50,
+            'col_smallinteger' => 50,
+            'col_mediuminteger' => 50,
             'col_integer' => 50,
             'col_bigint' => 1234567890,
             'col_string' => 'string',
@@ -81,6 +84,9 @@ class AddData extends AbstractMigration
 
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d',
+            'col_tinyinteger' => 50,
+            'col_smallinteger' => 50,
+            'col_mediuminteger' => 50,
             'col_integer' => 150,
             'col_bigint' => 9876543210,
             'col_string' => 'string',

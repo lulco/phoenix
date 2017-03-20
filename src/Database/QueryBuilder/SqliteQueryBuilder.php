@@ -12,6 +12,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 {
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_TINY_INTEGER => 'tinyinteger',
+        Column::TYPE_SMALL_INTEGER => 'smallinteger',
+        Column::TYPE_MEDIUM_INTEGER => 'mediuminteger',
         Column::TYPE_INTEGER => 'integer',
         Column::TYPE_BIG_INTEGER => 'bigint',
         Column::TYPE_BOOLEAN => 'boolean',

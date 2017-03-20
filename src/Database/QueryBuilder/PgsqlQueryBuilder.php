@@ -12,6 +12,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 {
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_TINY_INTEGER => 'smallint',
+        Column::TYPE_SMALL_INTEGER => 'smallint',
+        Column::TYPE_MEDIUM_INTEGER => 'int4',
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BIG_INTEGER => 'int8',
         Column::TYPE_BOOLEAN => 'bool',

@@ -42,6 +42,9 @@ class Init extends AbstractMigration
 
         $this->table('all_types', 'identifier')
             ->addColumn('identifier', 'uuid')
+            ->addColumn('col_tinyinteger', 'tinyinteger')
+            ->addColumn('col_smallinteger', 'smallinteger')
+            ->addColumn('col_mediuminteger', 'mediuminteger')
             ->addColumn('col_integer', 'integer')
             ->addColumn('col_bigint', 'biginteger')
             ->addColumn('col_string', 'string')

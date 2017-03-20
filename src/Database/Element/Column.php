@@ -7,6 +7,9 @@ use Phoenix\Exception\InvalidArgumentValueException;
 class Column
 {
     const TYPE_STRING = 'string';
+    const TYPE_TINY_INTEGER = 'tinyinteger';
+    const TYPE_SMALL_INTEGER = 'smallinteger';
+    const TYPE_MEDIUM_INTEGER = 'mediuminteger';
     const TYPE_INTEGER = 'integer';
     const TYPE_BIG_INTEGER = 'biginteger';
     const TYPE_BOOLEAN = 'boolean';
