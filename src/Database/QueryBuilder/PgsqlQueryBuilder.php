@@ -29,6 +29,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_DOUBLE => 'double precision',
         Column::TYPE_ENUM => '%s__%s',
         Column::TYPE_SET => '%s__%s[]',
+        Column::TYPE_POINT => 'point',
+        Column::TYPE_LINE => 'line',
+        Column::TYPE_POLYGON => 'polygon',
     ];
 
     protected $defaultLength = [
