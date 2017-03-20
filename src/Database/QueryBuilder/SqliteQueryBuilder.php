@@ -23,6 +23,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float',
+        Column::TYPE_DOUBLE => 'double',
         Column::TYPE_ENUM => 'enum CHECK(%s IN (%s))',
         Column::TYPE_SET => 'enum CHECK(%s IN (%s))',
     ];
@@ -30,7 +31,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
-        Column::TYPE_DECIMAL => [10, 0],
+        Column::TYPE_DECIMAL => [10, 0]
     ];
 
     private $adapter;

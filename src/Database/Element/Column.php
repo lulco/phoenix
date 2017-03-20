@@ -18,6 +18,7 @@ class Column
     const TYPE_CHAR = 'char';
     const TYPE_DECIMAL = 'decimal';
     const TYPE_FLOAT = 'float';
+    const TYPE_DOUBLE = 'double';
     const TYPE_ENUM = 'enum';
     const TYPE_SET = 'set';
 

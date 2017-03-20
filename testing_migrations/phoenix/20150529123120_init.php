@@ -49,6 +49,7 @@ class Init extends AbstractMigration
             ->addColumn('col_text', 'text')
             ->addColumn('col_json', 'json')
             ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
+            ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')
             ->addColumn('col_datetime', 'datetime')

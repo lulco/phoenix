@@ -23,6 +23,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'real',
+        Column::TYPE_DOUBLE => 'double precision',
         Column::TYPE_ENUM => '%s__%s',
         Column::TYPE_SET => '%s__%s[]',
     ];

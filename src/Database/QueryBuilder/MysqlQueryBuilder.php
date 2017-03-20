@@ -21,6 +21,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 'char(%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float(%d,%d)',
+        Column::TYPE_DOUBLE => 'double(%d,%d)',
         Column::TYPE_ENUM => 'enum(%s)',
         Column::TYPE_SET => 'set(%s)',
     ];
@@ -32,6 +33,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_CHAR => 255,
         Column::TYPE_DECIMAL => [10, 0],
         Column::TYPE_FLOAT => [10, 0],
+        Column::TYPE_DOUBLE => [10, 0],
     ];
 
     /**

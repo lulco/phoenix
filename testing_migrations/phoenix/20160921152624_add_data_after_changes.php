@@ -18,6 +18,7 @@ class AddDataAfterChanges extends AbstractMigration
             'col_text' => 'text',
             'col_json' => json_encode(['json' => 'my json']),
             'col_float' => 3.1415,
+            'col_double' => 3.1415,
             'col_decimal' => 3.1415,
             'col_boolean' => true,
             'col_datetime' => new DateTime(),
