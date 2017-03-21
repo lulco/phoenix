@@ -19,6 +19,7 @@ class Column
     const TYPE_UUID = 'uuid';
     const TYPE_JSON = 'json';
     const TYPE_CHAR = 'char';
+    const TYPE_NUMERIC = 'numeric';
     const TYPE_DECIMAL = 'decimal';
     const TYPE_FLOAT = 'float';
     const TYPE_DOUBLE = 'double';

@@ -15,7 +15,7 @@ abstract class CommonQueryBuilder
 
     protected function createType(Column $column, MigrationTable $table)
     {
-        if (in_array($column->getType(), [Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE])) {
+        if (in_array($column->getType(), [Column::TYPE_NUMERIC, Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE])) {
             return sprintf(
                 $this->remapType($column),
                 $column->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),

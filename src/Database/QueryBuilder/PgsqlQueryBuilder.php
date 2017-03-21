@@ -24,7 +24,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
-        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
+        Column::TYPE_NUMERIC => 'numeric(%d,%d)',
+        Column::TYPE_DECIMAL => 'numeric(%d,%d)',
         Column::TYPE_FLOAT => 'float4',
         Column::TYPE_DOUBLE => 'float8',
         Column::TYPE_ENUM => '%s__%s',
@@ -34,6 +35,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
+        Column::TYPE_NUMERIC => [10, 0],
         Column::TYPE_DECIMAL => [10, 0],
     ];
 

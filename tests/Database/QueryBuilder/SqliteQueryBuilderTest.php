@@ -75,8 +75,9 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_boolean', 'boolean'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_datetime', 'datetime'));
@@ -89,7 +90,7 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new SqliteQueryBuilder($adapter);
         $expectedQueries = [
-            'CREATE TABLE "all_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"col_uuid" char(36) NOT NULL,"col_tinyint" tinyinteger NOT NULL,"col_smallint" smallinteger NOT NULL,"col_mediumint" mediuminteger NOT NULL,"col_int" integer NOT NULL,"col_bigint" bigint NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_text" text NOT NULL,"col_json" text NOT NULL,"col_float" float NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_double" double NOT NULL,"col_boolean" boolean NOT NULL,"col_datetime" datetime NOT NULL,"col_date" date NOT NULL,"col_enum" enum CHECK(col_enum IN (\'xxx\',\'yyy\',\'zzz\')) NOT NULL,"col_set" enum CHECK(col_set IN (\'xxx\',\'xxx,yyy\',\'xxx,yyy,zzz\',\'xxx,zzz\',\'xxx,zzz,yyy\',\'yyy\',\'yyy,xxx\',\'yyy,xxx,zzz\',\'yyy,zzz\',\'yyy,zzz,xxx\',\'zzz\',\'zzz,xxx\',\'zzz,xxx,yyy\',\'zzz,yyy\',\'zzz,yyy,xxx\')) NOT NULL);'
+            'CREATE TABLE "all_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"col_uuid" char(36) NOT NULL,"col_tinyint" tinyinteger NOT NULL,"col_smallint" smallinteger NOT NULL,"col_mediumint" mediuminteger NOT NULL,"col_int" integer NOT NULL,"col_bigint" bigint NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_text" text NOT NULL,"col_json" text NOT NULL,"col_numeric" decimal(10,3) NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_float" float NOT NULL,"col_double" double NOT NULL,"col_boolean" boolean NOT NULL,"col_datetime" datetime NOT NULL,"col_date" date NOT NULL,"col_enum" enum CHECK(col_enum IN (\'xxx\',\'yyy\',\'zzz\')) NOT NULL,"col_set" enum CHECK(col_set IN (\'xxx\',\'xxx,yyy\',\'xxx,yyy,zzz\',\'xxx,zzz\',\'xxx,zzz,yyy\',\'yyy\',\'yyy,xxx\',\'yyy,xxx,zzz\',\'yyy,zzz\',\'yyy,zzz,xxx\',\'zzz\',\'zzz,xxx\',\'zzz,xxx,yyy\',\'zzz,yyy\',\'zzz,yyy,xxx\')) NOT NULL);'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }

@@ -24,6 +24,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_UUID => 'char(36)',
         Column::TYPE_JSON => 'text',
         Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_NUMERIC => 'decimal(%d,%d)',
         Column::TYPE_DECIMAL => 'decimal(%d,%d)',
         Column::TYPE_FLOAT => 'float',
         Column::TYPE_DOUBLE => 'double',
@@ -34,7 +35,8 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
-        Column::TYPE_DECIMAL => [10, 0]
+        Column::TYPE_NUMERIC => [10, 0],
+        Column::TYPE_DECIMAL => [10, 0],
     ];
 
     private $adapter;
