@@ -31,7 +31,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_ENUM => 'enum CHECK(%s IN (%s))',
         Column::TYPE_SET => 'enum CHECK(%s IN (%s))',
         Column::TYPE_POINT => 'point',
-        Column::TYPE_LINE => 'varchar(%d)',
+        Column::TYPE_LINE => 'varchar(255)',
         Column::TYPE_POLYGON => 'text',
     ];
 
@@ -40,7 +40,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 255,
         Column::TYPE_NUMERIC => [10, 0],
         Column::TYPE_DECIMAL => [10, 0],
-        Column::TYPE_LINE => 255,
     ];
 
     private $adapter;
