@@ -23,6 +23,7 @@ class AddDataAfterChanges extends AbstractMigration
             'col_float' => 3.1415,
             'col_double' => 3.1415,
             'col_decimal' => 3.1415,
+            'col_numeric' => 3.1415,
             'col_boolean' => true,
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),

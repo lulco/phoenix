@@ -12,8 +12,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 {
     protected $typeMap = [
         Column::TYPE_STRING => 'varchar(%d)',
-        Column::TYPE_TINY_INTEGER => 'smallint',
-        Column::TYPE_SMALL_INTEGER => 'smallint',
+        Column::TYPE_TINY_INTEGER => 'int2',
+        Column::TYPE_SMALL_INTEGER => 'int2',
         Column::TYPE_MEDIUM_INTEGER => 'int4',
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BIG_INTEGER => 'int8',
@@ -24,9 +24,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
         Column::TYPE_CHAR => 'char(%d)',
-        Column::TYPE_DECIMAL => 'decimal(%d,%d)',
-        Column::TYPE_FLOAT => 'real',
-        Column::TYPE_DOUBLE => 'double precision',
+        Column::TYPE_NUMERIC => 'numeric(%d,%d)',
+        Column::TYPE_DECIMAL => 'numeric(%d,%d)',
+        Column::TYPE_FLOAT => 'float4',
+        Column::TYPE_DOUBLE => 'float8',
         Column::TYPE_ENUM => '%s__%s',
         Column::TYPE_SET => '%s__%s[]',
         Column::TYPE_POINT => 'point',
@@ -37,6 +38,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
+        Column::TYPE_NUMERIC => [10, 0],
         Column::TYPE_DECIMAL => [10, 0],
     ];
 
