@@ -57,7 +57,10 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new MigrationTable('all_types');
         $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_uuid', 'uuid'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyint', 'tinyinteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_smallint', 'smallinteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumint', 'mediuminteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer', ['signed' => false]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
@@ -65,6 +68,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_boolean', 'boolean'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_datetime', 'datetime'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_date', 'date'));
@@ -73,7 +77,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_int` int(11) NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_text` text NOT NULL,`col_json` text NOT NULL,`col_float` float(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,PRIMARY KEY (`id`));"
+            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_text` text NOT NULL,`col_json` text NOT NULL,`col_float` float(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,PRIMARY KEY (`id`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
