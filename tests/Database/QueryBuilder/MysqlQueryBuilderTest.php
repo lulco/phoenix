@@ -75,10 +75,13 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_date', 'date'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_point', 'point', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_line', 'line', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_polygon', 'polygon', ['null' => true]));
 
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_text` text NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,PRIMARY KEY (`id`));"
+            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_text` text NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,`col_point` point DEFAULT NULL,`col_line` linestring DEFAULT NULL,`col_polygon` polygon DEFAULT NULL,PRIMARY KEY (`id`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }

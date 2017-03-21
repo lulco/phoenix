@@ -30,6 +30,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_DOUBLE => 'double',
         Column::TYPE_ENUM => 'enum CHECK(%s IN (%s))',
         Column::TYPE_SET => 'enum CHECK(%s IN (%s))',
+        Column::TYPE_POINT => 'point',
+        Column::TYPE_LINE => 'varchar(255)',
+        Column::TYPE_POLYGON => 'text',
     ];
 
     protected $defaultLength = [

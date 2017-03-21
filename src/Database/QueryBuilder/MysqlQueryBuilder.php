@@ -28,6 +28,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_DOUBLE => 'double(%d,%d)',
         Column::TYPE_ENUM => 'enum(%s)',
         Column::TYPE_SET => 'set(%s)',
+        Column::TYPE_POINT => 'point',
+        Column::TYPE_LINE => 'linestring',
+        Column::TYPE_POLYGON => 'polygon',
     ];
 
     protected $defaultLength = [
