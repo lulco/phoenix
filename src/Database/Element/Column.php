@@ -7,19 +7,36 @@ use Phoenix\Exception\InvalidArgumentValueException;
 class Column
 {
     const TYPE_STRING = 'string';
+    const TYPE_TINY_INTEGER = 'tinyinteger';
+    const TYPE_SMALL_INTEGER = 'smallinteger';
+    const TYPE_MEDIUM_INTEGER = 'mediuminteger';
     const TYPE_INTEGER = 'integer';
     const TYPE_BIG_INTEGER = 'biginteger';
     const TYPE_BOOLEAN = 'boolean';
+    const TYPE_BINARY = 'binary';
+    const TYPE_VARBINARY = 'varbinary';
+    const TYPE_TINY_TEXT = 'tinytext';
+    const TYPE_MEDIUM_TEXT = 'mediumtext';
     const TYPE_TEXT = 'text';
+    const TYPE_LONG_TEXT = 'longtext';
+    const TYPE_TINY_BLOB = 'tinyblob';
+    const TYPE_MEDIUM_BLOB = 'mediumblob';
+    const TYPE_BLOB = 'blob';
+    const TYPE_LONG_BLOB = 'longblob';
     const TYPE_DATE = 'date';
     const TYPE_DATETIME = 'datetime';
     const TYPE_UUID = 'uuid';
     const TYPE_JSON = 'json';
     const TYPE_CHAR = 'char';
+    const TYPE_NUMERIC = 'numeric';
     const TYPE_DECIMAL = 'decimal';
     const TYPE_FLOAT = 'float';
+    const TYPE_DOUBLE = 'double';
     const TYPE_ENUM = 'enum';
     const TYPE_SET = 'set';
+    const TYPE_POINT = 'point';
+    const TYPE_LINE = 'line';
+    const TYPE_POLYGON = 'polygon';
 
     private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation', 'values'];
 

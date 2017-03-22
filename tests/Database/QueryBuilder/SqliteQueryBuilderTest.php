@@ -63,23 +63,40 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new MigrationTable('all_types');
         $table->addPrimary(true);
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_uuid', 'uuid'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyint', 'tinyinteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_smallint', 'smallinteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumint', 'mediuminteger'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer', ['signed' => false]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_binary', 'binary'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_varbinary', 'varbinary'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinytext', 'tinytext'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumtext', 'mediumtext'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longtext', 'longtext'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyblob', 'tinyblob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumblob', 'mediumblob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_blob', 'blob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longblob', 'longblob'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_boolean', 'boolean'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_datetime', 'datetime'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_date', 'date'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_point', 'point', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_line', 'line', ['null' => true]));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_polygon', 'polygon', ['null' => true]));
 
         $queryBuilder = new SqliteQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE TABLE "all_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"col_uuid" char(36) NOT NULL,"col_int" integer NOT NULL,"col_bigint" bigint NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_text" text NOT NULL,"col_json" text NOT NULL,"col_float" float NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_boolean" boolean NOT NULL,"col_datetime" datetime NOT NULL,"col_date" date NOT NULL,"col_enum" enum CHECK(col_enum IN (\'xxx\',\'yyy\',\'zzz\')) NOT NULL,"col_set" enum CHECK(col_set IN (\'xxx\',\'xxx,yyy\',\'xxx,yyy,zzz\',\'xxx,zzz\',\'xxx,zzz,yyy\',\'yyy\',\'yyy,xxx\',\'yyy,xxx,zzz\',\'yyy,zzz\',\'yyy,zzz,xxx\',\'zzz\',\'zzz,xxx\',\'zzz,xxx,yyy\',\'zzz,yyy\',\'zzz,yyy,xxx\')) NOT NULL);'
+            'CREATE TABLE "all_types" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"col_uuid" char(36) NOT NULL,"col_tinyint" tinyinteger NOT NULL,"col_smallint" smallinteger NOT NULL,"col_mediumint" mediuminteger NOT NULL,"col_int" integer NOT NULL,"col_bigint" bigint NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" binary(255) NOT NULL,"col_varbinary" varbinary(255) NOT NULL,"col_tinytext" tinytext NOT NULL,"col_mediumtext" mediumtext NOT NULL,"col_text" text NOT NULL,"col_longtext" longtext NOT NULL,"col_tinyblob" tinyblob NOT NULL,"col_mediumblob" mediumblob NOT NULL,"col_blob" blob NOT NULL,"col_longblob" longblob NOT NULL,"col_json" text NOT NULL,"col_numeric" decimal(10,3) NOT NULL,"col_decimal" decimal(10,3) NOT NULL,"col_float" float NOT NULL,"col_double" double NOT NULL,"col_boolean" boolean NOT NULL,"col_datetime" datetime NOT NULL,"col_date" date NOT NULL,"col_enum" enum CHECK(col_enum IN (\'xxx\',\'yyy\',\'zzz\')) NOT NULL,"col_set" enum CHECK(col_set IN (\'xxx\',\'xxx,yyy\',\'xxx,yyy,zzz\',\'xxx,zzz\',\'xxx,zzz,yyy\',\'yyy\',\'yyy,xxx\',\'yyy,xxx,zzz\',\'yyy,zzz\',\'yyy,zzz,xxx\',\'zzz\',\'zzz,xxx\',\'zzz,xxx,yyy\',\'zzz,yyy\',\'zzz,yyy,xxx\')) NOT NULL,"col_point" point DEFAULT NULL,"col_line" varchar(255) DEFAULT NULL,"col_polygon" text DEFAULT NULL);'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
