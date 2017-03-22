@@ -11,15 +11,22 @@ use Phoenix\Exception\PhoenixException;
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
     protected $typeMap = [
-        Column::TYPE_STRING => 'varchar(%d)',
         Column::TYPE_TINY_INTEGER => 'int2',
         Column::TYPE_SMALL_INTEGER => 'int2',
         Column::TYPE_MEDIUM_INTEGER => 'int4',
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BIG_INTEGER => 'int8',
-        Column::TYPE_BOOLEAN => 'bool',
+        Column::TYPE_NUMERIC => 'numeric(%d,%d)',
+        Column::TYPE_DECIMAL => 'numeric(%d,%d)',
+        Column::TYPE_FLOAT => 'float4',
+        Column::TYPE_DOUBLE => 'float8',
         Column::TYPE_BINARY => 'bytea',
         Column::TYPE_VARBINARY => 'bytea',
+        Column::TYPE_CHAR => 'char(%d)',
+        Column::TYPE_STRING => 'varchar(%d)',
+        Column::TYPE_BOOLEAN => 'bool',
+        Column::TYPE_DATE => 'date',
+        Column::TYPE_DATETIME => 'timestamp(6)',
         Column::TYPE_TINY_TEXT => 'text',
         Column::TYPE_MEDIUM_TEXT => 'text',
         Column::TYPE_TEXT => 'text',
@@ -28,15 +35,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_MEDIUM_BLOB => 'bytea',
         Column::TYPE_BLOB => 'bytea',
         Column::TYPE_LONG_BLOB => 'bytea',
-        Column::TYPE_DATE => 'date',
-        Column::TYPE_DATETIME => 'timestamp(6)',
         Column::TYPE_UUID => 'uuid',
         Column::TYPE_JSON => 'json',
-        Column::TYPE_CHAR => 'char(%d)',
-        Column::TYPE_NUMERIC => 'numeric(%d,%d)',
-        Column::TYPE_DECIMAL => 'numeric(%d,%d)',
-        Column::TYPE_FLOAT => 'float4',
-        Column::TYPE_DOUBLE => 'float8',
         Column::TYPE_ENUM => '%s__%s',
         Column::TYPE_SET => '%s__%s[]',
         Column::TYPE_POINT => 'point',
@@ -114,9 +114,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function dropTable(MigrationTable $table)
     {
         return [
-            'DROP TABLE ' . $this->escapeString($table->getName()) . ';',
-            'DROP SEQUENCE IF EXISTS ' . $this->escapeString($table->getName() . '_seq') . ';',
-            'DELETE FROM ' . $this->escapeString('pg_type') . ' WHERE ' . $this->escapeString('typname') . ' LIKE \'' . $table->getName() . '__%\';',
+            sprintf('DROP TABLE %s;', $this->escapeString($table->getName())),
+            sprintf('DROP SEQUENCE IF EXISTS %s;', $this->escapeString($table->getName() . '_seq')),
+            sprintf("DELETE FROM %s WHERE %s LIKE '%s';", $this->escapeString('pg_type'), $this->escapeString('typname'), $table->getName() . '__%'),
         ];
     }
 
