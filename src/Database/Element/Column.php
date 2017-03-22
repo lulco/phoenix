@@ -13,6 +13,8 @@ class Column
     const TYPE_INTEGER = 'integer';
     const TYPE_BIG_INTEGER = 'biginteger';
     const TYPE_BOOLEAN = 'boolean';
+    const TYPE_BINARY = 'binary';
+    const TYPE_VARBINARY = 'varbinary';
     const TYPE_TINY_TEXT = 'tinytext';
     const TYPE_MEDIUM_TEXT = 'mediumtext';
     const TYPE_TEXT = 'text';

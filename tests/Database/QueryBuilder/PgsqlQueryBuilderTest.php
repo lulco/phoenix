@@ -63,6 +63,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_binary', 'binary'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_varbinary', 'varbinary'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinytext', 'tinytext'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumtext', 'mediumtext'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
@@ -90,7 +92,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'CREATE TYPE "all_types__col_enum" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
             'CREATE TYPE "all_types__col_set" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
             'CREATE SEQUENCE "all_types_seq";',
-            'CREATE TABLE "all_types" ("id" int4 DEFAULT nextval(\'all_types_seq\'::regclass) NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
+            'CREATE TABLE "all_types" ("id" int4 DEFAULT nextval(\'all_types_seq\'::regclass) NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" bytea NOT NULL,"col_varbinary" bytea NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }

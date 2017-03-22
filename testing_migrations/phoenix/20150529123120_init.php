@@ -45,6 +45,8 @@ class Init extends AbstractMigration
             ->addColumn('col_bigint', 'biginteger')
             ->addColumn('col_string', 'string')
             ->addColumn('col_char', 'char')
+            ->addColumn('col_binary', 'binary', ['null' => true])
+            ->addColumn('col_varbinary', 'varbinary', ['null' => true])
             ->addColumn('col_tinytext', 'tinytext', ['null' => true])
             ->addColumn('col_mediumtext', 'mediumtext', ['null' => true])
             ->addColumn('col_text', 'text', ['null' => true])

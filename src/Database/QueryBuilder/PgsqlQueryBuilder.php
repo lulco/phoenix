@@ -18,6 +18,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_INTEGER => 'int4',
         Column::TYPE_BIG_INTEGER => 'int8',
         Column::TYPE_BOOLEAN => 'bool',
+        Column::TYPE_BINARY => 'bytea',
+        Column::TYPE_VARBINARY => 'bytea',
         Column::TYPE_TINY_TEXT => 'text',
         Column::TYPE_MEDIUM_TEXT => 'text',
         Column::TYPE_TEXT => 'text',
