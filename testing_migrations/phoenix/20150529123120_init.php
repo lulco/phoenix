@@ -19,10 +19,6 @@ class Init extends AbstractMigration
             ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
             ->create();
 
-//        $this->table('table_1')
-//
-//            ->save();
-
         $this->table('table_2')
             ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_slovak_ci'])
             ->addColumn('sorting', 'integer', ['default' => 100])
@@ -42,19 +38,36 @@ class Init extends AbstractMigration
 
         $this->table('all_types', 'identifier')
             ->addColumn('identifier', 'uuid')
+            ->addColumn('col_tinyinteger', 'tinyinteger')
+            ->addColumn('col_smallinteger', 'smallinteger')
+            ->addColumn('col_mediuminteger', 'mediuminteger')
             ->addColumn('col_integer', 'integer')
             ->addColumn('col_bigint', 'biginteger')
             ->addColumn('col_string', 'string')
             ->addColumn('col_char', 'char')
-            ->addColumn('col_text', 'text')
+            ->addColumn('col_binary', 'binary', ['null' => true])
+            ->addColumn('col_varbinary', 'varbinary', ['null' => true])
+            ->addColumn('col_tinytext', 'tinytext', ['null' => true])
+            ->addColumn('col_mediumtext', 'mediumtext', ['null' => true])
+            ->addColumn('col_text', 'text', ['null' => true])
+            ->addColumn('col_longtext', 'longtext', ['null' => true])
+            ->addColumn('col_tinyblob', 'tinyblob', ['null' => true])
+            ->addColumn('col_mediumblob', 'mediumblob', ['null' => true])
+            ->addColumn('col_blob', 'blob', ['null' => true])
+            ->addColumn('col_longblob', 'longblob', ['null' => true])
             ->addColumn('col_json', 'json')
-            ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
+            ->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])
+            ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
+            ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')
             ->addColumn('col_datetime', 'datetime')
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addColumn('col_point', 'point', ['null' => true])
+            ->addColumn('col_line', 'line', ['null' => true])
+            ->addColumn('col_polygon', 'polygon', ['null' => true])
             ->create();
     }
 
