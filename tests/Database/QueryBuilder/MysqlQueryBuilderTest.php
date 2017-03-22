@@ -64,7 +64,16 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_binary', 'binary'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_varbinary', 'varbinary'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinytext', 'tinytext'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumtext', 'mediumtext'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longtext', 'longtext'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyblob', 'tinyblob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumblob', 'mediumblob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_blob', 'blob'));
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longblob', 'longblob'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
@@ -81,7 +90,7 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
-            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_text` text NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,`col_point` point DEFAULT NULL,`col_line` linestring DEFAULT NULL,`col_polygon` polygon DEFAULT NULL,PRIMARY KEY (`id`));"
+            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_binary` binary(255) NOT NULL,`col_varbinary` varbinary(255) NOT NULL,`col_tinytext` tinytext NOT NULL,`col_mediumtext` mediumtext NOT NULL,`col_text` text NOT NULL,`col_longtext` longtext NOT NULL,`col_tinyblob` tinyblob NOT NULL,`col_mediumblob` mediumblob NOT NULL,`col_blob` blob NOT NULL,`col_longblob` longblob NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL,`col_datetime` datetime NOT NULL,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,`col_point` point DEFAULT NULL,`col_line` linestring DEFAULT NULL,`col_polygon` polygon DEFAULT NULL,PRIMARY KEY (`id`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }

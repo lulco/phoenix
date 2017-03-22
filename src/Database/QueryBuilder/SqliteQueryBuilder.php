@@ -18,7 +18,16 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_INTEGER => 'integer',
         Column::TYPE_BIG_INTEGER => 'bigint',
         Column::TYPE_BOOLEAN => 'boolean',
+        Column::TYPE_BINARY => 'binary(%d)',
+        Column::TYPE_VARBINARY => 'varbinary(%d)',
+        Column::TYPE_TINY_TEXT => 'tinytext',
+        Column::TYPE_MEDIUM_TEXT => 'mediumtext',
         Column::TYPE_TEXT => 'text',
+        Column::TYPE_LONG_TEXT => 'longtext',
+        Column::TYPE_TINY_BLOB => 'tinyblob',
+        Column::TYPE_MEDIUM_BLOB => 'mediumblob',
+        Column::TYPE_BLOB => 'blob',
+        Column::TYPE_LONG_BLOB => 'longblob',
         Column::TYPE_DATE => 'date',
         Column::TYPE_DATETIME => 'datetime',
         Column::TYPE_UUID => 'char(36)',
@@ -40,6 +49,8 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_CHAR => 255,
         Column::TYPE_NUMERIC => [10, 0],
         Column::TYPE_DECIMAL => [10, 0],
+        Column::TYPE_BINARY => 255,
+        Column::TYPE_VARBINARY => 255,
     ];
 
     private $adapter;
