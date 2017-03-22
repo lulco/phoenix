@@ -11,6 +11,9 @@ class AddDataAfterChanges extends AbstractMigration
     {
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465e',
+            'col_tinyinteger' => 50,
+            'col_smallinteger' => 50,
+            'col_mediuminteger' => 50,
             'col_integer' => 50,
             'col_bigint' => 1234567890,
             'col_string' => 'string',
@@ -18,7 +21,9 @@ class AddDataAfterChanges extends AbstractMigration
             'col_text' => 'text',
             'col_json' => json_encode(['json' => 'my json']),
             'col_float' => 3.1415,
+            'col_double' => 3.1415,
             'col_decimal' => 3.1415,
+            'col_numeric' => 3.1415,
             'col_boolean' => true,
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),
