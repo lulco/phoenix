@@ -18,17 +18,6 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->structure = new Structure();
     }
 
-    public function testUnsupportedColumnType()
-    {
-        $table = new MigrationTable('unsupported');
-        $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'unsupported'));
-
-        $queryBuilder = new SqliteQueryBuilder($this->structure);
-        $this->setExpectedException('\Exception', 'Type "unsupported" is not allowed');
-        $queryBuilder->createTable($table);
-    }
-
     public function testSimpleCreate()
     {
         $table = new MigrationTable('simple');

@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
@@ -38,10 +39,30 @@ class PgsqlAdapter extends PdoAdapter
 
     private function tableInfo($table)
     {
-        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
+        $this->loadColumns($migrationTable, $table);
+        $this->loadIndexes($migrationTable, $table);
+        $this->loadForeignKeys($migrationTable, $table);
+        return $migrationTable;
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
+    }
+
+    private function loadColumns(MigrationTable $migrationTable, $table)
+    {
+        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($columns as $column) {
             $type = $column['data_type'];
+            $type = $this->remapType($type);
+
             $settings = [
                 'null' => $column['is_nullable'] == 'YES',
                 'default' => $column['column_default'],
@@ -59,8 +80,33 @@ class PgsqlAdapter extends PdoAdapter
             }
             $migrationTable->addColumn($column['column_name'], $type, $settings);
         }
+    }
 
-        // http://www.alberton.info/postgresql_meta_info.html#.WMuSe31tnIU
+    private function remapType($type)
+    {
+        $types = [
+            'smallint' => Column::TYPE_SMALL_INTEGER,
+            'bigint' => Column::TYPE_BIG_INTEGER,
+            'real' => Column::TYPE_FLOAT,
+            'float4' => Column::TYPE_FLOAT,
+            'double precision' => Column::TYPE_DOUBLE,
+            'float8' => Column::TYPE_DOUBLE,
+            'varchar' => Column::TYPE_STRING,
+            'character' => Column::TYPE_CHAR,
+            'character varying' => Column::TYPE_STRING,
+            'bytea' => Column::TYPE_BLOB,
+            'timestamp without time zone' => Column::TYPE_DATETIME,
+        ];
+        return isset($types[$type]) ? $types[$type] : $type;
+    }
+
+    /**
+     * http://www.alberton.info/postgresql_meta_info.html#.WMuSe31tnIU
+     * @param MigrationTable $migrationTable
+     * @param string $table
+     */
+    private function loadIndexes(MigrationTable $migrationTable, $table)
+    {
         $indexRows = $this->execute("SELECT a.index_name, b.attname, a.indisunique
   FROM (
     SELECT a.indrelid,
@@ -88,19 +134,49 @@ class PgsqlAdapter extends PdoAdapter
         foreach ($indexes as $name => $index) {
             $migrationTable->addIndex($index['columns'], $index['type'], Index::METHOD_DEFAULT, $name);
         }
-
-        // TODO foreign keys
-
-        return $migrationTable;
     }
 
-    protected function createRealValue($value)
+    /**
+     * http://stackoverflow.com/questions/1152260/postgres-sql-to-list-table-foreign-keys
+     * @param MigrationTable $migrationTable
+     * @param string $table
+     */
+    private function loadForeignKeys(MigrationTable $migrationTable, $table)
     {
-        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
+        $query = sprintf("SELECT tc.constraint_name, kcu.column_name, kcu.ordinal_position,
+ ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name,
+ pgc.confupdtype, pgc.confdeltype
+ FROM information_schema.table_constraints AS tc
+ JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+ JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+ JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
+ WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='%s';", $table);
+
+        $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
+        $foreignKeys = [];
+        foreach ($foreignKeyColumns as $foreignKeyColumn) {
+            $foreignKeys[$foreignKeyColumn['constraint_name']]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];
+            $foreignKeys[$foreignKeyColumn['constraint_name']]['referenced_table'] = $foreignKeyColumn['foreign_table_name'];
+            $foreignKeys[$foreignKeyColumn['constraint_name']]['referenced_columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['foreign_column_name'];
+            $foreignKeys[$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
+            $foreignKeys[$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
+        }
+
+        foreach ($foreignKeys as $foreignKey) {
+            ksort($foreignKey['columns']);
+            ksort($foreignKey['referenced_columns']);
+            $migrationTable->addForeignKey(array_values($foreignKey['columns']), $foreignKey['referenced_table'], array_values($foreignKey['referenced_columns']), $foreignKey['on_delete'], $foreignKey['on_update']);
+        }
     }
 
-    protected function escapeString($string)
+    private function remapForeignKeyAction($action)
     {
-        return '"' . $string . '"';
+        $actionMap = [
+            'a' => ForeignKey::NO_ACTION,
+            'c' => ForeignKey::CASCADE,
+            'n' => ForeignKey::SET_NULL,
+            'r' => ForeignKey::RESTRICT,
+        ];
+        return isset($actionMap[$action]) ? $actionMap[$action] : $action;
     }
 }

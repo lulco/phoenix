@@ -38,20 +38,52 @@ class MysqlAdapter extends PdoAdapter
 
     private function tableInfo($table, $database)
     {
-        $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
         $migrationTable = new MigrationTable($table);
-        foreach ($columns as $column) {
-            $type = $column['Type'];
-            preg_match('/(.*?)\((.*?)\)/', $column['Type'], $matches);
+        $this->loadColumns($migrationTable, $table);
+        $this->loadIndexes($migrationTable, $table);
+        $this->loadForeignKeys($migrationTable, $database, $table);
+        return $migrationTable;
+    }
 
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? implode(',', $value) : $value;
+    }
+
+    protected function escapeString($string)
+    {
+        return '`' . $string . '`';
+    }
+
+    private function remapType($type)
+    {
+        $types = [
+            'int' => Column::TYPE_INTEGER,
+            'tinyint' => Column::TYPE_TINY_INTEGER,
+            'smallint' => Column::TYPE_SMALL_INTEGER,
+            'mediumint' => Column::TYPE_MEDIUM_INTEGER,
+            'bigint' => Column::TYPE_BIG_INTEGER,
+            'varchar' => Column::TYPE_STRING,
+            'linestring' => Column::TYPE_LINE,
+        ];
+        return isset($types[$type]) ? $types[$type] : $type;
+    }
+
+    private function loadColumns(MigrationTable $migrationTable, $table)
+    {
+        $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($columns as $column) {
+            $values = null;
+            $type = $column['Type'];
+            preg_match('/(.*?)\((.*?)\)(.*)/', $column['Type'], $matches);
             if (isset($matches[1]) && $matches[1] != '') {
                 $type = $matches[1];
             }
 
-            if ($type == 'int') {
-                $type = Column::TYPE_INTEGER;
-            } elseif ($type == 'varchar') {
-                $type = Column::TYPE_STRING;
+            $type = $this->remapType($type);
+
+            if (($type == 'enum' || $type == 'set') && isset($matches[2])) {
+                $values = explode('\',\'', substr($matches[2], 1, -1));
             }
 
             $length = null;
@@ -66,18 +98,33 @@ class MysqlAdapter extends PdoAdapter
                 }
             }
 
+            if ($type == Column::TYPE_CHAR && $length == 36) {
+                $type = Column::TYPE_UUID;
+            }
+            if ($type == Column::TYPE_TINY_INTEGER && $length == 1) {
+                $type = Column::TYPE_BOOLEAN;
+                $length = null;
+            }
+
+            $collation = $column['Collation'];
+            $charset = $collation ? explode('_', $collation, 2)[0] : null;
             $settings = [
                 'autoincrement' => $column['Extra'] == 'auto_increment',
                 'null' => $column['Null'] == 'YES',
                 'default' => $column['Default'],
                 'length' => $length,
                 'decimals' => $decimals,
+                'signed' => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
+                'charset' => $charset,
+                'collation' => $collation,
+                'values' => $values,
             ];
-            if ($column['Collation']) {
-                $settings['collation'] = $column['Collation'];
-            }
             $migrationTable->addColumn($column['Field'], $type, $settings);
         }
+    }
+
+    private function loadIndexes(MigrationTable $migrationTable, $table)
+    {
         $indexRows = $this->execute(sprintf('SHOW INDEX FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
         $primaryKeys = [];
         $indexes = [];
@@ -88,43 +135,33 @@ class MysqlAdapter extends PdoAdapter
                 continue;
             }
             $indexes[$indexRow['Key_name']][$indexRow['Seq_in_index']] = $indexRow['Column_name'];
-            $indexesTypesAndMethods[$indexRow['Key_name']]['type'] = $indexRow['Non_unique'] == 0 ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
-            $indexesTypesAndMethods[$indexRow['Key_name']]['method'] = $indexRow['Index_type'];
+            $indexesTypesAndMethods[$indexRow['Key_name']]['type'] = $indexRow['Non_unique'] == 0 ? Index::TYPE_UNIQUE : ($indexRow['Index_type'] == 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $indexesTypesAndMethods[$indexRow['Key_name']]['method'] = $indexRow['Index_type'] == 'FULLTEXT' ? Index::TYPE_NORMAL : $indexRow['Index_type'];
         }
         $migrationTable->addPrimary($primaryKeys);
         foreach ($indexes as $name => $columns) {
             ksort($columns);
-            $migrationTable->addIndex($columns, $indexesTypesAndMethods[$name]['type'], $indexesTypesAndMethods[$name]['method'], $name);
+            $migrationTable->addIndex(array_values($columns), $indexesTypesAndMethods[$name]['type'], $indexesTypesAndMethods[$name]['method'], $name);
+        }
+    }
+
+    private function loadForeignKeys(MigrationTable $migrationTable, $database, $table)
+    {
+        $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
+INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
+WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_schema.KEY_COLUMN_USAGE.TABLE_NAME = "%s";', $database, $table);
+        $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
+        $foreignKeys = [];
+        foreach ($foreignKeyColumns as $foreignKeyColumn) {
+            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];
+            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_table'] = $foreignKeyColumn['REFERENCED_TABLE_NAME'];
+            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_columns'][] = $foreignKeyColumn['REFERENCED_COLUMN_NAME'];
+            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
+            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
         }
 
-        // TODO foreign keys
-        
-        /**
-         * SELECT * FROM information_schema.KEY_COLUMN_USAGE
-INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
-WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "phoenix" AND information_schema.KEY_COLUMN_USAGE.TABLE_NAME = "table_2";
-         */
-
-
-//        $foreignKeys = $this->execute(sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = "%s" AND TABLE_NAME = "%s"', $database, $table));
-//        foreach ($foreignKeys as $foreignKey) {
-//            if ($foreignKey['CONSTRAINT_NAME'] == 'PRIMARY') {
-//                continue;
-//            }
-//            $migrationTable->addfore
-//        }
-
-
-        return $migrationTable;
-    }
-
-    protected function createRealValue($value)
-    {
-        return is_array($value) ? implode(',', $value) : $value;
-    }
-
-    protected function escapeString($string)
-    {
-        return '`' . $string . '`';
+        foreach ($foreignKeys as $foreignKey) {
+            $migrationTable->addForeignKey($foreignKey['columns'], $foreignKey['referenced_table'], $foreignKey['referenced_columns'], $foreignKey['on_delete'], $foreignKey['on_update']);
+        }
     }
 }
