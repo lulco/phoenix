@@ -102,12 +102,12 @@ class MigrationTable
 
         if ($primaryColumn instanceof Column) {
             $this->columns = array_merge([$primaryColumn->getName() => $primaryColumn], $this->columns);
-            $this->primaryColumns = array_merge([$primaryColumn->getName() => $primaryColumn->getName()], $this->primaryColumns);
+            $this->primaryColumns = array_merge([$primaryColumn->getName()], $this->primaryColumns);
             return $this;
         }
 
         if (is_string($primaryColumn)) {
-            $this->primaryColumns = array_merge([$primaryColumn => $primaryColumn], $this->primaryColumns);
+            $this->primaryColumns = array_merge([$primaryColumn], $this->primaryColumns);
             return $this;
         }
 
