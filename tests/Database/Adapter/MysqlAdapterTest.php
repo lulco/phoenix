@@ -198,11 +198,11 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         ]));
 
         // check all indexes for table_1
-        $this->assertCount(4, $table1->getIndexes());
+        $this->assertCount(3, $table1->getIndexes());
 
         $this->checkIndex($table1, 'idx_table_1_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
         $this->checkIndex($table1, 'idx_table_1_col_string', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);  // HASH not working
-        $this->checkIndex($table1, 'idx_table_1_col_text', ['col_text'], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);
+        // $this->checkIndex($table1, 'idx_table_1_col_text', ['col_text'], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);  // full text index not working on InnoDB Engine for MySql <= 5.6
         $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', ['col_mediumint', 'col_bigint'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
 
         // check all foreign keys for table_1
@@ -385,7 +385,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $migrationTable1->addColumn('col_polygon', 'polygon', ['null' => true]);
         $migrationTable1->addIndex('col_int');
         $migrationTable1->addIndex('col_string', Index::TYPE_UNIQUE, Index::METHOD_HASH);
-        $migrationTable1->addIndex('col_text', Index::TYPE_FULLTEXT);
+        // $migrationTable1->addIndex('col_text', Index::TYPE_FULLTEXT);
         $migrationTable1->addIndex(['col_mediumint', 'col_bigint']);
         $migrationTable1->create();
         $queries1 = $queryBuilder->createTable($migrationTable1);
