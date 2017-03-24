@@ -63,10 +63,32 @@ class PgsqlAdapter extends PdoAdapter
             $type = $column['data_type'];
             $type = $this->remapType($type);
 
+            $length = null;
+            $decimals = null;
+            if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR])) {
+                $length = $column['character_maximum_length'];
+            } elseif (in_array($type, [Column::TYPE_NUMERIC])) {
+                $length = $column['numeric_precision'];
+                $decimals = $column['numeric_scale'];
+            }
+
+            $default = null;
+            if ($column['column_default']) {
+                $default = $column['column_default'];
+                if ($type === Column::TYPE_BOOLEAN) {
+                    $default = $default === 'true';
+                } elseif (substr($default, 0, 6) == 'NULL::') {
+                    $default = null;
+                } elseif (substr($default, 0, 7) == 'nextval') {
+                    $default = null;
+                }
+            }
+
             $settings = [
                 'null' => $column['is_nullable'] == 'YES',
-                'default' => $column['column_default'],
-                'length' => $column['character_maximum_length'],
+                'default' => $default,
+                'length' => $length,
+                'decimals' => $decimals,
                 'autoincrement' => strpos($column['column_default'], 'nextval') === 0,
             ];
             if (in_array($column['data_type'], ['USER-DEFINED', 'ARRAY'])) {
@@ -107,26 +129,25 @@ class PgsqlAdapter extends PdoAdapter
      */
     private function loadIndexes(MigrationTable $migrationTable, $table)
     {
-        $indexRows = $this->execute("SELECT a.index_name, b.attname, a.indisunique
+        $indexRows = $this->execute("SELECT a.index_name, b.attname, a.indisunique, a.indisprimary
   FROM (
     SELECT a.indrelid,
 		   a.indisunique,
+           a.indisprimary,
            c.relname index_name,
            unnest(a.indkey) index_num
-      FROM pg_index a,
-           pg_class b,
-           pg_class c
-     WHERE b.relname='$table'
-       AND b.oid=a.indrelid
-       AND a.indisprimary != 't'
-       AND a.indexrelid=c.oid
-       ) a,
-       pg_attribute b
- WHERE a.indrelid = b.attrelid
-   AND a.index_num = b.attnum
+    FROM pg_index a, pg_class b, pg_class c
+    WHERE b.relname='$table' AND b.oid=a.indrelid AND a.indexrelid=c.oid
+       ) a, pg_attribute b
+ WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum
  ORDER BY a.index_name, a.index_num");
         $indexes = [];
+        $primaryKeys = [];
         foreach ($indexRows as $indexRow) {
+            if ($indexRow['indisprimary']) {
+                $primaryKeys[] = $indexRow['attname'];
+                continue;
+            }
             $indexes[$indexRow['index_name']]['columns'][] = $indexRow['attname'];
             $indexes[$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
         }
@@ -134,6 +155,8 @@ class PgsqlAdapter extends PdoAdapter
         foreach ($indexes as $name => $index) {
             $migrationTable->addIndex($index['columns'], $index['type'], Index::METHOD_DEFAULT, $name);
         }
+
+        $migrationTable->addPrimary($primaryKeys);
     }
 
     /**

@@ -57,7 +57,11 @@ class SqliteAdapter extends PdoAdapter
     private function loadColumns(MigrationTable $migrationTable, $table)
     {
         $columns = $this->execute('PRAGMA table_info(' . $this->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
+        $primaryKeys = [];
         foreach ($columns as $column) {
+            if ($column['pk']) {
+                $primaryKeys[$column['cid']] = $column['name'];
+            }
             preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
             $type = $column['type'];
 
@@ -97,6 +101,8 @@ class SqliteAdapter extends PdoAdapter
             }
             $migrationTable->addColumn($column['name'], $type, $settings);
         }
+        ksort($primaryKeys);
+        $migrationTable->addPrimary($primaryKeys);
     }
 
     private function loadIndexes(MigrationTable $migrationTable, $table)

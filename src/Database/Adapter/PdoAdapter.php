@@ -308,9 +308,9 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getStructure()
+    public function getStructure($force = false)
     {
-        if ($this->structure === null) {
+        if ($this->structure === null || $force === true) {
             $this->structure = $this->loadStructure();
         }
         return $this->structure;

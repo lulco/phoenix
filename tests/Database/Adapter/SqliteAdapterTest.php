@@ -2,37 +2,37 @@
 
 namespace Phoenix\Tests\Database\Adapter;
 
-use Phoenix\Database\Adapter\MysqlAdapter;
+use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
-use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
-use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
-use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
+use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
+use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
+use Phoenix\Tests\Helpers\Pdo\SqliteMemoryPdo;
 use PHPUnit_Framework_TestCase;
 
-class MysqlAdapterTest extends PHPUnit_Framework_TestCase
+class SqliteAdapterTest extends PHPUnit_Framework_TestCase
 {
     private $adapter;
 
     public function setUp()
     {
-        $pdo = new MysqlPdo();
-        $adapter = new MysqlCleanupAdapter($pdo);
+        $pdo = new SqliteMemoryPdo();
+        $adapter = new SqliteCleanupAdapter($pdo);
         $adapter->cleanupDatabase();
 
-        $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
-        $this->adapter = new MysqlAdapter($pdo);
+        $pdo = new SqliteMemoryPdo();
+        $this->adapter = new SqliteAdapter($pdo);
     }
 
     public function testGetQueryBuilder()
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
-        $this->assertInstanceOf(MysqlQueryBuilder::class, $this->adapter->getQueryBuilder());
+        $this->assertInstanceOf(SqliteQueryBuilder::class, $this->adapter->getQueryBuilder());
     }
 
     public function testGetEmptyStructureAndUpdate()
@@ -60,7 +60,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
     {
         $this->prepareStructure();
 
-        $structure = $this->adapter->getStructure();
+        $structure = $this->adapter->getStructure(true);
         $this->assertInstanceOf(Structure::class, $structure);
         $this->assertCount(2, $structure->getTables());
         // check all tables
@@ -84,45 +84,31 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         // check all columns and their settings for table_1
         $this->assertEquals(['id'], $table1->getPrimary());
         $this->checkColumn($table1, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
-            'length' => 11,
             'autoincrement' => true,
         ]));
         $this->checkColumn($table1, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
             'null' => true,
             'length' => 36,
         ]));
         $this->checkColumn($table1, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 4,
         ]));
         $this->checkColumn($table1, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 6,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 9,
         ]));
         $this->checkColumn($table1, 'col_int', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'default' => 50,
             'null' => true,
-            'length' => 11,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
-            'length' => 20,
         ]));
         $this->checkColumn($table1, 'col_string', Column::TYPE_STRING, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
             'length' => 255,
         ]));
         $this->checkColumn($table1, 'col_char', Column::TYPE_CHAR, array_merge($defaultSettings, [
-            'charset' => 'utf16',
-            'collation' => 'utf16_general_ci',
             'length' => 50,
         ]));
         $this->checkColumn($table1, 'col_binary', Column::TYPE_BINARY, array_merge($defaultSettings, [
@@ -131,30 +117,15 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->checkColumn($table1, 'col_varbinary', Column::TYPE_VARBINARY, array_merge($defaultSettings, [
             'length' => 255,
         ]));
-        $this->checkColumn($table1, 'col_tinytext', Column::TYPE_TINY_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-        ]));
-        $this->checkColumn($table1, 'col_mediumtext', Column::TYPE_MEDIUM_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-        ]));
-        $this->checkColumn($table1, 'col_text', Column::TYPE_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-        ]));
-        $this->checkColumn($table1, 'col_longtext', Column::TYPE_LONG_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-        ]));
+        $this->checkColumn($table1, 'col_tinytext', Column::TYPE_TINY_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table1, 'col_mediumtext', Column::TYPE_MEDIUM_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table1, 'col_text', Column::TYPE_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table1, 'col_longtext', Column::TYPE_LONG_TEXT, array_merge($defaultSettings, []));
         $this->checkColumn($table1, 'col_tinyblob', Column::TYPE_TINY_BLOB, $defaultSettings);
         $this->checkColumn($table1, 'col_mediumblob', Column::TYPE_MEDIUM_BLOB, $defaultSettings);
         $this->checkColumn($table1, 'col_blob', Column::TYPE_BLOB, $defaultSettings);
         $this->checkColumn($table1, 'col_longblob', Column::TYPE_LONG_BLOB, $defaultSettings);
-        $this->checkColumn($table1, 'col_json', Column::TYPE_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-        ]));
+        $this->checkColumn($table1, 'col_json', Column::TYPE_TEXT, array_merge($defaultSettings, []));
         $this->checkColumn($table1, 'col_numeric', Column::TYPE_DECIMAL, array_merge($defaultSettings, [
             'length' => 10,
             'decimals' => 3,
@@ -165,14 +136,9 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         ]));
         $this->checkColumn($table1, 'col_float', Column::TYPE_FLOAT, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 12,
-            'decimals' => 4,
         ]));
         $this->checkColumn($table1, 'col_double', Column::TYPE_DOUBLE, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 13,
-            'decimals' => 1,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_boolean', Column::TYPE_BOOLEAN, array_merge($defaultSettings, [
             'default' => true,
@@ -180,32 +146,32 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->checkColumn($table1, 'col_datetime', Column::TYPE_DATETIME, $defaultSettings);
         $this->checkColumn($table1, 'col_date', Column::TYPE_DATE, $defaultSettings);
         $this->checkColumn($table1, 'col_enum', Column::TYPE_ENUM, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
             'values' => ['t1_enum_xxx', 't1_enum_yyy', 't1_enum_zzz'],
         ]));
-        $this->checkColumn($table1, 'col_set', Column::TYPE_SET, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_general_ci',
-            'values' => ['t1_set_xxx', 't1_set_yyy', 't1_set_zzz'],
+        $this->checkColumn($table1, 'col_set', Column::TYPE_ENUM, array_merge($defaultSettings, [
+            'values' => [
+                't1_set_xxx', 't1_set_xxx,t1_set_yyy', 't1_set_xxx,t1_set_yyy,t1_set_zzz', 't1_set_xxx,t1_set_zzz', 't1_set_xxx,t1_set_zzz,t1_set_yyy',
+                't1_set_yyy', 't1_set_yyy,t1_set_xxx', 't1_set_yyy,t1_set_xxx,t1_set_zzz', 't1_set_yyy,t1_set_zzz', 't1_set_yyy,t1_set_zzz,t1_set_xxx',
+                't1_set_zzz', 't1_set_zzz,t1_set_xxx', 't1_set_zzz,t1_set_xxx,t1_set_yyy', 't1_set_zzz,t1_set_yyy', 't1_set_zzz,t1_set_yyy,t1_set_xxx',
+            ],
         ]));
         $this->checkColumn($table1, 'col_point', Column::TYPE_POINT, array_merge($defaultSettings, [
             'null' => true,
         ]));
-        $this->checkColumn($table1, 'col_line', Column::TYPE_LINE, array_merge($defaultSettings, [
+        $this->checkColumn($table1, 'col_line', Column::TYPE_STRING, array_merge($defaultSettings, [
             'null' => true,
+            'length' => 255,
         ]));
-        $this->checkColumn($table1, 'col_polygon', Column::TYPE_POLYGON, array_merge($defaultSettings, [
+        $this->checkColumn($table1, 'col_polygon', Column::TYPE_TEXT, array_merge($defaultSettings, [
             'null' => true,
         ]));
 
         // check all indexes for table_1
         $this->assertCount(3, $table1->getIndexes());
 
-        $this->checkIndex($table1, 'idx_table_1_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
-        $this->checkIndex($table1, 'idx_table_1_col_string', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);  // HASH not working
-        // $this->checkIndex($table1, 'idx_table_1_col_text', ['col_text'], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);  // full text index not working on InnoDB Engine for MySql <= 5.6
-        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', ['col_mediumint', 'col_bigint'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $this->checkIndex($table1, 'idx_table_1_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table1, 'idx_table_1_col_string', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', ['col_mediumint', 'col_bigint'], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
 
         // check all foreign keys for table_1
         $this->assertCount(0, $table1->getForeignKeys());
@@ -213,44 +179,26 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         // check all columns and their settings for table_2
         $this->assertEquals(['id'], $table2->getPrimary());
         $this->checkColumn($table2, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
-            'length' => 11,
             'autoincrement' => true,
         ]));
         $this->checkColumn($table2, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
             'length' => 36,
         ]));
-        $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
-            'length' => 4,
-            'signed' => false,
-        ]));
-        $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
-            'length' => 6,
-        ]));
-        $this->checkColumn($table2, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
-            'length' => 9,
-            'signed' => false,
-        ]));
+        $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_int', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 11,
         ]));
 
         $this->checkColumn($table2, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 20,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_string', Column::TYPE_STRING, array_merge($defaultSettings, [
-            'charset' => 'utf16',
-            'collation' => 'utf16_slovak_ci',
             'null' => true,
             'length' => 50,
         ]));
         $this->checkColumn($table2, 'col_char', Column::TYPE_CHAR, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
             'length' => 255,
         ]));
         $this->checkColumn($table2, 'col_binary', Column::TYPE_BINARY, array_merge($defaultSettings, [
@@ -262,31 +210,15 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
             'length' => 50,
         ]));
 
-        $this->checkColumn($table2, 'col_tinytext', Column::TYPE_TINY_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-        ]));
-        $this->checkColumn($table2, 'col_mediumtext', Column::TYPE_MEDIUM_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-        ]));
-        $this->checkColumn($table2, 'col_text', Column::TYPE_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-        ]));
-        $this->checkColumn($table2, 'col_longtext', Column::TYPE_LONG_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-        ]));
+        $this->checkColumn($table2, 'col_tinytext', Column::TYPE_TINY_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_mediumtext', Column::TYPE_MEDIUM_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_text', Column::TYPE_TEXT, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_longtext', Column::TYPE_LONG_TEXT, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_tinyblob', Column::TYPE_TINY_BLOB, $defaultSettings);
         $this->checkColumn($table2, 'col_mediumblob', Column::TYPE_MEDIUM_BLOB, $defaultSettings);
         $this->checkColumn($table2, 'col_blob', Column::TYPE_BLOB, $defaultSettings);
         $this->checkColumn($table2, 'col_longblob', Column::TYPE_LONG_BLOB, $defaultSettings);
-        $this->checkColumn($table2, 'col_json', Column::TYPE_TEXT, array_merge($defaultSettings, [
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-        ]));
-
+        $this->checkColumn($table2, 'col_json', Column::TYPE_TEXT, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_numeric', Column::TYPE_DECIMAL, array_merge($defaultSettings, [
             'null' => true,
             'length' => 10,
@@ -297,14 +229,8 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
             'length' => 11,
             'decimals' => 0,
         ]));
-        $this->checkColumn($table2, 'col_float', Column::TYPE_FLOAT, array_merge($defaultSettings, [
-            'length' => 10,
-            'decimals' => 0,
-        ]));
-        $this->checkColumn($table2, 'col_double', Column::TYPE_DOUBLE, array_merge($defaultSettings, [
-            'length' => 10,
-            'decimals' => 0,
-        ]));
+        $this->checkColumn($table2, 'col_float', Column::TYPE_FLOAT, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_double', Column::TYPE_DOUBLE, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_boolean', Column::TYPE_BOOLEAN, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_datetime', Column::TYPE_DATETIME, array_merge($defaultSettings, [
             'null' => true
@@ -315,26 +241,28 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
 
         $this->checkColumn($table2, 'col_enum', Column::TYPE_ENUM, array_merge($defaultSettings, [
             'null' => true,
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
             'values' => ['t2_enum_xxx', 't2_enum_yyy', 't2_enum_zzz'],
         ]));
-        $this->checkColumn($table2, 'col_set', Column::TYPE_SET, array_merge($defaultSettings, [
+        $this->checkColumn($table2, 'col_set', Column::TYPE_ENUM, array_merge($defaultSettings, [
             'null' => true,
-            'charset' => 'utf8',
-            'collation' => 'utf8_slovak_ci',
-            'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz'],
+            'values' => [
+                't2_set_xxx', 't2_set_xxx,t2_set_yyy', 't2_set_xxx,t2_set_yyy,t2_set_zzz', 't2_set_xxx,t2_set_zzz', 't2_set_xxx,t2_set_zzz,t2_set_yyy',
+                't2_set_yyy', 't2_set_yyy,t2_set_xxx', 't2_set_yyy,t2_set_xxx,t2_set_zzz', 't2_set_yyy,t2_set_zzz', 't2_set_yyy,t2_set_zzz,t2_set_xxx',
+                't2_set_zzz', 't2_set_zzz,t2_set_xxx', 't2_set_zzz,t2_set_xxx,t2_set_yyy', 't2_set_zzz,t2_set_yyy', 't2_set_zzz,t2_set_yyy,t2_set_xxx',
+            ],
         ]));
         $this->checkColumn($table2, 'col_point', Column::TYPE_POINT, array_merge($defaultSettings, []));
-        $this->checkColumn($table2, 'col_line', Column::TYPE_LINE, array_merge($defaultSettings, []));
-        $this->checkColumn($table2, 'col_polygon', Column::TYPE_POLYGON, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_line', Column::TYPE_STRING, array_merge($defaultSettings, [
+            'length' => 255,
+        ]));
+        $this->checkColumn($table2, 'col_polygon', Column::TYPE_TEXT, array_merge($defaultSettings, []));
 
         // check all indexes for table_2
-        $this->assertCount(2, $table2->getIndexes());
+        $this->assertCount(1, $table2->getIndexes());
         $this->assertNull($table2->getIndex('idx_table_2_col_string'));
-        $this->checkIndex($table2, 'named_unique_index', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);
-        // index based on foreign key
-        $this->checkIndex($table2, 'table_2_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $this->checkIndex($table2, 'named_unique_index', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+        // index based on foreign key is not created
+        $this->assertNull($table2->getIndex('table_2_col_int'));
 
         // check all foreign keys for table_2
         $this->assertCount(1, $table2->getForeignKeys());
@@ -385,9 +313,8 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $migrationTable1->addColumn('col_point', 'point', ['null' => true]);
         $migrationTable1->addColumn('col_line', 'line', ['null' => true]);
         $migrationTable1->addColumn('col_polygon', 'polygon', ['null' => true]);
-        $migrationTable1->addIndex('col_int');
-        $migrationTable1->addIndex('col_string', Index::TYPE_UNIQUE, Index::METHOD_HASH);
-        // $migrationTable1->addIndex('col_text', Index::TYPE_FULLTEXT);
+        $migrationTable1->addIndex('col_int', Index::TYPE_NORMAL, Index::METHOD_HASH);
+        $migrationTable1->addIndex('col_string', Index::TYPE_UNIQUE, Index::METHOD_BTREE);
         $migrationTable1->addIndex(['col_mediumint', 'col_bigint']);
         $migrationTable1->create();
         $queries1 = $queryBuilder->createTable($migrationTable1);
