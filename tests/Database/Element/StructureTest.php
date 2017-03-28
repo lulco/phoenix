@@ -397,6 +397,32 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $structure->prepare($migrationTable);
     }
 
+    public function testDropTableReferencedInAnotherTable()
+    {
+        $structure = $this->prepareComplexStructure();
+        $migrationTable = new MigrationTable('test_1');
+        $migrationTable->drop();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage('Table "test_1" is referenced in foreign key "fk_test_1_id" in table "test_2"');
+        $structure->prepare($migrationTable);
+    }
+
+    public function testRenameTableReferencedInAnotherTableAndDropIt()
+    {
+        $structure = $this->prepareComplexStructure();
+        $migrationRenameTable = new MigrationTable('test_1');
+        $migrationRenameTable->rename('renamed_table_1');
+        $structure->update($migrationRenameTable);
+
+        $migrationTable = new MigrationTable('renamed_table_1');
+        $migrationTable->drop();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage('Table "renamed_table_1" is referenced in foreign key "fk_test_1_id" in table "test_2"');
+        $structure->prepare($migrationTable);
+    }
+
     private function prepareSimpleStructure()
     {
         $structure = new Structure();

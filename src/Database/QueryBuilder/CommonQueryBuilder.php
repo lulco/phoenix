@@ -29,10 +29,7 @@ abstract class CommonQueryBuilder
 
     protected function remapType(Column $column)
     {
-        if (!isset($this->typeMap[$column->getType()])) {
-            throw new Exception('Type "' . $column->getType() . '" is not allowed');
-        }
-        return $this->typeMap[$column->getType()];
+        return isset($this->typeMap[$column->getType()]) ? $this->typeMap[$column->getType()] : $column->getType();
     }
 
     protected function createTableQuery(MigrationTable $table)
