@@ -58,7 +58,7 @@ class Manager
     private function findMigrations($type)
     {
         $migrations = $this->findMigrationClasses();
-        $executedMigrations = $this->executedMigrations($type);
+        $executedMigrations = $this->executedMigrations();
         if ($type == self::TYPE_UP) {
             foreach (array_keys($executedMigrations) as $migrationIdentifier) {
                 unset($migrations[$migrationIdentifier]);
