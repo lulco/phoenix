@@ -85,7 +85,7 @@ Command `php vendor/bin/phoenix init` initializes phoenix and creates database t
 ### Create first migration
 Create command `php vendor/bin/phoenix create [options] [--] <migration> [<dir>]`
 
-```php
+```
 php vendor/bin/phoenix create "FirstDir\MyFirstMigration" second
 ```
 This will create PHP class `FirstDir\MyFirstMigration` in file named `{timestamp}_my_first_migration.php` where `{timestamp}` represents actual timestamp in format `YmdHis` e.g. `20160919082117`. This file will be created in migration directory `second` which is configured as `__DIR__ . '/../second_dir'` (see configuration example above).
@@ -115,7 +115,7 @@ class MyFirstMigration extends AbstractMigration
 Now you need to implement both methods: `up()`, which is used when command `migrate` is executed and `down()`, which is used when command `rollback` is executed. In general: if you create table in `up()` method, you have to drop this table in `down()` method and vice versa.
 
 Let say you need to execute this query:
-```php
+```sql
 CREATE TABLE `first_table` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -207,7 +207,7 @@ All done. Took 0.0401s
 ### Status command
 Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:
 
-```sql
+```
 Executed migrations
 +---------------------------------------------+---------------------+
 | Class name                                  | Executed at         |
