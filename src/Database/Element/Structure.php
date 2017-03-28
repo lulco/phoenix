@@ -96,7 +96,9 @@ class Structure
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_DROP) {
             unset($this->tables[$migrationTable->getName()]);
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_RENAME) {
-            $this->tables[$migrationTable->getNewName()] = $this->tables[$migrationTable->getName()];
+            $table = $this->tables[$migrationTable->getName()];
+            $table->setName($migrationTable->getNewName());
+            $this->tables[$migrationTable->getNewName()] = $table;
             unset($this->tables[$migrationTable->getName()]);
             foreach ($this->getTables() as $table) {
                 foreach ($table->getForeignKeys() as $foreginKey) {
