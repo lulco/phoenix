@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Exception;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
