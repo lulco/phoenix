@@ -63,7 +63,6 @@ class SqliteAdapter extends PdoAdapter
                 $primaryKeys[$column['cid']] = $column['name'];
             }
             $this->addColumn($migrationTable, $column, $table);
-
         }
         ksort($primaryKeys);
         $migrationTable->addPrimary($primaryKeys);
