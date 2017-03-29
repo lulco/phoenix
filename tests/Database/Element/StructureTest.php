@@ -39,6 +39,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $table = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $table);
+        $this->assertEquals('test', $table->getName());
         $this->assertCount(2, $table->getColumns());
         $idColumn = $table->getColumn('id');
         $this->assertInstanceOf(Column::class, $idColumn);
@@ -55,6 +56,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test_2'));
         $table2 = $structure->getTable('test_2');
         $this->assertInstanceOf(Table::class, $table2);
+        $this->assertEquals('test_2', $table2->getName());
         $this->assertCount(2, $table2->getColumns());
         $idColumn = $table2->getColumn('id');
         $this->assertInstanceOf(Column::class, $idColumn);
@@ -174,6 +176,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertNull($testTable->getColumn('description'));
 
         $alterTable = new MigrationTable('test');
@@ -191,6 +194,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertInstanceOf(Column::class, $testTable->getColumn('title'));
 
         $alterTable = new MigrationTable('test');
@@ -209,6 +213,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertInstanceOf(Column::class, $testTable->getColumn('title'));
 
         $migrationTable = new MigrationTable('test');
@@ -227,6 +232,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertNull($testTable->getColumn('description'));
 
         $migrationTable = new MigrationTable('test');
@@ -245,6 +251,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertInstanceOf(Column::class, $testTable->getColumn('title'));
 
         $migrationTable = new MigrationTable('test');
@@ -263,6 +270,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertNull($testTable->getColumn('description'));
 
         $migrationTable = new MigrationTable('test');
@@ -281,6 +289,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertInstanceOf(Column::class, $testTable->getColumn('title'));
         $this->assertInstanceOf(Column::class, $testTable->getColumn('alias'));
 
@@ -300,6 +309,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertInstanceOf(Column::class, $testTable->getColumn('alias'));
 
         $migrationTable = new MigrationTable('test');
@@ -318,6 +328,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test'));
         $testTable = $structure->getTable('test');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test', $testTable->getName());
         $this->assertNull($testTable->getColumn('description'));
 
         $migrationTable = new MigrationTable('test');
@@ -335,6 +346,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test_1'));
         $testTable = $structure->getTable('test_1');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test_1', $testTable->getName());
         $this->assertInstanceOf(Index::class, $testTable->getIndex('alias'));
 
         $migrationTable = new MigrationTable('test_1');
@@ -352,6 +364,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test_1'));
         $testTable = $structure->getTable('test_1');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test_1', $testTable->getName());
         $this->assertNull($testTable->getIndex('non_existing_index'));
 
         $migrationTable = new MigrationTable('test_1');
@@ -369,6 +382,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test_2'));
         $testTable = $structure->getTable('test_2');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test_2', $testTable->getName());
         $this->assertInstanceOf(ForeignKey::class, $testTable->getForeignKey('fk_test_1_id'));
 
         $migrationTable = new MigrationTable('test_2');
@@ -386,6 +400,7 @@ class StructureTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($structure->tableExists('test_2'));
         $testTable = $structure->getTable('test_2');
         $this->assertInstanceOf(Table::class, $testTable);
+        $this->assertEquals('test_2', $testTable->getName());
         $this->assertNull($testTable->getForeignKey('non_existing_fk'));
 
         $migrationTable = new MigrationTable('test_2');
@@ -394,6 +409,32 @@ class StructureTest extends PHPUnit_Framework_TestCase
 
         $this->expectException(StructureException::class);
         $this->expectExceptionMessage("Foreign key 'non_existing_fk' doesn't exist in table 'test_2'");
+        $structure->prepare($migrationTable);
+    }
+
+    public function testDropTableReferencedInAnotherTable()
+    {
+        $structure = $this->prepareComplexStructure();
+        $migrationTable = new MigrationTable('test_1');
+        $migrationTable->drop();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage('Table "test_1" is referenced in foreign key "fk_test_1_id" in table "test_2"');
+        $structure->prepare($migrationTable);
+    }
+
+    public function testRenameTableReferencedInAnotherTableAndDropIt()
+    {
+        $structure = $this->prepareComplexStructure();
+        $migrationRenameTable = new MigrationTable('test_1');
+        $migrationRenameTable->rename('renamed_table_1');
+        $structure->update($migrationRenameTable);
+
+        $migrationTable = new MigrationTable('renamed_table_1');
+        $migrationTable->drop();
+
+        $this->expectException(StructureException::class);
+        $this->expectExceptionMessage('Table "renamed_table_1" is referenced in foreign key "fk_test_1_id" in table "test_2"');
         $structure->prepare($migrationTable);
     }
 

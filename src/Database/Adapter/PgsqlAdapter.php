@@ -60,46 +60,8 @@ class PgsqlAdapter extends PdoAdapter
     {
         $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($columns as $column) {
-            $type = $column['data_type'];
-            $type = $this->remapType($type);
-
-            $length = null;
-            $decimals = null;
-            if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR])) {
-                $length = $column['character_maximum_length'];
-            } elseif (in_array($type, [Column::TYPE_NUMERIC])) {
-                $length = $column['numeric_precision'];
-                $decimals = $column['numeric_scale'];
-            }
-
-            $default = null;
-            if ($column['column_default']) {
-                $default = $column['column_default'];
-                if ($type === Column::TYPE_BOOLEAN) {
-                    $default = $default === 'true';
-                } elseif (substr($default, 0, 6) == 'NULL::') {
-                    $default = null;
-                } elseif (substr($default, 0, 7) == 'nextval') {
-                    $default = null;
-                }
-            }
-
-            $settings = [
-                'null' => $column['is_nullable'] == 'YES',
-                'default' => $default,
-                'length' => $length,
-                'decimals' => $decimals,
-                'autoincrement' => strpos($column['column_default'], 'nextval') === 0,
-            ];
-            if (in_array($column['data_type'], ['USER-DEFINED', 'ARRAY'])) {
-                if ($column['data_type'] == 'USER-DEFINED') {
-                    $type = Column::TYPE_ENUM;
-                } else {
-                    $type = Column::TYPE_SET;
-                }
-                $enumType = $table . '__' . $column['column_name'];
-                $settings['values'] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
-            }
+            $type = $this->remapType($column['data_type']);
+            $settings = $this->prepareSettings($type, $column, $table);
             $migrationTable->addColumn($column['column_name'], $type, $settings);
         }
     }
@@ -118,8 +80,49 @@ class PgsqlAdapter extends PdoAdapter
             'character varying' => Column::TYPE_STRING,
             'bytea' => Column::TYPE_BLOB,
             'timestamp without time zone' => Column::TYPE_DATETIME,
+            'USER-DEFINED' => Column::TYPE_ENUM,
+            'ARRAY' => Column::TYPE_SET,
         ];
         return isset($types[$type]) ? $types[$type] : $type;
+    }
+
+    private function prepareSettings($type, $column, $table)
+    {
+        $length = null;
+        $decimals = null;
+        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR])) {
+            $length = $column['character_maximum_length'];
+        } elseif (in_array($type, [Column::TYPE_NUMERIC])) {
+            $length = $column['numeric_precision'];
+            $decimals = $column['numeric_scale'];
+        }
+
+        $settings = [
+            'null' => $column['is_nullable'] == 'YES',
+            'default' => $this->prepareDefault($column, $type),
+            'length' => $length,
+            'decimals' => $decimals,
+            'autoincrement' => strpos($column['column_default'], 'nextval') === 0,
+        ];
+        if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
+            $enumType = $table . '__' . $column['column_name'];
+            $settings['values'] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
+        }
+        return $settings;
+    }
+
+    private function prepareDefault($column, $type)
+    {
+        if (!$column['column_default']) {
+            return null;
+        }
+        $default = $column['column_default'];
+        if ($type === Column::TYPE_BOOLEAN) {
+            $default = $default === 'true';
+        } elseif (substr($default, 0, 6) == 'NULL::' || substr($default, 0, 7) == 'nextval') {
+            $default = null;
+        }
+        return $default;
     }
 
     /**

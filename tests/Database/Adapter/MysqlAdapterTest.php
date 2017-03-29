@@ -91,7 +91,6 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
             'charset' => 'utf8',
             'collation' => 'utf8_general_ci',
             'null' => true,
-            'length' => 36,
         ]));
         $this->checkColumn($table1, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -219,7 +218,6 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->checkColumn($table2, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
             'charset' => 'utf8',
             'collation' => 'utf8_slovak_ci',
-            'length' => 36,
         ]));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'length' => 4,

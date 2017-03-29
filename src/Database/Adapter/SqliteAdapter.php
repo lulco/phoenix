@@ -62,47 +62,57 @@ class SqliteAdapter extends PdoAdapter
             if ($column['pk']) {
                 $primaryKeys[$column['cid']] = $column['name'];
             }
-            preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
-            $type = $column['type'];
-
-            if (isset($matches[1]) && $matches[1] != '') {
-                $type = $matches[1];
-            }
-
-            $length = null;
-            $decimals = null;
-            if (isset($matches[2])) {
-                if (strpos($matches[2], ',')) {
-                    list($length, $decimals) = array_map('intval', explode(',', $matches[2], 2));
-                } else {
-                    $length = (int) $matches[2];
-                }
-            }
-
-            $settings = [
-                'null' => !$column['notnull'],
-                'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
-                'autoincrement' => (bool)$column['pk'] && $type == 'integer',
-                'length' => $length,
-                'decimals' => $decimals,
-            ];
-
-            if ($type == 'varchar') {
-                $type = Column::TYPE_STRING;
-            } elseif ($type == 'bigint') {
-                $type = Column::TYPE_BIG_INTEGER;
-            } elseif ($type == 'char' && $length == 36) {
-                $type = Column::TYPE_UUID;
-                $length = null;
-            } elseif ($type == 'enum') {
-                $sql = $this->execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'")->fetch(PDO::FETCH_COLUMN);
-                preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
-                $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
-            }
-            $migrationTable->addColumn($column['name'], $type, $settings);
+            $this->addColumn($migrationTable, $column, $table);
         }
         ksort($primaryKeys);
         $migrationTable->addPrimary($primaryKeys);
+    }
+
+    private function addColumn(MigrationTable $migrationTable, array $column, $table)
+    {
+        preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
+        $type = $column['type'];
+        if (isset($matches[1]) && $matches[1] != '') {
+            $type = $matches[1];
+        }
+
+        list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+
+        $settings = [
+            'null' => !$column['notnull'],
+            'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
+            'autoincrement' => (bool)$column['pk'] && $type == 'integer',
+            'length' => $length,
+            'decimals' => $decimals,
+        ];
+
+        if ($type == 'varchar') {
+            $type = Column::TYPE_STRING;
+        } elseif ($type == 'bigint') {
+            $type = Column::TYPE_BIG_INTEGER;
+        } elseif ($type == 'char' && $length == 36) {
+            $type = Column::TYPE_UUID;
+            $settings['length'] = null;
+        } elseif ($type == Column::TYPE_ENUM) {
+            $sql = $this->execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'")->fetch(PDO::FETCH_COLUMN);
+            preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
+            $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
+        }
+        $migrationTable->addColumn($column['name'], $type, $settings);
+    }
+
+    private function getLengthAndDecimals($lengthAndDecimals = null)
+    {
+        if ($lengthAndDecimals === null) {
+            return [null, null];
+        }
+
+        $length = (int) $lengthAndDecimals;
+        $decimals = null;
+        if (strpos($lengthAndDecimals, ',')) {
+            list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
+        }
+        return [$length, $decimals];
     }
 
     private function loadIndexes(MigrationTable $migrationTable, $table)

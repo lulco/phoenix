@@ -17,72 +17,75 @@ class Structure
      */
     public function prepare(MigrationTable $migrationTable)
     {
-        switch ($migrationTable->getAction()) {
-            case MigrationTable::ACTION_CREATE:
-                if ($this->tableExists($migrationTable->getName())) {
-                    throw new StructureException('Table "' . $migrationTable->getName() . '" already exists');
+        if ($migrationTable->getAction() == MigrationTable::ACTION_CREATE) {
+            if ($this->tableExists($migrationTable->getName())) {
+                throw new StructureException('Table "' . $migrationTable->getName() . '" already exists');
+            }
+        } elseif ($migrationTable->getAction() == MigrationTable::ACTION_DROP) {
+            if (!$this->tableExists($migrationTable->getName())) {
+                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
+            }
+            foreach ($this->getTables() as $table) {
+                if ($table->getName() == $migrationTable->getName()) {
+                    continue;
                 }
-                break;
-            case MigrationTable::ACTION_DROP:
-                if (!$this->tableExists($migrationTable->getName())) {
-                    throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
-                }
-                // TODO check foreign keys to this table
-                break;
-            case MigrationTable::ACTION_ALTER:
-                if (!$this->tableExists($migrationTable->getName())) {
-                    throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
-                }
-                $table = $this->getTable($migrationTable->getName());
-                foreach ($migrationTable->getColumns() as $column) {
-                    if ($table->getColumn($column->getName())) {
-                        throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
+                foreach ($table->getForeignKeys() as $foreginKey) {
+                    if ($foreginKey->getReferencedTable() == $migrationTable->getName()) {
+                        throw new StructureException('Table "' . $migrationTable->getName() . '" is referenced in foreign key "' . $foreginKey->getName() . '" in table "' . $table->getName() . '"');
                     }
                 }
-                foreach ($migrationTable->getColumnsToDrop() as $columnName) {
-                    if (!$table->getColumn($columnName)) {
-                        throw new StructureException('Column "' . $columnName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
-                    }
+            }
+        } elseif ($migrationTable->getAction() == MigrationTable::ACTION_ALTER) {
+            if (!$this->tableExists($migrationTable->getName())) {
+                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
+            }
+            $table = $this->getTable($migrationTable->getName());
+            foreach ($migrationTable->getColumns() as $column) {
+                if ($table->getColumn($column->getName())) {
+                    throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
                 }
-                foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
-                    if (!$table->getColumn($oldName)) {
-                        throw new StructureException('Column "' . $oldName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
-                    }
-                    if ($column->getName() != $oldName && $table->getColumn($column->getName())) {
-                        throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
-                    }
+            }
+            foreach ($migrationTable->getColumnsToDrop() as $columnName) {
+                if (!$table->getColumn($columnName)) {
+                    throw new StructureException('Column "' . $columnName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
                 }
-                foreach ($migrationTable->getForeignKeys() as $foreignKey) {
-                    if ($table->getForeignKey($foreignKey->getName())) {
-                        throw new StructureException("Foreign key '{$foreignKey->getName()}' already exists in table '{$table->getName()}'");
-                    }
+            }
+            foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
+                if (!$table->getColumn($oldName)) {
+                    throw new StructureException('Column "' . $oldName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
                 }
-                foreach ($migrationTable->getForeignKeysToDrop() as $foreignKeyName) {
-                    if (!$table->getForeignKey($foreignKeyName)) {
-                        throw new StructureException("Foreign key '$foreignKeyName' doesn't exist in table '{$table->getName()}'");
-                    }
+                if ($column->getName() != $oldName && $table->getColumn($column->getName())) {
+                    throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
                 }
-                foreach ($migrationTable->getIndexes() as $index) {
-                    if ($table->getIndex($index->getName())) {
-                        throw new StructureException("Index '{$index->getName()}' already exists in table '{$table->getName()}'");
-                    }
+            }
+            foreach ($migrationTable->getForeignKeys() as $foreignKey) {
+                if ($table->getForeignKey($foreignKey->getName())) {
+                    throw new StructureException("Foreign key '{$foreignKey->getName()}' already exists in table '{$table->getName()}'");
                 }
-                foreach ($migrationTable->getIndexesToDrop() as $indexName) {
-                    if (!$table->getIndex($indexName)) {
-                        throw new StructureException("Index '$indexName' doesn't exist in table '{$table->getName()}'");
-                    }
+            }
+            foreach ($migrationTable->getForeignKeysToDrop() as $foreignKeyName) {
+                if (!$table->getForeignKey($foreignKeyName)) {
+                    throw new StructureException("Foreign key '$foreignKeyName' doesn't exist in table '{$table->getName()}'");
                 }
-                break;
-            case MigrationTable::ACTION_RENAME:
-                if (!$this->tableExists($migrationTable->getName())) {
-                    throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
+            }
+            foreach ($migrationTable->getIndexes() as $index) {
+                if ($table->getIndex($index->getName())) {
+                    throw new StructureException("Index '{$index->getName()}' already exists in table '{$table->getName()}'");
                 }
-                if ($this->tableExists($migrationTable->getNewName())) {
-                    throw new StructureException('Table "' . $migrationTable->getNewName() . '" already exists');
+            }
+            foreach ($migrationTable->getIndexesToDrop() as $indexName) {
+                if (!$table->getIndex($indexName)) {
+                    throw new StructureException("Index '$indexName' doesn't exist in table '{$table->getName()}'");
                 }
-                break;
+            }
+        } elseif ($migrationTable->getAction() == MigrationTable::ACTION_RENAME) {
+            if (!$this->tableExists($migrationTable->getName())) {
+                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
+            }
+            if ($this->tableExists($migrationTable->getNewName())) {
+                throw new StructureException('Table "' . $migrationTable->getNewName() . '" already exists');
+            }
         }
-
         return $migrationTable;
     }
 
@@ -93,9 +96,17 @@ class Structure
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_DROP) {
             unset($this->tables[$migrationTable->getName()]);
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_RENAME) {
-            $this->tables[$migrationTable->getNewName()] = $this->tables[$migrationTable->getName()];
+            $table = $this->tables[$migrationTable->getName()];
+            $table->setName($migrationTable->getNewName());
+            $this->tables[$migrationTable->getNewName()] = $table;
             unset($this->tables[$migrationTable->getName()]);
-            // todo zmenit tabulku vo foreign keys vsade kde sa pouziva stara tabulka
+            foreach ($this->getTables() as $table) {
+                foreach ($table->getForeignKeys() as $foreginKey) {
+                    if ($foreginKey->getReferencedTable() == $migrationTable->getName()) {
+                        $foreginKey->setReferencedTable($migrationTable->getNewName());
+                    }
+                }
+            }
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_ALTER) {
             $table = $this->tables[$migrationTable->getName()];
             foreach ($migrationTable->getIndexesToDrop() as $index) {

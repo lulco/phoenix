@@ -37,7 +37,7 @@ composer require lulco/phoenix
 
 ### Create configuration file
 Create file `phoenix.php` in the root directory of your project. For example:
-```
+```php
 <?php
 
 return [
@@ -91,7 +91,7 @@ php vendor/bin/phoenix create "FirstDir\MyFirstMigration" second
 This will create PHP class `FirstDir\MyFirstMigration` in file named `{timestamp}_my_first_migration.php` where `{timestamp}` represents actual timestamp in format `YmdHis` e.g. `20160919082117`. This file will be created in migration directory `second` which is configured as `__DIR__ . '/../second_dir'` (see configuration example above).
 
 `create` command creates a skeleton of migration file, which looks like this:
-```
+```php
 <?php
 
 namespace FirstDir;
@@ -115,7 +115,7 @@ class MyFirstMigration extends AbstractMigration
 Now you need to implement both methods: `up()`, which is used when command `migrate` is executed and `down()`, which is used when command `rollback` is executed. In general: if you create table in `up()` method, you have to drop this table in `down()` method and vice versa.
 
 Let say you need to execute this query:
-```
+```sql
 CREATE TABLE `first_table` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE `first_table` (
 ```
 
 You need to implement `up()` method in your migration class as below:
-```
+```php
 <?php
 
 namespace FirstDir;
@@ -151,7 +151,7 @@ class MyFirstMigration extends AbstractMigration
 }
 ```
 Implementation of correspondent `down()` method which drops table `first_table` looks like below:
-```
+```php
     protected function down()
     {
         $this->table('first_table')

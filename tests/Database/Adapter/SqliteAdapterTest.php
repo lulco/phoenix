@@ -88,7 +88,6 @@ class SqliteAdapterTest extends PHPUnit_Framework_TestCase
         ]));
         $this->checkColumn($table1, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
             'null' => true,
-            'length' => 36,
         ]));
         $this->checkColumn($table1, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -181,9 +180,7 @@ class SqliteAdapterTest extends PHPUnit_Framework_TestCase
         $this->checkColumn($table2, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'autoincrement' => true,
         ]));
-        $this->checkColumn($table2, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
-            'length' => 36,
-        ]));
+        $this->checkColumn($table2, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, []));

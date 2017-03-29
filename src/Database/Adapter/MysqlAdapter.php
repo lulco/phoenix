@@ -73,54 +73,69 @@ class MysqlAdapter extends PdoAdapter
     {
         $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
         foreach ($columns as $column) {
-            $values = null;
-            $type = $column['Type'];
-            preg_match('/(.*?)\((.*?)\)(.*)/', $column['Type'], $matches);
-            if (isset($matches[1]) && $matches[1] != '') {
-                $type = $matches[1];
-            }
-
-            $type = $this->remapType($type);
-
-            if (($type == 'enum' || $type == 'set') && isset($matches[2])) {
-                $values = explode('\',\'', substr($matches[2], 1, -1));
-            }
-
-            $length = null;
-            $decimals = null;
-            if (isset($matches[2])) {
-                if (strpos($matches[2], ',')) {
-                    list($length, $decimals) = explode(',', $matches[2], 2);
-                    $length = (int) $length;
-                    $decimals = (int) $decimals;
-                } else {
-                    $length = (int) $matches[2];
-                }
-            }
-
-            if ($type == Column::TYPE_CHAR && $length == 36) {
-                $type = Column::TYPE_UUID;
-            }
-            if ($type == Column::TYPE_TINY_INTEGER && $length == 1) {
-                $type = Column::TYPE_BOOLEAN;
-                $length = null;
-            }
-
-            $collation = $column['Collation'];
-            $charset = $collation ? explode('_', $collation, 2)[0] : null;
-            $settings = [
-                'autoincrement' => $column['Extra'] == 'auto_increment',
-                'null' => $column['Null'] == 'YES',
-                'default' => $column['Default'],
-                'length' => $length,
-                'decimals' => $decimals,
-                'signed' => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
-                'charset' => $charset,
-                'collation' => $collation,
-                'values' => $values,
-            ];
-            $migrationTable->addColumn($column['Field'], $type, $settings);
+            $this->addColumn($migrationTable, $column);
         }
+    }
+
+    private function addColumn(MigrationTable $migrationTable, array $column)
+    {
+        $values = null;
+        $type = $column['Type'];
+        preg_match('/(.*?)\((.*?)\)(.*)/', $column['Type'], $matches);
+        if (isset($matches[1]) && $matches[1] != '') {
+            $type = $matches[1];
+        }
+
+        $type = $this->remapType($type);
+
+        if (($type == Column::TYPE_ENUM || $type == Column::TYPE_SET) && isset($matches[2])) {
+            $values = explode('\',\'', substr($matches[2], 1, -1));
+        }
+
+        list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+
+        if ($type == Column::TYPE_CHAR && $length == 36) {
+            $type = Column::TYPE_UUID;
+            $length = null;
+        }
+        if ($type == Column::TYPE_TINY_INTEGER && $length == 1) {
+            $type = Column::TYPE_BOOLEAN;
+            $length = null;
+        }
+
+        $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
+        $migrationTable->addColumn($column['Field'], $type, $settings);
+    }
+
+    private function getLengthAndDecimals($lengthAndDecimals = null)
+    {
+        if ($lengthAndDecimals === null) {
+            return [null, null];
+        }
+
+        $length = (int) $lengthAndDecimals;
+        $decimals = null;
+        if (strpos($lengthAndDecimals, ',')) {
+            list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
+        }
+        return [$length, $decimals];
+    }
+
+    private function prepareSettings($column, $length, $decimals, $matches, $values)
+    {
+        $collation = $column['Collation'];
+        $charset = $collation ? explode('_', $collation, 2)[0] : null;
+        return [
+            'autoincrement' => $column['Extra'] == 'auto_increment',
+            'null' => $column['Null'] == 'YES',
+            'default' => $column['Default'],
+            'length' => $length,
+            'decimals' => $decimals,
+            'signed' => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
+            'charset' => $charset,
+            'collation' => $collation,
+            'values' => $values,
+        ];
     }
 
     private function loadIndexes(MigrationTable $migrationTable, $table)
