@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\StatusCommand;
 
+use Phoenix\Tests\Command\MysqlCommandBehavior;
+
 class MysqlStatusCommandTest extends StatusCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'mysql';
-    }
+    use MysqlCommandBehavior;
 }

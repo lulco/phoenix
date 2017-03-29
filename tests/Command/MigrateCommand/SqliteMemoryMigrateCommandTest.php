@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\MigrateCommand;
 
+use Phoenix\Tests\Command\SqliteMemoryCommandBehavior;
+
 class SqliteMemoryMigrateCommandTest extends MigrateCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'sqlite_memory';
-    }
+    use SqliteMemoryCommandBehavior;
 }

@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\RollbackCommand;
 
+use Phoenix\Tests\Command\PgsqlCommandBehavior;
+
 class PgsqlRollbackCommandTest extends RollbackCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'pgsql';
-    }
+    use PgsqlCommandBehavior;
 }
