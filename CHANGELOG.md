@@ -9,6 +9,7 @@
 #### Added
 - added method getSettings to Column
 - added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
+- column settings constants
 
 #### Removed
 - removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
