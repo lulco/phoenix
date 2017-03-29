@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\InitCommand;
 
+use Phoenix\Tests\Command\MysqlCommandBehavior;
+
 class MysqlInitCommandTest extends InitCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'mysql';
-    }
+    use MysqlCommandBehavior;
 }

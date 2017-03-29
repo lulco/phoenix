@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\MigrateCommand;
 
+use Phoenix\Tests\Command\PgsqlCommandBehavior;
+
 class PgsqlMigrateCommandTest extends MigrateCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'pgsql';
-    }
+    use PgsqlCommandBehavior;
 }

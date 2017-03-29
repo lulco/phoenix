@@ -32,7 +32,7 @@ class Init extends AbstractMigration
             ->addColumn('identifier', 'uuid')
             ->addColumn('t1_fk', 'integer')
             ->addColumn('t2_fk', 'integer', ['null' => true])
-            ->addForeignKey('t1_fk', 'table_1', 'id')
+            ->addForeignKey('t1_fk', 'table_1', 'id', ForeignKey::RESTRICT, ForeignKey::RESTRICT)
             ->addForeignKey('t2_fk', 'table_2', 'id')
             ->create();
 
@@ -68,6 +68,7 @@ class Init extends AbstractMigration
             ->addColumn('col_point', 'point', ['null' => true])
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])
+            ->addIndex(['col_string', 'col_integer'])
             ->create();
     }
 

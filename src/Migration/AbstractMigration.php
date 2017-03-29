@@ -204,16 +204,12 @@ abstract class AbstractMigration
     private function runQueries(array $queries, $dry = false)
     {
         $results = [];
-        try {
-            foreach ($queries as $query) {
-                if (!$dry) {
-                    $result = $this->adapter->execute($query);
-                    $results[] = $result;
-                }
-                $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
+        foreach ($queries as $query) {
+            if (!$dry) {
+                $result = $this->adapter->execute($query);
+                $results[] = $result;
             }
-        } catch (DatabaseQueryExecuteException $e) {
-            throw $e;
+            $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;
         }
         return $results;
     }
@@ -245,6 +241,7 @@ abstract class AbstractMigration
     private function prepare()
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
+        $structure = $this->adapter->getStructure();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
             if (!($queryToExecute instanceof MigrationTable)) {
@@ -252,7 +249,9 @@ abstract class AbstractMigration
                 continue;
             }
 
+            $queryToExecute = $structure->prepare($queryToExecute);
             $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
+            $structure->update($queryToExecute);
             $queries = array_merge($queries, $tableQueries);
         }
         return $queries;

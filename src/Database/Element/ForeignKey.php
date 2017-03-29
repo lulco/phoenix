@@ -8,23 +8,23 @@ use Phoenix\Exception\InvalidArgumentValueException;
 class ForeignKey
 {
     use ParamsCheckerBehavior;
-    
+
     const DEFAULT_ACTION = '';
     const RESTRICT = 'RESTRICT';
     const NO_ACTION = 'NO ACTION';
     const CASCADE = 'CASCADE';
     const SET_NULL = 'SET NULL';
-    
+
     private $columns = [];
-    
+
     private $referencedTable;
-    
+
     private $referencedColumns;
-    
+
     private $onDelete;
-    
+
     private $onUpdate;
-    
+
     /**
      * @param string|array $columns
      * @param string $referencedTable
@@ -40,7 +40,7 @@ class ForeignKey
         }
         $this->columns = $columns;
         $this->referencedTable = $referencedTable;
-        
+
         if (!is_array($referencedColumns)) {
             $referencedColumns = [$referencedColumns];
         }
@@ -48,11 +48,11 @@ class ForeignKey
 
         $this->onDelete = strtoupper($onDelete);
         $this->inArray($this->onDelete, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onDelete . '" is not allowed on delete');
-        
+
         $this->onUpdate = strtoupper($onUpdate);
         $this->inArray($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onUpdate . '" is not allowed on update');
     }
-    
+
     /**
      * @return string
      */
@@ -68,7 +68,17 @@ class ForeignKey
     {
         return $this->columns;
     }
-    
+
+    /**
+     * @param string $referencedTable
+     * @return ForeignKey
+     */
+    public function setReferencedTable($referencedTable)
+    {
+        $this->referencedTable = $referencedTable;
+        return $this;
+    }
+
     /**
      * @return string
      */

@@ -10,6 +10,7 @@
 - added method getSettings to Column
 - added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
 - column settings constants
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 #### Removed
 - removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
@@ -23,7 +24,7 @@
 - deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
 
 #### Fixed
-- Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
+- load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
 
 #### Added
 - support for json config file

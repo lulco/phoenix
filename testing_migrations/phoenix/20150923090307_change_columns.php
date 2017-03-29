@@ -17,14 +17,24 @@ class ChangeColumns extends AbstractMigration
             ->save();
 
         $this->table('all_types')
+            ->addColumn('new_column', 'string', ['null' => true])
             ->changeColumn('col_enum', 'col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz', 'qqq'], 'null' => true])
             ->changeColumn('col_set', 'col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz', 'qqq'], 'null' => true])
+            ->save();
+
+        $this->table('all_types')
+            ->dropColumn('new_column')
             ->save();
     }
 
     public function down()
     {
         $this->table('all_types')
+            ->addColumn('new_column', 'string', ['null' => true])
+            ->save();
+
+        $this->table('all_types')
+            ->dropColumn('new_column')
             ->changeColumn('col_enum', 'col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->changeColumn('col_set', 'col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->save();

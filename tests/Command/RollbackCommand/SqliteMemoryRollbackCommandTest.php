@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\RollbackCommand;
 
+use Phoenix\Tests\Command\SqliteMemoryCommandBehavior;
+
 class SqliteMemoryRollbackCommandTest extends RollbackCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'sqlite_memory';
-    }
+    use SqliteMemoryCommandBehavior;
 }

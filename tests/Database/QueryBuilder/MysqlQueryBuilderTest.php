@@ -5,20 +5,11 @@ namespace Phoenix\Tests\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
-    public function testUnsupportedColumnType()
-    {
-        $table = new MigrationTable('unsupported');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'unsupported'));
-
-        $queryBuilder = new MysqlQueryBuilder();
-        $this->setExpectedException('\Exception', 'Type "unsupported" is not allowed');
-        $queryBuilder->createTable($table);
-    }
-
     public function testSimpleCreate()
     {
         $table = new MigrationTable('simple');

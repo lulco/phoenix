@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\InitCommand;
 
+use Phoenix\Tests\Command\PgsqlCommandBehavior;
+
 class PgsqlInitCommandTest extends InitCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'pgsql';
-    }
+    use PgsqlCommandBehavior;
 }

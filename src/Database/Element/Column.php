@@ -3,6 +3,7 @@
 namespace Phoenix\Database\Element;
 
 use Phoenix\Exception\InvalidArgumentValueException;
+use ReflectionClass;
 
 class Column
 {
@@ -73,9 +74,9 @@ class Column
         self::SETTING_AUTOINCREMENT => ['is_bool'],
         self::SETTING_AFTER => ['is_null', 'is_string'],
         self::SETTING_FIRST => ['is_bool'],
-        self::SETTING_CHARSET => ['is_string'],
-        self::SETTING_COLLATION => ['is_string'],
-        self::SETTING_VALUES => ['is_array'],
+        self::SETTING_CHARSET => ['is_null', 'is_string'],
+        self::SETTING_COLLATION => ['is_null', 'is_string'],
+        self::SETTING_VALUES => ['is_null', 'is_array'],
     ];
 
     private $name;
@@ -91,6 +92,7 @@ class Column
      */
     public function __construct($name, $type, array $settings = [])
     {
+        $this->checkType($type);
         $this->checkSettings($settings);
 
         $this->name = $name;
@@ -210,6 +212,14 @@ class Column
     public function getValues()
     {
         return isset($this->settings['values']) ? $this->settings['values'] : null;
+    }
+
+    private function checkType($type)
+    {
+        $reflectionClass = new ReflectionClass($this);
+        if (!in_array($type, $reflectionClass->getConstants())) {
+            throw new InvalidArgumentValueException('Type "' . $type . '" is not allowed.');
+        }
     }
 
     private function checkSettings($settings)
