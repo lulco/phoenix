@@ -3,6 +3,7 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
+use Phoenix\Database\Element\Column;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,9 +33,14 @@ class DumpCommand extends AbstractCommand
         $migration = '';
         $tables = $this->getOrderedTables($ignoredTables);
         foreach ($tables as $table) {
-            $migration .= $indent . "\$this->table('{$table->getName()}')\n";
+            $migration .= $indent . "\$this->table('{$table->getName()}'";
+            if ($table->getPrimary()) {
+                $migration .= ", " . $this->columnsToString($table->getPrimary());
+            }
+            $migration .= ")\n";
+
             foreach ($table->getColumns() as $column) {
-                $migration .= "$indent$indent" . "->addColumn('{$column->getName()}', '{$column->getType()}')\n";
+                $migration .= "$indent$indent" . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column->getType(), $column->getSettings()) . ")\n";
             }
             foreach ($table->getIndexes() as $index) {
                 $migration .= "$indent$indent" . "->addIndex(";
@@ -95,10 +101,52 @@ class DumpCommand extends AbstractCommand
     private function columnsToString(array $columns)
     {
         $columns = array_map(function ($column) {
-            return "'" . $column . "'";
+            return "'$column'";
         }, $columns);
         $implodedColumns = implode(', ', $columns);
         return count($columns) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
+    }
+
+    private function settingsToString($type, array $settings)
+    {
+        $defaultSettings = [
+            'autoincrement' => false,
+            'null' => false,
+            'default' => null,
+            'signed' => true,
+            'length' => null,
+            'decimals' => null,
+        ];
+        if ($type == Column::TYPE_STRING) {
+            $defaultSettings['length'] = 255;
+        } elseif ($type == Column::TYPE_INTEGER) {
+            $defaultSettings['length'] = 11;
+        } elseif ($type == Column::TYPE_BOOLEAN) {
+            $defaultSettings['signed'] = false;
+        } elseif ($type == Column::TYPE_TEXT) {
+            $defaultSettings['null'] = true;
+        }
+        $settingsList = [];
+        foreach ($settings as $setting => $value) {
+            if (in_array($setting, ['charset', 'collation'])) {
+                continue;
+            }
+            if ($value === $defaultSettings[$setting]) {
+                continue;
+            }
+            if ($value === null) {
+                $value = 'null';
+            } elseif (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            } elseif (!is_numeric($value)) {
+                $value = "'$value'";
+            }
+            $settingsList[] = "'$setting' => $value";
+        }
+        if (empty($settingsList)) {
+            return '';
+        }
+        return ', [' . implode(', ', $settingsList) . ']';
     }
 
     private function getIndent(InputInterface $input)
