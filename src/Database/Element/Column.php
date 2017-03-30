@@ -39,20 +39,44 @@ class Column
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';
 
-    private $allowedSettings = ['null', 'default', 'length', 'decimals', 'signed', 'autoincrement', 'after', 'first', 'charset', 'collation', 'values'];
+    const SETTING_NULL = 'null';
+    const SETTING_DEFAULT = 'default';
+    const SETTING_LENGTH = 'length';
+    const SETTING_DECIMALS = 'decimals';
+    const SETTING_SIGNED = 'signed';
+    const SETTING_AUTOINCREMENT = 'autoincrement';
+    const SETTING_AFTER = 'after';
+    const SETTING_FIRST = 'first';
+    const SETTING_CHARSET = 'charset';
+    const SETTING_COLLATION = 'collation';
+    const SETTING_VALUES = 'values';
+
+    private $allowedSettings = [
+        self::SETTING_NULL,
+        self::SETTING_DEFAULT,
+        self::SETTING_LENGTH,
+        self::SETTING_DECIMALS,
+        self::SETTING_SIGNED,
+        self::SETTING_AUTOINCREMENT,
+        self::SETTING_AFTER,
+        self::SETTING_FIRST,
+        self::SETTING_CHARSET,
+        self::SETTING_COLLATION,
+        self::SETTING_VALUES
+    ];
 
     private $allowedSettingsValues = [
-        'null' => ['is_bool'],
-        'default' => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
-        'length' => ['is_null', 'is_int'],
-        'decimals' => ['is_null', 'is_int'],
-        'signed' => ['is_bool'],
-        'autoincrement' => ['is_bool'],
-        'after' => ['is_null', 'is_string'],
-        'first' => ['is_bool'],
-        'charset' => ['is_null', 'is_string'],
-        'collation' => ['is_null', 'is_string'],
-        'values' => ['is_null', 'is_array'],
+        self::SETTING_NULL => ['is_bool'],
+        self::SETTING_DEFAULT => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
+        self::SETTING_LENGTH => ['is_null', 'is_int'],
+        self::SETTING_DECIMALS => ['is_null', 'is_int'],
+        self::SETTING_SIGNED => ['is_bool'],
+        self::SETTING_AUTOINCREMENT => ['is_bool'],
+        self::SETTING_AFTER => ['is_null', 'is_string'],
+        self::SETTING_FIRST => ['is_bool'],
+        self::SETTING_CHARSET => ['is_null', 'is_string'],
+        self::SETTING_COLLATION => ['is_null', 'is_string'],
+        self::SETTING_VALUES => ['is_null', 'is_array'],
     ];
 
     private $name;
@@ -64,7 +88,7 @@ class Column
     /**
      * @param string $name name of column
      * @param string $type type of column
-     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first
+     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values
      */
     public function __construct($name, $type, array $settings = [])
     {
