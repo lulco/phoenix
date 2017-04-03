@@ -18,13 +18,15 @@ class Structure
     public function prepare(MigrationTable $migrationTable)
     {
         if ($migrationTable->getAction() == MigrationTable::ACTION_CREATE) {
-            if ($this->tableExists($migrationTable->getName())) {
-                throw new StructureException('Table "' . $migrationTable->getName() . '" already exists');
+            $this->checkTableAlreadyExists($migrationTable->getName());
+            foreach ($migrationTable->getForeignKeys() as $foreignKey) {
+                if ($foreignKey->getReferencedTable() == $migrationTable->getName()) {
+                    continue;
+                }
+                $this->checkTableNotExists($foreignKey->getReferencedTable());
             }
         } elseif ($migrationTable->getAction() == MigrationTable::ACTION_DROP) {
-            if (!$this->tableExists($migrationTable->getName())) {
-                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
-            }
+            $this->checkTableNotExists($migrationTable->getName());
             foreach ($this->getTables() as $table) {
                 if ($table->getName() == $migrationTable->getName()) {
                     continue;
@@ -36,26 +38,18 @@ class Structure
                 }
             }
         } elseif ($migrationTable->getAction() == MigrationTable::ACTION_ALTER) {
-            if (!$this->tableExists($migrationTable->getName())) {
-                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
-            }
+            $this->checkTableNotExists($migrationTable->getName());
             $table = $this->getTable($migrationTable->getName());
             foreach ($migrationTable->getColumns() as $column) {
-                if ($table->getColumn($column->getName())) {
-                    throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
-                }
+                $this->checkColumnAlreadyExists($table, $column->getName());
             }
             foreach ($migrationTable->getColumnsToDrop() as $columnName) {
-                if (!$table->getColumn($columnName)) {
-                    throw new StructureException('Column "' . $columnName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
-                }
+                $this->checkColumnNotExists($table, $columnName);
             }
             foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
-                if (!$table->getColumn($oldName)) {
-                    throw new StructureException('Column "' . $oldName . '" doesn\'t exist in table "' . $migrationTable->getName() . '"');
-                }
-                if ($column->getName() != $oldName && $table->getColumn($column->getName())) {
-                    throw new StructureException('Column "' . $column->getName() . '" already exists in table "' . $migrationTable->getName() . '"');
+                $this->checkColumnNotExists($table, $oldName);
+                if ($column->getName() != $oldName) {
+                    $this->checkColumnAlreadyExists ($table, $column->getName());
                 }
             }
             foreach ($migrationTable->getForeignKeys() as $foreignKey) {
@@ -79,12 +73,8 @@ class Structure
                 }
             }
         } elseif ($migrationTable->getAction() == MigrationTable::ACTION_RENAME) {
-            if (!$this->tableExists($migrationTable->getName())) {
-                throw new StructureException('Table "' . $migrationTable->getName() . '" doesn\'t exist');
-            }
-            if ($this->tableExists($migrationTable->getNewName())) {
-                throw new StructureException('Table "' . $migrationTable->getNewName() . '" already exists');
-            }
+            $this->checkTableNotExists($migrationTable->getName());
+            $this->checkTableAlreadyExists($migrationTable->getNewName());
         }
         return $migrationTable;
     }
@@ -158,5 +148,33 @@ class Structure
     public function tableExists($tableName)
     {
         return isset($this->tables[$tableName]);
+    }
+
+    private function checkTableAlreadyExists($tableName)
+    {
+        if ($this->tableExists($tableName)) {
+            throw new StructureException('Table "' . $tableName . '" already exists');
+        }
+    }
+
+    private function checkTableNotExists($tableName)
+    {
+        if (!$this->tableExists($tableName)) {
+            throw new StructureException('Table "' . $tableName . '" doesn\'t exist');
+        }
+    }
+
+    private function checkColumnAlreadyExists(Table $table, $columnName)
+    {
+        if ($table->getColumn($columnName)) {
+            throw new StructureException('Column "' . $columnName . '" already exists in table "' . $table->getName() . '"');
+        }
+    }
+
+    private function checkColumnNotExists(Table $table, $columnName)
+    {
+        if (!$table->getColumn($columnName)) {
+            throw new StructureException('Column "' . $columnName . '" doesn\'t exist in table "' . $table->getName() . '"');
+        }
     }
 }
