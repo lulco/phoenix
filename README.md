@@ -24,7 +24,7 @@ Framework agnostic database migrations for PHP.
 - PostgreSQL
 - SQLite
 
-## Instalation
+## Installation
 
 ### Composer
 This library requires PHP 5.6 or later. It works also on PHP 7.0 and HHVM. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
