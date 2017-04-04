@@ -86,18 +86,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
         }
 
-        $autoincrement = false;
-        foreach ($primaryKeys as $primaryKey) {
-            $primaryKeyColumn = $table->getColumn($primaryKey);
-            if ($primaryKeyColumn->isAutoincrement()) {
-                $autoincrement = true;
-                break;
-            }
-        }
-        if ($autoincrement) {
-            $queries[] = 'CREATE SEQUENCE ' . $this->escapeString($table->getName() . '_seq') . ';';
-        }
-
         $queries[] = $this->createTableQuery($table);
         foreach ($table->getIndexes() as $index) {
             $queries[] = $this->createIndex($index, $table);
@@ -187,8 +175,14 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected function createColumn(Column $column, MigrationTable $table)
     {
-        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        if ($column->getDefault() !== null || $column->isAutoincrement()) {
+        $col = $this->escapeString($column->getName()) . ' ';
+        if ($column->isAutoincrement()) {
+            $col .= $column->getType() == Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+        } else {
+            $col .= $this->createType($column, $table);
+        }
+
+        if ($column->getDefault() !== null) {
             $col .= ' DEFAULT ' . $this->escapeDefault($column, $table);
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';
@@ -199,9 +193,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function escapeDefault(Column $column, MigrationTable $table)
     {
-        if ($column->isAutoincrement()) {
-            $default = "nextval('" . $table->getName() . "_seq'::regclass)";
-        } elseif ($column->getType() == Column::TYPE_INTEGER) {
+        if ($column->getType() == Column::TYPE_INTEGER) {
             $default = $column->getDefault();
         } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
             $default = $column->getDefault() ? 'true' : 'false';
