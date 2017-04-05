@@ -9,6 +9,7 @@
 #### Added
 - added method getSettings to Column
 - added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
+- json output for Status command
 
 #### Fixed
 - Fix wrong order in rollback
