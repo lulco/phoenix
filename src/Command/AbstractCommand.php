@@ -28,6 +28,8 @@ abstract class AbstractCommand extends Command
     /** @var Manager */
     protected $manager;
 
+    protected $start;
+
     /**
      * @param string $name
      * @return AbstractCommand
@@ -71,11 +73,9 @@ abstract class AbstractCommand extends Command
         $this->manager = new Manager($this->config, $this->adapter);
         $this->check($input, $output);
 
-        $start = microtime(true);
+        $this->start = microtime(true);
         $this->runCommand($input, $output);
-        $output->writeln('');
-        $output->write('<comment>All done. Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
-        $output->writeln('');
+        $this->finishCommand($input, $output);
     }
 
     private function loadConfig(InputInterface $input)
@@ -135,6 +135,13 @@ abstract class AbstractCommand extends Command
         if ($executedMigrations !== false && $this instanceof InitCommand) {
             throw new WrongCommandException('Phoenix was already initialized, run migrate or rollback command now.');
         }
+    }
+
+    protected function finishCommand(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('');
+        $output->write('<comment>All done. Took ' . sprintf('%.4fs', microtime(true) - $this->start) . '</comment>');
+        $output->writeln('');
     }
 
     abstract protected function runCommand(InputInterface $input, OutputInterface $output);

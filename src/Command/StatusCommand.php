@@ -3,7 +3,6 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
-use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,13 +37,21 @@ class StatusCommand extends AbstractCommand
             ];
         }
 
-        if ($input->getOption('output-format') == 'json') {
+        if ($input->getOption('output-format') === 'json') {
             $output->write(json_encode(['executed_migrations' => $executedMigrations, 'migrations_to_execute' => $migrationsToExecute]));
-            exit;
+            return;
         }
 
         $this->printTable(['Migration datetime', 'Class name', 'Executed at'], $executedMigrations, $output, 'Executed migrations', 'No executed migrations');
         $this->printTable(['Migration datetime', 'Class name'], $migrationsToExecute, $output, 'Migrations to execute', 'No migrations to execute');
+    }
+
+    protected function finishCommand(InputInterface $input, OutputInterface $output)
+    {
+        if ($input->getOption('output-format') === 'json') {
+            return;
+        }
+        parent::finishCommand($input, $output);
     }
 
     private function printTable(array $headers, array $rows, OutputInterface $output, $header, $noItemsText)
