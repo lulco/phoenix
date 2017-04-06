@@ -70,7 +70,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function createTable(MigrationTable $table)
     {
         $queries = [];
-        $primaryKeys = $table->getPrimaryColumns();
         $enumSetColumns = [];
         foreach ($table->getColumns() as $column) {
             if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
@@ -84,18 +83,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     return "'$value'";
                 }, $column->getValues())) . ');';
             }
-        }
-
-        $autoincrement = false;
-        foreach ($primaryKeys as $primaryKey) {
-            $primaryKeyColumn = $table->getColumn($primaryKey);
-            if ($primaryKeyColumn->isAutoincrement()) {
-                $autoincrement = true;
-                break;
-            }
-        }
-        if ($autoincrement) {
-            $queries[] = 'CREATE SEQUENCE ' . $this->escapeString($table->getName() . '_seq') . ';';
         }
 
         $queries[] = $this->createTableQuery($table);
@@ -115,7 +102,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         return [
             sprintf('DROP TABLE %s;', $this->escapeString($table->getName())),
-            sprintf('DROP SEQUENCE IF EXISTS %s;', $this->escapeString($table->getName() . '_seq')),
             sprintf("DELETE FROM %s WHERE %s LIKE '%s';", $this->escapeString('pg_type'), $this->escapeString('typname'), $table->getName() . '__%'),
         ];
     }
@@ -174,7 +160,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($newColumn->getDefault() === null && $newColumn->allowNull()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
                 } elseif ($newColumn->getDefault()) {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn, $table) . ';';
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
                 } else {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
                 }
@@ -187,9 +173,15 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected function createColumn(Column $column, MigrationTable $table)
     {
-        $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        if ($column->getDefault() !== null || $column->isAutoincrement()) {
-            $col .= ' DEFAULT ' . $this->escapeDefault($column, $table);
+        $col = $this->escapeString($column->getName()) . ' ';
+        if ($column->isAutoincrement()) {
+            $col .= $column->getType() == Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+        } else {
+            $col .= $this->createType($column, $table);
+        }
+
+        if ($column->getDefault() !== null) {
+            $col .= ' DEFAULT ' . $this->escapeDefault($column);
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
@@ -197,11 +189,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $col;
     }
 
-    private function escapeDefault(Column $column, MigrationTable $table)
+    private function escapeDefault(Column $column)
     {
-        if ($column->isAutoincrement()) {
-            $default = "nextval('" . $table->getName() . "_seq'::regclass)";
-        } elseif ($column->getType() == Column::TYPE_INTEGER) {
+        if ($column->getType() == Column::TYPE_INTEGER) {
             $default = $column->getDefault();
         } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
             $default = $column->getDefault() ? 'true' : 'false';
