@@ -70,7 +70,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function createTable(MigrationTable $table)
     {
         $queries = [];
-        $primaryKeys = $table->getPrimaryColumns();
         $enumSetColumns = [];
         foreach ($table->getColumns() as $column) {
             if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
@@ -161,7 +160,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($newColumn->getDefault() === null && $newColumn->allowNull()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
                 } elseif ($newColumn->getDefault()) {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn, $table) . ';';
+                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
                 } else {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
                 }
@@ -182,7 +181,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
 
         if ($column->getDefault() !== null) {
-            $col .= ' DEFAULT ' . $this->escapeDefault($column, $table);
+            $col .= ' DEFAULT ' . $this->escapeDefault($column);
         } elseif ($column->allowNull() && $column->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
@@ -190,7 +189,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $col;
     }
 
-    private function escapeDefault(Column $column, MigrationTable $table)
+    private function escapeDefault(Column $column)
     {
         if ($column->getType() == Column::TYPE_INTEGER) {
             $default = $column->getDefault();
