@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [0.7.0] - 2017-04-06
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
 - migration dir in create command is required if there are more then one migration dir registered
@@ -101,7 +102,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.6.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/lulco/phoenix/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/lulco/phoenix/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/lulco/phoenix/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
