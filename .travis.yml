@@ -18,7 +18,7 @@ sudo: false
 matrix:
     allow_failures:
         - php: hhvm
-        
+
 before_script:
     - travis_retry composer self-update
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
