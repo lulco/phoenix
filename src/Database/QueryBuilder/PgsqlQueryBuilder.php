@@ -103,7 +103,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         return [
             sprintf('DROP TABLE %s;', $this->escapeString($table->getName())),
-            sprintf('DROP SEQUENCE IF EXISTS %s;', $this->escapeString($table->getName() . '_seq')),
             sprintf("DELETE FROM %s WHERE %s LIKE '%s';", $this->escapeString('pg_type'), $this->escapeString('typname'), $table->getName() . '__%'),
         ];
     }

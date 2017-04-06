@@ -232,7 +232,6 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $queryBuilder = new PgsqlQueryBuilder();
         $expectedQueries = [
             'DROP TABLE "drop";',
-            'DROP SEQUENCE IF EXISTS "drop_seq";',
             'DELETE FROM "pg_type" WHERE "typname" LIKE \'drop__%\';',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));
