@@ -5,6 +5,7 @@ namespace Phoenix\Database\Adapter;
 use DateTime;
 use InvalidArgumentException;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
@@ -32,7 +33,11 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function execute($sql)
     {
-        $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
+        try {
+            $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
+        } catch (PDOException $e) {
+            $res = false;
+        }
         if ($res === false) {
             $this->throwError($sql);
         }
