@@ -34,7 +34,7 @@ abstract class AbstractCommand extends Command
     /** @var OutputInterface */
     protected $output;
 
-    /** @var type */
+    /** @var double */
     protected $start;
 
     /**
@@ -97,8 +97,12 @@ abstract class AbstractCommand extends Command
 
     protected function writeln($message, $options = 0)
     {
-        $specialOptions = $this->input->getOption('output-format') === 'json' ? -1 : $options;
-        $this->output->writeln($message, $specialOptions);
+        $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
+    }
+
+    protected function isDefaultOutput()
+    {
+        return $this->input->getOption('output-format') === null || $this->input->getOption('output-format') === 'default';
     }
 
     private function finishCommand(InputInterface $input, OutputInterface $output)
