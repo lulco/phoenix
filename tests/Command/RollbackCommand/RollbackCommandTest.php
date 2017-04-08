@@ -161,11 +161,11 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $command->run($input, $output);
 
         $dryMessages = $output->getMessages();
-        $dryQueries = array_slice($dryMessages[0], 3, -3);
+        $dryQueries = $dryMessages[OutputInterface::VERBOSITY_DEBUG];
 
         $this->assertTrue(is_array($dryMessages));
         $this->assertArrayHasKey(0, $dryMessages);
-        $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
 
         $input = $this->createInput();
         $output = new Output();

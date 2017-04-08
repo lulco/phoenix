@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Command\MigrateCommand;
 
 use Phoenix\Command\CleanupCommand;
+use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Command\BaseCommandTest;
@@ -108,6 +109,10 @@ abstract class MigrateCommandTest extends BaseCommandTest
 
     public function testDryRun()
     {
+        $initCommand = new InitCommand();
+        $initCommand->setConfig($this->configuration);
+        $initCommand->run($this->createInput(), new Output());
+
         $input = $this->createInput();
         $output = new Output();
         $command = new MigrateCommand();
@@ -117,10 +122,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $command->run($input, $output);
 
         $messages = $output->getMessages();
-
-        $dryMigrationExecuting = $messages[0][6];
-        $dryMigrationExecuted = $messages[0][7];
-        $dryQueries = array_slice($messages[0], 8, -3);
+        $dryQueries = $messages[OutputInterface::VERBOSITY_DEBUG];
 
         $input = $this->createInput();
         $output = new Output();
