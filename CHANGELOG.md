@@ -2,9 +2,11 @@
 
 ### [Unreleased][unreleased]
 
+### [0.7.0] - 2017-04-06
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
 - migration dir in create command is required if there are more then one migration dir registered
+- using serial and bigserial for autoincrement primary keys in pgsql instead of creating and dropping custom sequence
 
 #### Added
 - added method getSettings to Column
@@ -12,21 +14,21 @@
 - json output for Status command
 
 #### Fixed
-- Fix wrong order in rollback
+- wrong order in rollback
 
 #### Removed
 - removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
 
 ### [0.6.1] - 2016-12-13
 #### Fixed
-- Fixed support for changing column settings (allowNull, default) in pgsql
+- support for changing column settings (allowNull, default) in pgsql
 
 ### [0.6.0] - 2016-09-26
 #### Removed
 - deprecated variants of methods addColumn and changeColumn which allowed set all settings individually as parameter
 
 #### Fixed
-- Load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
+- load configuration from all default config files (php, yml, neon, json) if no file is set as config option in command
 
 #### Added
 - support for json config file
@@ -96,12 +98,13 @@
 - unsigned for MySQL
 
 ### [0.1.0] - 2016-02-05
-- First tagged version
+- first tagged version
 - 3 PDO Adapters: MySQL, PgSQL, SQLite
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.6.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/lulco/phoenix/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/lulco/phoenix/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/lulco/phoenix/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
