@@ -11,21 +11,20 @@ php:
     - 5.6
     - 7.0
     - 7.1
-    - hhvm
 
 sudo: false
 
 matrix:
-  fast_finish: true
-  include:
-    - php: hhvm
-      sudo: true
-      dist: trusty
-      group: edge # Use edge image until the next travis CI image update
-      addons:
-        code_climate:
-          repo_token: 2935307212620b0e2228ab67eadd92c9f5501ddb60549d0d86007a354d56915b
-        postgresql: "9.3"
+    fast_finish: true
+    include:
+          - php: hhvm
+            sudo: true
+            dist: trusty
+            group: edge
+            addons:
+                code_climate:
+                    repo_token: 2935307212620b0e2228ab67eadd92c9f5501ddb60549d0d86007a354d56915b
+                postgresql: "9.4"
 
 before_script:
     - travis_retry composer self-update
