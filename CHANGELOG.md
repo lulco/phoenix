@@ -3,7 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- json output for Migrate and Rollback commands
+- json output for commands
 
 ### [0.7.0] - 2017-04-06
 #### Changed
