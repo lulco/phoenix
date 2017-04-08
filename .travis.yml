@@ -1,43 +1,43 @@
 language: php
 
 services:
-    - mysql
-    - postgresql
+  - mysql
+  - postgresql
 
 addons:
-    postgresql: "9.4"
+  postgresql: "9.4"
 
 php:
-    - 5.6
-    - 7.0
-    - 7.1
-    - hhvm
+  - 5.6
+  - 7.0
+  - 7.1
+  - hhvm
 
 sudo: false
 
 matrix:
-    include:
-        - hhvm:
-            services:
-                - postgresql
+  include:
+    - php: hhvm
+      services:
+        - postgresql
 
-    allow_failures:
-        - php: hhvm
+  allow_failures:
+    - php: hhvm
 
 before_script:
-    - travis_retry composer self-update
-    - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
-    - if [[ $TRAVIS_PHP_VERSION = hhvm ]]; then composer remove nette/neon --dev --no-interaction; fi
-    - mysql -e 'DROP DATABASE IF EXISTS phoenix;'
-    - mysql -e 'CREATE DATABASE phoenix;'
-    - psql -c 'DROP DATABASE IF EXISTS phoenix;' -U postgres
-    - psql -c 'CREATE DATABASE phoenix;' -U postgres
+  - travis_retry composer self-update
+  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
+  - if [[ $TRAVIS_PHP_VERSION = hhvm ]]; then composer remove nette/neon --dev --no-interaction; fi
+  - mysql -e 'DROP DATABASE IF EXISTS phoenix;'
+  - mysql -e 'CREATE DATABASE phoenix;'
+  - psql -c 'DROP DATABASE IF EXISTS phoenix;' -U postgres
+  - psql -c 'CREATE DATABASE phoenix;' -U postgres
 
 script:
-    - mkdir -p build/logs
-    - php vendor/bin/phpcs src/ --standard=PSR2 -n
-    - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - mkdir -p build/logs
+  - php vendor/bin/phpcs src/ --standard=PSR2 -n
+  - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:
-    - wget https://scrutinizer-ci.com/ocular.phar
-    - php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
