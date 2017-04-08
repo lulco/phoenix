@@ -20,7 +20,6 @@ matrix:
         - php: hhvm
 
 before_script:
-    - echo "extension = pdo_pgsql.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - echo "extension = pgsql.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - travis_retry composer self-update
     - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction
