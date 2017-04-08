@@ -37,7 +37,7 @@ class StatusCommand extends AbstractCommand
         }
         $this->outputData['migrations_to_execute'] = $migrationsToExecute;
 
-        if ($input->getOption('output-format') === null || $input->getOption('output-format') === 'default') {
+        if ($this->isDefaultOutput()) {
             $this->printTable(['Migration datetime', 'Class name', 'Executed at'], $executedMigrations, 'Executed migrations', 'No executed migrations');
             $this->printTable(['Migration datetime', 'Class name'], $migrationsToExecute, 'Migrations to execute', 'No migrations to execute');
         }
