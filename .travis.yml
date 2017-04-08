@@ -16,6 +16,11 @@ php:
 sudo: false
 
 matrix:
+    include:
+        - hhvm:
+            services:
+                - postgresql
+
     allow_failures:
         - php: hhvm
 
