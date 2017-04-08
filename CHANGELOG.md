@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- migration datetime to Status command
+- json output for Status command
+
 ### [0.7.0] - 2017-04-06
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
@@ -11,7 +15,6 @@
 #### Added
 - added method getSettings to Column
 - added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
-- json output for Status command
 
 #### Fixed
 - wrong order in rollback
