@@ -5,7 +5,6 @@ namespace Phoenix\Command;
 use Phoenix\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class StatusCommand extends AbstractCommand
@@ -13,8 +12,7 @@ class StatusCommand extends AbstractCommand
     protected function configure()
     {
         $this->setName('status')
-            ->setDescription('List of migrations already executed and list of migrations to execute')
-            ->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: table, json', 'table');
+            ->setDescription('List of migrations already executed and list of migrations to execute');
         parent::configure();
     }
 
@@ -28,6 +26,7 @@ class StatusCommand extends AbstractCommand
                 'executed_at' => $migration['executed_at'],
             ];
         }
+        $this->outputData['executed_migrations'] = $executedMigrations;
 
         $migrationsToExecute = [];
         foreach ($this->manager->findMigrationsToExecute() as $migration) {
@@ -36,33 +35,23 @@ class StatusCommand extends AbstractCommand
                 'classname' => $migration->getClassName()
             ];
         }
+        $this->outputData['migrations_to_execute'] = $migrationsToExecute;
 
-        if ($input->getOption('output-format') === 'json') {
-            $output->write(json_encode(['executed_migrations' => $executedMigrations, 'migrations_to_execute' => $migrationsToExecute]));
-            return;
+        if ($input->getOption('output-format') === null || $input->getOption('output-format') === 'default') {
+            $this->printTable(['Migration datetime', 'Class name', 'Executed at'], $executedMigrations, 'Executed migrations', 'No executed migrations');
+            $this->printTable(['Migration datetime', 'Class name'], $migrationsToExecute, 'Migrations to execute', 'No migrations to execute');
         }
-
-        $this->printTable(['Migration datetime', 'Class name', 'Executed at'], $executedMigrations, $output, 'Executed migrations', 'No executed migrations');
-        $this->printTable(['Migration datetime', 'Class name'], $migrationsToExecute, $output, 'Migrations to execute', 'No migrations to execute');
     }
 
-    protected function finishCommand(InputInterface $input, OutputInterface $output)
+    private function printTable(array $headers, array $rows, $header, $noItemsText)
     {
-        if ($input->getOption('output-format') === 'json') {
-            return;
-        }
-        parent::finishCommand($input, $output);
-    }
-
-    private function printTable(array $headers, array $rows, OutputInterface $output, $header, $noItemsText)
-    {
-        $output->writeln('');
-        $output->writeln("<comment>$header</comment>");
+        $this->writeln('');
+        $this->writeln("<comment>$header</comment>");
         if (empty($rows)) {
-            $output->writeln("<info>$noItemsText</info>");
+            $this->writeln("<info>$noItemsText</info>");
             return;
         }
-        $table = new Table($output);
+        $table = new Table($this->output);
         $table->setHeaders($headers);
         $table->setRows($rows);
         $table->render();

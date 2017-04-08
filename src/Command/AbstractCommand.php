@@ -28,7 +28,20 @@ abstract class AbstractCommand extends Command
     /** @var Manager */
     protected $manager;
 
+    /** @var InputInterface */
+    protected $input;
+
+    /** @var OutputInterface */
+    protected $output;
+
+    /** @var double */
     protected $start;
+
+    /**
+     * output data used for json output format
+     * @var array
+     */
+    protected $outputData = [];
 
     /**
      * @param string $name
@@ -47,6 +60,7 @@ abstract class AbstractCommand extends Command
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED, 'Environment');
         $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Path to config file');
         $this->addOption('config_type', 't', InputOption::VALUE_OPTIONAL, 'Type of config, available values: php, yml, neon, json');
+        $this->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: default, json', 'default');
     }
 
     /**
@@ -65,6 +79,9 @@ abstract class AbstractCommand extends Command
      */
     final protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->input = $input;
+        $this->output = $output;
+
         $this->loadConfig($input);
 
         $environment = $input->getOption('environment') ?: $this->config->getDefaultEnvironment();
@@ -76,6 +93,25 @@ abstract class AbstractCommand extends Command
         $this->start = microtime(true);
         $this->runCommand($input, $output);
         $this->finishCommand($input, $output);
+    }
+
+    protected function writeln($message, $options = 0)
+    {
+        $specialOptions = $this->input->getOption('output-format') === 'json' ? -1 : $options;
+        $this->output->writeln($message, $specialOptions);
+    }
+
+    private function finishCommand(InputInterface $input, OutputInterface $output)
+    {
+        $executionTime = microtime(true) - $this->start;
+        if ($input->getOption('output-format') === 'json') {
+            $this->outputData['execution_time'] = $executionTime;
+            $output->write(json_encode($this->outputData));
+            return;
+        }
+        $output->writeln('');
+        $output->write('<comment>All done. Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
+        $output->writeln('');
     }
 
     private function loadConfig(InputInterface $input)
@@ -135,13 +171,6 @@ abstract class AbstractCommand extends Command
         if ($executedMigrations !== false && $this instanceof InitCommand) {
             throw new WrongCommandException('Phoenix was already initialized, run migrate or rollback command now.');
         }
-    }
-
-    protected function finishCommand(InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln('');
-        $output->write('<comment>All done. Took ' . sprintf('%.4fs', microtime(true) - $this->start) . '</comment>');
-        $output->writeln('');
     }
 
     abstract protected function runCommand(InputInterface $input, OutputInterface $output);
