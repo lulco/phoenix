@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Command\MigrateCommand;
 
 use Phoenix\Command\CleanupCommand;
+use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Command\BaseCommandTest;
@@ -108,6 +109,10 @@ abstract class MigrateCommandTest extends BaseCommandTest
 
     public function testDryRun()
     {
+        $initCommand = new InitCommand();
+        $initCommand->setConfig($this->configuration);
+        $initCommand->run($this->createInput(), new Output());
+
         $input = $this->createInput();
         $output = new Output();
         $command = new MigrateCommand();
@@ -117,10 +122,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $command->run($input, $output);
 
         $messages = $output->getMessages();
-
-        $dryMigrationExecuting = $messages[0][6];
-        $dryMigrationExecuted = $messages[0][7];
-        $dryQueries = array_slice($messages[0], 8, -3);
+        $dryQueries = $messages[OutputInterface::VERBOSITY_DEBUG];
 
         $input = $this->createInput();
         $output = new Output();
@@ -129,5 +131,40 @@ abstract class MigrateCommandTest extends BaseCommandTest
 
         $realRunMessages = $output->getMessages();
         $this->assertEquals($dryQueries, $realRunMessages[OutputInterface::VERBOSITY_DEBUG]);
+    }
+
+    public function testDryRunWithJsonOutput()
+    {
+        $initCommand = new InitCommand();
+        $initCommand->setConfig($this->configuration);
+        $initCommand->run($this->createInput(), new Output());
+
+        $input = $this->createInput();
+        $output = new Output();
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $input->setOption('dry', true);
+        $input->setOption('first', true);
+        $input->setOption('output-format', 'json');
+        $command->run($input, $output);
+
+        $messages = $output->getMessages(0);
+
+        $this->assertTrue(is_array($messages));
+        $this->assertCount(1, $messages);
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertJson($messages[0]);
+
+        $message = json_decode($messages[0], true);
+
+        $this->assertArrayHasKey('executed_migrations', $message);
+        $this->assertArrayHasKey('execution_time', $message);
+        $this->assertNotEmpty($message['executed_migrations']);
+        $this->assertNotEmpty($message['execution_time']);
+        foreach ($message['executed_migrations'] as $executedMigration) {
+            $this->assertArrayHasKey('classname', $executedMigration);
+            $this->assertArrayHasKey('execution_time', $executedMigration);
+            $this->assertArrayHasKey('executed_queries', $executedMigration);
+        }
     }
 }
