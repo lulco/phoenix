@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\StatusCommand;
 
+use Phoenix\Tests\Command\SqliteMemoryCommandBehavior;
+
 class SqliteMemoryStatusCommandTest extends StatusCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'sqlite_memory';
-    }
+    use SqliteMemoryCommandBehavior;
 }

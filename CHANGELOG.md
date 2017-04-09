@@ -15,6 +15,8 @@
 #### Added
 - added method getSettings to Column
 - added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
+- column settings constants
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 #### Fixed
 - wrong order in rollback

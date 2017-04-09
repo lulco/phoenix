@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\RollbackCommand;
 
+use Phoenix\Tests\Command\MysqlCommandBehavior;
+
 class MysqlRollbackCommandTest extends RollbackCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'mysql';
-    }
+    use MysqlCommandBehavior;
 }

@@ -25,7 +25,7 @@ return [
         ],
         'sqlite_memory' => [
             'adapter' => 'sqlite',
-            'dsn' => 'sqlite::memory:',
+            'dsn' => 'sqlite:' . __DIR__ . '/../phoenix.sqlite',
         ],
     ],
 ];

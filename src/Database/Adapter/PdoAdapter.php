@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
@@ -20,10 +21,12 @@ abstract class PdoAdapter implements AdapterInterface
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
 
+    /** @var Structure */
+    private $structure = null;
+
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->getQueryBuilder();
     }
 
     /**
@@ -59,7 +62,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildInsertQuery($table, array $data)
     {
-        $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
+        $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
         $statement = $this->pdo->prepare($query);
         if (!$statement) {
             $this->throwError($statement);
@@ -90,9 +93,9 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $values = [];
         foreach (array_keys($data) as $key) {
-            $values[] = $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key);
+            $values[] = $this->escapeString($key) . ' = ' . $this->createValue($key);
         }
-        $query = sprintf('UPDATE %s SET %s%s;', $this->queryBuilder->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
+        $query = sprintf('UPDATE %s SET %s%s;', $this->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         if (!$statement) {
             $this->throwError($statement);
@@ -116,7 +119,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function buildDeleteQuery($table, array $conditions = [], $where = '')
     {
-        $query = sprintf('DELETE FROM %s%s;', $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
+        $query = sprintf('DELETE FROM %s%s;', $this->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
         if (!$statement) {
             $this->throwError($statement);
@@ -158,7 +161,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
     {
-        $query = sprintf('SELECT %s FROM %s%s%s%s%s;', $fields, $this->queryBuilder->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
+        $query = sprintf('SELECT %s FROM %s%s%s%s%s;', $fields, $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
         $statement = $this->pdo->prepare($query);
         if (!$statement) {
             $this->throwError($statement);
@@ -174,7 +177,7 @@ abstract class PdoAdapter implements AdapterInterface
             $data = current($data);
         }
         foreach (array_keys($data) as $key) {
-            $keys[] = $this->queryBuilder->escapeString($key);
+            $keys[] = $this->escapeString($key);
         }
         return '(' . implode(', ', $keys) . ')';
     }
@@ -224,13 +227,13 @@ abstract class PdoAdapter implements AdapterInterface
     private function addCondition($key, $value)
     {
         if (!is_array($value)) {
-            return $this->queryBuilder->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+            return $this->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
         }
         $inConditions = [];
         foreach (array_keys($value) as $index) {
             $inConditions[] = $this->createValue($key, 'where_' . $index . '_');
         }
-        return $this->queryBuilder->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
+        return $this->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
     }
 
     private function createLimit($limit = null)
@@ -310,7 +313,19 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    abstract public function tableInfo($table);
+    public function getStructure($force = false)
+    {
+        if ($this->structure === null || $force === true) {
+            $this->structure = $this->loadStructure();
+        }
+        return $this->structure;
+    }
+
+    /**
+     * Load structure of database
+     * @return Structure
+     */
+    abstract protected function loadStructure();
 
     private function bindDataValues($statement, $data, $prefix = '')
     {
@@ -357,4 +372,6 @@ abstract class PdoAdapter implements AdapterInterface
     }
 
     abstract protected function createRealValue($value);
+
+    abstract protected function escapeString($string);
 }
