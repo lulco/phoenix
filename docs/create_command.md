@@ -1,10 +1,10 @@
 ## Create command
-`php vendor/bin/phoenix create [-e|--environment ENVIRONMENT] [-c|--config [CONFIG]] [-t|--config_type [CONFIG_TYPE]] [--template [TEMPLATE]] <migration> [<dir>]`
+`php vendor/bin/phoenix create [-e|--environment ENVIRONMENT] [-c|--config [CONFIG]] [-t|--config_type [CONFIG_TYPE]] [-f|--output-format OUTPUT-FORMAT] [--template [TEMPLATE]] <migration> [<dir>]`
 
 Creates new migration file.
 
 ### Options:
-First three options are [common](commands.md), other are described here:
+First four options are [common](commands.md), other are described here:
 - `--template` Path to custom migration template file, if not set, default template file is used
 
 ### Arguments:

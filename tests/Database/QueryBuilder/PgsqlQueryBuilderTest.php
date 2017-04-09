@@ -25,8 +25,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "simple_seq";',
-            'CREATE TABLE "simple" ("id" int4 DEFAULT nextval(\'simple_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "simple_pkey" PRIMARY KEY ("id"));'
+            'CREATE TABLE "simple" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "simple_pkey" PRIMARY KEY ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -42,8 +41,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "more_columns_seq";',
-            'CREATE TABLE "more_columns" ("id" int4 DEFAULT nextval(\'more_columns_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "more_columns_pkey" PRIMARY KEY ("id"));',
+            'CREATE TABLE "more_columns" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "more_columns_pkey" PRIMARY KEY ("id"));',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -51,7 +49,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testAllTypes()
     {
         $table = new MigrationTable('all_types');
-        $table->addPrimary(true);
+        $table->addPrimary('id');
+        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('id', 'biginteger', ['autoincrement' => true]));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_uuid', 'uuid'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyint', 'tinyinteger'));
         $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_smallint', 'smallinteger'));
@@ -88,8 +87,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $expectedQueries = [
             'CREATE TYPE "all_types__col_enum" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
             'CREATE TYPE "all_types__col_set" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
-            'CREATE SEQUENCE "all_types_seq";',
-            'CREATE TABLE "all_types" ("id" int4 DEFAULT nextval(\'all_types_seq\'::regclass) NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" bytea NOT NULL,"col_varbinary" bytea NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
+            'CREATE TABLE "all_types" ("id" bigserial NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" bytea NOT NULL,"col_varbinary" bytea NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -177,8 +175,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_indexes_seq";',
-            'CREATE TABLE "table_with_indexes" ("id" int4 DEFAULT nextval(\'table_with_indexes_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "table_with_indexes_pkey" PRIMARY KEY ("id"));',
+            'CREATE TABLE "table_with_indexes" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "table_with_indexes_pkey" PRIMARY KEY ("id"));',
             'CREATE INDEX "table_with_indexes_sorting" ON "table_with_indexes" USING BTREE ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_title_alias" ON "table_with_indexes" ("title","alias");',
             'CREATE FULLTEXT INDEX "table_with_indexes_bodytext" ON "table_with_indexes" USING HASH ("bodytext");',
@@ -197,8 +194,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_foreign_keys_seq";',
-            'CREATE TABLE "table_with_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
+            'CREATE TABLE "table_with_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -219,8 +215,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_indexes_and_foreign_keys_seq";',
-            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_indexes_and_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
+            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" USING BTREE ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_and_foreign_keys_title_alias" ON "table_with_indexes_and_foreign_keys" ("title","alias");',
             'CREATE FULLTEXT INDEX "table_with_indexes_and_foreign_keys_bodytext" ON "table_with_indexes_and_foreign_keys" USING HASH ("bodytext");',
@@ -234,7 +229,6 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
             'DROP TABLE "drop";',
-            'DROP SEQUENCE IF EXISTS "drop_seq";',
             'DELETE FROM "pg_type" WHERE "typname" LIKE \'drop__%\';',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));

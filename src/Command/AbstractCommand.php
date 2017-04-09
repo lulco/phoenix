@@ -28,6 +28,21 @@ abstract class AbstractCommand extends Command
     /** @var Manager */
     protected $manager;
 
+    /** @var InputInterface */
+    protected $input;
+
+    /** @var OutputInterface */
+    protected $output;
+
+    /** @var double */
+    protected $start;
+
+    /**
+     * output data used for json output format
+     * @var array
+     */
+    protected $outputData = [];
+
     /**
      * @param string $name
      * @return AbstractCommand
@@ -45,6 +60,7 @@ abstract class AbstractCommand extends Command
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED, 'Environment');
         $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Path to config file');
         $this->addOption('config_type', 't', InputOption::VALUE_OPTIONAL, 'Type of config, available values: php, yml, neon, json');
+        $this->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: default, json', 'default');
     }
 
     /**
@@ -63,6 +79,9 @@ abstract class AbstractCommand extends Command
      */
     final protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->input = $input;
+        $this->output = $output;
+
         $this->loadConfig($input);
 
         $environment = $input->getOption('environment') ?: $this->config->getDefaultEnvironment();
@@ -71,10 +90,31 @@ abstract class AbstractCommand extends Command
         $this->manager = new Manager($this->config, $this->adapter);
         $this->check($input, $output);
 
-        $start = microtime(true);
+        $this->start = microtime(true);
         $this->runCommand($input, $output);
+        $this->finishCommand($input, $output);
+    }
+
+    protected function writeln($message, $options = 0)
+    {
+        $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
+    }
+
+    protected function isDefaultOutput()
+    {
+        return $this->input->getOption('output-format') === null || $this->input->getOption('output-format') === 'default';
+    }
+
+    private function finishCommand(InputInterface $input, OutputInterface $output)
+    {
+        $executionTime = microtime(true) - $this->start;
+        if ($input->getOption('output-format') === 'json') {
+            $this->outputData['execution_time'] = $executionTime;
+            $output->write(json_encode($this->outputData));
+            return;
+        }
         $output->writeln('');
-        $output->write('<comment>All done. Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+        $output->write('<comment>All done. Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
         $output->writeln('');
     }
 
@@ -128,7 +168,10 @@ abstract class AbstractCommand extends Command
             if (!($this instanceof InitCommand)) {
                 $init = new InitCommand();
                 $init->setConfig($this->config->getConfiguration());
+                $verbosity = $output->getVerbosity();
+                $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
                 $init->execute($input, $output);
+                $output->setVerbosity($verbosity);
             }
         }
 
