@@ -17,13 +17,13 @@ abstract class CommonQueryBuilder
         if (in_array($column->getType(), [Column::TYPE_NUMERIC, Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE])) {
             return sprintf(
                 $this->remapType($column),
-                $column->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),
-                $column->getDecimals(isset($this->defaultLength[$column->getType()][1]) ? $this->defaultLength[$column->getType()][1] : null)
+                $column->getSettings()->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),
+                $column->getSettings()->getDecimals(isset($this->defaultLength[$column->getType()][1]) ? $this->defaultLength[$column->getType()][1] : null)
             );
         } elseif (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
             return $this->createEnumSetColumn($column, $table);
         }
-        return sprintf($this->remapType($column), $column->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
+        return sprintf($this->remapType($column), $column->getSettings()->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
 
     protected function remapType(Column $column)

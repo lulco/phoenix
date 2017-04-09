@@ -3,7 +3,7 @@
 namespace Phoenix\Tests\Command;
 
 use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
-use Phoenix\Tests\Helpers\Pdo\SqliteMemoryPdo;
+use Phoenix\Tests\Helpers\Pdo\SqlitePdo;
 
 trait SqliteCommandBehavior
 {
@@ -14,7 +14,7 @@ trait SqliteCommandBehavior
 
     protected function getAdapter()
     {
-        $pdo = new SqliteMemoryPdo();
+        $pdo = new SqlitePdo();
         return new SqliteCleanupAdapter($pdo);
     }
 }

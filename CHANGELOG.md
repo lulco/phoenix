@@ -5,6 +5,8 @@
 #### Added
 - json output for all commands
 - migration datetime to Status command
+- column settings class with constants
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 ### [0.7.0] - 2017-04-06
 #### Changed
@@ -13,16 +15,14 @@
 - using serial and bigserial for autoincrement primary keys in pgsql instead of creating and dropping custom sequence
 
 #### Added
-- added method getSettings to Column
-- added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
-- column settings constants
-- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
+- method getSettings to Column
+- column types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
 
 #### Fixed
 - wrong order in rollback
 
 #### Removed
-- removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
+- magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
 
 ### [0.6.1] - 2016-12-13
 #### Fixed
