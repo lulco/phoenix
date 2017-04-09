@@ -168,8 +168,10 @@ abstract class AbstractCommand extends Command
             if (!($this instanceof InitCommand)) {
                 $init = new InitCommand();
                 $init->setConfig($this->config->getConfiguration());
+                $verbosity = $output->getVerbosity();
                 $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
                 $init->execute($input, $output);
+                $output->setVerbosity($verbosity);
             }
         }
 
