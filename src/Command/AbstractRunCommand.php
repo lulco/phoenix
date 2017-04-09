@@ -21,25 +21,41 @@ abstract class AbstractRunCommand extends AbstractCommand
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
+        $dry = (bool) $input->getOption('dry');
+        if ($dry) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+        }
+
         $migrations = $this->findMigrations($input);
         if (empty($migrations)) {
-            $output->writeln('');
-            $output->writeln('<info>' . $this->noMigrationsFoundMessage . '</info>');
-            return;
+            $this->writeln('');
+            $this->writeln('<info>' . $this->noMigrationsFoundMessage . '</info>');
         }
 
-        $dry = (bool) $input->getOption('dry');
+        $executedMigrations = [];
         foreach ($migrations as $migration) {
-            $output->writeln('');
-            $output->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executing</info>');
-            
+            $this->writeln('');
+            $this->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executing</info>');
+
             $start = microtime(true);
             $this->runMigration($migration, $dry);
-            $output->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', microtime(true) - $start) . '</comment>');
+            $executionTime = microtime(true) - $start;
+            $this->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
 
-            $output->writeln('Executed queries:', $dry ? 0 : OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln($migration->getExecutedQueries(), $dry ? 0 : OutputInterface::VERBOSITY_DEBUG);
+            $executedQueries = $migration->getExecutedQueries();
+            $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+            $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
+
+            $executedMigration = [
+                'classname' => $migration->getClassName(),
+                'execution_time' => $executionTime,
+            ];
+            if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+                $executedMigration['executed_queries'] = $executedQueries;
+            }
+            $executedMigrations[] = $executedMigration;
         }
+        $this->outputData['executed_migrations'] = $executedMigrations;
     }
 
     abstract protected function findMigrations(InputInterface $input);
