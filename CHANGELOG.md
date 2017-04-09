@@ -4,6 +4,7 @@
 
 #### Added
 - json output for commands
+- migration datetime to Status command
 
 ### [0.7.0] - 2017-04-06
 #### Changed

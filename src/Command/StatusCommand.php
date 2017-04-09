@@ -3,7 +3,6 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
-use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,38 +18,40 @@ class StatusCommand extends AbstractCommand
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('');
-        $executedMigrations = $this->manager->executedMigrations();
-
-        $output->writeln('<comment>Executed migrations</comment>');
-        if (empty($executedMigrations)) {
-            $output->writeln('<info>No executed migrations</info>');
-        } else {
-            $rows = [];
-            foreach ($executedMigrations as $migration) {
-                $rows[] = [ltrim($migration['classname'], '\\'), $migration['executed_at']];
-            }
-            $this->printTable(['Class name', 'Executed at'], $rows, $output);
+        $executedMigrations = [];
+        foreach ($this->manager->executedMigrations() as $migration) {
+            $executedMigrations[] = [
+                'migration_datetime' => $migration['migration_datetime'],
+                'classname' => ltrim($migration['classname'], '\\'),
+                'executed_at' => $migration['executed_at'],
+            ];
         }
+        $this->outputData['executed_migrations'] = $executedMigrations;
 
-        $output->writeln('');
+        $migrationsToExecute = [];
+        foreach ($this->manager->findMigrationsToExecute() as $migration) {
+            $migrationsToExecute[] = [
+                'migration_datetime' => $migration->getDatetime(),
+                'classname' => $migration->getClassName()
+            ];
+        }
+        $this->outputData['migrations_to_execute'] = $migrationsToExecute;
 
-        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_UP);
-        $output->writeln('<comment>Migrations to execute</comment>');
-        if (empty($migrations)) {
-            $output->writeln('<info>No migrations to execute</info>');
-        } else {
-            $rows = [];
-            foreach ($migrations as $migration) {
-                $rows[] = [$migration->getClassName()];
-            }
-            $this->printTable(['Class name'], $rows, $output);
+        if ($this->isDefaultOutput()) {
+            $this->printTable(['Migration datetime', 'Class name', 'Executed at'], $executedMigrations, 'Executed migrations', 'No executed migrations');
+            $this->printTable(['Migration datetime', 'Class name'], $migrationsToExecute, 'Migrations to execute', 'No migrations to execute');
         }
     }
 
-    private function printTable(array $headers, array $rows, OutputInterface $output)
+    private function printTable(array $headers, array $rows, $header, $noItemsText)
     {
-        $table = new Table($output);
+        $this->writeln('');
+        $this->writeln("<comment>$header</comment>");
+        if (empty($rows)) {
+            $this->writeln("<info>$noItemsText</info>");
+            return;
+        }
+        $table = new Table($this->output);
         $table->setHeaders($headers);
         $table->setRows($rows);
         $table->render();
