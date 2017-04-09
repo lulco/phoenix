@@ -222,11 +222,9 @@ class Column
             }
         }
 
-        if (empty($errors)) {
-            return true;
+        if (!empty($errors)) {
+            throw new InvalidArgumentValueException(implode("\n", $errors));
         }
-
-        throw new InvalidArgumentValueException(implode("\n", $errors));
     }
 
     private function checkValue($setting, $value)
