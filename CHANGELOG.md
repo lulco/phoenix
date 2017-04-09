@@ -5,7 +5,7 @@
 #### Added
 - json output for all commands
 - migration datetime to Status command
-- column settings constants
+- column settings class with constants
 
 ### [0.7.0] - 2017-04-06
 #### Changed

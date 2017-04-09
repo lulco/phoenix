@@ -39,36 +39,13 @@ class Column
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';
 
-    const SETTING_NULL = 'null';
-    const SETTING_DEFAULT = 'default';
-    const SETTING_LENGTH = 'length';
-    const SETTING_DECIMALS = 'decimals';
-    const SETTING_SIGNED = 'signed';
-    const SETTING_AUTOINCREMENT = 'autoincrement';
-    const SETTING_AFTER = 'after';
-    const SETTING_FIRST = 'first';
-    const SETTING_CHARSET = 'charset';
-    const SETTING_COLLATION = 'collation';
-    const SETTING_VALUES = 'values';
-
-    private $allowedSettingsValues = [
-        self::SETTING_NULL => ['is_bool'],
-        self::SETTING_DEFAULT => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
-        self::SETTING_LENGTH => ['is_null', 'is_int'],
-        self::SETTING_DECIMALS => ['is_null', 'is_int'],
-        self::SETTING_SIGNED => ['is_bool'],
-        self::SETTING_AUTOINCREMENT => ['is_bool'],
-        self::SETTING_AFTER => ['is_null', 'is_string'],
-        self::SETTING_FIRST => ['is_bool'],
-        self::SETTING_CHARSET => ['is_null', 'is_string'],
-        self::SETTING_COLLATION => ['is_null', 'is_string'],
-        self::SETTING_VALUES => ['is_null', 'is_array'],
-    ];
-
+    /** @var string */
     private $name;
 
+    /** @var string */
     private $type;
 
+    /** @var ColumnSettings */
     private $settings;
 
     /**
@@ -79,11 +56,9 @@ class Column
     public function __construct($name, $type, array $settings = [])
     {
         $this->checkType($type);
-        $this->checkSettings($settings);
-
         $this->name = $name;
         $this->type = $type;
-        $this->settings = $settings;
+        $this->settings = new ColumnSettings($settings);
     }
 
     /**
@@ -107,7 +82,7 @@ class Column
      */
     public function getSettings()
     {
-        return $this->settings;
+        return $this->settings->getSettings();
     }
 
     /**
@@ -115,7 +90,7 @@ class Column
      */
     public function allowNull()
     {
-        return isset($this->settings['null']) ? $this->settings['null'] : false;
+        return $this->settings->allowNull();
     }
 
     /**
@@ -123,7 +98,7 @@ class Column
      */
     public function getDefault()
     {
-        return isset($this->settings['default']) ? $this->settings['default'] : null;
+        return $this->settings->getDefault();
     }
 
     /**
@@ -131,7 +106,7 @@ class Column
      */
     public function isSigned()
     {
-        return isset($this->settings['signed']) ? $this->settings['signed'] : true;
+        return $this->settings->isSigned();
     }
 
     /**
@@ -140,7 +115,7 @@ class Column
      */
     public function getLength($default = null)
     {
-        return isset($this->settings['length']) ? $this->settings['length'] : $default;
+        return $this->settings->getLength($default);
     }
 
     /**
@@ -149,7 +124,7 @@ class Column
      */
     public function getDecimals($default = null)
     {
-        return isset($this->settings['decimals']) ? $this->settings['decimals'] : $default;
+        return $this->settings->getDecimals($default);
     }
 
     /**
@@ -157,7 +132,7 @@ class Column
      */
     public function isAutoincrement()
     {
-        return isset($this->settings['autoincrement']) ? $this->settings['autoincrement'] : false;
+        return $this->settings->isAutoincrement();
     }
 
     /**
@@ -165,7 +140,7 @@ class Column
      */
     public function getAfter()
     {
-        return isset($this->settings['after']) ? $this->settings['after'] : null;
+        return $this->settings->getAfter();
     }
 
     /**
@@ -173,7 +148,7 @@ class Column
      */
     public function isFirst()
     {
-        return isset($this->settings['first']) ? $this->settings['first'] : false;
+        return $this->settings->isFirst();
     }
 
     /**
@@ -181,7 +156,7 @@ class Column
      */
     public function getCharset()
     {
-        return isset($this->settings['charset']) ? $this->settings['charset'] : null;
+        return $this->settings->getCharset();
     }
 
     /**
@@ -189,7 +164,7 @@ class Column
      */
     public function getCollation()
     {
-        return isset($this->settings['collation']) ? $this->settings['collation'] : null;
+        return $this->settings->getCollation();
     }
 
     /**
@@ -197,59 +172,15 @@ class Column
      */
     public function getValues()
     {
-        return isset($this->settings['values']) ? $this->settings['values'] : null;
+        return $this->settings->getValues();
     }
 
     private function checkType($type)
     {
-        $typeConstants = $this->getConstants('TYPE_');
+        $reflectionClass = new ReflectionClass($this);
+        $typeConstants = $reflectionClass->getConstants();
         if (!in_array($type, $typeConstants)) {
             throw new InvalidArgumentValueException('Type "' . $type . '" is not allowed.');
         }
-    }
-
-    private function checkSettings($settings)
-    {
-        $errors = [];
-        $settingsConstants = $this->getConstants('SETTING_');
-        foreach ($settings as $setting => $value) {
-            if (!in_array($setting, $settingsConstants)) {
-                $errors[] = 'Setting "' . $setting . '" is not allowed.';
-            }
-            $checkedValue = $this->checkValue($setting, $value);
-            if ($checkedValue !== true) {
-                $errors[] = $checkedValue;
-            }
-        }
-
-        if (!empty($errors)) {
-            throw new InvalidArgumentValueException(implode("\n", $errors));
-        }
-    }
-
-    private function checkValue($setting, $value)
-    {
-        if (!isset($this->allowedSettingsValues[$setting])) {
-            return true;
-        }
-
-        foreach ($this->allowedSettingsValues[$setting] as $checkFunction) {
-            if (call_user_func($checkFunction, $value) === true) {
-                return true;
-            }
-        }
-        return 'Value "' . $value . '" is not allowed for setting "' . $setting . '".';
-    }
-
-    private function getConstants($prefix)
-    {
-        $reflectionClass = new ReflectionClass($this);
-        $constants = [];
-        foreach ($reflectionClass->getConstants() as $name => $value) {
-            if (strpos($name, $prefix) === 0) {
-                $constants[$name] = $value;
-            }
-        }
-        return $constants;
     }
 }
