@@ -7,6 +7,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class MigrationTableTest extends PHPUnit_Framework_TestCase
@@ -98,7 +99,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $table = new MigrationTable('test');
         $table->addPrimary(true);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'int'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer'));
         $this->assertCount(3, $table->getColumns());
 
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('title', 'new_title', 'string'));
@@ -113,6 +114,14 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->dropColumn('title'));
         $this->assertCount(3, $table->getColumns());
         $this->assertCount(1, $table->getColumnsToDrop());
+    }
+
+    public function testUnsupportedColumnType()
+    {
+        $table = new MigrationTable('unsupported');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Type "unsupported" is not allowed');
+        $table->addColumn('title', 'unsupported');
     }
 
     public function testIndexes()
@@ -156,7 +165,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'int'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
 
         $columns = $table->getColumns();

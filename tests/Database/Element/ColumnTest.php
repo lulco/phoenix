@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class ColumnTest extends PHPUnit_Framework_TestCase
@@ -84,15 +85,24 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['first', 'second', 'third'], $column->getValues());
     }
 
+    public function testUnsupportedColumnType()
+    {
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Type "unsupported" is not allowed');
+        new Column('title', 'unsupported');
+    }
+
     public function testNotAllowedSetting()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Setting "not_allowed_setting" is not allowed.');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Setting "not_allowed_setting" is not allowed.');
         new Column('title', 'string', ['not_allowed_setting' => true]);
     }
 
     public function testNotAllowedSettingValue()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Value "123" is not allowed for setting "null".');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Value "123" is not allowed for setting "null".');
         new Column('title', 'string', ['null' => 123]);
     }
 }
