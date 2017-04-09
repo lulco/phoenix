@@ -3,7 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- json output for commands
+- json output for all commands
 - migration datetime to Status command
 
 ### [0.7.0] - 2017-04-06
