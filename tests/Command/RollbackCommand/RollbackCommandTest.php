@@ -27,7 +27,8 @@ abstract class RollbackCommandTest extends BaseCommandTest
     public function testMissingDefaultConfig()
     {
         $command = new RollbackCommand();
-        $this->setExpectedException(ConfigException::class, 'No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         $command->run($this->input, $this->output);
     }
 
@@ -35,7 +36,8 @@ abstract class RollbackCommandTest extends BaseCommandTest
     {
         $command = new RollbackCommand();
         $this->input->setOption('config', 'xyz.neon');
-        $this->setExpectedException(ConfigException::class, 'Configuration file "xyz.neon" doesn\'t exist.');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
         $command->run($this->input, $this->output);
     }
 

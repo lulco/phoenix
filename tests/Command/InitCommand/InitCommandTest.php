@@ -25,7 +25,8 @@ abstract class InitCommandTest extends BaseCommandTest
     public function testMissingDefaultConfig()
     {
         $command = new InitCommand();
-        $this->setExpectedException(ConfigException::class, 'No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         $command->run($this->input, $this->output);
     }
 
@@ -33,7 +34,8 @@ abstract class InitCommandTest extends BaseCommandTest
     {
         $command = new InitCommand();
         $this->input->setOption('config', 'xyz.neon');
-        $this->setExpectedException(ConfigException::class, 'Configuration file "xyz.neon" doesn\'t exist.');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
         $command->run($this->input, $this->output);
     }
 
@@ -94,7 +96,8 @@ abstract class InitCommandTest extends BaseCommandTest
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
-        $this->setExpectedException(WrongCommandException::class, 'Phoenix was already initialized, run migrate or rollback command now.');
+        $this->expectException(WrongCommandException::class);
+        $this->expectExceptionMessage('Phoenix was already initialized, run migrate or rollback command now.');
         $command->run($this->input, $this->output);
     }
 }

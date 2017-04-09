@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Index;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class IndexTest extends PHPUnit_Framework_TestCase
@@ -65,13 +66,15 @@ class IndexTest extends PHPUnit_Framework_TestCase
 
     public function testUnknownType()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Index type "unknown" is not allowed');
-        $index = new Index('title', 'title', 'unknown');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Index type "unknown" is not allowed');
+        new Index('title', 'title', 'unknown');
     }
 
     public function testUnknownMethod()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Index method "unknown" is not allowed');
-        $index = new Index('title', 'title', '', 'unknown');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Index method "unknown" is not allowed');
+        new Index('title', 'title', '', 'unknown');
     }
 }

@@ -36,7 +36,8 @@ class ConfigParserFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testUnknownType()
     {
-        $this->setExpectedException(ConfigException::class, 'Unknown config type "asdf"');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Unknown config type "asdf"');
         ConfigParserFactory::instance('Asdf');
     }
 }
