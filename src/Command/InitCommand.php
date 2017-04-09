@@ -13,7 +13,6 @@ class InitCommand extends AbstractCommand
     {
         $this->setName('init')
             ->setDescription('Initialize phoenix');
-
         parent::configure();
     }
 
@@ -24,9 +23,16 @@ class InitCommand extends AbstractCommand
         $migration = new Init($this->adapter, $this->config->getLogTableName());
         $migration->migrate();
 
-        $output->writeln('');
-        $output->writeln('<info>Phoenix initialized</info>');
-        $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
-        $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln('');
+        $executedQueries = $migration->getExecutedQueries();
+        $this->writeln('<info>Phoenix initialized</info>');
+        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
+
+        $this->outputData['message'] = 'Phoenix initialized';
+
+        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+            $this->outputData['executed_queries'] = $executedQueries;
+        }
     }
 }
