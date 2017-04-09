@@ -81,7 +81,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             foreach ($enumSetColumns as $column) {
                 $queries[] = 'CREATE TYPE ' . $this->escapeString($table->getName() . '__' . $column->getName()) . ' AS ENUM (' . implode(',', array_map(function ($value) {
                     return "'$value'";
-                }, $column->getValues())) . ');';
+                }, $column->getSettings()->getValues())) . ');';
             }
         }
 
@@ -149,17 +149,17 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
 
                     $tableInfo = $this->adapter->tableInfo($table->getName());
-                    foreach (array_diff($newColumn->getValues(), $tableInfo[$oldColumnName]->getValues()) as $newValue) {
+                    foreach (array_diff($newColumn->getSettings()->getValues(), $tableInfo[$oldColumnName]->getSettings()->getValues()) as $newValue) {
                         $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
                     }
                 } else {
                     $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
                 }
                 $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . $cast . ';';
-                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . ($newColumn->allowNull() ? 'DROP' : 'SET') . ' NOT NULL;';
-                if ($newColumn->getDefault() === null && $newColumn->allowNull()) {
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . ($newColumn->getSettings()->allowNull() ? 'DROP' : 'SET') . ' NOT NULL;';
+                if ($newColumn->getSettings()->getDefault() === null && $newColumn->getSettings()->allowNull()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
-                } elseif ($newColumn->getDefault()) {
+                } elseif ($newColumn->getSettings()->getDefault()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
                 } else {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
@@ -174,29 +174,29 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ';
-        if ($column->isAutoincrement()) {
+        if ($column->getSettings()->isAutoincrement()) {
             $col .= $column->getType() == Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
         } else {
             $col .= $this->createType($column, $table);
         }
 
-        if ($column->getDefault() !== null) {
+        if ($column->getSettings()->getDefault() !== null) {
             $col .= ' DEFAULT ' . $this->escapeDefault($column);
-        } elseif ($column->allowNull() && $column->getDefault() === null) {
+        } elseif ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
-        $col .= $column->allowNull() ? '' : ' NOT NULL';
+        $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         return $col;
     }
 
     private function escapeDefault(Column $column)
     {
         if ($column->getType() == Column::TYPE_INTEGER) {
-            $default = $column->getDefault();
+            $default = $column->getSettings()->getDefault();
         } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
-            $default = $column->getDefault() ? 'true' : 'false';
+            $default = $column->getSettings()->getDefault() ? 'true' : 'false';
         } else {
-            $default = "'" . $column->getDefault() . "'";
+            $default = "'" . $column->getSettings()->getDefault() . "'";
         }
 
         return $default;

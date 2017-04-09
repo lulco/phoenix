@@ -78,101 +78,11 @@ class Column
     }
 
     /**
-     * @return array
+     * @return ColumnSettings
      */
     public function getSettings()
     {
-        return $this->settings->getSettings();
-    }
-
-    /**
-     * @return boolean
-     */
-    public function allowNull()
-    {
-        return $this->settings->allowNull();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefault()
-    {
-        return $this->settings->getDefault();
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isSigned()
-    {
-        return $this->settings->isSigned();
-    }
-
-    /**
-     * @param mixed $default value to return if length is not set
-     * @return mixed
-     */
-    public function getLength($default = null)
-    {
-        return $this->settings->getLength($default);
-    }
-
-    /**
-     * @param integer $default
-     * @return int|null
-     */
-    public function getDecimals($default = null)
-    {
-        return $this->settings->getDecimals($default);
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isAutoincrement()
-    {
-        return $this->settings->isAutoincrement();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAfter()
-    {
-        return $this->settings->getAfter();
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isFirst()
-    {
-        return $this->settings->isFirst();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCharset()
-    {
-        return $this->settings->getCharset();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCollation()
-    {
-        return $this->settings->getCollation();
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getValues()
-    {
-        return $this->settings->getValues();
+        return $this->settings;
     }
 
     private function checkType($type)

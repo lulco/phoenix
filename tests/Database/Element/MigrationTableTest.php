@@ -31,12 +31,12 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Column::class, $idColumn);
         $this->assertEquals('id', $idColumn->getName());
         $this->assertEquals('integer', $idColumn->getType());
-        $this->assertFalse($idColumn->allowNull());
-        $this->assertNull($idColumn->getDefault());
-        $this->assertTrue($idColumn->isSigned());
-        $this->assertNull($idColumn->getLength());
-        $this->assertNull($idColumn->getDecimals());
-        $this->assertTrue($idColumn->isAutoincrement());
+        $this->assertFalse($idColumn->getSettings()->allowNull());
+        $this->assertNull($idColumn->getSettings()->getDefault());
+        $this->assertTrue($idColumn->getSettings()->isSigned());
+        $this->assertNull($idColumn->getSettings()->getLength());
+        $this->assertNull($idColumn->getSettings()->getDecimals());
+        $this->assertTrue($idColumn->getSettings()->isAutoincrement());
         $primaryColumns = $table->getPrimaryColumns();
         $this->assertCount(1, $primaryColumns);
         foreach ($primaryColumns as $primaryColumn) {
@@ -220,12 +220,12 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Column::class, $idColumn);
         $this->assertEquals('id', $idColumn->getName());
         $this->assertEquals('integer', $idColumn->getType());
-        $this->assertFalse($idColumn->allowNull());
-        $this->assertNull($idColumn->getDefault());
-        $this->assertTrue($idColumn->isSigned());
-        $this->assertNull($idColumn->getLength());
-        $this->assertNull($idColumn->getDecimals());
-        $this->assertTrue($idColumn->isAutoincrement());
+        $this->assertFalse($idColumn->getSettings()->allowNull());
+        $this->assertNull($idColumn->getSettings()->getDefault());
+        $this->assertTrue($idColumn->getSettings()->isSigned());
+        $this->assertNull($idColumn->getSettings()->getLength());
+        $this->assertNull($idColumn->getSettings()->getDecimals());
+        $this->assertTrue($idColumn->getSettings()->isAutoincrement());
         $this->assertCount(1, $table->getPrimaryColumns());
     }
 
