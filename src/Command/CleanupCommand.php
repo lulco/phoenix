@@ -20,20 +20,14 @@ class CleanupCommand extends AbstractCommand
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
         $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
-        if (empty($migrations)) {
-            $output->writeln('');
-            $output->writeln('<info>Nothing to rollback</info>');
-            $output->writeln('');
-        }
-
+        $executedMigrations = [];
         foreach ($migrations as $migration) {
             $migration->rollback();
             $this->manager->removeExecution($migration);
 
-            $output->writeln('');
-            $output->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
-            $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
-            $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
+            $this->writeln('');
+            $this->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
+            $executedMigrations[] = $this->addMigrationToList($migration, $output);
         }
 
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
@@ -41,10 +35,26 @@ class CleanupCommand extends AbstractCommand
         $migration = new Init($this->adapter, $this->config->getLogTableName());
         $migration->rollback();
 
-        $output->writeln('');
-        $output->writeln('<info>Phoenix cleaned</info>');
-        $output->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
-        $output->writeln($migration->getExecutedQueries(), OutputInterface::VERBOSITY_DEBUG);
-        $output->writeln('');
+        $this->writeln('');
+        $this->writeln('<info>Phoenix cleaned</info>');
+        $executedMigrations[] = $this->addMigrationToList($migration, $output);
+        $this->writeln('');
+
+        $this->outputData['executed_migrations'] = $executedMigrations;
+    }
+
+    private function addMigrationToList($migration, OutputInterface $output)
+    {
+        $executedQueries = $migration->getExecutedQueries();
+        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
+
+        $executedMigration = [
+            'classname' => $migration->getClassName(),
+        ];
+        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+            $executedMigration['executed_queries'] = $executedQueries;
+        }
+        return $executedMigration;
     }
 }
