@@ -16,8 +16,7 @@ abstract class AbstractRunCommand extends AbstractCommand
     protected function configure()
     {
         parent::configure();
-        $this
-            ->addOption('dry', null, InputOption::VALUE_NONE, 'Only print queries, no execution');
+        $this->addOption('dry', null, InputOption::VALUE_NONE, 'Only print queries, no execution');
     }
 
     protected function runCommand(InputInterface $input, OutputInterface $output)

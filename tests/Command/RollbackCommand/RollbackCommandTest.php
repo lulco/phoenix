@@ -177,4 +177,38 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
         $this->assertEquals($dryQueries, $messages[OutputInterface::VERBOSITY_DEBUG]);
     }
+
+    public function testDryRunWithJsonOutput()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $input = $this->createInput();
+        $input->setOption('dry', true);
+        $input->setOption('output-format', 'json');
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages(0);
+
+        $this->assertTrue(is_array($messages));
+        $this->assertCount(1, $messages);
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertJson($messages[0]);
+
+        $message = json_decode($messages[0], true);
+
+        $this->assertArrayHasKey('executed_migrations', $message);
+        $this->assertArrayHasKey('execution_time', $message);
+        $this->assertNotEmpty($message['executed_migrations']);
+        $this->assertNotEmpty($message['execution_time']);
+        foreach ($message['executed_migrations'] as $executedMigration) {
+            $this->assertArrayHasKey('classname', $executedMigration);
+            $this->assertArrayHasKey('execution_time', $executedMigration);
+            $this->assertArrayHasKey('executed_queries', $executedMigration);
+        }
+    }
 }
