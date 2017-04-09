@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\MigrateCommand;
 
+use Phoenix\Tests\Command\MysqlCommandBehavior;
+
 class MysqlMigrateCommandTest extends MigrateCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'mysql';
-    }
+    use MysqlCommandBehavior;
 }

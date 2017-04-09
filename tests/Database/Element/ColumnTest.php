@@ -3,6 +3,8 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class ColumnTest extends PHPUnit_Framework_TestCase
@@ -12,20 +14,21 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $column = new Column('title', 'string');
         $this->assertEquals('title', $column->getName());
         $this->assertEquals('string', $column->getType());
-        $this->assertEquals([], $column->getSettings());
-        $this->assertFalse($column->allowNull());
-        $this->assertNull($column->getDefault());
-        $this->assertNull($column->getLength());
-        $this->assertEquals(100, $column->getLength(100));
-        $this->assertNull($column->getDecimals());
-        $this->assertEquals(2, $column->getDecimals(2));
-        $this->assertTrue($column->isSigned());
-        $this->assertFalse($column->isAutoincrement());
-        $this->assertFalse($column->isFirst());
-        $this->assertNull($column->getAfter());
-        $this->assertNull($column->getCharset());
-        $this->assertNull($column->getCollation());
-        $this->assertNull($column->getValues());
+        $this->assertInstanceOf(ColumnSettings::class, $column->getSettings());
+        $this->assertEquals([], $column->getSettings()->getSettings());
+        $this->assertFalse($column->getSettings()->allowNull());
+        $this->assertNull($column->getSettings()->getDefault());
+        $this->assertNull($column->getSettings()->getLength());
+        $this->assertEquals(100, $column->getSettings()->getLength(100));
+        $this->assertNull($column->getSettings()->getDecimals());
+        $this->assertEquals(2, $column->getSettings()->getDecimals(2));
+        $this->assertTrue($column->getSettings()->isSigned());
+        $this->assertFalse($column->getSettings()->isAutoincrement());
+        $this->assertFalse($column->getSettings()->isFirst());
+        $this->assertNull($column->getSettings()->getAfter());
+        $this->assertNull($column->getSettings()->getCharset());
+        $this->assertNull($column->getSettings()->getCollation());
+        $this->assertNull($column->getSettings()->getValues());
     }
 
     public function testComplex()
@@ -33,20 +36,21 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $column = new Column('title', 'string', ['null' => true, 'default' => '', 'length' => 255, 'after' => 'id']);
         $this->assertEquals('title', $column->getName());
         $this->assertEquals('string', $column->getType());
-        $this->assertEquals(['null' => true, 'default' => '', 'length' => 255, 'after' => 'id'], $column->getSettings());
-        $this->assertTrue($column->allowNull());
-        $this->assertEquals('', $column->getDefault());
-        $this->assertEquals(255, $column->getLength());
-        $this->assertEquals(255, $column->getLength(100));
-        $this->assertNull($column->getDecimals());
-        $this->assertEquals(2, $column->getDecimals(2));
-        $this->assertTrue($column->isSigned());
-        $this->assertFalse($column->isAutoincrement());
-        $this->assertFalse($column->isFirst());
-        $this->assertEquals('id', $column->getAfter());
-        $this->assertNull($column->getCharset());
-        $this->assertNull($column->getCollation());
-        $this->assertNull($column->getValues());
+        $this->assertInstanceOf(ColumnSettings::class, $column->getSettings());
+        $this->assertEquals(['null' => true, 'default' => '', 'length' => 255, 'after' => 'id'], $column->getSettings()->getSettings());
+        $this->assertTrue($column->getSettings()->allowNull());
+        $this->assertEquals('', $column->getSettings()->getDefault());
+        $this->assertEquals(255, $column->getSettings()->getLength());
+        $this->assertEquals(255, $column->getSettings()->getLength(100));
+        $this->assertNull($column->getSettings()->getDecimals());
+        $this->assertEquals(2, $column->getSettings()->getDecimals(2));
+        $this->assertTrue($column->getSettings()->isSigned());
+        $this->assertFalse($column->getSettings()->isAutoincrement());
+        $this->assertFalse($column->getSettings()->isFirst());
+        $this->assertEquals('id', $column->getSettings()->getAfter());
+        $this->assertNull($column->getSettings()->getCharset());
+        $this->assertNull($column->getSettings()->getCollation());
+        $this->assertNull($column->getSettings()->getValues());
     }
 
     public function testFullSettings()
@@ -68,31 +72,41 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $column = new Column('title', 'string', $settings);
         $this->assertEquals('title', $column->getName());
         $this->assertEquals('string', $column->getType());
-        $this->assertEquals($settings, $column->getSettings());
-        $this->assertFalse($column->allowNull());
-        $this->assertEquals('default_value', $column->getDefault());
-        $this->assertEquals(100, $column->getLength());
-        $this->assertEquals(100, $column->getLength(150));
-        $this->assertNull($column->getDecimals());
-        $this->assertEquals(2, $column->getDecimals(2));
-        $this->assertFalse($column->isSigned());
-        $this->assertFalse($column->isAutoincrement());
-        $this->assertTrue($column->isFirst());
-        $this->assertNull($column->getAfter());
-        $this->assertEquals('my_charset', $column->getCharset());
-        $this->assertEquals('my_collation', $column->getCollation());
-        $this->assertEquals(['first', 'second', 'third'], $column->getValues());
+        $this->assertInstanceOf(ColumnSettings::class, $column->getSettings());
+        $this->assertEquals($settings, $column->getSettings()->getSettings());
+        $this->assertFalse($column->getSettings()->allowNull());
+        $this->assertEquals('default_value', $column->getSettings()->getDefault());
+        $this->assertEquals(100, $column->getSettings()->getLength());
+        $this->assertEquals(100, $column->getSettings()->getLength(150));
+        $this->assertNull($column->getSettings()->getDecimals());
+        $this->assertEquals(2, $column->getSettings()->getDecimals(2));
+        $this->assertFalse($column->getSettings()->isSigned());
+        $this->assertFalse($column->getSettings()->isAutoincrement());
+        $this->assertTrue($column->getSettings()->isFirst());
+        $this->assertNull($column->getSettings()->getAfter());
+        $this->assertEquals('my_charset', $column->getSettings()->getCharset());
+        $this->assertEquals('my_collation', $column->getSettings()->getCollation());
+        $this->assertEquals(['first', 'second', 'third'], $column->getSettings()->getValues());
+    }
+
+    public function testUnsupportedColumnType()
+    {
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Type "unsupported" is not allowed');
+        new Column('title', 'unsupported');
     }
 
     public function testNotAllowedSetting()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Setting "not_allowed_setting" is not allowed.');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Setting "not_allowed_setting" is not allowed.');
         new Column('title', 'string', ['not_allowed_setting' => true]);
     }
 
     public function testNotAllowedSettingValue()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Value "123" is not allowed for setting "null".');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Value "123" is not allowed for setting "null".');
         new Column('title', 'string', ['null' => 123]);
     }
 }

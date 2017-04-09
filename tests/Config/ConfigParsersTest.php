@@ -71,7 +71,7 @@ class ConfigParsersTest extends PHPUnit_Framework_TestCase
             $configParser = ConfigParserFactory::instance($type);
             $filename = __DIR__ . '/../../example/not_found_' . $configuration['file'];
             try {
-                $config = $configParser->parse($filename);
+                $configParser->parse($filename);
             } catch (Exception $e) {
                 $this->assertInstanceOf(ConfigException::class, $e);
                 $this->assertEquals('File "' . $filename . '" not found', $e->getMessage());

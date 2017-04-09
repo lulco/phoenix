@@ -2,9 +2,12 @@
 
 namespace Phoenix\Tests\Database\Adapter;
 
+use LogicException;
 use PDO;
 use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Adapter\SqliteAdapter;
+use Phoenix\Database\Element\Column;
+use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Tests\Mock\Database\FakePdo;
 use PHPUnit_Framework_TestCase;
 
@@ -14,9 +17,10 @@ class AdapterTest extends PHPUnit_Framework_TestCase
     {
         $pdo = new FakePdo();
         $adapter = new MysqlAdapter($pdo);
-        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        $this->assertInstanceOf(QueryBuilderInterface::class, $adapter->getQueryBuilder());
 
-        $this->setExpectedException('\LogicException', 'Not yet implemented');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Not yet implemented');
         $adapter->tableInfo('table');
     }
 
@@ -24,7 +28,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
     {
         $pdo = new PDO('sqlite::memory:');
         $adapter = new SqliteAdapter($pdo);
-        $this->assertInstanceOf('\Phoenix\Database\QueryBuilder\QueryBuilderInterface', $adapter->getQueryBuilder());
+        $this->assertInstanceOf(QueryBuilderInterface::class, $adapter->getQueryBuilder());
 
         $pdo->query('CREATE TABLE "test" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"title" varchar(255) NOT NULL);');
 
@@ -34,7 +38,7 @@ class AdapterTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('title', $tableInfo);
 
         foreach ($tableInfo as $column) {
-            $this->assertInstanceOf('\Phoenix\Database\Element\Column', $column);
+            $this->assertInstanceOf(Column::class, $column);
         }
     }
 }

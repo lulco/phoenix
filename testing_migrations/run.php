@@ -20,13 +20,9 @@ $configuration = [
             'password' => '123',
             'charset' => 'utf8',
         ],
-        'sqlite_file' => [
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
-        ],
         'sqlite' => [
             'adapter' => 'sqlite',
-            'dsn' => 'sqlite::memory:',
+            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
         ],
         'pgsql' => [
             'adapter' => 'pgsql',

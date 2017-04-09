@@ -24,7 +24,7 @@ class PgsqlAdapter extends PdoAdapter
         $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
         $tableInfo = [];
         foreach ($columns as $column) {
-            $type = $column['data_type'];
+            $type = $this->remapType($column['data_type']);
             $settings = [
                 'null' => $column['is_nullable'] == 'YES',
                 'default' => $column['column_default'],
@@ -48,5 +48,25 @@ class PgsqlAdapter extends PdoAdapter
     protected function createRealValue($value)
     {
         return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
+    }
+
+    private function remapType($type)
+    {
+        $types = [
+            'smallint' => Column::TYPE_SMALL_INTEGER,
+            'bigint' => Column::TYPE_BIG_INTEGER,
+            'real' => Column::TYPE_FLOAT,
+            'float4' => Column::TYPE_FLOAT,
+            'double precision' => Column::TYPE_DOUBLE,
+            'float8' => Column::TYPE_DOUBLE,
+            'varchar' => Column::TYPE_STRING,
+            'character' => Column::TYPE_CHAR,
+            'character varying' => Column::TYPE_STRING,
+            'bytea' => Column::TYPE_BLOB,
+            'timestamp without time zone' => Column::TYPE_DATETIME,
+            'USER-DEFINED' => Column::TYPE_ENUM,
+            'ARRAY' => Column::TYPE_SET,
+        ];
+        return isset($types[$type]) ? $types[$type] : $type;
     }
 }

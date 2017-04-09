@@ -2,10 +2,9 @@
 
 namespace Phoenix\Tests\Command\StatusCommand;
 
+use Phoenix\Tests\Command\PgsqlCommandBehavior;
+
 class PgsqlStatusCommandTest extends StatusCommandTest
 {
-    protected function getEnvironment()
-    {
-        return 'pgsql';
-    }
+    use PgsqlCommandBehavior;
 }

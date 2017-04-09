@@ -4,6 +4,10 @@ namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Database\Adapter\AdapterFactory;
+use Phoenix\Database\Adapter\MysqlAdapter;
+use Phoenix\Database\Adapter\PgsqlAdapter;
+use Phoenix\Database\Adapter\SqliteAdapter;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class AdapterFactoryTest extends PHPUnit_Framework_TestCase
@@ -14,35 +18,36 @@ class AdapterFactoryTest extends PHPUnit_Framework_TestCase
             'adapter' => 'mysql',
             'dsn' => 'sqlite::memory:',
         ]);
-        $this->assertInstanceOf('\Phoenix\Database\Adapter\MysqlAdapter', AdapterFactory::instance($config));
+        $this->assertInstanceOf(MysqlAdapter::class, AdapterFactory::instance($config));
     }
-    
+
     public function testPgsql()
     {
         $config = new EnvironmentConfig([
             'adapter' => 'pgsql',
             'dsn' => 'sqlite::memory:',
         ]);
-        $this->assertInstanceOf('\Phoenix\Database\Adapter\PgsqlAdapter', AdapterFactory::instance($config));
+        $this->assertInstanceOf(PgsqlAdapter::class, AdapterFactory::instance($config));
     }
-    
+
     public function testSqlite()
     {
         $config = new EnvironmentConfig([
             'adapter' => 'sqlite',
             'dsn' => 'sqlite::memory:',
         ]);
-        $this->assertInstanceOf('\Phoenix\Database\Adapter\SqliteAdapter', AdapterFactory::instance($config));
+        $this->assertInstanceOf(SqliteAdapter::class, AdapterFactory::instance($config));
     }
-    
+
     public function testUnknown()
     {
         $config = new EnvironmentConfig([
             'adapter' => 'unknown',
             'dsn' => 'sqlite::memory:',
         ]);
-        
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Unknown adapter "unknown". Use one of value: "mysql", "pgsql", "sqlite".');
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Unknown adapter "unknown". Use one of value: "mysql", "pgsql", "sqlite".');
         AdapterFactory::instance($config);
     }
 }
