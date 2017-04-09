@@ -68,6 +68,26 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
+    public function testSetCustomConfigWithJsonOutput()
+    {
+        $command = new InitCommand();
+        $command->setConfig($this->configuration);
+        $this->input->setOption('output-format', 'json');
+        $command->run($this->input, $this->output);
+
+        $messages = $this->output->getMessages(0);
+
+        $this->assertTrue(is_array($messages));
+        $this->assertCount(1, $messages);
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertJson($messages[0]);
+
+        $message = json_decode($messages[0], true);
+        $this->assertArrayHasKey('message', $message);
+        $this->assertArrayNotHasKey('executed_queries', $message);
+        $this->assertArrayHasKey('execution_time', $message);
+    }
+
     public function testMultipleInitialization()
     {
         $command = new InitCommand();

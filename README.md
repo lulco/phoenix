@@ -16,6 +16,7 @@ Framework agnostic database migrations for PHP.
 - Multiple migration directories
 - Migrate up and down
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
+- json output format for all commands
 - Namespaces in migration classes
 - Own migration templates
 - Easy integration to any PHP application
@@ -210,18 +211,18 @@ Run `php vendor/bin/phoenix status` and show list of migrations already executed
 
 ```
 Executed migrations
-+---------------------------------------------+---------------------+
-| Class name                                  | Executed at         |
-+---------------------------------------------+---------------------+
-| FirstDir\MyFirstMigration                   | 2016-09-26 06:49:49 |
-+---------------------------------------------+---------------------+
++--------------------+---------------------------------------------+---------------------+
+| Migration datetime | Class name                                  | Executed at         |
++--------------------+---------------------------------------------+---------------------+
+| 20160919082117     | FirstDir\MyFirstMigration                   | 2016-09-26 06:49:49 |
++--------------------+---------------------------------------------+---------------------+
 
 Migrations to execute
-+----------------------------------------+
-| Class name                             |
-+----------------------------------------+
-| FirstDir\MySecondMigration             |
-+----------------------------------------+
++--------------------+---------------------------------+
+| Migration datetime | Class name                      |
++--------------------+---------------------------------+
+| 20160921183201     | FirstDir\MySecondMigration      |
++--------------------+---------------------------------+
 
 All done. Took 0.2016s
 ```

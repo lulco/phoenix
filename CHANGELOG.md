@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- json output for all commands
+- migration datetime to Status command
+
 ### [0.7.0] - 2017-04-06
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
