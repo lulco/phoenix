@@ -441,15 +441,15 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Column::class, $column);
         $this->assertEquals($name, $column->getName());
         $this->assertEquals($type, $column->getType());
-        $this->assertEquals($expectedSettings['charset'], $column->getCharset());
-        $this->assertEquals($expectedSettings['collation'], $column->getCollation());
-        $this->assertEquals($expectedSettings['default'], $column->getDefault());
-        $this->assertEquals($expectedSettings['null'], $column->allowNull());
-        $this->assertEquals($expectedSettings['length'], $column->getLength());
-        $this->assertEquals($expectedSettings['decimals'], $column->getDecimals());
-        $this->assertEquals($expectedSettings['autoincrement'], $column->isAutoincrement());
-        $this->assertEquals($expectedSettings['signed'], $column->isSigned());
-        $this->assertEquals($expectedSettings['values'], $column->getValues());
+        $this->assertEquals($expectedSettings['charset'], $column->getSettings()->getCharset());
+        $this->assertEquals($expectedSettings['collation'], $column->getSettings()->getCollation());
+        $this->assertEquals($expectedSettings['default'], $column->getSettings()->getDefault());
+        $this->assertEquals($expectedSettings['null'], $column->getSettings()->allowNull());
+        $this->assertEquals($expectedSettings['length'], $column->getSettings()->getLength());
+        $this->assertEquals($expectedSettings['decimals'], $column->getSettings()->getDecimals());
+        $this->assertEquals($expectedSettings['autoincrement'], $column->getSettings()->isAutoincrement());
+        $this->assertEquals($expectedSettings['signed'], $column->getSettings()->isSigned());
+        $this->assertEquals($expectedSettings['values'], $column->getSettings()->getValues());
     }
 
     private function checkIndex(Table $table, $name, array $columns, $type, $method)

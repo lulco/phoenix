@@ -2,7 +2,6 @@
 
 namespace Phoenix\Tests\Command;
 
-use Phoenix\Command\CleanupCommand;
 use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Tests\Helpers\Adapter\CleanupInterface;
 use Phoenix\Tests\Mock\Command\Input;

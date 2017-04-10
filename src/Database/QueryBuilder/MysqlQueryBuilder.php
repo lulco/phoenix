@@ -141,31 +141,31 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        $col .= (!$column->isSigned()) ? ' unsigned' : '';
+        $col .= (!$column->getSettings()->isSigned()) ? ' unsigned' : '';
         $col .= $this->createColumnCharset($column);
-        $col .= $column->allowNull() ? '' : ' NOT NULL';
+        $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createColumnDefault($column);
         $col .= $this->createColumnPosition($column);
 
-        $col .= $column->isAutoincrement() ? ' AUTO_INCREMENT' : '';
+        $col .= $column->getSettings()->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }
 
     private function createColumnDefault(Column $column)
     {
-        if ($column->allowNull() && $column->getDefault() === null) {
+        if ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             return ' DEFAULT NULL';
         }
 
-        if ($column->getDefault() !== null) {
+        if ($column->getSettings()->getDefault() !== null) {
             $default = ' DEFAULT ';
             if ($column->getType() == Column::TYPE_INTEGER) {
-                return $default .= $column->getDefault();
+                return $default .= $column->getSettings()->getDefault();
             }
             if ($column->getType() == Column::TYPE_BOOLEAN) {
-                return $default .= intval($column->getDefault());
+                return $default .= intval($column->getSettings()->getDefault());
             }
-            return $default .= "'" . $column->getDefault() . "'";
+            return $default .= "'" . $column->getSettings()->getDefault() . "'";
         }
 
         return '';
@@ -173,10 +173,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createColumnPosition(Column $column)
     {
-        if ($column->getAfter() !== null) {
-            return ' AFTER ' . $this->escapeString($column->getAfter());
+        if ($column->getSettings()->getAfter() !== null) {
+            return ' AFTER ' . $this->escapeString($column->getSettings()->getAfter());
         }
-        if ($column->isFirst()) {
+        if ($column->getSettings()->isFirst()) {
             return  ' FIRST';
         }
         return '';
@@ -216,7 +216,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createColumnCharset(Column $column)
     {
-        return $this->createCharset($column->getCharset(), $column->getCollation(), ' ');
+        return $this->createCharset($column->getSettings()->getCharset(), $column->getSettings()->getCollation(), ' ');
     }
 
     private function createTableCharset(MigrationTable $table)
@@ -246,7 +246,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $this->remapType($column),
             implode(',', array_map(function ($value) {
                 return "'$value'";
-            }, $column->getValues()))
+            }, $column->getSettings()->getValues()))
         );
     }
 }

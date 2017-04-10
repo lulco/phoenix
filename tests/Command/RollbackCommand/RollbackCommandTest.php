@@ -27,7 +27,8 @@ abstract class RollbackCommandTest extends BaseCommandTest
     public function testMissingDefaultConfig()
     {
         $command = new RollbackCommand();
-        $this->setExpectedException(ConfigException::class, 'No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         $command->run($this->input, $this->output);
     }
 
@@ -35,7 +36,8 @@ abstract class RollbackCommandTest extends BaseCommandTest
     {
         $command = new RollbackCommand();
         $this->input->setOption('config', 'xyz.neon');
-        $this->setExpectedException(ConfigException::class, 'Configuration file "xyz.neon" doesn\'t exist.');
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
         $command->run($this->input, $this->output);
     }
 
@@ -161,11 +163,11 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $command->run($input, $output);
 
         $dryMessages = $output->getMessages();
-        $dryQueries = array_slice($dryMessages[0], 3, -3);
+        $dryQueries = $dryMessages[OutputInterface::VERBOSITY_DEBUG];
 
         $this->assertTrue(is_array($dryMessages));
         $this->assertArrayHasKey(0, $dryMessages);
-        $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $dryMessages);
 
         $input = $this->createInput();
         $output = new Output();
@@ -176,5 +178,39 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $messages = $output->getMessages();
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
         $this->assertEquals($dryQueries, $messages[OutputInterface::VERBOSITY_DEBUG]);
+    }
+
+    public function testDryRunWithJsonOutput()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $input = $this->createInput();
+        $input->setOption('dry', true);
+        $input->setOption('output-format', 'json');
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages(0);
+
+        $this->assertTrue(is_array($messages));
+        $this->assertCount(1, $messages);
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertJson($messages[0]);
+
+        $message = json_decode($messages[0], true);
+
+        $this->assertArrayHasKey('executed_migrations', $message);
+        $this->assertArrayHasKey('execution_time', $message);
+        $this->assertNotEmpty($message['executed_migrations']);
+        $this->assertNotEmpty($message['execution_time']);
+        foreach ($message['executed_migrations'] as $executedMigration) {
+            $this->assertArrayHasKey('classname', $executedMigration);
+            $this->assertArrayHasKey('execution_time', $executedMigration);
+            $this->assertArrayHasKey('executed_queries', $executedMigration);
+        }
     }
 }

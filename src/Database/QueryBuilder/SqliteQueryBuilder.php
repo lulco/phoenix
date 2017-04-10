@@ -115,16 +115,16 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        $col .= $column->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
-        $col .= $column->allowNull() ? '' : ' NOT NULL';
-        if ($column->getDefault() !== null && $column->getDefault() !== '') {
+        $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
+        $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
+        if ($column->getSettings()->getDefault() !== null && $column->getSettings()->getDefault() !== '') {
             $col .= ' DEFAULT ';
             if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BOOLEAN])) {
-                $col .= intval($column->getDefault());
+                $col .= intval($column->getSettings()->getDefault());
             } else {
-                $col .= "'" . $column->getDefault() . "'";
+                $col .= "'" . $column->getSettings()->getDefault() . "'";
             }
-        } elseif ($column->allowNull() && $column->getDefault() === null) {
+        } elseif ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
         return $col;
@@ -135,7 +135,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
             $column = $table->getColumn($name);
-            if (!$column->isAutoincrement()) {
+            if (!$column->getSettings()->isAutoincrement()) {
                 $primaryKeys[] = $this->escapeString($column->getName());
             }
         }
@@ -179,14 +179,14 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
                 continue;
             }
             $columnNames[] = $column->getName();
-            if ($column->isAutoincrement()) {
+            if ($column->getSettings()->isAutoincrement()) {
                 $newTable->addPrimary($column);
                 continue;
             }
-            $newTable->addColumn($column->getName(), $column->getType(), $column->getSettings());
+            $newTable->addColumn($column->getName(), $column->getType(), $column->getSettings()->getSettings());
         }
         foreach ($table->getColumns() as $newColumn) {
-            $newTable->addColumn($newColumn->getName(), $newColumn->getType(), $newColumn->getSettings());
+            $newTable->addColumn($newColumn->getName(), $newColumn->getType(), $newColumn->getSettings()->getSettings());
         }
 
         $indexesToDrop = $table->getIndexesToDrop();
@@ -222,9 +222,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         $values = [];
         if ($column->getType() == Column::TYPE_ENUM) {
-            $values = $column->getValues();
+            $values = $column->getSettings()->getValues();
         } elseif ($column->getType() === Column::TYPE_SET) {
-            $this->createSetCombinations($column->getValues(), '', $values);
+            $this->createSetCombinations($column->getSettings()->getValues(), '', $values);
         }
         return sprintf($this->remapType($column), $column->getName(), implode(',', array_map(function ($value) {
             return "'$value'";
