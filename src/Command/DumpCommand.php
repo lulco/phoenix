@@ -2,8 +2,8 @@
 
 namespace Phoenix\Command;
 
+use Dumper\Dumper;
 use Phoenix\Command\AbstractCommand;
-use Phoenix\Database\Element\Column;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,63 +29,21 @@ class DumpCommand extends AbstractCommand
         $output->writeln('');
 
         $indent = $this->getIndent($input);
+        $dumper = new Dumper($indent);
 
-        $migration = '';
-        $tables = $this->getOrderedTables($ignoredTables);
-        foreach ($tables as $table) {
-            $migration .= $indent . "\$this->table('{$table->getName()}'";
-            if ($table->getPrimary()) {
-                $migration .= ", " . $this->columnsToString($table->getPrimary());
-            }
-            $migration .= ")\n";
-
-            foreach ($table->getColumns() as $column) {
-                $migration .= "$indent$indent" . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column->getType(), $column->getSettings()) . ")\n";
-            }
-            foreach ($table->getIndexes() as $index) {
-                $migration .= "$indent$indent" . "->addIndex(";
-                $indexColumns = $index->getColumns();
-                $migration .= $this->columnsToString($indexColumns) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
-            }
-            foreach ($table->getForeignKeys() as $foreignKey) {
-                $migration .= "$indent$indent" . "->addForeignKey(";
-                $migration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}', ";
-                $migration .= $this->columnsToString($foreignKey->getReferencedColumns()) . ", '{$foreignKey->getOnDelete()}', '{$foreignKey->getOnUpdate()}')\n";
-            }
-            $migration .= "$indent$indent" . "->create();\n\n";
-        }
+        $tables = $this->getFilteredTables($ignoredTables);
+        $migration = $dumper->dumpTables($tables);
 
         if ($input->getOption('data')) {
-            $ignoredDataTables = $input->getOption('ignore-data-tables')
-                ? array_merge($ignoredTables, array_map('trim', explode(',', $input->getOption('ignore-data-tables'))))
-                : $ignoredTables;
-
-            foreach ($tables as $table) {
-                if (in_array($table->getName(), $ignoredDataTables)) {
-                    continue;
-                }
-                $rows = $this->adapter->fetchAll($table->getName());
-                if (empty($rows)) {
-                    continue;
-                }
-                $migration .= "$indent\$this->insert('{$table->getName()}', [\n";
-                foreach ($rows as $row) {
-                    $migration .= "$indent$indent" . "[\n";
-                    foreach ($row as $column => $value) {
-                        $migration .= "$indent$indent$indent'$column' => '" . addslashes($value) . "',\n";
-                    }
-                    $migration .= "$indent$indent],\n";
-                }
-                $migration .= "$indent]);\n\n";
-            }
+            $data = $this->loadData($tables);
+            $migration .= $dumper->dumpData($data);
         }
 
         $output->write($migration);
-
         $output->writeln('');
     }
 
-    private function getOrderedTables(array $ignoredTables = [])
+    private function getFilteredTables(array $ignoredTables = [])
     {
         $tables = [];
         $structure = $this->adapter->getStructure();
@@ -98,55 +56,24 @@ class DumpCommand extends AbstractCommand
         return $tables;
     }
 
-    private function columnsToString(array $columns)
+    private function loadData(array $tables = [])
     {
-        $columns = array_map(function ($column) {
-            return "'$column'";
-        }, $columns);
-        $implodedColumns = implode(', ', $columns);
-        return count($columns) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
-    }
+        $ignoredDataTables = $this->input->getOption('ignore-data-tables')
+            ? array_map('trim', explode(',', $this->input->getOption('ignore-data-tables')))
+            : [];
 
-    private function settingsToString($type, array $settings)
-    {
-        $defaultSettings = [
-            'autoincrement' => false,
-            'null' => false,
-            'default' => null,
-            'signed' => true,
-            'length' => null,
-            'decimals' => null,
-        ];
-        if ($type == Column::TYPE_STRING) {
-            $defaultSettings['length'] = 255;
-        } elseif ($type == Column::TYPE_INTEGER) {
-            $defaultSettings['length'] = 11;
-        } elseif ($type == Column::TYPE_BOOLEAN) {
-            $defaultSettings['signed'] = false;
-        } elseif ($type == Column::TYPE_TEXT) {
-            $defaultSettings['null'] = true;
-        }
-        $settingsList = [];
-        foreach ($settings as $setting => $value) {
-            if (in_array($setting, ['charset', 'collation'])) {
+        $data = [];
+        foreach ($tables as $table) {
+            if (in_array($table->getName(), $ignoredDataTables)) {
                 continue;
             }
-            if ($value === $defaultSettings[$setting]) {
+            $rows = $this->adapter->fetchAll($table->getName());
+            if (empty($rows)) {
                 continue;
             }
-            if ($value === null) {
-                $value = 'null';
-            } elseif (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            } elseif (!is_numeric($value)) {
-                $value = "'$value'";
-            }
-            $settingsList[] = "'$setting' => $value";
+            $data[$table->getName()] = $rows;
         }
-        if (empty($settingsList)) {
-            return '';
-        }
-        return ', [' . implode(', ', $settingsList) . ']';
+        return $data;
     }
 
     private function getIndent(InputInterface $input)
