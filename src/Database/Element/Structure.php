@@ -49,7 +49,7 @@ class Structure
             foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
                 $this->checkColumnNotExists($table, $oldName);
                 if ($column->getName() != $oldName) {
-                    $this->checkColumnAlreadyExists ($table, $column->getName());
+                    $this->checkColumnAlreadyExists($table, $column->getName());
                 }
             }
             foreach ($migrationTable->getForeignKeys() as $foreignKey) {
