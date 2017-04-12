@@ -8,13 +8,15 @@ Framework agnostic database migrations for PHP.
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
 [![Dependency Status](https://www.versioneye.com/user/projects/575d6bbd7757a00041b3b85b/badge.svg?style=flat)](https://www.versioneye.com/user/projects/575d6bbd7757a00041b3b85b)
-[![PHP 7 ready](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://travis-ci.org/lulco/phoenix)
+[![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://travis-ci.org/lulco/phoenix)
+[![HHVM supported](http://hhvm.h4cc.de/badge/lulco/phoenix.svg)](https://travis-ci.org/lulco/phoenix)
 
 ## Features
 - Validation all settings in migration before executing first query
 - Multiple migration directories
 - Migrate up and down
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
+- json output format for all commands
 - Namespaces in migration classes
 - Own migration templates
 - Easy integration to any PHP application
@@ -24,10 +26,10 @@ Framework agnostic database migrations for PHP.
 - PostgreSQL
 - SQLite
 
-## Instalation
+## Installation
 
 ### Composer
-This library requires PHP 5.6 or later. It works also on PHP 7.0 and HHVM. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
+This library requires PHP 5.6 or later. It works also on PHP 7.0, PHP 7.1 and HHVM. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
 
 ```
 composer require lulco/phoenix
@@ -209,18 +211,18 @@ Run `php vendor/bin/phoenix status` and show list of migrations already executed
 
 ```
 Executed migrations
-+---------------------------------------------+---------------------+
-| Class name                                  | Executed at         |
-+---------------------------------------------+---------------------+
-| FirstDir\MyFirstMigration                   | 2016-09-26 06:49:49 |
-+---------------------------------------------+---------------------+
++--------------------+---------------------------------------------+---------------------+
+| Migration datetime | Class name                                  | Executed at         |
++--------------------+---------------------------------------------+---------------------+
+| 20160919082117     | FirstDir\MyFirstMigration                   | 2016-09-26 06:49:49 |
++--------------------+---------------------------------------------+---------------------+
 
 Migrations to execute
-+----------------------------------------+
-| Class name                             |
-+----------------------------------------+
-| FirstDir\MySecondMigration             |
-+----------------------------------------+
++--------------------+---------------------------------+
+| Migration datetime | Class name                      |
++--------------------+---------------------------------+
+| 20160921183201     | FirstDir\MySecondMigration      |
++--------------------+---------------------------------+
 
 All done. Took 0.2016s
 ```

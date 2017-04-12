@@ -47,7 +47,7 @@ class Manager
 
         $migrations = $this->findMigrations($type);
         if (empty($migrations)) {
-            return $migrations;
+            return [];
         }
         if ($type == self::TYPE_DOWN) {
             $migrations = array_reverse($migrations);
@@ -57,12 +57,29 @@ class Manager
 
     private function findMigrations($type)
     {
+        $migrations = $this->findMigrationClasses();
+        $executedMigrations = $this->executedMigrations();
+        if ($type == self::TYPE_UP) {
+            foreach (array_keys($executedMigrations) as $migrationIdentifier) {
+                unset($migrations[$migrationIdentifier]);
+            }
+            ksort($migrations);
+            return array_values($migrations);
+        }
+
+        $migrationsToExecute = [];
+        foreach (array_keys($executedMigrations) as $migrationIdentifier) {
+            $migrationsToExecute[] = $migrations[$migrationIdentifier];
+        }
+        return $migrationsToExecute;
+    }
+
+    private function findMigrationClasses()
+    {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $directory) {
             $filesFinder->addDirectory($directory);
         }
-
-        $executedMigrations = $this->executedMigrations();
 
         $migrations = [];
         foreach ($filesFinder->getFiles() as $file) {
@@ -70,13 +87,8 @@ class Manager
             $classNameCreator = new ClassNameCreator($file);
             $className = $classNameCreator->getClassName();
             $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
-            if ($type == self::TYPE_UP && !isset($executedMigrations[$migrationIdentifier])) {
-                $migrations[$migrationIdentifier] = new $className($this->adapter);
-            } elseif ($type == self::TYPE_DOWN && isset($executedMigrations[$migrationIdentifier])) {
-                $migrations[$migrationIdentifier] = new $className($this->adapter);
-            }
+            $migrations[$migrationIdentifier] = new $className($this->adapter);
         }
-        ksort($migrations);
         return $migrations;
     }
 
@@ -86,7 +98,7 @@ class Manager
      */
     public function executedMigrations()
     {
-        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*');
+        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*', [], null, ['executed_at', 'migration_datetime']);
         $executedMigrations = [];
         foreach ($migrations as $migration) {
             $executedMigrations[$migration['migration_datetime'] . '|' . $migration['classname']] = $migration;

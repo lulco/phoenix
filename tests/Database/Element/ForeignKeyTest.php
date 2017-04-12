@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class ForeignKeyTest extends PHPUnit_Framework_TestCase
@@ -19,7 +20,7 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $foreignKey->getOnDelete());
         $this->assertEquals('', $foreignKey->getOnUpdate());
     }
-    
+
     public function testArray()
     {
         $foreignKey = new ForeignKey(['title', 'alias'], 'ref_table', ['t', 'a']);
@@ -32,7 +33,7 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $foreignKey->getOnDelete());
         $this->assertEquals('', $foreignKey->getOnUpdate());
     }
-    
+
     public function testRestrict()
     {
         $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'RESTRICT');
@@ -45,7 +46,7 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('RESTRICT', $foreignKey->getOnDelete());
         $this->assertEquals('RESTRICT', $foreignKey->getOnUpdate());
     }
-    
+
     public function testSetNull()
     {
         $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'set null', 'SET NULL');
@@ -58,7 +59,7 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('SET NULL', $foreignKey->getOnDelete());
         $this->assertEquals('SET NULL', $foreignKey->getOnUpdate());
     }
-    
+
     public function testCascadeAndNoAction()
     {
         $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'Cascade', 'No Action');
@@ -71,16 +72,18 @@ class ForeignKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('CASCADE', $foreignKey->getOnDelete());
         $this->assertEquals('NO ACTION', $foreignKey->getOnUpdate());
     }
-    
+
     public function testUnknownAction()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Action "unknown" is not allowed on delete');
-        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'unknown');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Action "unknown" is not allowed on delete');
+        new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'unknown');
     }
-    
+
     public function testUnknownMethod()
     {
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Action "unknown" is not allowed on update');
-        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'unknown');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Action "unknown" is not allowed on update');
+        new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'unknown');
     }
 }

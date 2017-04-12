@@ -29,12 +29,12 @@ class CreateCommand extends AbstractCommand
         $filename = $migrationNameCreator->getFileName();
         $dir = $input->getArgument('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
-        
+
         $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
         if (!file_exists($templatePath)) {
             throw new PhoenixException('Template "' . $templatePath . '" not found');
         }
-        
+
         $template = file_get_contents($templatePath);
         $namespace = '';
         if ($migrationNameCreator->getNamespace()) {
@@ -42,10 +42,14 @@ class CreateCommand extends AbstractCommand
         }
         $template = str_replace('###NAMESPACE###', $namespace, $template);
         $template = str_replace('###CLASSNAME###', $migrationNameCreator->getClassName(), $template);
-        
-        file_put_contents($migrationDir . '/' . $filename, $template);
 
-        $output->writeln('');
-        $output->writeln('<info>Migration "' . $migration . '" created</info>');
+        $migrationPath = $migrationDir . '/' . $filename;
+        file_put_contents($migrationPath, $template);
+
+        $this->writeln('');
+        $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
+
+        $this->outputData['migration_name'] = $migration;
+        $this->outputData['migration_filepath'] = $migrationPath;
     }
 }

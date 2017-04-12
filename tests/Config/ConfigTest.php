@@ -3,6 +3,9 @@
 namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\Config;
+use Phoenix\Config\EnvironmentConfig;
+use Phoenix\Exception\ConfigException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class ConfigTest extends PHPUnit_Framework_TestCase
@@ -23,8 +26,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('phoenix_log', $config->getLogTableName());
         $this->assertCount(2, $config->getMigrationDirs());
         $this->assertEquals('first', $config->getDefaultEnvironment());
-        $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('first'));
-        $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('second'));
+        $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('first'));
+        $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('second'));
         $this->assertTrue(is_array($config->getConfiguration()));
         $this->assertArrayHasKey('migration_dirs', $config->getConfiguration());
         $this->assertCount(2, $config->getConfiguration()['migration_dirs']);
@@ -48,14 +51,15 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('custom_log_table_name', $config->getLogTableName());
         $this->assertCount(2, $config->getMigrationDirs());
         $this->assertEquals('second', $config->getDefaultEnvironment());
-        $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('first'));
-        $this->assertInstanceOf('\Phoenix\Config\EnvironmentConfig', $config->getEnvironmentConfig('second'));
+        $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('first'));
+        $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('second'));
     }
 
     public function testEmptyMigrationDirs()
     {
-        $this->setExpectedException('\Phoenix\Exception\ConfigException', 'Empty migration dirs');
-        $config = new Config([
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Empty migration dirs');
+        new Config([
             'environments' => [
                 'first' => [],
             ],
@@ -77,7 +81,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals('first_dir', $config->getMigrationDir());
         $this->assertEquals('first_dir', $config->getMigrationDir(0));
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Directory "xxx" doesn\'t exist. Use: 0');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Directory "xxx" doesn\'t exist. Use: 0');
         $config->getMigrationDir('xxx');
     }
 
@@ -98,7 +103,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('first_dir', $config->getMigrationDir(0));
         $this->assertEquals('second_dir', $config->getMigrationDir(1));
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'There are more then 1 migration dirs. Use one of them: 0, 1');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('There are more then 1 migration dirs. Use one of them: 0, 1');
         $config->getMigrationDir();
     }
 
@@ -118,7 +124,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('first_dir', $config->getMigrationDir());
         $this->assertEquals('first_dir', $config->getMigrationDir('first'));
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Directory "xxx" doesn\'t exist. Use: first');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Directory "xxx" doesn\'t exist. Use: first');
         $config->getMigrationDir('xxx');
     }
 
@@ -139,14 +146,16 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('first_dir', $config->getMigrationDir('first'));
         $this->assertEquals('second_dir', $config->getMigrationDir('second'));
-        $this->setExpectedException('\Phoenix\Exception\InvalidArgumentValueException', 'Directory "xxx" doesn\'t exist. Use: first, second');
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Directory "xxx" doesn\'t exist. Use: first, second');
         $config->getMigrationDir('xxx');
     }
 
     public function testEmptyEnvironments()
     {
-        $this->setExpectedException('\Phoenix\Exception\ConfigException', 'Empty environments');
-        $config = new Config([
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Empty environments');
+        new Config([
             'migration_dirs' => [
                 'first_dir'
             ],

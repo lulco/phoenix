@@ -21,12 +21,11 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('simple');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "simple_seq";',
-            'CREATE TABLE "simple" ("id" int4 DEFAULT nextval(\'simple_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "simple_pkey" PRIMARY KEY ("id"));'
+            'CREATE TABLE "simple" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "simple_pkey" PRIMARY KEY ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -35,15 +34,14 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('more_columns');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string', ['null' => true]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('total', 'integer', ['default' => 0]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string', ['null' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "more_columns_seq";',
-            'CREATE TABLE "more_columns" ("id" int4 DEFAULT nextval(\'more_columns_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "more_columns_pkey" PRIMARY KEY ("id"));',
+            'CREATE TABLE "more_columns" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "more_columns_pkey" PRIMARY KEY ("id"));',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -51,45 +49,45 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testAllTypes()
     {
         $table = new MigrationTable('all_types');
-        $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_uuid', 'uuid'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyint', 'tinyinteger'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_smallint', 'smallinteger'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumint', 'mediuminteger'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_int', 'integer', ['signed' => false]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_bigint', 'biginteger'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_string', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_char', 'char'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_binary', 'binary'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_varbinary', 'varbinary'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinytext', 'tinytext'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumtext', 'mediumtext'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_text', 'text'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longtext', 'longtext'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_tinyblob', 'tinyblob'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_mediumblob', 'mediumblob'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_blob', 'blob'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_longblob', 'longblob'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_json', 'json'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_boolean', 'boolean'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_datetime', 'datetime'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_date', 'date'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_point', 'point', ['null' => true]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_line', 'line', ['null' => true]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('col_polygon', 'polygon', ['null' => true]));
+        $table->addPrimary('id');
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('id', 'biginteger', ['autoincrement' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_uuid', 'uuid'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_tinyint', 'tinyinteger'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_smallint', 'smallinteger'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_mediumint', 'mediuminteger'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_int', 'integer', ['signed' => false]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_bigint', 'biginteger'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_string', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_char', 'char'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_binary', 'binary'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_varbinary', 'varbinary'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_tinytext', 'tinytext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_mediumtext', 'mediumtext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_text', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_longtext', 'longtext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_tinyblob', 'tinyblob'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_mediumblob', 'mediumblob'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_blob', 'blob'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_longblob', 'longblob'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_json', 'json'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_boolean', 'boolean'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_datetime', 'datetime'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_date', 'date'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz']]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz']]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_point', 'point', ['null' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_line', 'line', ['null' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_polygon', 'polygon', ['null' => true]));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
             'CREATE TYPE "all_types__col_enum" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
             'CREATE TYPE "all_types__col_set" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
-            'CREATE SEQUENCE "all_types_seq";',
-            'CREATE TABLE "all_types" ("id" int4 DEFAULT nextval(\'all_types_seq\'::regclass) NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" bytea NOT NULL,"col_varbinary" bytea NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
+            'CREATE TABLE "all_types" ("id" bigserial NOT NULL,"col_uuid" uuid NOT NULL,"col_tinyint" int2 NOT NULL,"col_smallint" int2 NOT NULL,"col_mediumint" int4 NOT NULL,"col_int" int4 NOT NULL,"col_bigint" int8 NOT NULL,"col_string" varchar(255) NOT NULL,"col_char" char(255) NOT NULL,"col_binary" bytea NOT NULL,"col_varbinary" bytea NOT NULL,"col_tinytext" text NOT NULL,"col_mediumtext" text NOT NULL,"col_text" text NOT NULL,"col_longtext" text NOT NULL,"col_tinyblob" bytea NOT NULL,"col_mediumblob" bytea NOT NULL,"col_blob" bytea NOT NULL,"col_longblob" bytea NOT NULL,"col_json" json NOT NULL,"col_numeric" numeric(10,3) NOT NULL,"col_decimal" numeric(10,3) NOT NULL,"col_float" float4 NOT NULL,"col_double" float8 NOT NULL,"col_boolean" bool NOT NULL,"col_datetime" timestamp(6) NOT NULL,"col_date" date NOT NULL,"col_enum" all_types__col_enum NOT NULL,"col_set" all_types__col_set[] NOT NULL,"col_point" point DEFAULT NULL,"col_line" line DEFAULT NULL,"col_polygon" polygon DEFAULT NULL,CONSTRAINT "all_types_pkey" PRIMARY KEY ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -97,9 +95,9 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testNoPrimaryKey()
     {
         $table = new MigrationTable('no_primary_key');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['null' => true]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('total', 'integer', ['default' => 0]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('is_deleted', 'boolean', ['default' => false]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['null' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('is_deleted', 'boolean', ['default' => false]));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -112,7 +110,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('own_primary_key');
         $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -125,7 +123,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('more_own_primary_keys');
         $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -138,8 +136,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('one_field_as_pk');
         $table->addPrimary('identifier');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('identifier', 'string', ['length' => 32]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -152,9 +150,9 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('more_fields_as_pk');
         $table->addPrimary(['identifier', 'subidentifier']);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('identifier', 'string', ['length' => 32]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('subidentifier', 'string', ['length' => 32]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string', ['default' => '']));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('subidentifier', 'string', ['length' => 32]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -167,18 +165,17 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('table_with_indexes');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', 'btree', 'table_with_indexes_sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_title_alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_bodytext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', 'btree', 'table_with_indexes_sorting'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_title_alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_bodytext'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_indexes_seq";',
-            'CREATE TABLE "table_with_indexes" ("id" int4 DEFAULT nextval(\'table_with_indexes_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "table_with_indexes_pkey" PRIMARY KEY ("id"));',
+            'CREATE TABLE "table_with_indexes" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "table_with_indexes_pkey" PRIMARY KEY ("id"));',
             'CREATE INDEX "table_with_indexes_sorting" ON "table_with_indexes" USING BTREE ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_title_alias" ON "table_with_indexes" ("title","alias");',
             'CREATE FULLTEXT INDEX "table_with_indexes_bodytext" ON "table_with_indexes" USING HASH ("bodytext");',
@@ -190,15 +187,14 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('table_with_foreign_keys');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_table_id', 'second_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_table_id', 'second_table'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_foreign_keys_seq";',
-            'CREATE TABLE "table_with_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
+            'CREATE TABLE "table_with_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -207,20 +203,19 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('table_with_indexes_and_foreign_keys');
         $table->addPrimary(true);
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('bodytext', 'text'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_table_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', 'btree', 'table_with_indexes_and_foreign_keys_sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_and_foreign_keys_title_alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_and_foreign_keys_bodytext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_table_id', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', 'btree', 'table_with_indexes_and_foreign_keys_sorting'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_and_foreign_keys_title_alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_and_foreign_keys_bodytext'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
-            'CREATE SEQUENCE "table_with_indexes_and_foreign_keys_seq";',
-            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" int4 DEFAULT nextval(\'table_with_indexes_and_foreign_keys_seq\'::regclass) NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
+            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" USING BTREE ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_and_foreign_keys_title_alias" ON "table_with_indexes_and_foreign_keys" ("title","alias");',
             'CREATE FULLTEXT INDEX "table_with_indexes_and_foreign_keys_bodytext" ON "table_with_indexes_and_foreign_keys" USING HASH ("bodytext");',
@@ -234,7 +229,6 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
             'DROP TABLE "drop";',
-            'DROP SEQUENCE IF EXISTS "drop_seq";',
             'DELETE FROM "pg_type" WHERE "typname" LIKE \'drop__%\';',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));
@@ -244,8 +238,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         // add columns
         $table = new MigrationTable('add_columns');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('title', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -255,8 +249,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // add and remove primary key
         $table = new MigrationTable('change_primary_key');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropPrimaryKey());
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addPrimary('new_primary'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropPrimaryKey());
+        $this->assertInstanceOf(MigrationTable::class, $table->addPrimary('new_primary'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -267,7 +261,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // add index
         $table = new MigrationTable('add_index');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('alias', 'unique', '', 'add_index_alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('alias', 'unique', '', 'add_index_alias'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -277,8 +271,8 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // add column and index
         $table = new MigrationTable('add_column_and_index');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('alias', 'string'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('alias', 'unique', '', 'add_column_and_index_alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('alias', 'unique', '', 'add_column_and_index_alias'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -289,10 +283,10 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // add foreign key, index, columns
         $table = new MigrationTable('add_columns_index_foreign_key');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', '', 'add_columns_index_foreign_key_sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'add_columns_index_foreign_key_sorting'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -310,13 +304,13 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // combination of add / remove column, add / remove index, add / remove foreign key
         $table = new MigrationTable('all_in_one');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropColumn('title'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', '', 'all_in_one_sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropIndex('alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_key_id', 'referenced_table'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropColumn('title'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'all_in_one_sorting'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropIndex('alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('foreign_key_to_drop_id'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -331,13 +325,13 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 
         // mixed order of calls add / remove column, add / remove index, add / remove foreign key - output is the same
         $table = new MigrationTable('all_in_one_mixed');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addIndex('sorting', '', '', 'all_in_one_mixed_sorting'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropForeignKey('foreign_key_to_drop_id'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('foreign_key_id', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropColumn('title'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addColumn('sorting', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->dropIndexByName('all_in_one_mixed_alias'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'all_in_one_mixed_sorting'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropColumn('title'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropIndexByName('all_in_one_mixed_alias'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [
@@ -354,10 +348,10 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testChangeColumn()
     {
         $table = new MigrationTable('with_columns_to_change');
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('old_name', 'new_name', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('no_name_change', 'no_name_change', 'integer'));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('default_null_change', 'default_null_change', 'string', ['null' => true]));
-        $this->assertInstanceOf('\Phoenix\Database\Element\MigrationTable', $table->changeColumn('default_null_with_value_change', 'default_null_with_value_change', 'string', ['null' => true, 'default' => 'default_value']));
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('old_name', 'new_name', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('no_name_change', 'no_name_change', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('default_null_change', 'default_null_change', 'string', ['null' => true]));
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('default_null_with_value_change', 'default_null_with_value_change', 'string', ['null' => true, 'default' => 'default_value']));
 
         $queryBuilder = new PgsqlQueryBuilder($this->structure);
         $expectedQueries = [

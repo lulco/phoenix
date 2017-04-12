@@ -2,22 +2,31 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- json output for all commands
+- migration datetime to Status command
+- column settings class with constants
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
+
+### [0.7.0] - 2017-04-06
 #### Changed
 - move all table methods (addColumn, addIndex, addForeignKey etc) from AbstractMigration to new Element MigrationTable which is now used in Query Builders
 - migration dir in create command is required if there are more then one migration dir registered
+- using serial and bigserial for autoincrement primary keys in pgsql instead of creating and dropping custom sequence
 
 #### Added
-- added method getSettings to Column
-- added types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
-- column settings constants
-- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
+- method getSettings to Column
+- column types: tiny integer, small integer and medium integer, double, tinytext, mediumtext, longtext, tinyblob, mediumblob, blob, longblob, binary, varbinary, point, line, polygon
+
+#### Fixed
+- wrong order in rollback
 
 #### Removed
-- removed magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
+- magic method variants addColumn and changeColumn from MigrationTable - possible BC if somebody uses methods addColumn(Column $column) or changeColumn($oldName, Column $column)
 
 ### [0.6.1] - 2016-12-13
 #### Fixed
-- Fixed support for changing column settings (allowNull, default) in pgsql
+- support for changing column settings (allowNull, default) in pgsql
 
 ### [0.6.0] - 2016-09-26
 #### Removed
@@ -94,12 +103,13 @@
 - unsigned for MySQL
 
 ### [0.1.0] - 2016-02-05
-- First tagged version
+- first tagged version
 - 3 PDO Adapters: MySQL, PgSQL, SQLite
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.6.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/lulco/phoenix/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/lulco/phoenix/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/lulco/phoenix/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/lulco/phoenix/compare/0.4.0...0.5.0
