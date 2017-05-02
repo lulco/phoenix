@@ -2,8 +2,6 @@
 
 namespace Phoenix\Database\Element;
 
-use Exception;
-
 class MigrationTable
 {
     const ACTION_CREATE = 'create';
@@ -104,12 +102,12 @@ class MigrationTable
 
         if ($primaryColumn instanceof Column) {
             $this->columns = array_merge([$primaryColumn->getName() => $primaryColumn], $this->columns);
-            $this->primaryColumns = array_merge([$primaryColumn->getName() => $primaryColumn->getName()], $this->primaryColumns);
+            $this->primaryColumns = array_merge([$primaryColumn->getName()], $this->primaryColumns);
             return $this;
         }
 
         if (is_string($primaryColumn)) {
-            $this->primaryColumns = array_merge([$primaryColumn => $primaryColumn], $this->primaryColumns);
+            $this->primaryColumns = array_merge([$primaryColumn], $this->primaryColumns);
             return $this;
         }
 
@@ -148,14 +146,10 @@ class MigrationTable
     /**
      * @param string $name
      * @return Column
-     * @throws Exception if column is not found
      */
     public function getColumn($name)
     {
-        if (!isset($this->columns[$name])) {
-            throw new Exception('Column "' . $name . '" not found');
-        }
-        return $this->columns[$name];
+        return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
     /**
@@ -273,7 +267,7 @@ class MigrationTable
         if (!is_array($columns)) {
             $columns = [$columns];
         }
-        $this->foreignKeysToDrop[] = $this->getName() . '_' . implode('_', $columns);
+        $this->foreignKeysToDrop[] = implode('_', $columns);
         return $this;
     }
 
@@ -375,5 +369,25 @@ class MigrationTable
             $columns = [$columns];
         }
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
+    }
+
+    public function toTable()
+    {
+        $table = new Table($this->getName());
+        $table->setCharset($this->getCharset());
+        $table->setCollation($this->getCollation());
+        if ($this->getPrimaryColumns()) {
+            $table->setPrimary($this->getPrimaryColumns());
+        }
+        foreach ($this->getColumns() as $column) {
+            $table->addColumn($column);
+        }
+        foreach ($this->getIndexes() as $index) {
+            $table->addIndex($index);
+        }
+        foreach ($this->getForeignKeys() as $foreignKey) {
+            $table->addForeignKey($foreignKey);
+        }
+        return $table;
     }
 }

@@ -7,6 +7,7 @@
 - json output for all commands
 - migration datetime to Status command
 - column settings class with constants
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 ### [0.7.0] - 2017-04-06
 #### Changed

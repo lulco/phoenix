@@ -5,6 +5,7 @@ namespace Phoenix\Tests\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase

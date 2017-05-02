@@ -2,11 +2,10 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Exception\PhoenixException;
+use Phoenix\Database\Element\Structure;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -53,11 +52,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_VARBINARY => 255,
     ];
 
-    private $adapter;
+    private $structure;
 
-    public function __construct(AdapterInterface $adapter = null)
+    public function __construct(Structure $structure)
     {
-        $this->adapter = $adapter;
+        $this->structure = $structure;
     }
 
     /**
@@ -102,15 +101,13 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
      */
     public function alterTable(MigrationTable $table)
     {
-        $queries = $this->addColumns($table);
-        if ($table->getColumnsToChange()) {
-            $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
-            $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
-            $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName));
+        $queries = [];
+        $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
+        $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
+        $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName));
 
-            $tableToDrop = new MigrationTable($tmpTableName);
-            $queries = array_merge($queries, $this->dropTable($tableToDrop));
-        }
+        $tableToDrop = new MigrationTable($tmpTableName);
+        $queries = array_merge($queries, $this->dropTable($tableToDrop));
 
         return $queries;
     }
@@ -152,24 +149,35 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
-            $columns[] = $this->escapeString($table->getColumn($column)->getName());
+            $columns[] = $this->escapeString($column);
         }
         $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
         $query = 'CREATE ' . $indexType . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
         return $query;
     }
 
+    private function dropIndex($indexName)
+    {
+        return 'DROP INDEX "' . $indexName . '"';
+    }
+
     private function createNewTable(MigrationTable $table, $tmpTableName)
     {
-        if (is_null($this->adapter)) {
-            throw new PhoenixException('Missing adapter');
-        }
-        $oldColumns = $this->adapter->tableInfo($table->getName());
-        $columns = array_merge($oldColumns, $table->getColumnsToChange());
+        $queries = [];
 
+        $oldTable = $this->structure->getTable($table->getName());
+        $oldColumns = $oldTable->getColumns();
+        $columnsToDrop = $table->getColumnsToDrop();
+        $columnsToChange = $table->getColumnsToChange();
+
+        $columns = array_merge($oldColumns, $columnsToChange);
         $newTable = new MigrationTable($table->getName());
         $columnNames = [];
         foreach ($columns as $column) {
+            if (in_array($column->getName(), $columnsToDrop)) {
+                unset($oldColumns[$column->getName()]);
+                continue;
+            }
             $columnNames[] = $column->getName();
             if ($column->getSettings()->isAutoincrement()) {
                 $newTable->addPrimary($column);
@@ -177,8 +185,30 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             }
             $newTable->addColumn($column->getName(), $column->getType(), $column->getSettings()->getSettings());
         }
+        foreach ($table->getColumns() as $newColumn) {
+            $newTable->addColumn($newColumn->getName(), $newColumn->getType(), $newColumn->getSettings()->getSettings());
+        }
 
-        $queries = $this->createTable($newTable);
+        $indexesToDrop = $table->getIndexesToDrop();
+        foreach ($oldTable->getIndexes() as $index) {
+            $queries[] = $this->dropIndex($index->getName());
+            if (in_array($index->getName(), $indexesToDrop)) {
+                continue;
+            }
+            $indexColumns = [];
+            foreach ($index->getColumns() as $indexColumn) {
+                $indexColumns[] = array_key_exists($indexColumn, $columnsToChange) ? $columnsToChange[$indexColumn]->getName() : $indexColumn;
+            }
+            $newTable->addIndex($indexColumns, $index->getType(), $index->getMethod(), $index->getName());
+        }
+
+        foreach ($table->getIndexes() as $index) {
+            $newTable->addIndex($index->getColumns(), $index->getType(), $index->getMethod(), $index->getName());
+        }
+
+        // foreign keys
+
+        $queries = array_merge($queries, $this->createTable($newTable));
         $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
         return $queries;
     }

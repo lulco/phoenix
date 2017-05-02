@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Exception;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
@@ -29,10 +28,7 @@ abstract class CommonQueryBuilder
 
     protected function remapType(Column $column)
     {
-        if (!isset($this->typeMap[$column->getType()])) {
-            throw new Exception('Type "' . $column->getType() . '" is not allowed');
-        }
-        return $this->typeMap[$column->getType()];
+        return isset($this->typeMap[$column->getType()]) ? $this->typeMap[$column->getType()] : $column->getType();
     }
 
     protected function createTableQuery(MigrationTable $table)
@@ -159,7 +155,7 @@ abstract class CommonQueryBuilder
             $queries[] = $this->dropKeyQuery($table, $primaryKeyName);
         }
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($foreignKey));
+            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($table->getName() . '_' . $foreignKey));
         }
         return $queries;
     }
