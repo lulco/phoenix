@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [0.8.0] - 2017-05-02
 #### Added
 - json output for all commands
 - migration datetime to Status command
@@ -107,7 +108,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.7.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/lulco/phoenix/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/lulco/phoenix/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/lulco/phoenix/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/lulco/phoenix/compare/0.5.0...0.6.0
