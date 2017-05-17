@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Dump command for creating migration from existing database
+
 ### [0.8.0] - 2017-05-02
 #### Added
 - json output for all commands
