@@ -16,6 +16,7 @@ Framework agnostic database migrations for PHP.
 - Multiple migration directories
 - Migrate up and down
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
+- Dump command for creating migration from existing database
 - json output format for all commands
 - Namespaces in migration classes
 - Own migration templates
@@ -76,6 +77,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `create` - create migration
 - `migrate` - run migrations
 - `rollback` - rollback migrations
+- `dump` - create migration from existing database
 - `status` - list of migrations already executed and list of migrations to execute
 - `cleanup` - rollback all migrations and delete log table
 
@@ -205,6 +207,10 @@ Nothing to rollback
 
 All done. Took 0.0401s
 ```
+
+### Dump command
+Command `php vendor/bin/phoenix dump [options]` dumps actual database structure into migration file.
+If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
 
 ### Status command
 Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:

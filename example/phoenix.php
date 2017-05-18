@@ -5,10 +5,6 @@ return [
         'phoenix' => __DIR__ . '/../testing_migrations/phoenix',
     ],
     'environments' => [
-        'sqlite' => [
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite:' . __DIR__ . '/../testing_migrations/phoenix.sqlite',
-        ],
         'mysql' => [
             'adapter' => 'mysql',
             'host' => 'localhost',
@@ -24,6 +20,10 @@ return [
             'password' => '123',
             'db_name' => 'phoenix',
             'charset' => 'utf8',
+        ],
+        'sqlite' => [
+            'adapter' => 'sqlite',
+            'dsn' => 'sqlite:' . __DIR__ . '/../testing_migrations/phoenix.sqlite',
         ],
     ],
 ];
