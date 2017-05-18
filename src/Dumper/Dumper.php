@@ -3,8 +3,8 @@
 namespace Dumper;
 
 use Phoenix\Database\Element\Column;
-use Phoenix\Database\Element\ColumnSettings;
-use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\Table;
 
 class Dumper
 {
@@ -19,50 +19,73 @@ class Dumper
     }
 
     /**
-     * @param MigrationTable[] $tables
+     * @param Table[] $tables
      * @return string
      */
     public function dumpTables(array $tables = [])
     {
-        $migration = '';
+        $tableMigrations = [];
         foreach ($tables as $table) {
-            $migration .= $this->indent() . "\$this->table('{$table->getName()}'";
+            $tableMigration = $this->indent() . "\$this->table('{$table->getName()}'";
             if ($table->getPrimary()) {
-                $migration .= ", " . $this->columnsToString($table->getPrimary());
+                $tableMigration .= ", " . $this->columnsToString($table->getPrimary());
             }
-            $migration .= ")\n";
-
+            $tableMigration .= ")\n";
+            if ($table->getCharset()) {
+                $tableMigration .= $this->indent(1) . "->setCharset('{$table->getCharset()}')\n";
+            }
+            if ($table->getCollation()) {
+                $tableMigration .= $this->indent(1) . "->setCollation('{$table->getCollation()}')\n";
+            }
             foreach ($table->getColumns() as $column) {
-                $migration .= $this->indent(1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column->getType(), $column->getSettings()) . ")\n";
+                $tableMigration .= $this->indent(1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
             }
             foreach ($table->getIndexes() as $index) {
-                $migration .= $this->indent(1) . "->addIndex(";
+                $tableMigration .= $this->indent(1) . "->addIndex(";
                 $indexColumns = $index->getColumns();
-                $migration .= $this->columnsToString($indexColumns) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
+                $tableMigration .= $this->columnsToString($indexColumns) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }
-            $migration .= $this->indent(1) . "->create();\n\n";
+            $tableMigration .= $this->indent(1) . "->create();";
+            $tableMigrations[] = $tableMigration;
         }
-        $migration .= $this->dumpForeignKeys($tables);
-        return $migration;
+        return implode("\n\n", $tableMigrations);
     }
 
-    private function dumpForeignKeys(array $tables = [])
+    /**
+     * @param Table[] $tables
+     * @return string
+     */
+    public function dumpForeignKeys(array $tables = [])
     {
-        $foreignKeysMigration = '';
+        $foreignKeysMigrations = [];
         foreach ($tables as $table) {
             $foreignKeys = $table->getForeignKeys();
-            if (count($foreignKeys) == 0) {
+            if (count($foreignKeys) === 0) {
                 continue;
             }
-            $foreignKeysMigration .= $this->indent() . "\$this->table('{$table->getName()}')\n";
+            $foreignKeysMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
             foreach ($foreignKeys as $foreignKey) {
                 $foreignKeysMigration .= $this->indent(1) . "->addForeignKey(";
-                $foreignKeysMigration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}', ";
-                $foreignKeysMigration .= $this->columnsToString($foreignKey->getReferencedColumns()) . ", '{$foreignKey->getOnDelete()}', '{$foreignKey->getOnUpdate()}')\n";
+                $foreignKeysMigration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}'";
+                $referencedColumns = $foreignKey->getReferencedColumns();
+                $onDelete = strtolower($foreignKey->getOnDelete());
+                $onUpdate = strtolower($foreignKey->getOnUpdate());
+
+                if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION || $referencedColumns !== ['id']) {
+                    $foreignKeysMigration .= ', ' . $this->columnsToString($referencedColumns);
+                }
+                if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION) {
+                    $foreignKeysMigration .= ", '$onDelete'";
+                }
+                if ($onUpdate !== ForeignKey::DEFAULT_ACTION) {
+                    $foreignKeysMigration .= ", '$onUpdate'";
+                }
+                $foreignKeysMigration .= ")\n";
             }
-            $foreignKeysMigration .= $this->indent(1) . "->save();\n\n";
+            $foreignKeysMigration .= $this->indent(1) . "->save();";
+            $foreignKeysMigrations[] = $foreignKeysMigration;
         }
-        return $foreignKeysMigration;
+        return implode("\n\n", $foreignKeysMigrations);
     }
 
     /**
@@ -71,9 +94,9 @@ class Dumper
      */
     public function dumpData(array $data = [])
     {
-        $dataMigration = '';
+        $dataMigrations = [];
         foreach ($data as $table => $rows) {
-            $dataMigration .= "{$this->indent()}\$this->insert('$table', [\n";
+            $dataMigration = "{$this->indent()}\$this->insert('$table', [\n";
             foreach ($rows as $row) {
                 $dataMigration .= $this->indent(1) . "[\n";
                 foreach ($row as $column => $value) {
@@ -81,9 +104,10 @@ class Dumper
                 }
                 $dataMigration .= "{$this->indent(1)}],\n";
             }
-            $dataMigration .= "{$this->indent()}]);\n\n";
+            $dataMigration .= "{$this->indent()}]);";
+            $dataMigrations[] = $dataMigration;
         }
-        return $dataMigration;
+        return implode("\n\n", $dataMigrations);
     }
 
     private function indent($multiplier = 0)
@@ -108,8 +132,10 @@ class Dumper
         return '[' . implode(', ', $values) . ']';
     }
 
-    private function settingsToString($type, ColumnSettings $settings)
+    private function settingsToString(Column $column, Table $table)
     {
+        $type = $column->getType();
+        $settings = $column->getSettings();
         $defaultSettings = [
             'autoincrement' => false,
             'null' => false,
@@ -118,6 +144,8 @@ class Dumper
             'length' => null,
             'decimals' => null,
             'values' => null,
+            'charset' => ['', $table->getCharset()],
+            'collation' => ['', $table->getCollation()],
         ];
         if ($type == Column::TYPE_STRING) {
             $defaultSettings['length'] = 255;
@@ -130,20 +158,19 @@ class Dumper
         }
         $settingsList = [];
         foreach ($settings->getSettings() as $setting => $value) {
-            if (in_array($setting, ['charset', 'collation'])) {
+            if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting])) {
+                continue;
+            } elseif ($value === $defaultSettings[$setting]) {
                 continue;
             }
-            if ($value === $defaultSettings[$setting]) {
-                continue;
-            }
-            if ($value === null) {
-                $value = 'null';
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
             } elseif (is_array($value)) {
                 $value = $this->valuesToString($value);
-            } elseif (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
             } elseif (!is_numeric($value)) {
                 $value = "'$value'";
+            } elseif ($value === null) {
+                $value = 'null';
             }
             $settingsList[] = "'$setting' => $value";
         }

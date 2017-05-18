@@ -38,6 +38,7 @@ class DumpCommand extends AbstractCommand
             $data = $this->loadData($tables);
             $migration .= $dumper->dumpData($data);
         }
+        $migration .= $dumper->dumpForeignKeys($tables);
 
         $output->write($migration);
         $output->writeln('');
