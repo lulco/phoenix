@@ -202,7 +202,7 @@ class DumperTest extends PHPUnit_Framework_TestCase
         $table2 = new MigrationTable('table_2');
         $table2->addColumn('title', 'string', ['length' => 100]);
         $table2->addColumn('is_active', 'boolean', ['default' => true]);
-        $table2->addColumn('fk_table_1_id', 'integer');
+        $table2->addColumn('fk_table_1_id', 'integer', ['null' => false]);
         $table2->addForeignKey(['fk_table_1_id'], 'table_1');
         $table2->create();
         $structure->update($table2);

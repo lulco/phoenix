@@ -141,21 +141,18 @@ class Dumper
             'null' => false,
             'default' => null,
             'signed' => true,
-            'length' => null,
+            'length' => [null, ''],
             'decimals' => null,
             'values' => null,
             'charset' => ['', $table->getCharset()],
             'collation' => ['', $table->getCollation()],
         ];
-        if ($type == Column::TYPE_STRING) {
-            $defaultSettings['length'] = 255;
-        } elseif ($type == Column::TYPE_INTEGER) {
-            $defaultSettings['length'] = 11;
-        } elseif ($type == Column::TYPE_BOOLEAN) {
-            $defaultSettings['signed'] = false;
-        } elseif ($type == Column::TYPE_TEXT) {
-            $defaultSettings['null'] = true;
+        if ($type == Column::TYPE_INTEGER) {
+            $defaultSettings['length'][] = 11;
+        } elseif (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR, Column::TYPE_BINARY, Column::TYPE_VARBINARY])) {
+            $defaultSettings['length'][] = 255;
         }
+
         $settingsList = [];
         foreach ($settings->getSettings() as $setting => $value) {
             if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting])) {

@@ -34,20 +34,24 @@ class MysqlAdapter extends PdoAdapter
         $database = $this->execute('SELECT database()')->fetchColumn();
         $tables = $this->execute("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$database' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
-            $migrationTable = $this->createMigrationTable($table['TABLE_NAME'], $database);
-            if ($migrationTable) {
-                $structure->update($migrationTable);
-            }
+            $migrationTable = $this->createMigrationTable($table, $database);
+            $structure->update($migrationTable);
         }
         return $structure;
     }
 
     private function createMigrationTable($table, $database)
     {
-        $migrationTable = new MigrationTable($table, false);
-        $this->loadColumns($migrationTable, $table);
-        $this->loadIndexes($migrationTable, $table);
-        $this->loadForeignKeys($migrationTable, $database, $table);
+        $tableName = $table['TABLE_NAME'];
+        $migrationTable = new MigrationTable($tableName, false);
+        if ($table['TABLE_COLLATION']) {
+            list($charset,) = explode('_', $table['TABLE_COLLATION'], 2);
+            $migrationTable->setCharset($charset);
+            $migrationTable->setCollation($table['TABLE_COLLATION']);
+        }
+        $this->loadColumns($migrationTable, $tableName);
+        $this->loadIndexes($migrationTable, $tableName);
+        $this->loadForeignKeys($migrationTable, $database, $tableName);
         $migrationTable->create();
         return $migrationTable;
     }
@@ -65,7 +69,7 @@ class MysqlAdapter extends PdoAdapter
         ];
         return isset($types[$type]) ? $types[$type] : $type;
     }
-    
+
     private function loadColumns(MigrationTable $migrationTable, $table)
     {
         $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);

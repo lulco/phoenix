@@ -105,7 +105,9 @@ class SqliteAdapter extends PdoAdapter
             'length' => $length,
             'decimals' => $decimals,
         ];
-        if ($type == 'varchar') {
+        if ($type == 'boolean') {
+            $settings['default'] = (bool) $settings['default'];
+        } elseif ($type == 'varchar') {
             $type = Column::TYPE_STRING;
         } elseif ($type == 'bigint') {
             $type = Column::TYPE_BIG_INTEGER;
