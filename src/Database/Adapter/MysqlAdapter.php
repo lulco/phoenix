@@ -100,6 +100,9 @@ class MysqlAdapter extends PdoAdapter
             $length = null;
         }
         $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
+        if ($type === Column::TYPE_BOOLEAN) {
+            $settings['default'] = (bool)$settings['default'];
+        }
         $migrationTable->addColumn($column['Field'], $type, $settings);
     }
 
