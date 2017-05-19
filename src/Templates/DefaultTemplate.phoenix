@@ -4,13 +4,13 @@
 
 class ###CLASSNAME### extends AbstractMigration
 {
-    protected function up()
-    {
-        
-    }
+###INDENT###protected function up()
+###INDENT###{
+###UP###
+###INDENT###}
 
-    protected function down()
-    {
-        
-    }
+###INDENT###protected function down()
+###INDENT###{
+###DOWN###
+###INDENT###}
 }

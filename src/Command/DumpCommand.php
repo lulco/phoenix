@@ -4,6 +4,8 @@ namespace Phoenix\Command;
 
 use Dumper\Dumper;
 use Phoenix\Command\AbstractCommand;
+use Phoenix\Exception\PhoenixException;
+use Phoenix\Migration\MigrationNameCreator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,9 +17,12 @@ class DumpCommand extends AbstractCommand
         $this->setName('dump')
             ->setDescription('Dump actual database structure to migration file')
             ->addOption('data', 'd', InputOption::VALUE_NONE, 'Dump structure and also data')
-            ->addOption('ignore-tables', null, InputOption::VALUE_OPTIONAL, 'Comma separaterd list of tables to ignore (Structure and data). Default: phoenix_log')
-            ->addOption('ignore-data-tables', null, InputOption::VALUE_OPTIONAL, 'Comma separaterd list of tables which will be exported without data (Option -d, --data is required to use this option)')
-            ->addOption('indent', 'i', InputOption::VALUE_OPTIONAL, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces')
+            ->addOption('ignore-tables', null, InputOption::VALUE_REQUIRED, 'Comma separaterd list of tables to ignore (Structure and data). Default: phoenix_log')
+            ->addOption('ignore-data-tables', null, InputOption::VALUE_REQUIRED, 'Comma separaterd list of tables which will be exported without data (Option -d, --data is required to use this option)')
+            ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces')
+            ->addOption('migration', null, InputOption::VALUE_REQUIRED, 'Name of migration', 'Initialization')
+            ->addOption('dir', null, InputOption::VALUE_REQUIRED, 'Directory to create migration in')
+            ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')
         ;
 
         parent::configure();
@@ -29,19 +34,57 @@ class DumpCommand extends AbstractCommand
         $output->writeln('');
 
         $indent = $this->getIndent($input);
-        $dumper = new Dumper($indent);
+        $dumper = new Dumper($indent, 2);
 
         $tables = $this->getFilteredTables($ignoredTables);
-        $migration = $dumper->dumpTables($tables);
+        $upParts = [];
+        $upParts[] = $dumper->dumpTables($tables);
 
         if ($input->getOption('data')) {
             $data = $this->loadData($tables);
-            $migration .= $dumper->dumpData($data);
+            $upParts[] = $dumper->dumpData($data);
         }
-        $migration .= $dumper->dumpForeignKeys($tables);
+        $upParts[] = $dumper->dumpForeignKeys($tables);
+        $up = implode("\n\n", array_filter($upParts, function ($upPart) {
+            return (bool) $upPart;
+        }));
 
-        $output->write($migration);
-        $output->writeln('');
+        $downParts = [];
+        $downParts[] = $dumper->dumpTables($tables);
+
+        if ($input->getOption('data')) {
+            $data = $this->loadData($tables);
+            $downParts[] = $dumper->dumpData($data);
+        }
+        $downParts[] = $dumper->dumpForeignKeys($tables);
+        $down = implode("\n\n", array_filter($downParts, function ($downPart) {
+            return (bool) $downPart;
+        }));
+
+        $migration = $input->getOption('migration') ?: 'Initialization';
+        $migrationNameCreator = new MigrationNameCreator($migration);
+        $filename = $migrationNameCreator->getFileName();
+        $dir = $input->getOption('dir');
+        $migrationDir = $this->config->getMigrationDir($dir);
+
+        $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
+        if (!file_exists($templatePath)) {
+            throw new PhoenixException('Template "' . $templatePath . '" not found');
+        }
+
+        $template = file_get_contents($templatePath);
+        $namespace = '';
+        if ($migrationNameCreator->getNamespace()) {
+            $namespace .= "namespace {$migrationNameCreator->getNamespace()};\n\n";
+        }
+        $template = str_replace('###NAMESPACE###', $namespace, $template);
+        $template = str_replace('###CLASSNAME###', $migrationNameCreator->getClassName(), $template);
+        $template = str_replace('###INDENT###', $indent, $template);
+        $template = str_replace('###UP###', $up, $template);
+        $template = str_replace('###DOWN###', $down, $template);
+
+        $migrationPath = $migrationDir . '/' . $filename;
+        file_put_contents($migrationPath, $template);
     }
 
     private function getFilteredTables(array $ignoredTables = [])
