@@ -376,4 +376,24 @@ class MigrationTable
         }
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
+
+    public function toTable()
+    {
+        $table = new Table($this->getName());
+        $table->setCharset($this->getCharset());
+        $table->setCollation($this->getCollation());
+        if ($this->getPrimaryColumns()) {
+            $table->setPrimary($this->getPrimaryColumns());
+        }
+        foreach ($this->getColumns() as $column) {
+            $table->addColumn($column);
+        }
+        foreach ($this->getIndexes() as $index) {
+            $table->addIndex($index);
+        }
+        foreach ($this->getForeignKeys() as $foreignKey) {
+            $table->addForeignKey($foreignKey);
+        }
+        return $table;
+    }
 }

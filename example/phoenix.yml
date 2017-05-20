@@ -2,9 +2,6 @@ migration_dirs:
     phoenix: '%%ACTUAL_DIR%%/../testing_migrations/phoenix'
 
 environments:
-    sqlite:
-        adapter: sqlite
-        dsn: 'sqlite::memory:'
     mysql:
         adapter: mysql
         host: localhost
@@ -12,3 +9,13 @@ environments:
         password: 123
         db_name: phoenix
         charset: utf8
+    pgsql:
+        adapter: pgsql
+        host: localhost
+        username: postgres
+        password: 123
+        db_name: phoenix
+        charset: utf8
+    sqlite:
+        adapter: sqlite
+        dsn: 'sqlite::%%ACTUAL_DIR%%/../testing_migrations/phoenix.sqlite'
