@@ -145,7 +145,7 @@ class MigrationTable
 
     /**
      * @param string $name
-     * @return Column
+     * @return Column|null
      */
     public function getColumn($name)
     {

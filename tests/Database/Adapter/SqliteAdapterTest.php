@@ -12,7 +12,7 @@ use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
-use Phoenix\Tests\Helpers\Pdo\SqliteMemoryPdo;
+use Phoenix\Tests\Helpers\Pdo\SqlitePdo;
 use PHPUnit_Framework_TestCase;
 
 class SqliteAdapterTest extends PHPUnit_Framework_TestCase
@@ -21,11 +21,11 @@ class SqliteAdapterTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $pdo = new SqliteMemoryPdo();
+        $pdo = new SqlitePdo();
         $adapter = new SqliteCleanupAdapter($pdo);
         $adapter->cleanupDatabase();
 
-        $pdo = new SqliteMemoryPdo();
+        $pdo = new SqlitePdo();
         $this->adapter = new SqliteAdapter($pdo);
     }
 

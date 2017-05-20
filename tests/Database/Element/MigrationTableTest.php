@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Database\Element;
 
+use Exception;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
@@ -184,7 +185,6 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($indexes as $index) {
             $this->assertInstanceOf(Index::class, $index);
         }
-
         $this->assertNull($table->getColumn('unknown_column'));
     }
 
@@ -269,12 +269,10 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $migrationTable->addIndex('alias', Index::TYPE_UNIQUE);
         $migrationTable->addForeignKey('fk_table1_id', 'table1');
         $migrationTable->create();
-
         $table = $migrationTable->toTable();
         $this->assertCount(4, $migrationTable->getColumns());
         $this->assertCount(1, $migrationTable->getIndexes());
         $this->assertCount(1, $migrationTable->getForeignKeys());
-
         $this->assertInstanceOf(Table::class, $table);
         $this->assertEquals($migrationTable->getName(), $table->getName());
         $this->assertEquals($migrationTable->getCharset(), $table->getCharset());

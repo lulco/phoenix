@@ -19,7 +19,8 @@ class CreateCommand extends AbstractCommand
             ->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
-            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Path to template');
+            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Path to template')
+            ->addOption('indent', 'i', InputOption::VALUE_OPTIONAL, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces');
     }
 
     protected function runCommand(InputInterface $input, OutputInterface $output)
@@ -31,9 +32,11 @@ class CreateCommand extends AbstractCommand
         $migrationDir = $this->config->getMigrationDir($dir);
 
         $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
-        if (!file_exists($templatePath)) {
-            throw new PhoenixException('Template "' . $templatePath . '" not found');
+        if (!is_file($templatePath)) {
+            throw new PhoenixException('Template "' . $templatePath . '" doesn\'t exist or is not a regular file');
         }
+
+        $indent = $this->getIndent($input);
 
         $template = file_get_contents($templatePath);
         $namespace = '';
@@ -42,6 +45,8 @@ class CreateCommand extends AbstractCommand
         }
         $template = str_replace('###NAMESPACE###', $namespace, $template);
         $template = str_replace('###CLASSNAME###', $migrationNameCreator->getClassName(), $template);
+        $template = str_replace('###INDENT###', $indent, $template);
+        $template = str_replace(['###UP###', '###DOWN###'], str_repeat($indent, 2), $template);
 
         $migrationPath = $migrationDir . '/' . $filename;
         file_put_contents($migrationPath, $template);
@@ -51,5 +56,23 @@ class CreateCommand extends AbstractCommand
 
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;
+    }
+
+    private function getIndent(InputInterface $input)
+    {
+        $indent = strtolower(str_replace([' ', '-', '_'], '', $input->getOption('indent')));
+        if ($indent == '2spaces') {
+            return '  ';
+        }
+        if ($indent == '3spaces') {
+            return '   ';
+        }
+        if ($indent == '5spaces') {
+            return '     ';
+        }
+        if ($indent == 'tab') {
+            return "\t";
+        }
+        return '    ';
     }
 }
