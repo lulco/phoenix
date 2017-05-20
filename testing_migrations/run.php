@@ -20,10 +20,6 @@ $configuration = [
             'password' => '123',
             'charset' => 'utf8',
         ],
-        'sqlite' => [
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
-        ],
         'pgsql' => [
             'adapter' => 'pgsql',
             'db_name' => 'phoenix',
@@ -31,6 +27,10 @@ $configuration = [
             'username' => 'postgres',
             'password' => '123',
             'charset' => 'utf8',
+        ],
+        'sqlite' => [
+            'adapter' => 'sqlite',
+            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
         ],
     ],
 ];
@@ -43,16 +43,19 @@ foreach (array_keys($configuration['environments']) as $environment) {
     $initMigration = new Init($adapter, $config->getLogTableName());
     $initMigration->migrate();
 
-    $manager = new Manager($config, $adapter);
-    $migrations = $manager->findMigrationsToExecute();
-    foreach ($migrations as $migration) {
-        $migration->migrate();
-        $manager->logExecution($migration);
-        $migration->rollback();
-        $manager->removeExecution($migration);
-        $migration->migrate();
-        $manager->logExecution($migration);
-//        print_R($migration->getExecutedQueries());
-    }
+    do {
+        $adapter = AdapterFactory::instance($config->getEnvironmentConfig($environment));
+        $manager = new Manager($config, $adapter);
+        $migrations = $manager->findMigrationsToExecute(Manager::TYPE_UP, Manager::TARGET_FIRST);
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $manager->logExecution($migration);
+            $migration->rollback();
+            $manager->removeExecution($migration);
+            $migration->migrate();
+            $manager->logExecution($migration);
+    //        print_R($migration->getExecutedQueries());
+        }
+    } while ($migrations);
     echo "All OK\n\n";
 }

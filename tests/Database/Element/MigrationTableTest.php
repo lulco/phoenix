@@ -159,7 +159,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         }
         $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('first_column'));
         $this->assertCount(1, $table->getForeignKeysToDrop());
-        $this->assertEquals('test_first_column', $table->getForeignKeysToDrop()[0]);
+        $this->assertEquals('first_column', $table->getForeignKeysToDrop()[0]);
     }
 
     public function testGetters()
@@ -185,10 +185,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($indexes as $index) {
             $this->assertInstanceOf(Index::class, $index);
         }
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Column "unknown_column" not found');
-        $table->getColumn('unknown_column');
+        $this->assertNull($table->getColumn('unknown_column'));
     }
 
     public function testCharsetAndCollation()

@@ -82,7 +82,7 @@ class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
         ];
 
         // check all columns and their settings for table_1
-        $this->assertEquals(['id' => 'id'], $table1->getPrimary());
+        $this->assertEquals(['id'], $table1->getPrimary());
         $this->checkColumn($table1, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'autoincrement' => true,
         ]));
@@ -168,7 +168,7 @@ class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertCount(0, $table1->getForeignKeys());
 
         // check all columns and their settings for table_2
-        $this->assertEquals(['id' => 'id'], $table2->getPrimary());
+        $this->assertEquals(['id'], $table2->getPrimary());
         $this->checkColumn($table2, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'autoincrement' => true,
         ]));
