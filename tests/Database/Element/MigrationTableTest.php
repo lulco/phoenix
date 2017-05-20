@@ -185,10 +185,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($indexes as $index) {
             $this->assertInstanceOf(Index::class, $index);
         }
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Column "unknown_column" not found');
-        $table->getColumn('unknown_column');
+        $this->assertNull($table->getColumn('unknown_column'));
     }
 
     public function testCharsetAndCollation()
