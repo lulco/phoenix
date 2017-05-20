@@ -159,7 +159,7 @@ abstract class CommonQueryBuilder
             $queries[] = $this->dropKeyQuery($table, $primaryKeyName);
         }
         foreach ($table->getForeignKeysToDrop() as $foreignKey) {
-            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($foreignKey));
+            $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($table->getName() . '_' . $foreignKey));
         }
         return $queries;
     }
