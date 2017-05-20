@@ -28,7 +28,7 @@ class MysqlAdapter extends PdoAdapter
         $structure = new Structure();
         $tables = $this->execute("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$database' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
-            $migrationTable = $this->tableInfo($table['TABLE_NAME'], $database);
+            $migrationTable = $this->tableInfo($table, $database);
             if ($migrationTable) {
                 $structure->update($migrationTable);
             }
@@ -36,12 +36,19 @@ class MysqlAdapter extends PdoAdapter
         return $structure;
     }
 
-    private function tableInfo($table, $database)
+    private function tableInfo(array $table, $database)
     {
-        $migrationTable = new MigrationTable($table);
-        $this->loadColumns($migrationTable, $table);
-        $this->loadIndexes($migrationTable, $table);
-        $this->loadForeignKeys($migrationTable, $database, $table);
+        $tableName = $table['TABLE_NAME'];
+        $migrationTable = new MigrationTable($tableName, false);
+        if ($table['TABLE_COLLATION']) {
+            list($charset,) = explode('_', $table['TABLE_COLLATION'], 2);
+            $migrationTable->setCharset($charset);
+            $migrationTable->setCollation($table['TABLE_COLLATION']);
+        }
+        $this->loadColumns($migrationTable, $tableName);
+        $this->loadIndexes($migrationTable, $tableName);
+        $this->loadForeignKeys($migrationTable, $database, $tableName);
+        $migrationTable->create();
         return $migrationTable;
     }
 
@@ -104,6 +111,9 @@ class MysqlAdapter extends PdoAdapter
         }
 
         $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
+        if ($type === Column::TYPE_BOOLEAN) {
+            $settings['default'] = (bool)$settings['default'];
+        }
         $migrationTable->addColumn($column['Field'], $type, $settings);
     }
 
@@ -164,6 +174,7 @@ class MysqlAdapter extends PdoAdapter
     {
         $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
+AND information_schema.KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
 WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_schema.KEY_COLUMN_USAGE.TABLE_NAME = "%s";', $database, $table);
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
