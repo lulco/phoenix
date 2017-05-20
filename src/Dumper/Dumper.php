@@ -22,7 +22,7 @@ class Dumper
      * @param Table[] $tables
      * @return string
      */
-    public function dumpTables(array $tables = [])
+    public function dumpTablesUp(array $tables = [])
     {
         $tableMigrations = [];
         foreach ($tables as $table) {
@@ -55,7 +55,7 @@ class Dumper
      * @param Table[] $tables
      * @return string
      */
-    public function dumpForeignKeys(array $tables = [])
+    public function dumpForeignKeysUp(array $tables = [])
     {
         $foreignKeysMigrations = [];
         foreach ($tables as $table) {
@@ -92,7 +92,7 @@ class Dumper
      * @param array $data data for migration in format table => rows
      * @return string
      */
-    public function dumpData(array $data = [])
+    public function dumpDataUp(array $data = [])
     {
         $dataMigrations = [];
         foreach ($data as $table => $rows) {
@@ -108,6 +108,43 @@ class Dumper
             $dataMigrations[] = $dataMigration;
         }
         return implode("\n\n", $dataMigrations);
+    }
+
+    /**
+     * @param Table[] $tables
+     * @return string
+     */
+    public function dumpTablesDown(array $tables = [])
+    {
+        $downMigrations = [];
+        foreach ($tables as $table) {
+            $downMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
+            $downMigration .= $this->indent(1) . "->drop();";
+            $downMigrations[] = $downMigration;
+        }
+        return implode("\n\n", $downMigrations);
+    }
+
+    /**
+     * @param Table[] $tables
+     * @return string
+     */
+    public function dumpForeignKeysDown(array $tables = [])
+    {
+        $downForeignKeysMigrations = [];
+        foreach ($tables as $table) {
+            $foreignKeys = $table->getForeignKeys();
+            if (count($foreignKeys) === 0) {
+                continue;
+            }
+            $foreignKeysMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
+            foreach ($foreignKeys as $foreignKey) {
+                $foreignKeysMigration .= $this->indent(1) . "->dropForeignKey({$this->columnsToString($foreignKey->getColumns())})\n";
+            }
+            $foreignKeysMigration .= $this->indent(1) . "->save();";
+            $downForeignKeysMigrations[] = $foreignKeysMigration;
+        }
+        return implode("\n\n", $downForeignKeysMigrations);
     }
 
     private function indent($multiplier = 0)

@@ -38,25 +38,20 @@ class DumpCommand extends AbstractCommand
 
         $tables = $this->getFilteredTables($ignoredTables);
         $upParts = [];
-        $upParts[] = $dumper->dumpTables($tables);
+        $upParts[] = $dumper->dumpTablesUp($tables);
 
         if ($input->getOption('data')) {
             $data = $this->loadData($tables);
-            $upParts[] = $dumper->dumpData($data);
+            $upParts[] = $dumper->dumpDataUp($data);
         }
-        $upParts[] = $dumper->dumpForeignKeys($tables);
+        $upParts[] = $dumper->dumpForeignKeysUp($tables);
         $up = implode("\n\n", array_filter($upParts, function ($upPart) {
             return (bool) $upPart;
         }));
 
         $downParts = [];
-        $downParts[] = $dumper->dumpTables($tables);
-
-        if ($input->getOption('data')) {
-            $data = $this->loadData($tables);
-            $downParts[] = $dumper->dumpData($data);
-        }
-        $downParts[] = $dumper->dumpForeignKeys($tables);
+        $downParts[] = $dumper->dumpForeignKeysDown($tables);
+        $downParts[] = $dumper->dumpTablesDown($tables);
         $down = implode("\n\n", array_filter($downParts, function ($downPart) {
             return (bool) $downPart;
         }));

@@ -162,6 +162,7 @@ class MysqlAdapter extends PdoAdapter
     {
         $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
+AND information_schema.KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
 WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_schema.KEY_COLUMN_USAGE.TABLE_NAME = "%s";', $database, $table);
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
