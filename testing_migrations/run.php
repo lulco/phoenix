@@ -54,7 +54,7 @@ foreach (array_keys($configuration['environments']) as $environment) {
             $manager->removeExecution($migration);
             $migration->migrate();
             $manager->logExecution($migration);
-    //        print_R($migration->getExecutedQueries());
+//            print_R($migration->getExecutedQueries());
         }
     } while ($migrations);
     echo "All OK\n\n";
