@@ -50,6 +50,12 @@ class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertCount(1, $structure->getTables());
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
 
+        $queryBuilder = $this->adapter->getQueryBuilder();
+        $queries = $queryBuilder->createTable($migrationTable);
+        foreach ($queries as $query) {
+            $this->adapter->execute($query);
+        }
+
         $updatedStructure = $this->adapter->getStructure();
         $this->assertInstanceOf(Structure::class, $updatedStructure);
         $this->assertCount(1, $updatedStructure->getTables());

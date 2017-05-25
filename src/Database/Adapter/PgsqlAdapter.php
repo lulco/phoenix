@@ -18,7 +18,7 @@ class PgsqlAdapter extends PdoAdapter
     public function getQueryBuilder()
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new PgsqlQueryBuilder($this->getStructure());
+            $this->queryBuilder = new PgsqlQueryBuilder($this);
         }
         return $this->queryBuilder;
     }

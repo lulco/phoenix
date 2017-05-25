@@ -2,10 +2,10 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Database\Element\Structure;
 
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -54,11 +54,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_STRING => 'varchar',
     ];
 
-    private $structure;
+    private $adapter;
 
-    public function __construct(Structure $structure)
+    public function __construct(AdapterInterface $adapter = null)
     {
-        $this->structure = $structure;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -142,7 +142,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 }
                 if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
-                    $tableInfo = $this->structure->getTable($table->getName());
+                    $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
                     foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
                         $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
                     }

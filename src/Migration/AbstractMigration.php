@@ -241,17 +241,13 @@ abstract class AbstractMigration
     private function prepare()
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
-        $structure = $this->adapter->getStructure();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
             if (!($queryToExecute instanceof MigrationTable)) {
                 $queries[] = $queryToExecute;
                 continue;
             }
-
-            $queryToExecute = $structure->prepare($queryToExecute);
             $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
-            $structure->update($queryToExecute);
             $queries = array_merge($queries, $tableQueries);
         }
         return $queries;
@@ -259,7 +255,7 @@ abstract class AbstractMigration
 
     private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder)
     {
-        $tableQueries = null;
+        $tableQueries = [];
         if ($table->getAction() === MigrationTable::ACTION_CREATE) {
             $tableQueries = $queryBuilder->createTable($table);
         } elseif ($table->getAction() === MigrationTable::ACTION_ALTER) {

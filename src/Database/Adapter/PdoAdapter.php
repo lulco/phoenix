@@ -21,9 +21,6 @@ abstract class PdoAdapter implements AdapterInterface
     /** @var QueryBuilderInterface */
     protected $queryBuilder;
 
-    /** @var Structure */
-    private $structure = null;
-
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -313,12 +310,9 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getStructure($force = false)
+    public function getStructure()
     {
-        if ($this->structure === null || $force === true) {
-            $this->structure = $this->loadStructure();
-        }
-        return $this->structure;
+        return $this->loadStructure();
     }
 
     /**

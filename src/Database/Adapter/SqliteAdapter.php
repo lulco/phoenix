@@ -17,7 +17,7 @@ class SqliteAdapter extends PdoAdapter
     public function getQueryBuilder()
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new SqliteQueryBuilder($this->getStructure());
+            $this->queryBuilder = new SqliteQueryBuilder($this);
         }
         return $this->queryBuilder;
     }

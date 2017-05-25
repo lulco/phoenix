@@ -2,10 +2,10 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Database\Element\Structure;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -52,11 +52,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_VARBINARY => 255,
     ];
 
-    private $structure;
+    private $adapter;
 
-    public function __construct(Structure $structure)
+    public function __construct(AdapterInterface $adapter = null)
     {
-        $this->structure = $structure;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -165,7 +165,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         $queries = [];
 
-        $oldTable = $this->structure->getTable($table->getName());
+        $oldTable = $this->adapter->getStructure()->getTable($table->getName());
         $oldColumns = $oldTable->getColumns();
         $columnsToDrop = $table->getColumnsToDrop();
         $columnsToChange = $table->getColumnsToChange();
