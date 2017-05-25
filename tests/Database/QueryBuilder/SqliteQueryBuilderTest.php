@@ -241,12 +241,15 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table->create();
         $this->adapter->getStructure()->update($table);
 
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+        foreach ($queryBuilder->createTable($table) as $query) {
+            $this->adapter->execute($query);
+        }
+
         // add columns
         $table = new MigrationTable('add_columns');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
-
-        $queryBuilder = new SqliteQueryBuilder($this->adapter);
 
         $timestamp = date('YmdHis');
         $expectedQueries = [
@@ -270,12 +273,16 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $migartionCreateTable->create();
         $this->adapter->getStructure()->update($migartionCreateTable);
 
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+        foreach ($queryBuilder->createTable($migartionCreateTable) as $query) {
+            $this->adapter->execute($query);
+        }
+
         $table = new MigrationTable('with_columns_to_change');
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('old_name', 'new_name', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('no_name_change', 'no_name_change', 'integer'));
 
         $timestamp = date('YmdHis');
-        $queryBuilder = new SqliteQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "with_columns_to_change" RENAME TO "_with_columns_to_change_old_' . $timestamp . '";',
             'CREATE TABLE "with_columns_to_change" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"new_name" integer NOT NULL,"no_name_change" integer NOT NULL);',
@@ -293,12 +300,15 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table->create();
 
         $this->adapter->getStructure()->update($table);
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+
+        foreach ($queryBuilder->createTable($table) as $query) {
+            $this->adapter->execute($query);
+        }
 
         $table = new MigrationTable('with_change_added_column');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('old_name', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('old_name', 'new_name', 'string'));
-
-        $queryBuilder = new SqliteQueryBuilder($this->adapter);
 
         $timestamp = date('YmdHis');
         $expectedQueries = [
