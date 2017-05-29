@@ -22,46 +22,13 @@ class SqliteAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    public function tableInfo($table)
-    {
-        $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
-        $tableInfo = [];
-        foreach ($columns as $column) {
-            preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
-            $type = $column['type'];
-            $settings = [
-                'null' => !$column['notnull'],
-                'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
-                'autoincrement' => (bool)$column['pk'] && $column['type'] == 'integer',
-            ];
-
-            if (isset($matches[1]) && $matches[1] != '') {
-                $type = $matches[1];
-            }
-
-            if ($type == 'varchar') {
-                $type = Column::TYPE_STRING;
-            } elseif ($type == 'bigint') {
-                $type = Column::TYPE_BIG_INTEGER;
-            } elseif ($type == 'enum') {
-                $sql = $this->execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'")->fetch(PDO::FETCH_COLUMN);
-                preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
-                $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
-            }
-            $tableInfo[$column['name']] = new Column($column['name'], $type, $settings);
-        }
-        return $tableInfo;
-    }
-
     protected function loadStructure()
     {
         $structure = new Structure();
         $tables = $this->execute("SELECT * FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence'")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
             $migrationTable = $this->createMigrationTable($table['name']);
-            if ($migrationTable) {
-                $structure->update($migrationTable);
-            }
+            $structure->update($migrationTable);
         }
         return $structure;
     }
@@ -78,7 +45,7 @@ class SqliteAdapter extends PdoAdapter
 
     private function loadColumns(MigrationTable $migrationTable, $table)
     {
-        $columns = $this->execute('PRAGMA table_info(' . $this->getQueryBuilder()->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute('PRAGMA table_info(' . $this->escapeString($table) . ')')->fetchAll(PDO::FETCH_ASSOC);
         $primaryKeys = [];
         foreach ($columns as $column) {
             if ($column['pk']) {
@@ -97,7 +64,9 @@ class SqliteAdapter extends PdoAdapter
         if (isset($matches[1]) && $matches[1] != '') {
             $type = $matches[1];
         }
+
         list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+
         $settings = [
             'null' => !$column['notnull'],
             'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
@@ -105,9 +74,8 @@ class SqliteAdapter extends PdoAdapter
             'length' => $length,
             'decimals' => $decimals,
         ];
-        if ($type == 'boolean') {
-            $settings['default'] = (bool) $settings['default'];
-        } elseif ($type == 'varchar') {
+
+        if ($type == 'varchar') {
             $type = Column::TYPE_STRING;
         } elseif ($type == 'bigint') {
             $type = Column::TYPE_BIG_INTEGER;
@@ -127,6 +95,7 @@ class SqliteAdapter extends PdoAdapter
         if ($lengthAndDecimals === null) {
             return [null, null];
         }
+
         $length = (int) $lengthAndDecimals;
         $decimals = null;
         if (strpos($lengthAndDecimals, ',')) {
@@ -158,6 +127,11 @@ class SqliteAdapter extends PdoAdapter
         foreach ($foreignKeyList as $foreignKeyRow) {
             $migrationTable->addForeignKey($foreignKeyRow['from'], $foreignKeyRow['table'], $foreignKeyRow['to'], $foreignKeyRow['on_delete'], $foreignKeyRow['on_update']);
         }
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
     }
 
     protected function createRealValue($value)

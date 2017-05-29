@@ -2,20 +2,35 @@
 
 namespace Phoenix\Tests\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
+use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
+use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
 use PHPUnit_Framework_TestCase;
 
 class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
+    private $adapter;
+
+    protected function setUp()
+    {
+        $pdo = new PgsqlPdo();
+        $adapter = new PgsqlCleanupAdapter($pdo);
+        $adapter->cleanupDatabase();
+
+        $pdo = new PgsqlPdo(getenv('PHOENIX_PGSQL_DATABASE'));
+        $this->adapter = new PgsqlAdapter($pdo);
+    }
+
     public function testSimpleCreate()
     {
         $table = new MigrationTable('simple');
         $table->addPrimary(true);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "simple" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "simple_pkey" PRIMARY KEY ("id"));'
         ];
@@ -31,7 +46,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer', ['default' => 0]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "more_columns" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "more_columns_pkey" PRIMARY KEY ("id"));',
         ];
@@ -75,7 +90,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_line', 'line', ['null' => true]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_polygon', 'polygon', ['null' => true]));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TYPE "all_types__col_enum" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
             'CREATE TYPE "all_types__col_set" AS ENUM (\'xxx\',\'yyy\',\'zzz\');',
@@ -91,7 +106,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('total', 'integer', ['default' => 0]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('is_deleted', 'boolean', ['default' => false]));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "no_primary_key" ("title" varchar(255) DEFAULT NULL,"total" int4 DEFAULT 0 NOT NULL,"is_deleted" bool DEFAULT false NOT NULL);'
         ];
@@ -104,7 +119,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "own_primary_key" ("identifier" varchar(32) NOT NULL,"title" varchar(255) DEFAULT \'\' NOT NULL,CONSTRAINT "own_primary_key_pkey" PRIMARY KEY ("identifier"));'
         ];
@@ -117,7 +132,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "more_own_primary_keys" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL,"title" varchar(255) DEFAULT \'\' NOT NULL,CONSTRAINT "more_own_primary_keys_pkey" PRIMARY KEY ("identifier","subidentifier"));'
         ];
@@ -131,7 +146,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier', 'string', ['length' => 32]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "one_field_as_pk" ("identifier" varchar(32) NOT NULL,"title" varchar(255) DEFAULT \'\' NOT NULL,CONSTRAINT "one_field_as_pk_pkey" PRIMARY KEY ("identifier"));',
         ];
@@ -146,7 +161,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('subidentifier', 'string', ['length' => 32]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['default' => '']));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "more_fields_as_pk" ("identifier" varchar(32) NOT NULL,"subidentifier" varchar(32) NOT NULL,"title" varchar(255) DEFAULT \'\' NOT NULL,CONSTRAINT "more_fields_as_pk_pkey" PRIMARY KEY ("identifier","subidentifier"));'
         ];
@@ -165,7 +180,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_title_alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_bodytext'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_indexes" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,CONSTRAINT "table_with_indexes_pkey" PRIMARY KEY ("id"));',
             'CREATE INDEX "table_with_indexes_sorting" ON "table_with_indexes" USING BTREE ("sorting");',
@@ -184,7 +199,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_table_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_table_id', 'second_table'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("id"));'
         ];
@@ -205,7 +220,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_and_foreign_keys_title_alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_and_foreign_keys_bodytext'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" USING BTREE ("sorting");',
@@ -218,7 +233,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testDropMigrationTable()
     {
         $table = new MigrationTable('drop');
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'DROP TABLE "drop";',
             'DELETE FROM "pg_type" WHERE "typname" LIKE \'drop__%\';',
@@ -233,7 +248,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "add_columns" ADD COLUMN "title" varchar(255) NOT NULL,ADD COLUMN "alias" varchar(255) NOT NULL;'
         ];
@@ -244,7 +259,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->dropPrimaryKey());
         $this->assertInstanceOf(MigrationTable::class, $table->addPrimary('new_primary'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "change_primary_key" DROP CONSTRAINT "change_primary_key_pkey";',
             'ALTER TABLE "change_primary_key" ADD CONSTRAINT "change_primary_key_pkey" PRIMARY KEY ("new_primary");',
@@ -255,7 +270,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $table = new MigrationTable('add_index');
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('alias', 'unique', '', 'add_index_alias'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE UNIQUE INDEX "add_index_alias" ON "add_index" ("alias");',
         ];
@@ -266,7 +281,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('alias', 'unique', '', 'add_column_and_index_alias'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "add_column_and_index" ADD COLUMN "alias" varchar(255) NOT NULL;',
             'CREATE UNIQUE INDEX "add_column_and_index_alias" ON "add_column_and_index" ("alias");',
@@ -280,7 +295,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'add_columns_index_foreign_key_sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "add_columns_index_foreign_key" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
             'CREATE INDEX "add_columns_index_foreign_key_sorting" ON "add_columns_index_foreign_key" ("sorting");',
@@ -304,7 +319,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('foreign_key_to_drop_id'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'DROP INDEX "idx_all_in_one_alias";',
             'ALTER TABLE "all_in_one" DROP CONSTRAINT "all_in_one_foreign_key_to_drop_id";',
@@ -325,7 +340,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->dropIndexByName('all_in_one_mixed_alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'DROP INDEX "all_in_one_mixed_alias";',
             'ALTER TABLE "all_in_one_mixed" DROP CONSTRAINT "all_in_one_mixed_foreign_key_to_drop_id";',
@@ -345,7 +360,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('default_null_change', 'default_null_change', 'string', ['null' => true]));
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('default_null_with_value_change', 'default_null_with_value_change', 'string', ['null' => true, 'default' => 'default_value']));
 
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "with_columns_to_change" RENAME COLUMN "old_name" TO "new_name";',
             'ALTER TABLE "with_columns_to_change" ALTER COLUMN "new_name" TYPE int4 USING new_name::integer;',
@@ -367,7 +382,7 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testRenameMigrationTable()
     {
         $table = new MigrationTable('old_table_name');
-        $queryBuilder = new PgsqlQueryBuilder();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "old_table_name" RENAME TO "new_table_name";',
         ];

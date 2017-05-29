@@ -23,37 +23,6 @@ class PgsqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    public function tableInfo($table)
-    {
-        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
-        $tableInfo = [];
-        foreach ($columns as $column) {
-            $type = $this->remapType($column['data_type']);
-            $settings = [
-                'null' => $column['is_nullable'] == 'YES',
-                'default' => $column['column_default'],
-                'length' => $column['character_maximum_length'],
-                'autoincrement' => strpos($column['column_default'], 'nextval') === 0,
-            ];
-            if (in_array($column['data_type'], ['USER-DEFINED', 'ARRAY'])) {
-                if ($column['data_type'] == 'USER-DEFINED') {
-                    $type = Column::TYPE_ENUM;
-                } else {
-                    $type = Column::TYPE_SET;
-                }
-                $enumType = $table . '__' . $column['column_name'];
-                $settings['values'] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
-            }
-            $tableInfo[$column['column_name']] = new Column($column['column_name'], $type, $settings);
-        }
-        return $tableInfo;
-    }
-
-    protected function createRealValue($value)
-    {
-        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
-    }
-
     protected function loadStructure()
     {
         $database = $this->execute('SELECT current_database()')->fetchColumn();
@@ -61,19 +30,29 @@ class PgsqlAdapter extends PdoAdapter
         $tables = $this->execute("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '$database' AND table_schema='public' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
             $migrationTable = $this->createMigrationTable($table['table_name']);
-            if ($migrationTable) {
-                $structure->update($migrationTable);
-            }
+            $structure->update($migrationTable);
         }
         return $structure;
     }
+
     private function createMigrationTable($table)
     {
-        $migrationTable = new MigrationTable($table);
+        $migrationTable = new MigrationTable($table, false);
         $this->loadColumns($migrationTable, $table);
         $this->loadIndexes($migrationTable, $table);
         $this->loadForeignKeys($migrationTable, $table);
+        $migrationTable->create();
         return $migrationTable;
+    }
+
+    private function loadColumns(MigrationTable $migrationTable, $table)
+    {
+        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($columns as $column) {
+            $type = $this->remapType($column['data_type']);
+            $settings = $this->prepareSettings($type, $column, $table);
+            $migrationTable->addColumn($column['column_name'], $type, $settings);
+        }
     }
 
     private function remapType($type)
@@ -96,16 +75,6 @@ class PgsqlAdapter extends PdoAdapter
         return isset($types[$type]) ? $types[$type] : $type;
     }
 
-    private function loadColumns(MigrationTable $migrationTable, $table)
-    {
-        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($columns as $column) {
-            $type = $this->remapType($column['data_type']);
-            $settings = $this->prepareSettings($type, $column, $table);
-            $migrationTable->addColumn($column['column_name'], $type, $settings);
-        }
-    }
-
     private function prepareSettings($type, $column, $table)
     {
         $length = null;
@@ -116,6 +85,7 @@ class PgsqlAdapter extends PdoAdapter
             $length = $column['numeric_precision'];
             $decimals = $column['numeric_scale'];
         }
+
         $settings = [
             'null' => $column['is_nullable'] == 'YES',
             'default' => $this->prepareDefault($column, $type),
@@ -173,9 +143,11 @@ class PgsqlAdapter extends PdoAdapter
             $indexes[$indexRow['index_name']]['columns'][] = $indexRow['attname'];
             $indexes[$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
         }
+
         foreach ($indexes as $name => $index) {
             $migrationTable->addIndex($index['columns'], $index['type'], Index::METHOD_DEFAULT, $name);
         }
+
         $migrationTable->addPrimary($primaryKeys);
     }
 
@@ -194,6 +166,7 @@ class PgsqlAdapter extends PdoAdapter
  JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
  JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
  WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='%s';", $table);
+
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
@@ -203,6 +176,7 @@ class PgsqlAdapter extends PdoAdapter
             $foreignKeys[$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
             $foreignKeys[$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
         }
+
         foreach ($foreignKeys as $foreignKey) {
             ksort($foreignKey['columns']);
             ksort($foreignKey['referenced_columns']);
@@ -219,5 +193,15 @@ class PgsqlAdapter extends PdoAdapter
             'r' => ForeignKey::RESTRICT,
         ];
         return isset($actionMap[$action]) ? $actionMap[$action] : $action;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\Adapter;
 
-use LogicException;
 use PDO;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
@@ -23,15 +22,10 @@ class MysqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    public function tableInfo($table)
-    {
-        throw new LogicException('Not yet implemented');
-    }
-
     protected function loadStructure()
     {
-        $structure = new Structure();
         $database = $this->execute('SELECT database()')->fetchColumn();
+        $structure = new Structure();
         $tables = $this->execute("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$database' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
             $migrationTable = $this->createMigrationTable($table, $database);
@@ -40,7 +34,7 @@ class MysqlAdapter extends PdoAdapter
         return $structure;
     }
 
-    private function createMigrationTable($table, $database)
+    private function createMigrationTable(array $table, $database)
     {
         $tableName = $table['TABLE_NAME'];
         $migrationTable = new MigrationTable($tableName, false);
@@ -86,11 +80,15 @@ class MysqlAdapter extends PdoAdapter
         if (isset($matches[1]) && $matches[1] != '') {
             $type = $matches[1];
         }
+
         $type = $this->remapType($type);
+
         if (($type == Column::TYPE_ENUM || $type == Column::TYPE_SET) && isset($matches[2])) {
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
+
         list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+
         if ($type == Column::TYPE_CHAR && $length == 36) {
             $type = Column::TYPE_UUID;
             $length = null;
@@ -99,6 +97,7 @@ class MysqlAdapter extends PdoAdapter
             $type = Column::TYPE_BOOLEAN;
             $length = null;
         }
+
         $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
         if ($type === Column::TYPE_BOOLEAN) {
             $settings['default'] = (bool)$settings['default'];
@@ -111,6 +110,7 @@ class MysqlAdapter extends PdoAdapter
         if ($lengthAndDecimals === null) {
             return [null, null];
         }
+
         $length = (int) $lengthAndDecimals;
         $decimals = null;
         if (strpos($lengthAndDecimals, ',')) {
@@ -173,9 +173,15 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_sc
             $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
             $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
         }
+
         foreach ($foreignKeys as $foreignKey) {
             $migrationTable->addForeignKey($foreignKey['columns'], $foreignKey['referenced_table'], $foreignKey['referenced_columns'], $foreignKey['on_delete'], $foreignKey['on_update']);
         }
+    }
+
+    protected function escapeString($string)
+    {
+        return '`' . $string . '`';
     }
 
     protected function createRealValue($value)

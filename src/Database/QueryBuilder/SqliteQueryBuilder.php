@@ -152,7 +152,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
-            $columns[] = $this->escapeString($table->getColumn($column)->getName());
+            $columns[] = $this->escapeString($column);
         }
         $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
         $query = 'CREATE ' . $indexType . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . ' (' . implode(',', $columns) . ');';
@@ -164,7 +164,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         if (is_null($this->adapter)) {
             throw new PhoenixException('Missing adapter');
         }
-        $oldColumns = $this->adapter->tableInfo($table->getName());
+        $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
         $newTable = new MigrationTable($table->getName());
