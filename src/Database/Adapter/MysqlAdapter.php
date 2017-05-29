@@ -28,15 +28,13 @@ class MysqlAdapter extends PdoAdapter
         $structure = new Structure();
         $tables = $this->execute("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$database' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
-            $migrationTable = $this->tableInfo($table, $database);
-            if ($migrationTable) {
-                $structure->update($migrationTable);
-            }
+            $migrationTable = $this->createMigrationTable($table, $database);
+            $structure->update($migrationTable);
         }
         return $structure;
     }
 
-    private function tableInfo(array $table, $database)
+    private function createMigrationTable(array $table, $database)
     {
         $tableName = $table['TABLE_NAME'];
         $migrationTable = new MigrationTable($tableName, false);
@@ -50,16 +48,6 @@ class MysqlAdapter extends PdoAdapter
         $this->loadForeignKeys($migrationTable, $database, $tableName);
         $migrationTable->create();
         return $migrationTable;
-    }
-
-    protected function createRealValue($value)
-    {
-        return is_array($value) ? implode(',', $value) : $value;
-    }
-
-    protected function escapeString($string)
-    {
-        return '`' . $string . '`';
     }
 
     private function remapType($type)
@@ -189,5 +177,15 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_sc
         foreach ($foreignKeys as $foreignKey) {
             $migrationTable->addForeignKey($foreignKey['columns'], $foreignKey['referenced_table'], $foreignKey['referenced_columns'], $foreignKey['on_delete'], $foreignKey['on_update']);
         }
+    }
+
+    protected function escapeString($string)
+    {
+        return '`' . $string . '`';
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? implode(',', $value) : $value;
     }
 }

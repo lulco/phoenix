@@ -259,7 +259,7 @@ abstract class AbstractMigration
 
     private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder)
     {
-        $tableQueries = null;
+        $tableQueries = [];
         if ($table->getAction() === MigrationTable::ACTION_CREATE) {
             $tableQueries = $queryBuilder->createTable($table);
         } elseif ($table->getAction() === MigrationTable::ACTION_ALTER) {
