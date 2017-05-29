@@ -365,7 +365,7 @@ abstract class PdoAdapter implements AdapterInterface
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
     }
 
-    abstract protected function createRealValue($value);
-
     abstract protected function escapeString($string);
+
+    abstract protected function createRealValue($value);
 }

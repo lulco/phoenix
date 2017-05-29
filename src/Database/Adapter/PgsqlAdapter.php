@@ -29,31 +29,20 @@ class PgsqlAdapter extends PdoAdapter
         $structure = new Structure();
         $tables = $this->execute("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '$database' AND table_schema='public' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($tables as $table) {
-            $migrationTable = $this->tableInfo($table['table_name']);
-            if ($migrationTable) {
-                $structure->update($migrationTable);
-            }
+            $migrationTable = $this->createMigrationTable($table['table_name']);
+            $structure->update($migrationTable);
         }
         return $structure;
     }
 
-    private function tableInfo($table)
+    private function createMigrationTable($table)
     {
-        $migrationTable = new MigrationTable($table);
+        $migrationTable = new MigrationTable($table, false);
         $this->loadColumns($migrationTable, $table);
         $this->loadIndexes($migrationTable, $table);
         $this->loadForeignKeys($migrationTable, $table);
+        $migrationTable->create();
         return $migrationTable;
-    }
-
-    protected function createRealValue($value)
-    {
-        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
-    }
-
-    protected function escapeString($string)
-    {
-        return '"' . $string . '"';
     }
 
     private function loadColumns(MigrationTable $migrationTable, $table)
@@ -204,5 +193,15 @@ class PgsqlAdapter extends PdoAdapter
             'r' => ForeignKey::RESTRICT,
         ];
         return isset($actionMap[$action]) ? $actionMap[$action] : $action;
+    }
+
+    protected function escapeString($string)
+    {
+        return '"' . $string . '"';
+    }
+
+    protected function createRealValue($value)
+    {
+        return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
     }
 }

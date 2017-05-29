@@ -70,16 +70,6 @@ class ForeignKey
     }
 
     /**
-     * @param string $referencedTable
-     * @return ForeignKey
-     */
-    public function setReferencedTable($referencedTable)
-    {
-        $this->referencedTable = $referencedTable;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getReferencedTable()

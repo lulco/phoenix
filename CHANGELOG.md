@@ -3,14 +3,14 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- Dump command for creating migration from existing database
+- dump command for creating migration from existing database
+- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 ### [0.8.0] - 2017-05-02
 #### Added
 - json output for all commands
 - migration datetime to Status command
 - column settings class with constants
-- structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
 ### [0.7.0] - 2017-04-06
 #### Changed
