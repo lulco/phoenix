@@ -2,6 +2,7 @@
 
 namespace Phoenix\Command;
 
+use Dumper\Indenter;
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
@@ -36,7 +37,8 @@ class CreateCommand extends AbstractCommand
             throw new PhoenixException('Template "' . $templatePath . '" doesn\'t exist or is not a regular file');
         }
 
-        $indent = $this->getIndent($input);
+        $indenter = new Indenter();
+        $indent = $indenter->indent($input->getOption('indent'));
 
         $template = file_get_contents($templatePath);
         $namespace = '';
@@ -56,23 +58,5 @@ class CreateCommand extends AbstractCommand
 
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;
-    }
-
-    private function getIndent(InputInterface $input)
-    {
-        $indent = strtolower(str_replace([' ', '-', '_'], '', $input->getOption('indent')));
-        if ($indent == '2spaces') {
-            return '  ';
-        }
-        if ($indent == '3spaces') {
-            return '   ';
-        }
-        if ($indent == '5spaces') {
-            return '     ';
-        }
-        if ($indent == 'tab') {
-            return "\t";
-        }
-        return '    ';
     }
 }
