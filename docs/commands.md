@@ -1,8 +1,8 @@
 ## Commands
 There are several commands in phoenix and they have few common options:
 - `-h`, `--help` Displays help for command
-- `-c`, `--config[=CONFIG]` Path to config file, if not set, phoenix is trying to find files phoenix.php, phoenix.yml, phoenix.neon, phoenix.json, first found is used
-- `-t`, `--config-type[=CONFIG_TYPE]` Type of config, available values: php, yml, neon, json, if not set, phoenix identifies type from config file extension
+- `-c`, `--config=CONFIG` Path to config file, if not set, phoenix is trying to find files phoenix.php, phoenix.yml, phoenix.neon, phoenix.json, first found is used
+- `-t`, `--config-type=CONFIG_TYPE` Type of config, available values: php, yml, neon, json, if not set, phoenix identifies type from config file extension
 - `-f`, `--output-format=OUTPUT-FORMAT` Format of the output. Available values: default, json [default: "default"]. Default is default symfony command output
 - `-e`, `--environment=ENVIRONMENT` Environment from configuration to use, if not set, first environment from configuration is used
 - `-v|vv|vvv`, `--verbose` Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
