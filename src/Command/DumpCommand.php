@@ -32,7 +32,11 @@ class DumpCommand extends AbstractCommand
     protected function runCommand(InputInterface $input, OutputInterface $output)
     {
         $ignoredTables = array_map('trim', explode(',', $input->getOption('ignore-tables') . ',' . $this->config->getLogTableName() ? : $this->config->getLogTableName()));
-        $output->writeln('');
+
+        $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
+        if (!is_file($templatePath)) {
+            throw new PhoenixException('Template "' . $templatePath . '" not found');
+        }
 
         $indenter = new Indenter();
         $indent = $indenter->indent($input->getOption('indent'));
@@ -64,11 +68,6 @@ class DumpCommand extends AbstractCommand
         $dir = $input->getOption('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
 
-        $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
-        if (!file_exists($templatePath)) {
-            throw new PhoenixException('Template "' . $templatePath . '" not found');
-        }
-
         $template = file_get_contents($templatePath);
         $namespace = '';
         if ($migrationNameCreator->getNamespace()) {
@@ -82,6 +81,12 @@ class DumpCommand extends AbstractCommand
 
         $migrationPath = $migrationDir . '/' . $filename;
         file_put_contents($migrationPath, $template);
+
+        $migrationPath = realpath($migrationPath);
+        $this->writeln('');
+        $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
+        $this->outputData['migration_name'] = $migration;
+        $this->outputData['migration_filepath'] = $migrationPath;
     }
 
     private function getFilteredTables(array $ignoredTables = [])
@@ -108,11 +113,7 @@ class DumpCommand extends AbstractCommand
             if (in_array($table->getName(), $ignoredDataTables)) {
                 continue;
             }
-            $rows = $this->adapter->fetchAll($table->getName());
-            if (empty($rows)) {
-                continue;
-            }
-            $data[$table->getName()] = $rows;
+            $data[$table->getName()] = $this->adapter->fetchAll($table->getName());
         }
         return $data;
     }
