@@ -58,8 +58,8 @@ abstract class AbstractCommand extends Command
     protected function configure()
     {
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED, 'Environment');
-        $this->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Path to config file');
-        $this->addOption('config_type', 't', InputOption::VALUE_OPTIONAL, 'Type of config, available values: php, yml, neon, json');
+        $this->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to config file');
+        $this->addOption('config_type', 't', InputOption::VALUE_REQUIRED, 'Type of config, available values: php, yml, neon, json');
         $this->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: default, json', 'default');
     }
 

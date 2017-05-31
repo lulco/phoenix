@@ -19,8 +19,8 @@ class CreateCommand extends AbstractCommand
             ->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
-            ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'Path to template')
-            ->addOption('indent', 'i', InputOption::VALUE_OPTIONAL, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces');
+            ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')
+            ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces');
     }
 
     protected function runCommand(InputInterface $input, OutputInterface $output)

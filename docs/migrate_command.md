@@ -1,5 +1,5 @@
 ## Migrate command
-`php vendor/bin/phoenix migrate [-e|--environment ENVIRONMENT] [-c|--config [CONFIG]] [-t|--config_type [CONFIG_TYPE]] [-f|--output-format OUTPUT-FORMAT] [--dry] [--first]`
+`php vendor/bin/phoenix migrate [-e|--environment ENVIRONMENT] [-c|--config CONFIG] [-t|--config_type CONFIG_TYPE] [-f|--output-format OUTPUT-FORMAT] [--dry] [--first]`
 
 Executes available migrations.
 

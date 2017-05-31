@@ -6,6 +6,9 @@
 - dump command for creating migration from existing database
 - structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
 
+#### Fixed
+- command options config, config_type, template and indent require value
+
 ### [0.8.0] - 2017-05-02
 #### Added
 - json output for all commands

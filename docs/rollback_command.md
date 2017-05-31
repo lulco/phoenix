@@ -1,5 +1,5 @@
 ## Rollback command
-`php vendor/bin/phoenix rollback [-e|--environment ENVIRONMENT] [-c|--config [CONFIG]] [-t|--config_type [CONFIG_TYPE]] [-f|--output-format OUTPUT-FORMAT] [--dry] [--all]`
+`php vendor/bin/phoenix rollback [-e|--environment ENVIRONMENT] [-c|--config CONFIG] [-t|--config_type CONFIG_TYPE] [-f|--output-format OUTPUT-FORMAT] [--dry] [--all]`
 
 Rollbacks migrations.
 
