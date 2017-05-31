@@ -3,6 +3,7 @@
 namespace Phoenix\Command;
 
 use Dumper\Dumper;
+use Dumper\Indenter;
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
@@ -33,7 +34,8 @@ class DumpCommand extends AbstractCommand
         $ignoredTables = array_map('trim', explode(',', $input->getOption('ignore-tables') . ',' . $this->config->getLogTableName() ? : $this->config->getLogTableName()));
         $output->writeln('');
 
-        $indent = $this->getIndent($input);
+        $indenter = new Indenter();
+        $indent = $indenter->indent($input->getOption('indent'));
         $dumper = new Dumper($indent, 2);
 
         $tables = $this->getFilteredTables($ignoredTables);
@@ -113,23 +115,5 @@ class DumpCommand extends AbstractCommand
             $data[$table->getName()] = $rows;
         }
         return $data;
-    }
-
-    private function getIndent(InputInterface $input)
-    {
-        $indent = strtolower(str_replace([' ', '-', '_'], '', $input->getOption('indent')));
-        if ($indent == '2spaces') {
-            return '  ';
-        }
-        if ($indent == '3spaces') {
-            return '   ';
-        }
-        if ($indent == '5spaces') {
-            return '     ';
-        }
-        if ($indent == 'tab') {
-            return "\t";
-        }
-        return '    ';
     }
 }
