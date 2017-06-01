@@ -64,7 +64,7 @@ abstract class DumpCommandTest extends BaseCommandTest
     public function testMoreThanOneMigrationDirsAvailableException()
     {
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = __DIR__ . '/../../../testing_migrations/dump';
+        $configuration['migration_dirs']['dump'] = __DIR__ . '/../../../testing_migrations/new';
 
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -81,7 +81,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
     public function testDumpCommandAfterInit()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/dump';
+        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
         mkdir($dumpMigrationDir);
         $this->assertTrue(is_dir($dumpMigrationDir));
@@ -130,7 +130,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
     public function testDumpCommandAfterMigration()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/dump';
+        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
         mkdir($dumpMigrationDir);
         $this->assertTrue(is_dir($dumpMigrationDir));
@@ -182,7 +182,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
     public function testDumpCommandJsonOutputAfterMigration()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/dump';
+        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
         mkdir($dumpMigrationDir);
         $this->assertTrue(is_dir($dumpMigrationDir));

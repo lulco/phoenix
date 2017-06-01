@@ -31,16 +31,15 @@ abstract class BaseCommandTest extends PHPUnit_Framework_TestCase
         }
 
         // delete additional migration dir
-        $dumpMigrationDir = __DIR__ . '/../../testing_migrations/dump';
-        if (file_exists($dumpMigrationDir)) {
-            $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
-            foreach ($dumpFiles as $dumpFile) {
-                $filePath = (string)$dumpFile;
+        $newMigrationDir = __DIR__ . '/../../testing_migrations/new';
+        if (file_exists($newMigrationDir)) {
+            $newFiles = Finder::find('*')->in($newMigrationDir);
+            foreach ($newFiles as $newFile) {
+                $filePath = (string)$newFile;
                 unlink($filePath);
             }
-            rmdir($dumpMigrationDir);
+            rmdir($newMigrationDir);
         }
-
 
         $adapter = $this->getAdapter();
         $adapter->cleanupDatabase();

@@ -52,6 +52,7 @@ class CreateCommand extends AbstractCommand
 
         $migrationPath = $migrationDir . '/' . $filename;
         file_put_contents($migrationPath, $template);
+        $migrationPath = realpath($migrationPath);
 
         $this->writeln('');
         $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');

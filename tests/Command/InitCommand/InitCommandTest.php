@@ -55,6 +55,28 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
+    public function testDefaultConfig()
+    {
+        $oldPath = __DIR__ . '/../../../testing_migrations/config/phoenix.php';
+        $newPath = __DIR__ . '/../../../phoenix.php';
+
+        $content = file_get_contents($oldPath);
+        $content = str_replace("__DIR__", "__DIR__ . '/testing_migrations/phoenix'", $content);
+        file_put_contents($newPath, $content);
+
+        $command = new InitCommand();
+        $command->run($this->input, $this->output);
+        unlink($newPath);
+        $messages = $this->output->getMessages();
+
+        $this->assertTrue(is_array($messages));
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertCount(5, $messages[0]);
+        $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+        $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
+    }
+
     public function testSetCustomConfig()
     {
         $command = new InitCommand();
@@ -87,6 +109,27 @@ abstract class InitCommandTest extends BaseCommandTest
         $message = json_decode($messages[0], true);
         $this->assertArrayHasKey('message', $message);
         $this->assertArrayNotHasKey('executed_queries', $message);
+        $this->assertArrayHasKey('execution_time', $message);
+    }
+
+    public function testSetCustomConfigWithJsonOutputAndVerbosityDebug()
+    {
+        $command = new InitCommand();
+        $command->setConfig($this->configuration);
+        $this->input->setOption('output-format', 'json');
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+        $command->run($this->input, $this->output);
+
+        $messages = $this->output->getMessages(0);
+
+        $this->assertTrue(is_array($messages));
+        $this->assertCount(1, $messages);
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertJson($messages[0]);
+
+        $message = json_decode($messages[0], true);
+        $this->assertArrayHasKey('message', $message);
+        $this->assertArrayHasKey('executed_queries', $message);
         $this->assertArrayHasKey('execution_time', $message);
     }
 
