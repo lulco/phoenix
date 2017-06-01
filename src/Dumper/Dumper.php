@@ -3,6 +3,7 @@
 namespace Dumper;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Table;
 
@@ -196,26 +197,26 @@ class Dumper
     private function defaultSettings(Column $column, Table $table)
     {
         $defaultSettings = [
-            'autoincrement' => false,
-            'null' => false,
-            'default' => null,
-            'signed' => true,
-            'length' => [null, ''],
-            'decimals' => [null, ''],
-            'values' => null,
-            'charset' => ['', $table->getCharset()],
-            'collation' => ['', $table->getCollation()],
+            ColumnSettings::SETTING_AUTOINCREMENT => false,
+            ColumnSettings::SETTING_NULL => false,
+            ColumnSettings::SETTING_DEFAULT => null,
+            ColumnSettings::SETTING_SIGNED => true,
+            ColumnSettings::SETTING_LENGTH => [null, ''],
+            ColumnSettings::SETTING_DECIMALS => [null, ''],
+            ColumnSettings::SETTING_VALUES => null,
+            ColumnSettings::SETTING_CHARSET => ['', $table->getCharset()],
+            ColumnSettings::SETTING_COLLATION => ['', $table->getCollation()],
         ];
         $type = $column->getType();
         if ($type === Column::TYPE_INTEGER) {
-            $defaultSettings['length'][] = 11;
+            $defaultSettings[ColumnSettings::SETTING_LENGTH][] = 11;
         } elseif ($type === Column::TYPE_BIG_INTEGER) {
-            $defaultSettings['length'][] = 20;
+            $defaultSettings[ColumnSettings::SETTING_LENGTH][] = 20;
         } elseif (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR, Column::TYPE_BINARY, Column::TYPE_VARBINARY], true)) {
-            $defaultSettings['length'][] = 255;
+            $defaultSettings[ColumnSettings::SETTING_LENGTH][] = 255;
         } elseif (in_array($type, [Column::TYPE_NUMERIC, Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE], true)) {
-            $defaultSettings['length'][] = 10;
-            $defaultSettings['decimals'][] = 0;
+            $defaultSettings[ColumnSettings::SETTING_LENGTH][] = 10;
+            $defaultSettings[ColumnSettings::SETTING_DECIMALS][] = 0;
         }
         return $defaultSettings;
     }
@@ -228,8 +229,6 @@ class Dumper
             $value = $this->valuesToString($value);
         } elseif (!is_numeric($value)) {
             $value = "'$value'";
-        } elseif ($value === null) {
-            $value = 'null';
         }
         return $value;
     }

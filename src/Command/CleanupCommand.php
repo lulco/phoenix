@@ -37,10 +37,13 @@ class CleanupCommand extends AbstractCommand
 
         $this->writeln('');
         $this->writeln('<info>Phoenix cleaned</info>');
+        $this->outputData['message'] = 'Phoenix cleaned';
         $executedMigrations[] = $this->addMigrationToList($migration, $output);
         $this->writeln('');
 
-        $this->outputData['executed_migrations'] = $executedMigrations;
+        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+            $this->outputData['executed_migrations'] = $executedMigrations;
+        }
     }
 
     private function addMigrationToList($migration, OutputInterface $output)
