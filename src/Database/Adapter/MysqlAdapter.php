@@ -27,15 +27,16 @@ class MysqlAdapter extends PdoAdapter
     {
         $database = $this->execute('SELECT database()')->fetchColumn();
         $structure = new Structure();
-        $tables = $this->execute("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$database' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
+        $tables = $this->execute(sprintf("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tablesColumns = $this->loadColumns($database);
         foreach ($tables as $table) {
-            $migrationTable = $this->createMigrationTable($table, $database);
+            $migrationTable = $this->createMigrationTable($table, $database, $tablesColumns[$table['TABLE_NAME']]);
             $structure->update($migrationTable);
         }
         return $structure;
     }
 
-    private function createMigrationTable(array $table, $database)
+    private function createMigrationTable(array $table, $database, array $columns)
     {
         $tableName = $table['TABLE_NAME'];
         $migrationTable = new MigrationTable($tableName, false);
@@ -44,7 +45,9 @@ class MysqlAdapter extends PdoAdapter
             $migrationTable->setCharset($charset);
             $migrationTable->setCollation($table['TABLE_COLLATION']);
         }
-        $this->loadColumns($migrationTable, $tableName);
+        foreach ($columns as $column) {
+            $this->addColumn($migrationTable, $column);
+        }
         $this->loadIndexes($migrationTable, $tableName);
         $this->loadForeignKeys($migrationTable, $database, $tableName);
         $migrationTable->create();
@@ -65,45 +68,50 @@ class MysqlAdapter extends PdoAdapter
         return isset($types[$type]) ? $types[$type] : $type;
     }
 
-    private function loadColumns(MigrationTable $migrationTable, $table)
+    private function loadColumns($database)
     {
-        $columns = $this->execute(sprintf('SHOW FULL COLUMNS FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tablesColumns = [];
         foreach ($columns as $column) {
-            $this->addColumn($migrationTable, $column);
+            $tablesColumns[$column['TABLE_NAME']][] = $column;
         }
+        return $tablesColumns;
     }
 
     private function addColumn(MigrationTable $migrationTable, array $column)
     {
-        $values = null;
-        $type = $column['Type'];
-        preg_match('/(.*?)\((.*?)\)(.*)/', $column['Type'], $matches);
-        if (isset($matches[1]) && $matches[1] != '') {
-            $type = $matches[1];
-        }
-
-        $type = $this->remapType($type);
-
-        if (($type == Column::TYPE_ENUM || $type == Column::TYPE_SET) && isset($matches[2])) {
-            $values = explode('\',\'', substr($matches[2], 1, -1));
-        }
-
-        list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
-
-        if ($type == Column::TYPE_CHAR && $length == 36) {
+        $type = $this->remapType($column['DATA_TYPE']);
+        $settings = $this->prepareSettings($column);
+        if ($type == Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] == 36) {
             $type = Column::TYPE_UUID;
-            $length = null;
-        }
-        if ($type == Column::TYPE_TINY_INTEGER && $length == 1) {
+            $settings[ColumnSettings::SETTING_LENGTH] = null;
+        } elseif ($type == Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] == 1) {
             $type = Column::TYPE_BOOLEAN;
-            $length = null;
-        }
-
-        $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
-        if ($type === Column::TYPE_BOOLEAN) {
+            $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
         }
-        $migrationTable->addColumn($column['Field'], $type, $settings);
+        $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
+    }
+
+    private function prepareSettings($column)
+    {
+        preg_match('/(.*?)\((.*?)\)(.*)/', $column['COLUMN_TYPE'], $matches);
+        $values = null;
+        if ($column['DATA_TYPE'] == Column::TYPE_ENUM || $column['DATA_TYPE'] == Column::TYPE_SET) {
+            $values = explode('\',\'', substr($matches[2], 1, -1));
+        }
+        list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+        return [
+            ColumnSettings::SETTING_AUTOINCREMENT => $column['EXTRA'] == 'auto_increment',
+            ColumnSettings::SETTING_NULL => $column['IS_NULLABLE'] == 'YES',
+            ColumnSettings::SETTING_DEFAULT => $column['COLUMN_DEFAULT'],
+            ColumnSettings::SETTING_LENGTH => $length,
+            ColumnSettings::SETTING_DECIMALS => $decimals,
+            ColumnSettings::SETTING_SIGNED => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
+            ColumnSettings::SETTING_CHARSET => $column['CHARACTER_SET_NAME'],
+            ColumnSettings::SETTING_COLLATION => $column['COLLATION_NAME'],
+            ColumnSettings::SETTING_VALUES => $values,
+        ];
     }
 
     private function getLengthAndDecimals($lengthAndDecimals = null)
@@ -118,23 +126,6 @@ class MysqlAdapter extends PdoAdapter
             list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
         }
         return [$length, $decimals];
-    }
-
-    private function prepareSettings($column, $length, $decimals, $matches, $values)
-    {
-        $collation = $column['Collation'];
-        $charset = $collation ? explode('_', $collation, 2)[0] : null;
-        return [
-            ColumnSettings::SETTING_AUTOINCREMENT => $column['Extra'] == 'auto_increment',
-            ColumnSettings::SETTING_NULL => $column['Null'] == 'YES',
-            ColumnSettings::SETTING_DEFAULT => $column['Default'],
-            ColumnSettings::SETTING_LENGTH => $length,
-            ColumnSettings::SETTING_DECIMALS => $decimals,
-            ColumnSettings::SETTING_SIGNED => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
-            ColumnSettings::SETTING_CHARSET => $charset,
-            ColumnSettings::SETTING_COLLATION => $collation,
-            ColumnSettings::SETTING_VALUES => $values,
-        ];
     }
 
     private function loadIndexes(MigrationTable $migrationTable, $table)
