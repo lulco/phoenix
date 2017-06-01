@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
@@ -87,15 +88,15 @@ class PgsqlAdapter extends PdoAdapter
         }
 
         $settings = [
-            'null' => $column['is_nullable'] == 'YES',
-            'default' => $this->prepareDefault($column, $type),
-            'length' => $length,
-            'decimals' => $decimals,
-            'autoincrement' => strpos($column['column_default'], 'nextval') === 0,
+            ColumnSettings::SETTING_NULL => $column['is_nullable'] == 'YES',
+            ColumnSettings::SETTING_DEFAULT => $this->prepareDefault($column, $type),
+            ColumnSettings::SETTING_LENGTH => $length,
+            ColumnSettings::SETTING_DECIMALS => $decimals,
+            ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
         ];
         if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
             $enumType = $table . '__' . $column['column_name'];
-            $settings['values'] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
+            $settings[ColumnSettings::SETTING_VALUES] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
         }
         return $settings;
     }

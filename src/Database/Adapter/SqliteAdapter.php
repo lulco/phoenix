@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
@@ -68,11 +69,11 @@ class SqliteAdapter extends PdoAdapter
         list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
 
         $settings = [
-            'null' => !$column['notnull'],
-            'default' => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
-            'autoincrement' => (bool)$column['pk'] && $type == 'integer',
-            'length' => $length,
-            'decimals' => $decimals,
+            ColumnSettings::SETTING_NULL => !$column['notnull'],
+            ColumnSettings::SETTING_DEFAULT => strtolower($column['dflt_value']) == 'null' ? null : $column['dflt_value'],
+            ColumnSettings::SETTING_AUTOINCREMENT => (bool)$column['pk'] && $type == 'integer',
+            ColumnSettings::SETTING_LENGTH => $length,
+            ColumnSettings::SETTING_DECIMALS => $decimals,
         ];
 
         if ($type == 'varchar') {
@@ -81,11 +82,11 @@ class SqliteAdapter extends PdoAdapter
             $type = Column::TYPE_BIG_INTEGER;
         } elseif ($type == 'char' && $length == 36) {
             $type = Column::TYPE_UUID;
-            $settings['length'] = null;
+            $settings[ColumnSettings::SETTING_LENGTH] = null;
         } elseif ($type == Column::TYPE_ENUM) {
             $sql = $this->execute("SELECT sql FROM sqlite_master WHERE type = 'table' AND tbl_name='$table'")->fetch(PDO::FETCH_COLUMN);
             preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
-            $settings['values'] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
+            $settings[ColumnSettings::SETTING_VALUES] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
         }
         $migrationTable->addColumn($column['name'], $type, $settings);
     }

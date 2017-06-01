@@ -13,6 +13,18 @@ class Dumper
 
     private $baseIndent;
 
+    private $defaultSettings = [
+        ColumnSettings::SETTING_AUTOINCREMENT => false,
+        ColumnSettings::SETTING_NULL => false,
+        ColumnSettings::SETTING_DEFAULT => null,
+        ColumnSettings::SETTING_SIGNED => true,
+        ColumnSettings::SETTING_LENGTH => [null, ''],
+        ColumnSettings::SETTING_DECIMALS => [null, ''],
+        ColumnSettings::SETTING_VALUES => null,
+        ColumnSettings::SETTING_CHARSET => [null, ''],
+        ColumnSettings::SETTING_COLLATION => [null, ''],
+    ];
+
     public function __construct($indent, $baseIndent = 0)
     {
         $this->indent = $indent;
@@ -196,17 +208,10 @@ class Dumper
 
     private function defaultSettings(Column $column, Table $table)
     {
-        $defaultSettings = [
-            ColumnSettings::SETTING_AUTOINCREMENT => false,
-            ColumnSettings::SETTING_NULL => false,
-            ColumnSettings::SETTING_DEFAULT => null,
-            ColumnSettings::SETTING_SIGNED => true,
-            ColumnSettings::SETTING_LENGTH => [null, ''],
-            ColumnSettings::SETTING_DECIMALS => [null, ''],
-            ColumnSettings::SETTING_VALUES => null,
-            ColumnSettings::SETTING_CHARSET => ['', $table->getCharset()],
-            ColumnSettings::SETTING_COLLATION => ['', $table->getCollation()],
-        ];
+        $defaultSettings = $this->defaultSettings;
+        $defaultSettings[ColumnSettings::SETTING_CHARSET][] = $table->getCharset();
+        $defaultSettings[ColumnSettings::SETTING_COLLATION][] = $table->getCollation();
+
         $type = $column->getType();
         if ($type === Column::TYPE_INTEGER) {
             $defaultSettings[ColumnSettings::SETTING_LENGTH][] = 11;

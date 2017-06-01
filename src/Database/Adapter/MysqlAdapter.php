@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
@@ -100,7 +101,7 @@ class MysqlAdapter extends PdoAdapter
 
         $settings = $this->prepareSettings($column, $length, $decimals, $matches, $values);
         if ($type === Column::TYPE_BOOLEAN) {
-            $settings['default'] = (bool)$settings['default'];
+            $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
         }
         $migrationTable->addColumn($column['Field'], $type, $settings);
     }
@@ -124,15 +125,15 @@ class MysqlAdapter extends PdoAdapter
         $collation = $column['Collation'];
         $charset = $collation ? explode('_', $collation, 2)[0] : null;
         return [
-            'autoincrement' => $column['Extra'] == 'auto_increment',
-            'null' => $column['Null'] == 'YES',
-            'default' => $column['Default'],
-            'length' => $length,
-            'decimals' => $decimals,
-            'signed' => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
-            'charset' => $charset,
-            'collation' => $collation,
-            'values' => $values,
+            ColumnSettings::SETTING_AUTOINCREMENT => $column['Extra'] == 'auto_increment',
+            ColumnSettings::SETTING_NULL => $column['Null'] == 'YES',
+            ColumnSettings::SETTING_DEFAULT => $column['Default'],
+            ColumnSettings::SETTING_LENGTH => $length,
+            ColumnSettings::SETTING_DECIMALS => $decimals,
+            ColumnSettings::SETTING_SIGNED => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
+            ColumnSettings::SETTING_CHARSET => $charset,
+            ColumnSettings::SETTING_COLLATION => $collation,
+            ColumnSettings::SETTING_VALUES => $values,
         ];
     }
 
