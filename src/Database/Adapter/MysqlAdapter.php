@@ -28,15 +28,22 @@ class MysqlAdapter extends PdoAdapter
         $database = $this->execute('SELECT database()')->fetchColumn();
         $structure = new Structure();
         $tables = $this->execute(sprintf("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
-        $tablesColumns = $this->loadColumns($database);
+        $columns = $this->loadColumns($database);
+        $indexes = $this->loadIndexes($database);
+        $foreignKeys = $this->loadForeignKeys($database);
         foreach ($tables as $table) {
-            $migrationTable = $this->createMigrationTable($table, $database, $tablesColumns[$table['TABLE_NAME']]);
+            $tableName = $table['TABLE_NAME'];
+            $migrationTable = $this->createMigrationTable($table);
+            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
+            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
+            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
+            $migrationTable->create();
             $structure->update($migrationTable);
         }
         return $structure;
     }
 
-    private function createMigrationTable(array $table, $database, array $columns)
+    private function createMigrationTable(array $table)
     {
         $tableName = $table['TABLE_NAME'];
         $migrationTable = new MigrationTable($tableName, false);
@@ -45,12 +52,6 @@ class MysqlAdapter extends PdoAdapter
             $migrationTable->setCharset($charset);
             $migrationTable->setCollation($table['TABLE_COLLATION']);
         }
-        foreach ($columns as $column) {
-            $this->addColumn($migrationTable, $column);
-        }
-        $this->loadIndexes($migrationTable, $tableName);
-        $this->loadForeignKeys($migrationTable, $database, $tableName);
-        $migrationTable->create();
         return $migrationTable;
     }
 
@@ -76,6 +77,13 @@ class MysqlAdapter extends PdoAdapter
             $tablesColumns[$column['TABLE_NAME']][] = $column;
         }
         return $tablesColumns;
+    }
+
+    private function addColumns(MigrationTable $migrationTable, array $columns)
+    {
+        foreach ($columns as $column) {
+            $this->addColumn($migrationTable, $column);
+        }
     }
 
     private function addColumn(MigrationTable $migrationTable, array $column)
@@ -128,46 +136,62 @@ class MysqlAdapter extends PdoAdapter
         return [$length, $decimals];
     }
 
-    private function loadIndexes(MigrationTable $migrationTable, $table)
+    private function loadIndexes($database)
     {
-        $indexRows = $this->execute(sprintf('SHOW INDEX FROM `%s`', $table))->fetchAll(PDO::FETCH_ASSOC);
-        $primaryKeys = [];
-        $indexes = [];
-        $indexesTypesAndMethods = [];
-        foreach ($indexRows as $indexRow) {
-            if ($indexRow['Key_name'] == 'PRIMARY') {
-                $primaryKeys[$indexRow['Seq_in_index']] = $indexRow['Column_name'];
+        $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tablesIndexes = [];
+        foreach ($indexes as $index) {
+            if (!isset($tablesIndexes[$index['TABLE_NAME']])) {
+                $tablesIndexes[$index['TABLE_NAME']] = [];
+            }
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = $index['COLUMN_NAME'];
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] == 0 ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] == 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] == 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
+        }
+        return $tablesIndexes;
+    }
+
+    private function addIndexes(MigrationTable $migrationTable, array $indexes)
+    {
+        foreach ($indexes as $name => $index) {
+            $columns = $index['columns'];
+            ksort($columns);
+            if ($name == 'PRIMARY') {
+                $migrationTable->addPrimary($columns);
                 continue;
             }
-            $indexes[$indexRow['Key_name']][$indexRow['Seq_in_index']] = $indexRow['Column_name'];
-            $indexesTypesAndMethods[$indexRow['Key_name']]['type'] = $indexRow['Non_unique'] == 0 ? Index::TYPE_UNIQUE : ($indexRow['Index_type'] == 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
-            $indexesTypesAndMethods[$indexRow['Key_name']]['method'] = $indexRow['Index_type'] == 'FULLTEXT' ? Index::TYPE_NORMAL : $indexRow['Index_type'];
-        }
-        $migrationTable->addPrimary($primaryKeys);
-        foreach ($indexes as $name => $columns) {
-            ksort($columns);
-            $migrationTable->addIndex(array_values($columns), $indexesTypesAndMethods[$name]['type'], $indexesTypesAndMethods[$name]['method'], $name);
+            $migrationTable->addIndex(array_values($columns), $index['type'], $index['method'], $name);
         }
     }
 
-    private function loadForeignKeys(MigrationTable $migrationTable, $database, $table)
+    private function loadForeignKeys($database)
     {
         $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
 AND information_schema.KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
-WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s" AND information_schema.KEY_COLUMN_USAGE.TABLE_NAME = "%s";', $database, $table);
+WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
-            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];
-            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_table'] = $foreignKeyColumn['REFERENCED_TABLE_NAME'];
-            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_columns'][] = $foreignKeyColumn['REFERENCED_COLUMN_NAME'];
-            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
-            $foreignKeys[$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
+            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];
+            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_table'] = $foreignKeyColumn['REFERENCED_TABLE_NAME'];
+            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_columns'][] = $foreignKeyColumn['REFERENCED_COLUMN_NAME'];
+            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
+            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
         }
+        return $foreignKeys;
+    }
 
+    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
+    {
         foreach ($foreignKeys as $foreignKey) {
-            $migrationTable->addForeignKey($foreignKey['columns'], $foreignKey['referenced_table'], $foreignKey['referenced_columns'], $foreignKey['on_delete'], $foreignKey['on_update']);
+            $migrationTable->addForeignKey(
+                $foreignKey['columns'],
+                $foreignKey['referenced_table'],
+                $foreignKey['referenced_columns'],
+                $foreignKey['on_delete'],
+                $foreignKey['on_update']
+            );
         }
     }
 
