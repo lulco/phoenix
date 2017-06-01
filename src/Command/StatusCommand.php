@@ -4,8 +4,6 @@ namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class StatusCommand extends AbstractCommand
 {
@@ -16,7 +14,7 @@ class StatusCommand extends AbstractCommand
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function runCommand()
     {
         $executedMigrations = [];
         foreach ($this->manager->executedMigrations() as $migration) {

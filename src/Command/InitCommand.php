@@ -4,7 +4,6 @@ namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Migration\Init\Init;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InitCommand extends AbstractCommand
@@ -16,7 +15,7 @@ class InitCommand extends AbstractCommand
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function runCommand()
     {
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
         require_once $filename;
@@ -31,7 +30,7 @@ class InitCommand extends AbstractCommand
 
         $this->outputData['message'] = 'Phoenix initialized';
 
-        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+        if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $this->outputData['executed_queries'] = $executedQueries;
         }
     }

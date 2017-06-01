@@ -3,7 +3,6 @@
 namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -19,14 +18,14 @@ abstract class AbstractRunCommand extends AbstractCommand
         $this->addOption('dry', null, InputOption::VALUE_NONE, 'Only print queries, no execution');
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function runCommand()
     {
-        $dry = (bool) $input->getOption('dry');
+        $dry = (bool) $this->input->getOption('dry');
         if ($dry) {
-            $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+            $this->output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         }
 
-        $migrations = $this->findMigrations($input);
+        $migrations = $this->findMigrations();
         if (empty($migrations)) {
             $this->writeln('');
             $this->writeln('<info>' . $this->noMigrationsFoundMessage . '</info>');
@@ -50,7 +49,7 @@ abstract class AbstractRunCommand extends AbstractCommand
                 'classname' => $migration->getClassName(),
                 'execution_time' => $executionTime,
             ];
-            if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+            if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
                 $executedMigration['executed_queries'] = $executedQueries;
             }
             $executedMigrations[] = $executedMigration;
@@ -58,7 +57,7 @@ abstract class AbstractRunCommand extends AbstractCommand
         $this->outputData['executed_migrations'] = $executedMigrations;
     }
 
-    abstract protected function findMigrations(InputInterface $input);
+    abstract protected function findMigrations();
 
     abstract protected function runMigration(AbstractMigration $migration, $dry = false);
 }

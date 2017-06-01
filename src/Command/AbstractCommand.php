@@ -81,18 +81,17 @@ abstract class AbstractCommand extends Command
     {
         $this->input = $input;
         $this->output = $output;
+        $this->config = $this->loadConfig();
 
-        $this->loadConfig($input);
-
-        $environment = $input->getOption('environment') ?: $this->config->getDefaultEnvironment();
+        $environment = $this->input->getOption('environment') ?: $this->config->getDefaultEnvironment();
         $this->adapter = AdapterFactory::instance($this->config->getEnvironmentConfig($environment));
 
         $this->manager = new Manager($this->config, $this->adapter);
-        $this->check($input, $output);
+        $this->check();
 
         $this->start = microtime(true);
-        $this->runCommand($input, $output);
-        $this->finishCommand($input, $output);
+        $this->runCommand();
+        $this->finishCommand();
     }
 
     protected function writeln($message, $options = 0)
@@ -105,26 +104,26 @@ abstract class AbstractCommand extends Command
         return $this->input->getOption('output-format') === null || $this->input->getOption('output-format') === 'default';
     }
 
-    private function finishCommand(InputInterface $input, OutputInterface $output)
+    private function finishCommand()
     {
         $executionTime = microtime(true) - $this->start;
-        if ($input->getOption('output-format') === 'json') {
+        if ($this->input->getOption('output-format') === 'json') {
             $this->outputData['execution_time'] = $executionTime;
-            $output->write(json_encode($this->outputData));
+            $this->output->write(json_encode($this->outputData));
             return;
         }
-        $output->writeln('');
-        $output->write('<comment>All done. Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
-        $output->writeln('');
+        $this->output->writeln('');
+        $this->output->write('<comment>All done. Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
+        $this->output->writeln('');
     }
 
-    private function loadConfig(InputInterface $input)
+    private function loadConfig()
     {
         if ($this->config) {
-            return;
+            return $this->config;
         }
 
-        $configFile = $input->getOption('config');
+        $configFile = $this->input->getOption('config');
         if (!$configFile) {
             $configFile = $this->getDefaultConfig();
         }
@@ -132,15 +131,7 @@ abstract class AbstractCommand extends Command
         if (!$configFile) {
             throw new ConfigException('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         }
-
-        if ($configFile && !file_exists($configFile)) {
-            throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
-        }
-
-        $type = $input->getOption('config_type') ?: pathinfo($configFile, PATHINFO_EXTENSION);
-        $configParser = ConfigParserFactory::instance($type);
-        $configuration = $configParser->parse($configFile);
-        $this->config = new Config($configuration);
+        return $this->parseConfig($configFile);
     }
 
     private function getDefaultConfig()
@@ -159,7 +150,19 @@ abstract class AbstractCommand extends Command
         return null;
     }
 
-    private function check(InputInterface $input, OutputInterface $output)
+    private function parseConfig($configFile)
+    {
+        if ($configFile && !file_exists($configFile)) {
+            throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
+        }
+
+        $type = $this->input->getOption('config_type') ?: pathinfo($configFile, PATHINFO_EXTENSION);
+        $configParser = ConfigParserFactory::instance($type);
+        $configuration = $configParser->parse($configFile);
+        return new Config($configuration);
+    }
+
+    private function check()
     {
         try {
             $executedMigrations = $this->manager->executedMigrations();
@@ -168,10 +171,10 @@ abstract class AbstractCommand extends Command
             if (!($this instanceof InitCommand)) {
                 $init = new InitCommand();
                 $init->setConfig($this->config->getConfiguration());
-                $verbosity = $output->getVerbosity();
-                $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-                $init->execute($input, $output);
-                $output->setVerbosity($verbosity);
+                $verbosity = $this->output->getVerbosity();
+                $this->output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+                $init->run($this->input, $this->output);
+                $this->output->setVerbosity($verbosity);
             }
         }
 
@@ -180,5 +183,5 @@ abstract class AbstractCommand extends Command
         }
     }
 
-    abstract protected function runCommand(InputInterface $input, OutputInterface $output);
+    abstract protected function runCommand();
 }

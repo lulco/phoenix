@@ -5,7 +5,6 @@ namespace Phoenix\Command;
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanupCommand extends AbstractCommand
@@ -17,7 +16,7 @@ class CleanupCommand extends AbstractCommand
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function runCommand()
     {
         $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
         $executedMigrations = [];
@@ -27,7 +26,7 @@ class CleanupCommand extends AbstractCommand
 
             $this->writeln('');
             $this->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
-            $executedMigrations[] = $this->addMigrationToList($migration, $output);
+            $executedMigrations[] = $this->addMigrationToList($migration, $this->output);
         }
 
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
@@ -38,15 +37,15 @@ class CleanupCommand extends AbstractCommand
         $this->writeln('');
         $this->writeln('<info>Phoenix cleaned</info>');
         $this->outputData['message'] = 'Phoenix cleaned';
-        $executedMigrations[] = $this->addMigrationToList($migration, $output);
+        $executedMigrations[] = $this->addMigrationToList($migration, $this->output);
         $this->writeln('');
 
-        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+        if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $this->outputData['executed_migrations'] = $executedMigrations;
         }
     }
 
-    private function addMigrationToList($migration, OutputInterface $output)
+    private function addMigrationToList($migration)
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
@@ -55,7 +54,7 @@ class CleanupCommand extends AbstractCommand
         $executedMigration = [
             'classname' => $migration->getClassName(),
         ];
-        if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+        if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $executedMigration['executed_queries'] = $executedQueries;
         }
         return $executedMigration;
