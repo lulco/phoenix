@@ -26,7 +26,7 @@ class CleanupCommand extends AbstractCommand
 
             $this->writeln('');
             $this->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
-            $executedMigrations[] = $this->addMigrationToList($migration, $this->output);
+            $executedMigrations[] = $this->addMigrationToList($migration);
         }
 
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
@@ -37,7 +37,7 @@ class CleanupCommand extends AbstractCommand
         $this->writeln('');
         $this->writeln('<info>Phoenix cleaned</info>');
         $this->outputData['message'] = 'Phoenix cleaned';
-        $executedMigrations[] = $this->addMigrationToList($migration, $this->output);
+        $executedMigrations[] = $this->addMigrationToList($migration);
         $this->writeln('');
 
         if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
