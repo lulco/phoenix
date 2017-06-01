@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Command;
 
+use Nette\Utils\Finder;
 use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Tests\Helpers\Adapter\CleanupInterface;
 use Phoenix\Tests\Mock\Command\Input;
@@ -23,6 +24,24 @@ abstract class BaseCommandTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        // delete root config
+        $rootConfigPath = __DIR__ . '/../../phoenix.php';
+        if (file_exists($rootConfigPath)) {
+            unlink($rootConfigPath);
+        }
+
+        // delete additional migration dir
+        $dumpMigrationDir = __DIR__ . '/../../testing_migrations/dump';
+        if (file_exists($dumpMigrationDir)) {
+            $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+            foreach ($dumpFiles as $dumpFile) {
+                $filePath = (string)$dumpFile;
+                unlink($filePath);
+            }
+            rmdir($dumpMigrationDir);
+        }
+
+
         $adapter = $this->getAdapter();
         $adapter->cleanupDatabase();
 

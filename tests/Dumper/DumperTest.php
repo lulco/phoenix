@@ -98,6 +98,7 @@ class DumperTest extends PHPUnit_Framework_TestCase
                     'alias' => 'title-2',
                 ],
             ],
+            'table_2' => [],
         ];
         $dumper = new Dumper('    ');
         $output = "\$this->insert('table_1', [\n    [\n        'id' => '1',\n        'title' => 'Title 1',\n        'alias' => 'title-1',\n    ],\n    [\n        'id' => '2',\n        'title' => 'Title 2',\n        'alias' => 'title-2',\n    ],\n]);";
@@ -113,13 +114,13 @@ class DumperTest extends PHPUnit_Framework_TestCase
         $tables = $this->createComplexStructure()->getTables();
 
         $dumper = new Dumper('    ');
-        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n    ->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addColumn('price', 'decimal')\n    ->addColumn('sorting', 'biginteger')\n    ->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n    ->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['length' => 100])\n    ->addColumn('is_active', 'boolean', ['default' => true])\n    ->addColumn('fk_table_1_id', 'integer')\n    ->create();\n\n";
         $output .= "\$this->table('table_3', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n    ->addColumn('fk_table_1_id', 'integer', ['null' => true])\n    ->create();";
         $this->assertEquals($output, $dumper->dumpTablesUp($tables));
 
         $dumper = new Dumper("\t");
-        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n\t->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal')\n\t->addColumn('sorting', 'biginteger')\n\t->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n\t->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['length' => 100])\n\t->addColumn('is_active', 'boolean', ['default' => true])\n\t->addColumn('fk_table_1_id', 'integer')\n\t->create();\n\n";
         $output .= "\$this->table('table_3', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n\t->addColumn('fk_table_1_id', 'integer', ['null' => true])\n\t->create();";
         $this->assertEquals($output, $dumper->dumpTablesUp($tables));
@@ -249,6 +250,8 @@ class DumperTest extends PHPUnit_Framework_TestCase
         $table1->addColumn('title', 'string', ['length' => 255, 'charset' => 'utf16', 'collation' => 'utf16_general_ci']);
         $table1->addColumn('alias', 'string', ['charset' => 'utf8', 'collation' => 'utf8_general_ci']);
         $table1->addColumn('bodytext', 'text');
+        $table1->addColumn('price', 'decimal');
+        $table1->addColumn('sorting', 'biginteger');
         $table1->addIndex(['alias'], 'unique');
         $table1->create();
         $structure->update($table1);

@@ -96,6 +96,9 @@ class Dumper
     {
         $dataMigrations = [];
         foreach ($data as $table => $rows) {
+            if (empty($rows)) {
+                continue;
+            }
             $dataMigration = "{$this->indent()}\$this->insert('$table', [\n";
             foreach ($rows as $row) {
                 $dataMigration .= $this->indent(1) . "[\n";
@@ -171,8 +174,27 @@ class Dumper
 
     private function settingsToString(Column $column, Table $table)
     {
-        $type = $column->getType();
         $settings = $column->getSettings();
+        $defaultSettings = $this->defaultSettings($column, $table);
+
+        $settingsList = [];
+        foreach ($settings->getSettings() as $setting => $value) {
+            if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting])) {
+                continue;
+            } elseif ($value === $defaultSettings[$setting]) {
+                continue;
+            }
+            $value = $this->transformValue($value);
+            $settingsList[] = "'$setting' => $value";
+        }
+        if (empty($settingsList)) {
+            return '';
+        }
+        return ', [' . implode(', ', $settingsList) . ']';
+    }
+
+    private function defaultSettings(Column $column, Table $table)
+    {
         $defaultSettings = [
             'autoincrement' => false,
             'null' => false,
@@ -184,6 +206,7 @@ class Dumper
             'charset' => ['', $table->getCharset()],
             'collation' => ['', $table->getCollation()],
         ];
+        $type = $column->getType();
         if ($type === Column::TYPE_INTEGER) {
             $defaultSettings['length'][] = 11;
         } elseif ($type === Column::TYPE_BIG_INTEGER) {
@@ -194,28 +217,20 @@ class Dumper
             $defaultSettings['length'][] = 10;
             $defaultSettings['decimals'][] = 0;
         }
+        return $defaultSettings;
+    }
 
-        $settingsList = [];
-        foreach ($settings->getSettings() as $setting => $value) {
-            if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting])) {
-                continue;
-            } elseif ($value === $defaultSettings[$setting]) {
-                continue;
-            }
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            } elseif (is_array($value)) {
-                $value = $this->valuesToString($value);
-            } elseif (!is_numeric($value)) {
-                $value = "'$value'";
-            } elseif ($value === null) {
-                $value = 'null';
-            }
-            $settingsList[] = "'$setting' => $value";
+    private function transformValue($value)
+    {
+        if (is_bool($value)) {
+            $value = $value ? 'true' : 'false';
+        } elseif (is_array($value)) {
+            $value = $this->valuesToString($value);
+        } elseif (!is_numeric($value)) {
+            $value = "'$value'";
+        } elseif ($value === null) {
+            $value = 'null';
         }
-        if (empty($settingsList)) {
-            return '';
-        }
-        return ', [' . implode(', ', $settingsList) . ']';
+        return $value;
     }
 }
