@@ -96,7 +96,7 @@ class MigrationTable
     public function addPrimary($primaryColumn)
     {
         if ($primaryColumn === true) {
-            $primaryColumn = new Column('id', 'integer', ['autoincrement' => true]);
+            $primaryColumn = new Column('id', Column::TYPE_INTEGER, [ColumnSettings::SETTING_AUTOINCREMENT => true]);
             return $this->addPrimary($primaryColumn);
         }
 

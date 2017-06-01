@@ -57,7 +57,7 @@ class ColumnSettings
      */
     public function allowNull()
     {
-        return isset($this->settings['null']) ? $this->settings['null'] : false;
+        return isset($this->settings[self::SETTING_NULL]) ? $this->settings[self::SETTING_NULL] : false;
     }
 
     /**
@@ -65,7 +65,7 @@ class ColumnSettings
      */
     public function getDefault()
     {
-        return isset($this->settings['default']) ? $this->settings['default'] : null;
+        return isset($this->settings[self::SETTING_DEFAULT]) ? $this->settings[self::SETTING_DEFAULT] : null;
     }
 
     /**
@@ -73,7 +73,7 @@ class ColumnSettings
      */
     public function isSigned()
     {
-        return isset($this->settings['signed']) ? $this->settings['signed'] : true;
+        return isset($this->settings[self::SETTING_SIGNED]) ? $this->settings[self::SETTING_SIGNED] : true;
     }
 
     /**
@@ -82,7 +82,7 @@ class ColumnSettings
      */
     public function getLength($default = null)
     {
-        return isset($this->settings['length']) ? $this->settings['length'] : $default;
+        return isset($this->settings[self::SETTING_LENGTH]) ? $this->settings[self::SETTING_LENGTH] : $default;
     }
 
     /**
@@ -91,7 +91,7 @@ class ColumnSettings
      */
     public function getDecimals($default = null)
     {
-        return isset($this->settings['decimals']) ? $this->settings['decimals'] : $default;
+        return isset($this->settings[self::SETTING_DECIMALS]) ? $this->settings[self::SETTING_DECIMALS] : $default;
     }
 
     /**
@@ -99,7 +99,7 @@ class ColumnSettings
      */
     public function isAutoincrement()
     {
-        return isset($this->settings['autoincrement']) ? $this->settings['autoincrement'] : false;
+        return isset($this->settings[self::SETTING_AUTOINCREMENT]) ? $this->settings[self::SETTING_AUTOINCREMENT] : false;
     }
 
     /**
@@ -107,7 +107,7 @@ class ColumnSettings
      */
     public function getAfter()
     {
-        return isset($this->settings['after']) ? $this->settings['after'] : null;
+        return isset($this->settings[self::SETTING_AFTER]) ? $this->settings[self::SETTING_AFTER] : null;
     }
 
     /**
@@ -115,7 +115,7 @@ class ColumnSettings
      */
     public function isFirst()
     {
-        return isset($this->settings['first']) ? $this->settings['first'] : false;
+        return isset($this->settings[self::SETTING_FIRST]) ? $this->settings[self::SETTING_FIRST] : false;
     }
 
     /**
@@ -123,7 +123,7 @@ class ColumnSettings
      */
     public function getCharset()
     {
-        return isset($this->settings['charset']) ? $this->settings['charset'] : null;
+        return isset($this->settings[self::SETTING_CHARSET]) ? $this->settings[self::SETTING_CHARSET] : null;
     }
 
     /**
@@ -131,7 +131,7 @@ class ColumnSettings
      */
     public function getCollation()
     {
-        return isset($this->settings['collation']) ? $this->settings['collation'] : null;
+        return isset($this->settings[self::SETTING_COLLATION]) ? $this->settings[self::SETTING_COLLATION] : null;
     }
 
     /**
@@ -139,7 +139,7 @@ class ColumnSettings
      */
     public function getValues()
     {
-        return isset($this->settings['values']) ? $this->settings['values'] : null;
+        return isset($this->settings[self::SETTING_VALUES]) ? $this->settings[self::SETTING_VALUES] : null;
     }
 
     private function checkSettings($settings)
