@@ -94,7 +94,7 @@ class SqliteAdapter extends PdoAdapter
         $tables = $this->loadTables($database);
         $tablesIndexes = [];
         foreach ($tables as $table) {
-            $columns = $this->execute(sprintf("PRAGMA table_info('%s')",  $table['table_name']))->fetchAll(PDO::FETCH_ASSOC);
+            $columns = $this->execute(sprintf("PRAGMA table_info('%s')", $table['table_name']))->fetchAll(PDO::FETCH_ASSOC);
             $primaryColumns = [];
             foreach ($columns as $column) {
                 if ($column['pk']) {
