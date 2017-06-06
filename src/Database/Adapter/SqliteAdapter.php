@@ -94,24 +94,18 @@ class SqliteAdapter extends PdoAdapter
         $tables = $this->loadTables($database);
         $tablesIndexes = [];
         foreach ($tables as $table) {
-            $columns = $this->execute(sprintf("PRAGMA table_info('%s')", $table['table_name']))->fetchAll(PDO::FETCH_ASSOC);
-            $primaryColumns = [];
-            foreach ($columns as $column) {
-                if ($column['pk']) {
-                    $primaryColumns[$column['cid']] = $column['name'];
-                }
-            }
+            $primaryColumns = $this->loadPrimaryColumns($table['table_name']);
             if (!empty($primaryColumns)) {
                 $tablesIndexes[$table['table_name']]['PRIMARY']['columns'] = $primaryColumns;
             }
-
             $indexList = $this->execute(sprintf("PRAGMA INDEX_LIST ('%s');", $table['table_name']))->fetchAll(PDO::FETCH_ASSOC);
             foreach ($indexList as $index) {
                 if (substr($index['name'], 0, 6) == 'sqlite') {
                     continue;
                 }
                 $indexColumns = [];
-                foreach ($this->execute(sprintf("PRAGMA index_info('%s');", $index['name'])) as $indexColumn) {
+                $indexes = $this->execute(sprintf("PRAGMA index_info('%s');", $index['name']));
+                foreach ($indexes as $indexColumn) {
                     $indexColumns[$indexColumn['seqno']] = $indexColumn['name'];
                 }
                 $tablesIndexes[$table['table_name']][$index['name']]['columns'] = $indexColumns;
@@ -120,6 +114,18 @@ class SqliteAdapter extends PdoAdapter
             }
         }
         return $tablesIndexes;
+    }
+
+    private function loadPrimaryColumns($tableName)
+    {
+        $columns = $this->execute(sprintf("PRAGMA table_info('%s')", $tableName))->fetchAll(PDO::FETCH_ASSOC);
+        $primaryColumns = [];
+        foreach ($columns as $column) {
+            if ($column['pk']) {
+                $primaryColumns[$column['cid']] = $column['name'];
+            }
+        }
+        return $primaryColumns;
     }
 
     protected function loadForeignKeys($database)

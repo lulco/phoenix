@@ -7,13 +7,14 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Database\Element\Structure;
+use Phoenix\Database\Adapter\Behavior\StructureBehavior;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
 abstract class PdoAdapter implements AdapterInterface
 {
+    use StructureBehavior;
+    
     /** @var PDO */
     private $pdo;
 
@@ -355,85 +356,4 @@ abstract class PdoAdapter implements AdapterInterface
     abstract protected function escapeString($string);
 
     abstract protected function createRealValue($value);
-
-    /**
-     *  STRUCTURE OPERATIONS
-     */
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStructure()
-    {
-        $database = $this->loadDatabase();
-        $structure = new Structure();
-        $tables = $this->loadTables($database);
-        $columns = $this->loadColumns($database);
-        $indexes = $this->loadIndexes($database);
-        $foreignKeys = $this->loadForeignKeys($database);
-        foreach ($tables as $table) {
-            $tableName = $table['table_name'];
-            $migrationTable = $this->createMigrationTable($table);
-            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
-            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
-            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
-            $migrationTable->create();
-            $structure->update($migrationTable);
-        }
-        return $structure;
-    }
-
-    abstract protected function loadDatabase();
-
-    abstract protected function loadTables($database);
-
-    abstract protected function loadColumns($database);
-
-    abstract protected function loadIndexes($database);
-
-    abstract protected function loadForeignKeys($database);
-
-    protected function createMigrationTable(array $table)
-    {
-        return new MigrationTable($table['table_name'], false);
-    }
-
-    protected function addColumns(MigrationTable $migrationTable, array $columns)
-    {
-        foreach ($columns as $column) {
-            $this->addColumn($migrationTable, $column);
-        }
-    }
-
-    abstract protected function addColumn(MigrationTable $migrationTable, array $column);
-
-    private function addIndexes(MigrationTable $migrationTable, array $indexes)
-    {
-        foreach ($indexes as $name => $index) {
-            $columns = $index['columns'];
-            ksort($columns);
-            if ($name == 'PRIMARY') {
-                $migrationTable->addPrimary($columns);
-                continue;
-            }
-            $migrationTable->addIndex(array_values($columns), $index['type'], $index['method'], $name);
-        }
-    }
-
-    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
-    {
-        foreach ($foreignKeys as $foreignKey) {
-            $columns = $foreignKey['columns'];
-            ksort($columns);
-            $referencedColumns = $foreignKey['referenced_columns'];
-            ksort($referencedColumns);
-            $migrationTable->addForeignKey(
-                array_values($columns),
-                $foreignKey['referenced_table'],
-                array_values($referencedColumns),
-                $foreignKey['on_delete'],
-                $foreignKey['on_update']
-            );
-        }
-    }
 }
