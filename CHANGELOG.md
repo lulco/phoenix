@@ -8,6 +8,7 @@
 
 #### Fixed
 - command options config, config_type, template and indent require value
+- typehints in MigrationTable
 
 ### [0.8.0] - 2017-05-02
 #### Added
