@@ -7,12 +7,14 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Phoenix\Database\Element\Structure;
+use Phoenix\Database\Adapter\Behavior\StructureBehavior;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
 abstract class PdoAdapter implements AdapterInterface
 {
+    use StructureBehavior;
+    
     /** @var PDO */
     private $pdo;
 
@@ -306,20 +308,6 @@ abstract class PdoAdapter implements AdapterInterface
     {
         return $this->charset;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStructure()
-    {
-        return $this->loadStructure();
-    }
-
-    /**
-     * Load structure of database
-     * @return Structure
-     */
-    abstract protected function loadStructure();
 
     private function bindDataValues($statement, $data, $prefix = '')
     {

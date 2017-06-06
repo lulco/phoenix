@@ -227,17 +227,17 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createCharset($charset = null, $collation = null, $glue = '=')
     {
-        $output = '';
         if (is_null($charset) && is_null($collation)) {
-            return $output;
+            return '';
         }
+        $charsetAndCollation = '';
         if ($charset) {
-            $output .= " CHARACTER SET$glue$charset";
+            $charsetAndCollation .= " CHARACTER SET$glue$charset";
         }
         if ($collation) {
-            $output .= " COLLATE$glue$collation";
+            $charsetAndCollation .= " COLLATE$glue$collation";
         }
-        return $output;
+        return $charsetAndCollation;
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table)

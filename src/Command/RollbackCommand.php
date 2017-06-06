@@ -4,7 +4,6 @@ namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 class RollbackCommand extends AbstractRunCommand
@@ -21,9 +20,9 @@ class RollbackCommand extends AbstractRunCommand
             ->setDescription('Rollback migrations');
     }
 
-    protected function findMigrations(InputInterface $input)
+    protected function findMigrations()
     {
-        $target = $input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
+        $target = $this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
         return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target);
     }
 

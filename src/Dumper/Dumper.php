@@ -55,8 +55,7 @@ class Dumper
             }
             foreach ($table->getIndexes() as $index) {
                 $tableMigration .= $this->indent(1) . "->addIndex(";
-                $indexColumns = $index->getColumns();
-                $tableMigration .= $this->columnsToString($indexColumns) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
+                $tableMigration .= $this->columnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }
             $tableMigration .= $this->indent(1) . "->create();";
             $tableMigrations[] = $tableMigration;
@@ -80,19 +79,7 @@ class Dumper
             foreach ($foreignKeys as $foreignKey) {
                 $foreignKeysMigration .= $this->indent(1) . "->addForeignKey(";
                 $foreignKeysMigration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}'";
-                $referencedColumns = $foreignKey->getReferencedColumns();
-                $onDelete = strtolower($foreignKey->getOnDelete());
-                $onUpdate = strtolower($foreignKey->getOnUpdate());
-
-                if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION || $referencedColumns !== ['id']) {
-                    $foreignKeysMigration .= ', ' . $this->columnsToString($referencedColumns);
-                }
-                if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION) {
-                    $foreignKeysMigration .= ", '$onDelete'";
-                }
-                if ($onUpdate !== ForeignKey::DEFAULT_ACTION) {
-                    $foreignKeysMigration .= ", '$onUpdate'";
-                }
+                $foreignKeysMigration .= $this->foreignKeyActions($foreignKey);
                 $foreignKeysMigration .= ")\n";
             }
             $foreignKeysMigration .= $this->indent(1) . "->save();";
@@ -236,5 +223,24 @@ class Dumper
             $value = "'$value'";
         }
         return $value;
+    }
+
+    private function foreignKeyActions(ForeignKey $foreignKey)
+    {
+        $onDelete = strtolower($foreignKey->getOnDelete());
+        $onUpdate = strtolower($foreignKey->getOnUpdate());
+        $referencedColumns = $foreignKey->getReferencedColumns();
+
+        $foreignKeyActions = '';
+        if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION || $referencedColumns !== ['id']) {
+            $foreignKeyActions .= ', ' . $this->columnsToString($referencedColumns);
+        }
+        if ($onDelete !== ForeignKey::DEFAULT_ACTION || $onUpdate !== ForeignKey::DEFAULT_ACTION) {
+            $foreignKeyActions .= ", '$onDelete'";
+        }
+        if ($onUpdate !== ForeignKey::DEFAULT_ACTION) {
+            $foreignKeyActions .= ", '$onUpdate'";
+        }
+        return $foreignKeyActions;
     }
 }

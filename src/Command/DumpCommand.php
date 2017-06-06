@@ -7,9 +7,7 @@ use Dumper\Indenter;
 use Phoenix\Command\AbstractCommand;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class DumpCommand extends AbstractCommand
 {
@@ -29,24 +27,24 @@ class DumpCommand extends AbstractCommand
         parent::configure();
     }
 
-    protected function runCommand(InputInterface $input, OutputInterface $output)
+    protected function runCommand()
     {
-        $ignoredTables = array_map('trim', explode(',', $input->getOption('ignore-tables') . ',' . $this->config->getLogTableName() ? : $this->config->getLogTableName()));
+        $ignoredTables = array_map('trim', explode(',', $this->input->getOption('ignore-tables') . ',' . $this->config->getLogTableName() ? : $this->config->getLogTableName()));
 
-        $templatePath = $input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
+        $templatePath = $this->input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
         if (!is_file($templatePath)) {
             throw new PhoenixException('Template "' . $templatePath . '" not found');
         }
 
         $indenter = new Indenter();
-        $indent = $indenter->indent($input->getOption('indent'));
+        $indent = $indenter->indent($this->input->getOption('indent'));
         $dumper = new Dumper($indent, 2);
 
         $tables = $this->getFilteredTables($ignoredTables);
         $upParts = [];
         $upParts[] = $dumper->dumpTablesUp($tables);
 
-        if ($input->getOption('data')) {
+        if ($this->input->getOption('data')) {
             $data = $this->loadData($tables);
             $upParts[] = $dumper->dumpDataUp($data);
         }
@@ -62,10 +60,10 @@ class DumpCommand extends AbstractCommand
             return (bool) $downPart;
         }));
 
-        $migration = $input->getOption('migration') ?: 'Initialization';
+        $migration = $this->input->getOption('migration') ?: 'Initialization';
         $migrationNameCreator = new MigrationNameCreator($migration);
         $filename = $migrationNameCreator->getFileName();
-        $dir = $input->getOption('dir');
+        $dir = $this->input->getOption('dir');
         $migrationDir = $this->config->getMigrationDir($dir);
 
         $template = file_get_contents($templatePath);
@@ -82,7 +80,7 @@ class DumpCommand extends AbstractCommand
         $migrationPath = $migrationDir . '/' . $filename;
         file_put_contents($migrationPath, $template);
         $migrationPath = realpath($migrationPath);
-        
+
         $this->writeln('');
         $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
         $this->outputData['migration_name'] = $migration;
