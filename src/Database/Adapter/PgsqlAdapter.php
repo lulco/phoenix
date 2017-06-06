@@ -8,7 +8,6 @@ use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class PgsqlAdapter extends PdoAdapter
@@ -24,33 +23,17 @@ class PgsqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    protected function loadStructure()
+    protected function loadDatabase()
     {
-        $database = $this->execute('SELECT current_database()')->fetchColumn();
-        $structure = new Structure();
-        $tables = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '%s' AND table_schema='public' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
-        $columns = $this->loadColumns($database);
-        $indexes = $this->loadIndexes($database);
-        $foreignKeys = $this->loadForeignKeys($database);
-        foreach ($tables as $table) {
-            $tableName = $table['table_name'];
-            $migrationTable = $this->createMigrationTable($table);
-            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
-            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
-            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
-            $migrationTable->create();
-            $structure->update($migrationTable);
-        }
-        return $structure;
+        return $this->execute('SELECT current_database()')->fetchColumn();
     }
 
-    private function createMigrationTable(array $table)
+    protected function loadTables($database)
     {
-        $migrationTable = new MigrationTable($table['table_name'], false);
-        return $migrationTable;
+        return $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '%s' AND table_schema='public' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function loadColumns($database)
+    protected function loadColumns($database)
     {
         $columns = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public' ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesColumns = [];
@@ -60,14 +43,7 @@ class PgsqlAdapter extends PdoAdapter
         return $tablesColumns;
     }
 
-    private function addColumns(MigrationTable $migrationTable, array $columns)
-    {
-        foreach ($columns as $column) {
-            $this->addColumn($migrationTable, $column);
-        }
-    }
-
-    private function addColumn(MigrationTable $migrationTable, array $column)
+    protected function addColumn(MigrationTable $migrationTable, array $column)
     {
         $type = $this->remapType($column['data_type']);
         $settings = $this->prepareSettings($type, $column, $migrationTable->getName());
@@ -133,7 +109,7 @@ class PgsqlAdapter extends PdoAdapter
         return $default;
     }
 
-    private function loadIndexes($database)
+    protected function loadIndexes($database)
     {
         $indexRows = $this->execute("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
     SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
@@ -153,21 +129,7 @@ class PgsqlAdapter extends PdoAdapter
         return $indexes;
     }
 
-    private function addIndexes(MigrationTable $migrationTable, array $indexes)
-    {
-        foreach ($indexes as $name => $index) {
-            $columns = $index['columns'];
-            ksort($columns);
-
-            if ($name == 'PRIMARY') {
-                $migrationTable->addPrimary($columns);
-                continue;
-            }
-            $migrationTable->addIndex(array_values($columns), $index['type'], $index['method'], $name);
-        }
-    }
-
-    private function loadForeignKeys($database)
+    protected function loadForeignKeys($database)
     {
         $query = "SELECT tc.constraint_name, tc.table_name, kcu.column_name, kcu.ordinal_position, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name, pgc.confupdtype, pgc.confdeltype
     FROM information_schema.table_constraints AS tc
@@ -185,6 +147,7 @@ class PgsqlAdapter extends PdoAdapter
             $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
             $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
         }
+        return $foreignKeys;
     }
 
     private function remapForeignKeyAction($action)
@@ -196,23 +159,6 @@ class PgsqlAdapter extends PdoAdapter
             'r' => ForeignKey::RESTRICT,
         ];
         return isset($actionMap[$action]) ? $actionMap[$action] : $action;
-    }
-
-    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
-    {
-        foreach ($foreignKeys as $foreignKey) {
-            $columns = $foreignKey['columns'];
-            ksort($columns);
-            $referencedColumns = $foreignKey['referenced_columns'];
-            ksort($referencedColumns);
-            $migrationTable->addForeignKey(
-                $columns,
-                $foreignKey['referenced_table'],
-                $referencedColumns,
-                $foreignKey['on_delete'],
-                $foreignKey['on_update']
-            );
-        }
     }
 
     protected function escapeString($string)

@@ -7,7 +7,6 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
@@ -23,34 +22,23 @@ class MysqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    protected function loadStructure()
+    protected function loadDatabase()
     {
-        $database = $this->execute('SELECT database()')->fetchColumn();
-        $structure = new Structure();
-        $tables = $this->execute(sprintf("SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
-        $columns = $this->loadColumns($database);
-        $indexes = $this->loadIndexes($database);
-        $foreignKeys = $this->loadForeignKeys($database);
-        foreach ($tables as $table) {
-            $tableName = $table['TABLE_NAME'];
-            $migrationTable = $this->createMigrationTable($table);
-            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
-            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
-            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
-            $migrationTable->create();
-            $structure->update($migrationTable);
-        }
-        return $structure;
+        return $this->execute('SELECT database()')->fetchColumn();
     }
 
-    private function createMigrationTable(array $table)
+    protected function loadTables($database)
     {
-        $tableName = $table['TABLE_NAME'];
-        $migrationTable = new MigrationTable($tableName, false);
-        if ($table['TABLE_COLLATION']) {
-            list($charset,) = explode('_', $table['TABLE_COLLATION'], 2);
+        return $this->execute(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    protected function createMigrationTable(array $table)
+    {
+        $migrationTable = parent::createMigrationTable($table);
+        if ($table['table_collation']) {
+            list($charset,) = explode('_', $table['table_collation'], 2);
             $migrationTable->setCharset($charset);
-            $migrationTable->setCollation($table['TABLE_COLLATION']);
+            $migrationTable->setCollation($table['table_collation']);
         }
         return $migrationTable;
     }
@@ -69,7 +57,7 @@ class MysqlAdapter extends PdoAdapter
         return isset($types[$type]) ? $types[$type] : $type;
     }
 
-    private function loadColumns($database)
+    protected function loadColumns($database)
     {
         $columns = $this->execute(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesColumns = [];
@@ -79,14 +67,7 @@ class MysqlAdapter extends PdoAdapter
         return $tablesColumns;
     }
 
-    private function addColumns(MigrationTable $migrationTable, array $columns)
-    {
-        foreach ($columns as $column) {
-            $this->addColumn($migrationTable, $column);
-        }
-    }
-
-    private function addColumn(MigrationTable $migrationTable, array $column)
+    protected function addColumn(MigrationTable $migrationTable, array $column)
     {
         $type = $this->remapType($column['DATA_TYPE']);
         $settings = $this->prepareSettings($column);
@@ -136,7 +117,7 @@ class MysqlAdapter extends PdoAdapter
         return [$length, $decimals];
     }
 
-    private function loadIndexes($database)
+    protected function loadIndexes($database)
     {
         $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesIndexes = [];
@@ -151,20 +132,7 @@ class MysqlAdapter extends PdoAdapter
         return $tablesIndexes;
     }
 
-    private function addIndexes(MigrationTable $migrationTable, array $indexes)
-    {
-        foreach ($indexes as $name => $index) {
-            $columns = $index['columns'];
-            ksort($columns);
-            if ($name == 'PRIMARY') {
-                $migrationTable->addPrimary($columns);
-                continue;
-            }
-            $migrationTable->addIndex(array_values($columns), $index['type'], $index['method'], $name);
-        }
-    }
-
-    private function loadForeignKeys($database)
+    protected function loadForeignKeys($database)
     {
         $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
@@ -180,19 +148,6 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
             $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
         }
         return $foreignKeys;
-    }
-
-    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
-    {
-        foreach ($foreignKeys as $foreignKey) {
-            $migrationTable->addForeignKey(
-                $foreignKey['columns'],
-                $foreignKey['referenced_table'],
-                $foreignKey['referenced_columns'],
-                $foreignKey['on_delete'],
-                $foreignKey['on_update']
-            );
-        }
     }
 
     protected function escapeString($string)
