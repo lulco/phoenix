@@ -28,32 +28,50 @@ class PgsqlAdapter extends PdoAdapter
     {
         $database = $this->execute('SELECT current_database()')->fetchColumn();
         $structure = new Structure();
-        $tables = $this->execute("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '$database' AND table_schema='public' ORDER BY TABLE_NAME")->fetchAll(PDO::FETCH_ASSOC);
+        $tables = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '%s' AND table_schema='public' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->loadColumns($database);
+        $indexes = $this->loadIndexes($database);
+        $foreignKeys = $this->loadForeignKeys($database);
         foreach ($tables as $table) {
-            $migrationTable = $this->createMigrationTable($table['table_name']);
+            $tableName = $table['table_name'];
+            $migrationTable = $this->createMigrationTable($table);
+            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
+            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
+            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
+            $migrationTable->create();
             $structure->update($migrationTable);
         }
         return $structure;
     }
 
-    private function createMigrationTable($table)
+    private function createMigrationTable(array $table)
     {
-        $migrationTable = new MigrationTable($table, false);
-        $this->loadColumns($migrationTable, $table);
-        $this->loadIndexes($migrationTable, $table);
-        $this->loadForeignKeys($migrationTable, $table);
-        $migrationTable->create();
+        $migrationTable = new MigrationTable($table['table_name'], false);
         return $migrationTable;
     }
 
-    private function loadColumns(MigrationTable $migrationTable, $table)
+    private function loadColumns($database)
     {
-        $columns = $this->execute("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '$table'")->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public' ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tablesColumns = [];
         foreach ($columns as $column) {
-            $type = $this->remapType($column['data_type']);
-            $settings = $this->prepareSettings($type, $column, $table);
-            $migrationTable->addColumn($column['column_name'], $type, $settings);
+            $tablesColumns[$column['table_name']][] = $column;
         }
+        return $tablesColumns;
+    }
+
+    private function addColumns(MigrationTable $migrationTable, array $columns)
+    {
+        foreach ($columns as $column) {
+            $this->addColumn($migrationTable, $column);
+        }
+    }
+
+    private function addColumn(MigrationTable $migrationTable, array $column)
+    {
+        $type = $this->remapType($column['data_type']);
+        $settings = $this->prepareSettings($type, $column, $migrationTable->getName());
+        $migrationTable->addColumn($column['column_name'], $type, $settings);
     }
 
     private function remapType($type)
@@ -115,73 +133,57 @@ class PgsqlAdapter extends PdoAdapter
         return $default;
     }
 
-    /**
-     * http://www.alberton.info/postgresql_meta_info.html#.WMuSe31tnIU
-     * @param MigrationTable $migrationTable
-     * @param string $table
-     */
-    private function loadIndexes(MigrationTable $migrationTable, $table)
+    private function loadIndexes($database)
     {
-        $indexRows = $this->execute("SELECT a.index_name, b.attname, a.indisunique, a.indisprimary
-  FROM (
-    SELECT a.indrelid,
-		   a.indisunique,
-           a.indisprimary,
-           c.relname index_name,
-           unnest(a.indkey) index_num
+        $indexRows = $this->execute("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
+    SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
     FROM pg_index a, pg_class b, pg_class c
-    WHERE b.relname='$table' AND b.oid=a.indrelid AND a.indexrelid=c.oid
-       ) a, pg_attribute b
- WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum
- ORDER BY a.index_name, a.index_num");
+    WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
+    ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num");
         $indexes = [];
-        $primaryKeys = [];
         foreach ($indexRows as $indexRow) {
             if ($indexRow['indisprimary']) {
-                $primaryKeys[] = $indexRow['attname'];
+                $indexes[$indexRow['relname']]['PRIMARY']['columns'][] = $indexRow['attname'];
                 continue;
             }
-            $indexes[$indexRow['index_name']]['columns'][] = $indexRow['attname'];
-            $indexes[$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
+            $indexes[$indexRow['relname']][$indexRow['index_name']]['columns'][] = $indexRow['attname'];
+            $indexes[$indexRow['relname']][$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
+            $indexes[$indexRow['relname']][$indexRow['index_name']]['method'] = Index::METHOD_DEFAULT;
         }
-
-        foreach ($indexes as $name => $index) {
-            $migrationTable->addIndex($index['columns'], $index['type'], Index::METHOD_DEFAULT, $name);
-        }
-
-        $migrationTable->addPrimary($primaryKeys);
+        return $indexes;
     }
 
-    /**
-     * http://stackoverflow.com/questions/1152260/postgres-sql-to-list-table-foreign-keys
-     * @param MigrationTable $migrationTable
-     * @param string $table
-     */
-    private function loadForeignKeys(MigrationTable $migrationTable, $table)
+    private function addIndexes(MigrationTable $migrationTable, array $indexes)
     {
-        $query = sprintf("SELECT tc.constraint_name, kcu.column_name, kcu.ordinal_position,
- ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name,
- pgc.confupdtype, pgc.confdeltype
- FROM information_schema.table_constraints AS tc
- JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
- JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
- JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
- WHERE constraint_type = 'FOREIGN KEY' AND tc.table_name='%s';", $table);
+        foreach ($indexes as $name => $index) {
+            $columns = $index['columns'];
+            ksort($columns);
+
+            if ($name == 'PRIMARY') {
+                $migrationTable->addPrimary($columns);
+                continue;
+            }
+            $migrationTable->addIndex(array_values($columns), $index['type'], $index['method'], $name);
+        }
+    }
+
+    private function loadForeignKeys($database)
+    {
+        $query = "SELECT tc.constraint_name, tc.table_name, kcu.column_name, kcu.ordinal_position, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name, pgc.confupdtype, pgc.confdeltype
+    FROM information_schema.table_constraints AS tc
+    JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+    JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+    JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
+    WHERE constraint_type = 'FOREIGN KEY'";
 
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
-            $foreignKeys[$foreignKeyColumn['constraint_name']]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];
-            $foreignKeys[$foreignKeyColumn['constraint_name']]['referenced_table'] = $foreignKeyColumn['foreign_table_name'];
-            $foreignKeys[$foreignKeyColumn['constraint_name']]['referenced_columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['foreign_column_name'];
-            $foreignKeys[$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
-            $foreignKeys[$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
-        }
-
-        foreach ($foreignKeys as $foreignKey) {
-            ksort($foreignKey['columns']);
-            ksort($foreignKey['referenced_columns']);
-            $migrationTable->addForeignKey(array_values($foreignKey['columns']), $foreignKey['referenced_table'], array_values($foreignKey['referenced_columns']), $foreignKey['on_delete'], $foreignKey['on_update']);
+            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];
+            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['referenced_table'] = $foreignKeyColumn['foreign_table_name'];
+            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['referenced_columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['foreign_column_name'];
+            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
+            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
         }
     }
 
@@ -194,6 +196,23 @@ class PgsqlAdapter extends PdoAdapter
             'r' => ForeignKey::RESTRICT,
         ];
         return isset($actionMap[$action]) ? $actionMap[$action] : $action;
+    }
+
+    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
+    {
+        foreach ($foreignKeys as $foreignKey) {
+            $columns = $foreignKey['columns'];
+            ksort($columns);
+            $referencedColumns = $foreignKey['referenced_columns'];
+            ksort($referencedColumns);
+            $migrationTable->addForeignKey(
+                $columns,
+                $foreignKey['referenced_table'],
+                $referencedColumns,
+                $foreignKey['on_delete'],
+                $foreignKey['on_update']
+            );
+        }
     }
 
     protected function escapeString($string)
