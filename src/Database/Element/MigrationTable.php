@@ -44,6 +44,7 @@ class MigrationTable
 
     /**
      * @param string $name
+     * @param mixed $primaryKey
      */
     public function __construct($name, $primaryKey = true)
     {
@@ -154,7 +155,7 @@ class MigrationTable
 
     /**
      * @param string $name
-     * @return Table
+     * @return MigrationTable
      */
     public function dropColumn($name)
     {
@@ -191,7 +192,7 @@ class MigrationTable
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
      * @param string $name name of index
-     * @return Table
+     * @return MigrationTable
      */
     public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
     {
@@ -210,7 +211,7 @@ class MigrationTable
 
     /**
      * @param string|array $columns
-     * @return Table
+     * @return MigrationTable
      */
     public function dropIndex($columns)
     {
@@ -220,7 +221,7 @@ class MigrationTable
 
     /**
      * @param string $indexName
-     * @return Table
+     * @return MigrationTable
      */
     public function dropIndexByName($indexName)
     {
@@ -242,7 +243,7 @@ class MigrationTable
      * @param string|array $referencedColumns
      * @param string $onDelete
      * @param string $onUpdate
-     * @return Table
+     * @return MigrationTable
      */
     public function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::DEFAULT_ACTION, $onUpdate = ForeignKey::DEFAULT_ACTION)
     {
@@ -260,7 +261,7 @@ class MigrationTable
 
     /**
      * @param string|array $columns
-     * @return Table
+     * @return MigrationTable
      */
     public function dropForeignKey($columns)
     {
@@ -280,7 +281,7 @@ class MigrationTable
     }
 
     /**
-     * @return Table
+     * @return MigrationTable
      */
     public function dropPrimaryKey()
     {
@@ -298,7 +299,7 @@ class MigrationTable
 
     /**
      * @param string $charset
-     * @return Table
+     * @return MigrationTable
      */
     public function setCharset($charset)
     {
@@ -316,7 +317,7 @@ class MigrationTable
 
     /**
      * @param string $collation
-     * @return Table
+     * @return MigrationTable
      */
     public function setCollation($collation)
     {
@@ -371,6 +372,9 @@ class MigrationTable
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
 
+    /**
+     * @return Table
+     */
     public function toTable()
     {
         $table = new Table($this->getName());
