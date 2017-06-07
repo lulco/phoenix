@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+### [0.9.1] - 2017-06-07
+#### Fixed
+- Reverted calling execute instead of run for InitCommand in AbstractCommand
+
 ### [0.9.0] - 2017-06-07
 #### Changed
 - default action for migration table is now alter instead of create - possible BC, use `->create()` for new tables
@@ -120,7 +124,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.9.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/lulco/phoenix/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/lulco/phoenix/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/lulco/phoenix/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/lulco/phoenix/compare/0.6.1...0.7.0
