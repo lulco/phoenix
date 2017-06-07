@@ -173,7 +173,7 @@ abstract class AbstractCommand extends Command
                 $init->setConfig($this->config->getConfiguration());
                 $verbosity = $this->output->getVerbosity();
                 $this->output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
-                $init->run($this->input, $this->output);
+                $init->execute($this->input, $this->output);
                 $this->output->setVerbosity($verbosity);
             }
         }
