@@ -15,6 +15,7 @@ Framework agnostic database migrations for PHP.
 - Validation all settings in migration before executing first query
 - Multiple migration directories
 - Migrate up and down
+- Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
 - Dump command for creating migration from existing database
 - json output format for all commands

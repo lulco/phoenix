@@ -2,7 +2,6 @@
 
 namespace Phoenix\Tests\Database\Element;
 
-use Exception;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
@@ -21,7 +20,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($table->getCharset());
         $this->assertNull($table->getCollation());
         $this->assertNull($table->getNewName());
-        $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
+        $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
 
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
@@ -47,8 +46,9 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
 
     public function testNoPrimaryKey()
     {
-        $table = new MigrationTable('test');
+        $table = new MigrationTable('test', false);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
+        $table->create();
 
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
@@ -60,9 +60,9 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
 
     public function testStringPrimaryKey()
     {
-        $table = new MigrationTable('test');
+        $table = new MigrationTable('test', 'identifier');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier', 'string'));
-        $table->addPrimary('identifier');
+        $table->create();
 
         $columns = $table->getColumns();
         $this->assertCount(1, $columns);
@@ -74,10 +74,10 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
 
     public function testMultiPrimaryKey()
     {
-        $table = new MigrationTable('test');
+        $table = new MigrationTable('test', ['identifier1', 'identifier2']);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier1', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier2', 'string'));
-        $table->addPrimary(['identifier1', 'identifier2']);
+        $table->create();
 
         $columns = $table->getColumns();
         $this->assertCount(2, $columns);
@@ -231,10 +231,10 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
-        $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
-        $this->assertNull($table->save());
-        $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
+        $this->assertNull($table->create());
+        $this->assertEquals('test', $table->getName());
+        $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
     }
 
     public function testRename()
@@ -252,7 +252,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
-        $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
+        $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
         $this->assertNull($table->drop());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_DROP, $table->getAction());
