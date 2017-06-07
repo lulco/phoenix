@@ -167,7 +167,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
-        $newTable = new MigrationTable($table->getName());
+        $newTable = new MigrationTable($table->getName(), false);
         $columnNames = [];
         foreach ($columns as $column) {
             $columnNames[] = $column->getName();
@@ -177,6 +177,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
             }
             $newTable->addColumn($column->getName(), $column->getType(), $column->getSettings()->getSettings());
         }
+        $newTable->create();
 
         $queries = $this->createTable($newTable);
         $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);

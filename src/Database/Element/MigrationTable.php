@@ -12,7 +12,7 @@ class MigrationTable
 
     const ACTION_DROP = 'drop';
 
-    private $action = self::ACTION_CREATE;
+    private $action = self::ACTION_ALTER;
 
     private $tmpPrimaryKey;
 

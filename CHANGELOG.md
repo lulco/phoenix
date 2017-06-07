@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- default action for migration table is now alter instead of create - possible BC, use `->create()` for new tables
+
 #### Added
 - dump command for creating migration from existing database
 - structure introduced - all migrations are checked against actual database structure - possible BC if unknown column types are used
