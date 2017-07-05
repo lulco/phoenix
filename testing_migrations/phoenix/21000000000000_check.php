@@ -10,7 +10,7 @@ class Check extends AbstractMigration
     public function up()
     {
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 6) {
+        if (count($logs) != 7) {
             throw new Exception('Wrong count');
         }
 
@@ -27,6 +27,12 @@ class Check extends AbstractMigration
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at'
             ],
             'table_3' => [
+                'identifier', 't1_fk', 't2_fk',
+            ],
+            'new_table_2' => [
+                'id', 'title', 'new_sorting', 't1_fk', 'created_at'
+            ],
+            'new_table_3' => [
                 'identifier', 't1_fk', 't2_fk',
             ],
         ];

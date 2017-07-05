@@ -138,6 +138,21 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function copyTable(MigrationTable $table)
+    {
+        $queries = [];
+        if ($table->getCopyType() !== MigrationTable::COPY_ONLY_DATA) {
+            $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName());
+        }
+        if ($table->getCopyType() !== MigrationTable::COPY_ONLY_STRUCTURE) {
+            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName());
+        }
+        return $queries;
+    }
+
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);

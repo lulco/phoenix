@@ -2,8 +2,12 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Behavior\ParamsCheckerBehavior;
+
 class MigrationTable
 {
+    use ParamsCheckerBehavior;
+
     const ACTION_CREATE = 'create';
 
     const ACTION_ALTER = 'alter';
@@ -11,6 +15,14 @@ class MigrationTable
     const ACTION_RENAME = 'rename';
 
     const ACTION_DROP = 'drop';
+
+    const ACTION_COPY = 'copy';
+
+    const COPY_ONLY_STRUCTURE = 'only_structure';
+
+    const COPY_ONLY_DATA = 'only_data';
+
+    const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
     private $action = self::ACTION_ALTER;
 
@@ -41,6 +53,8 @@ class MigrationTable
     private $columnsToChange = [];
 
     private $dropPrimaryKey = false;
+
+    private $copyType;
 
     /**
      * @param string $name
@@ -333,6 +347,11 @@ class MigrationTable
         return $this->collation;
     }
 
+    public function getCopyType()
+    {
+        return $this->copyType;
+    }
+
     public function create()
     {
         $this->action = self::ACTION_CREATE;
@@ -353,6 +372,15 @@ class MigrationTable
     {
         $this->action = self::ACTION_RENAME;
         $this->newName = $newName;
+    }
+
+    public function copy($newName, $copyType = self::COPY_ONLY_STRUCTURE)
+    {
+        $this->inArray($copyType, [self::COPY_ONLY_STRUCTURE, self::COPY_ONLY_DATA, self::COPY_STRUCTURE_AND_DATA], '');
+
+        $this->action = self::ACTION_COPY;
+        $this->newName = $newName;
+        $this->copyType = $copyType;
     }
 
     public function getAction()

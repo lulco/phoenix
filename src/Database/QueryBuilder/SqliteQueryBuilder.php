@@ -115,6 +115,30 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $queries;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function copyTable(MigrationTable $table)
+    {
+        if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
+            return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
+        }
+
+        $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
+        $queries = $this->renameTable($table, $tmpTableName);
+        $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName, $table->getCopyType() === MigrationTable::COPY_STRUCTURE_AND_DATA));
+
+        $tableToRename = new MigrationTable($table->getName());
+        $tableToRename->rename($table->getNewName());
+        $queries = array_merge($queries, $this->renameTable($tableToRename, $table->getNewName()));
+
+        $tableToRename = new MigrationTable($tmpTableName);
+        $tableToRename->rename($table->getName());
+        $queries = array_merge($queries, $this->renameTable($tableToRename, $table->getName()));
+
+        return $queries;
+    }
+
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
@@ -159,7 +183,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $query;
     }
 
-    private function createNewTable(MigrationTable $table, $tmpTableName)
+    private function createNewTable(MigrationTable $table, $newTableName, $copyData = true)
     {
         if (is_null($this->adapter)) {
             throw new PhoenixException('Missing adapter');
@@ -180,7 +204,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $newTable->create();
 
         $queries = $this->createTable($newTable);
-        $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
+        if ($copyData) {
+            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($newTableName);
+        }
         return $queries;
     }
 
