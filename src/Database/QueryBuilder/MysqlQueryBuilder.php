@@ -94,12 +94,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     /**
      * generates rename table queries for mysql
      * @param MigrationTable $table
-     * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName)
+    public function renameTable(MigrationTable $table)
     {
-        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($newTableName) . ';'];
+        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     /**

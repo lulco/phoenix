@@ -108,12 +108,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     /**
      * generates rename table queries for pgsql
      * @param MigrationTable $table
-     * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName)
+    public function renameTable(MigrationTable $table)
     {
-        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
+        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     /**
