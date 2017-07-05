@@ -258,6 +258,40 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(MigrationTable::ACTION_DROP, $table->getAction());
     }
 
+    public function testCopy()
+    {
+        $table = new MigrationTable('test');
+        $this->assertEquals('test', $table->getName());
+        $this->assertNull($table->getNewName());
+        $this->assertNull($table->copy('new_test'));
+        $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
+        $this->assertEquals('test', $table->getName());
+        $this->assertEquals('new_test', $table->getNewName());
+        $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
+
+        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_STRUCTURE));
+        $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
+        $this->assertEquals('test', $table->getName());
+        $this->assertEquals('new_test', $table->getNewName());
+        $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
+
+        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_DATA));
+        $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
+        $this->assertEquals('test', $table->getName());
+        $this->assertEquals('new_test', $table->getNewName());
+        $this->assertEquals(MigrationTable::COPY_ONLY_DATA, $table->getCopyType());
+
+        $this->assertNull($table->copy('new_test', MigrationTable::COPY_STRUCTURE_AND_DATA));
+        $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
+        $this->assertEquals('test', $table->getName());
+        $this->assertEquals('new_test', $table->getNewName());
+        $this->assertEquals(MigrationTable::COPY_STRUCTURE_AND_DATA, $table->getCopyType());
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Copy type "unknown_copy_type" is not allowed');
+        $table->copy('new_test', 'unknown_copy_type');
+    }
+
     public function testToTable()
     {
         $migrationTable = new MigrationTable('test');

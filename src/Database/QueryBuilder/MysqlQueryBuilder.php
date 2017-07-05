@@ -145,10 +145,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $queries = [];
         if ($table->getCopyType() !== MigrationTable::COPY_ONLY_DATA) {
-            $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName());
+            $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName()) . ';';
         }
         if ($table->getCopyType() !== MigrationTable::COPY_ONLY_STRUCTURE) {
-            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName());
+            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';';
         }
         return $queries;
     }

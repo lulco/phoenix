@@ -376,7 +376,7 @@ class MigrationTable
 
     public function copy($newName, $copyType = self::COPY_ONLY_STRUCTURE)
     {
-        $this->inArray($copyType, [self::COPY_ONLY_STRUCTURE, self::COPY_ONLY_DATA, self::COPY_STRUCTURE_AND_DATA], '');
+        $this->inArray($copyType, [self::COPY_ONLY_STRUCTURE, self::COPY_ONLY_DATA, self::COPY_STRUCTURE_AND_DATA], 'Copy type "' . $copyType . '" is not allowed');
 
         $this->action = self::ACTION_COPY;
         $this->newName = $newName;
