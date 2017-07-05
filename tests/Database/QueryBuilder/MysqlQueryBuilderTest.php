@@ -363,10 +363,11 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testRenameMigrationTable()
     {
         $table = new MigrationTable('old_table_name');
+        $table->rename('new_table_name');
         $queryBuilder = new MysqlQueryBuilder();
         $expectedQueries = [
             'RENAME TABLE `old_table_name` TO `new_table_name`;',
         ];
-        $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table, 'new_table_name'));
+        $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
     }
 }
