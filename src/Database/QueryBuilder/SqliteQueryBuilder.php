@@ -126,7 +126,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
 
         $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
-        $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
         $tableToRename = new MigrationTable($table->getName());
         $tableToRename->rename($tmpTableName);
         $queries = $this->renameTable($tableToRename);
