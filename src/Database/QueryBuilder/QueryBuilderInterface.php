@@ -20,15 +20,21 @@ interface QueryBuilderInterface
 
     /**
      * @param MigrationTable $table
-     * @param string $newTableName
+     * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName);
+    public function renameTable(MigrationTable $table);
 
     /**
      * @param MigrationTable $table
      * @return array list of queries
      */
     public function alterTable(MigrationTable $table);
+
+    /**
+     * @param MigrationTable $table
+     * @return array list of queries
+     */
+    public function copyTable(MigrationTable $table);
 
     /**
      * @param string $string

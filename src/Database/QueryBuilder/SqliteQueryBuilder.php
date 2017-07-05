@@ -88,12 +88,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     /**
      * generates rename table queries for sqlite
      * @param MigrationTable $table
-     * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName)
+    public function renameTable(MigrationTable $table)
     {
-        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
+        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     /**
@@ -105,12 +104,40 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $queries = $this->addColumns($table);
         if ($table->getColumnsToChange()) {
             $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
-            $queries = array_merge($queries, $this->renameTable($table, $tmpTableName));
+            $tableToRename = new MigrationTable($table->getName());
+            $tableToRename->rename($tmpTableName);
+            $queries = array_merge($queries, $this->renameTable($tableToRename));
             $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName));
 
             $tableToDrop = new MigrationTable($tmpTableName);
             $queries = array_merge($queries, $this->dropTable($tableToDrop));
         }
+
+        return $queries;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copyTable(MigrationTable $table)
+    {
+        if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
+            return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
+        }
+
+        $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
+        $tableToRename = new MigrationTable($table->getName());
+        $tableToRename->rename($tmpTableName);
+        $queries = $this->renameTable($tableToRename);
+        $queries = array_merge($queries, $this->createNewTable($table, $tmpTableName, $table->getCopyType() === MigrationTable::COPY_STRUCTURE_AND_DATA));
+
+        $tableToRename = new MigrationTable($table->getName());
+        $tableToRename->rename($table->getNewName());
+        $queries = array_merge($queries, $this->renameTable($tableToRename));
+
+        $tableToRename = new MigrationTable($tmpTableName);
+        $tableToRename->rename($table->getName());
+        $queries = array_merge($queries, $this->renameTable($tableToRename));
 
         return $queries;
     }
@@ -159,7 +186,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $query;
     }
 
-    private function createNewTable(MigrationTable $table, $tmpTableName)
+    private function createNewTable(MigrationTable $table, $newTableName, $copyData = true)
     {
         if (is_null($this->adapter)) {
             throw new PhoenixException('Missing adapter');
@@ -180,7 +207,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $newTable->create();
 
         $queries = $this->createTable($newTable);
-        $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($tmpTableName);
+        if ($copyData) {
+            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($newTableName);
+        }
         return $queries;
     }
 

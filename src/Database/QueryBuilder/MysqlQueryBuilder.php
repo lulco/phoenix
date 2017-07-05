@@ -94,12 +94,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     /**
      * generates rename table queries for mysql
      * @param MigrationTable $table
-     * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName)
+    public function renameTable(MigrationTable $table)
     {
-        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($newTableName) . ';'];
+        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     /**
@@ -135,6 +134,21 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $query;
         }
         $queries = array_merge($queries, $this->addForeignKeys($table));
+        return $queries;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copyTable(MigrationTable $table)
+    {
+        $queries = [];
+        if ($table->getCopyType() !== MigrationTable::COPY_ONLY_DATA) {
+            $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName()) . ';';
+        }
+        if ($table->getCopyType() !== MigrationTable::COPY_ONLY_STRUCTURE) {
+            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';';
+        }
         return $queries;
     }
 

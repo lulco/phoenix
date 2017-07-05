@@ -261,9 +261,11 @@ abstract class AbstractMigration
         } elseif ($table->getAction() === MigrationTable::ACTION_ALTER) {
             $tableQueries = $queryBuilder->alterTable($table);
         } elseif ($table->getAction() === MigrationTable::ACTION_RENAME) {
-            $tableQueries = $queryBuilder->renameTable($table, $table->getNewName());
+            $tableQueries = $queryBuilder->renameTable($table);
         } elseif ($table->getAction() === MigrationTable::ACTION_DROP) {
             $tableQueries = $queryBuilder->dropTable($table);
+        } elseif ($table->getAction() === MigrationTable::ACTION_COPY) {
+            $tableQueries = $queryBuilder->copyTable($table);
         }
         return $tableQueries;
     }

@@ -382,10 +382,11 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
     public function testRenameMigrationTable()
     {
         $table = new MigrationTable('old_table_name');
+        $table->rename('new_table_name');
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE "old_table_name" RENAME TO "new_table_name";',
         ];
-        $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table, 'new_table_name'));
+        $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
     }
 }

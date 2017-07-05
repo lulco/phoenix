@@ -108,12 +108,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     /**
      * generates rename table queries for pgsql
      * @param MigrationTable $table
-     * @param string $newTableName
      * @return array list of queries
      */
-    public function renameTable(MigrationTable $table, $newTableName)
+    public function renameTable(MigrationTable $table)
     {
-        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($newTableName) . ';'];
+        return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     /**
@@ -166,6 +165,23 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = array_merge($queries, $this->addPrimaryKey($table));
         $queries = array_merge($queries, $this->addForeignKeys($table));
         return $queries;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function copyTable(MigrationTable $table)
+    {
+        if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
+            return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
+        }
+
+        $query = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' AS TABLE ' . $this->escapeString($table->getName()) . ' WITH';
+        if ($table->getCopyType() === MigrationTable::COPY_ONLY_STRUCTURE) {
+            $query .= ' NO';
+        }
+        $query .= ' DATA;';
+        return [$query];
     }
 
     protected function createColumn(Column $column, MigrationTable $table)
