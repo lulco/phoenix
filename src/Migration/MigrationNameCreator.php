@@ -5,25 +5,25 @@ namespace Phoenix\Migration;
 class MigrationNameCreator
 {
     private $namespace;
-    
+
     private $className;
-    
+
     private $fileName;
-    
+
     public function __construct($fullClassName)
     {
         if (substr($fullClassName, 0, 1) == '\\') {
             $fullClassName = substr($fullClassName, 1);
         }
-        $classNameParts = explode('\\', $fullClassName);
+        $classNameParts = array_map('ucfirst', explode('\\', $fullClassName));
         $className = array_pop($classNameParts);
         $namespace = implode('\\', $classNameParts);
-        
+
         $this->fileName = $this->createFileName($className);
         $this->className = $className;
         $this->namespace = $namespace;
     }
-    
+
     private function createFileName($className)
     {
         $fileName = '';
@@ -37,7 +37,7 @@ class MigrationNameCreator
         }
         return date('YmdHis') . $fileName . '.php';
     }
-    
+
     public function getClassName()
     {
         return $this->className;
