@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- ucfirst for lowercase named migrations
+
 ### [0.9.1] - 2017-06-07
 #### Fixed
 - Reverted calling execute instead of run for InitCommand in AbstractCommand
