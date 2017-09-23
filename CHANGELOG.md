@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- methods copyTable + renameTable refactoring
+- choice of migration dirs in CreateCommand
+
 #### Fixed
 - ucfirst for lowercase named migrations
 

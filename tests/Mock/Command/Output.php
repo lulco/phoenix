@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Mock\Command;
 
+use Phoenix\Tests\Helpers\Command\Formatter;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -13,6 +14,11 @@ class Output implements OutputInterface
     private $formatter;
 
     private $verbosity = self::VERBOSITY_NORMAL;
+
+    public function __construct($formatter = null)
+    {
+        $this->formatter = $formatter ?: new Formatter();
+    }
 
     public function getFormatter()
     {

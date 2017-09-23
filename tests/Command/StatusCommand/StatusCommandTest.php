@@ -7,18 +7,11 @@ use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\StatusCommand;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Command\BaseCommandTest;
-use Phoenix\Tests\Helpers\Command\Formatter;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class StatusCommandTest extends BaseCommandTest
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->output->setFormatter(new Formatter());
-    }
-
     public function testDefaultName()
     {
         $command = new StatusCommand();
