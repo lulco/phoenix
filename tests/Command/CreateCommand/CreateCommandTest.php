@@ -56,19 +56,6 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableException()
-    {
-        $configuration = $this->configuration;
-        $configuration['migration_dirs']['create'] = __DIR__ . '/../../../testing_migrations/new';
-
-        $command = new CreateCommand();
-        $command->setConfig($configuration);
-
-        $this->expectException(InvalidArgumentValueException::class);
-        $this->expectExceptionMessage('There are more then 1 migration dirs. Use one of them: phoenix, create');
-        $command->run($this->input, $this->output);
-    }
-
     public function testCreateMigrationInNewDirectory()
     {
         $createMigrationDir = __DIR__ . '/../../../testing_migrations/new';
