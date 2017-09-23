@@ -29,7 +29,7 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadTables($database)
     {
-        return $this->execute(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        return $this->execute(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
     protected function createMigrationTable(array $table)
