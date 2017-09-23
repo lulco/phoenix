@@ -135,7 +135,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $query;
         }
         $queries = array_merge($queries, $this->addForeignKeys($table));
-        $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ' . $this->createTableComment($table);
+        if ($table->getComment() !== null) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . $this->createTableComment($table) . ';';
+        }
         return $queries;
     }
 
@@ -266,7 +268,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($comment === null) {
             return '';
         }
-        return "COMMENT$glue'$comment'";
+        return " COMMENT$glue'$comment'";
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table)

@@ -10,6 +10,14 @@ use PHPUnit_Framework_TestCase;
 
 class TableTest extends PHPUnit_Framework_TestCase
 {
+    public function testConstructAndSetName()
+    {
+        $table = new Table('test');
+        $this->assertEquals('test', $table->getName());
+        $this->assertInstanceOf(Table::class, $table->setName('new_test'));
+        $this->assertEquals('new_test', $table->getName());
+    }
+
     public function testSimpleTable()
     {
         $table = new Table('test');
@@ -22,6 +30,7 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($table->getPrimary());
         $this->assertNull($table->getCharset());
         $this->assertNull($table->getCollation());
+        $this->assertNull($table->getComment());
         $this->assertCount(4, $table->getColumns());
         $this->assertInstanceOf(Column::class, $table->getColumn('title'));
         $this->assertInstanceOf(Column::class, $table->getColumn('alias'));
@@ -36,6 +45,7 @@ class TableTest extends PHPUnit_Framework_TestCase
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->setCharset('my_charset'));
         $this->assertInstanceOf(Table::class, $table->setCollation('my_collation'));
+        $this->assertInstanceOf(Table::class, $table->setComment('my_comment'));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('id', 'integer')));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('alias', 'string')));
@@ -49,6 +59,7 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['id'], $table->getPrimary());
         $this->assertEquals('my_charset', $table->getCharset());
         $this->assertEquals('my_collation', $table->getCollation());
+        $this->assertEquals('my_comment', $table->getComment());
         $this->assertCount(5, $table->getColumns());
         $this->assertInstanceOf(Column::class, $table->getColumn('id'));
         $this->assertInstanceOf(Column::class, $table->getColumn('title'));
@@ -64,6 +75,7 @@ class TableTest extends PHPUnit_Framework_TestCase
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->setCharset('my_charset'));
         $this->assertInstanceOf(Table::class, $table->setCollation('my_collation'));
+        $this->assertInstanceOf(Table::class, $table->setComment('my_comment'));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('id', 'integer')));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('title', 'string')));
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('alias', 'string')));
@@ -77,6 +89,7 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(['id'], $table->getPrimary());
         $this->assertEquals('my_charset', $table->getCharset());
         $this->assertEquals('my_collation', $table->getCollation());
+        $this->assertEquals('my_comment', $table->getComment());
         $this->assertCount(5, $table->getColumns());
         $this->assertInstanceOf(Column::class, $table->getColumn('id'));
         $this->assertInstanceOf(Column::class, $table->getColumn('title'));

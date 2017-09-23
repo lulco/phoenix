@@ -19,6 +19,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getCharset());
         $this->assertNull($table->getCollation());
+        $this->assertNull($table->getComment());
         $this->assertNull($table->getNewName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
 
@@ -188,14 +189,19 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($table->getColumn('unknown_column'));
     }
 
-    public function testCharsetAndCollation()
+    public function testCharsetCollationAndComment()
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->setCharset('my_charset'));
         $this->assertInstanceOf(MigrationTable::class, $table->setCollation('my_collation'));
+        $this->assertInstanceOf(MigrationTable::class, $table->setComment('my_comment'));
 
         $this->assertEquals('my_charset', $table->getCharset());
         $this->assertEquals('my_collation', $table->getCollation());
+        $this->assertEquals('my_comment', $table->getComment());
+
+        $this->assertInstanceOf(MigrationTable::class, $table->unsetComment());
+        $this->assertEquals('', $table->getComment());
     }
 
     public function testCreate()
@@ -209,6 +215,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getCharset());
         $this->assertNull($table->getCollation());
+        $this->assertNull($table->getComment());
         $this->assertNull($table->getNewName());
         $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
 
@@ -297,6 +304,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $migrationTable = new MigrationTable('test');
         $migrationTable->setCharset('my_charset');
         $migrationTable->setCollation('my_collation');
+        $migrationTable->setComment('my_comment');
         $migrationTable->addColumn('title', 'string');
         $migrationTable->addColumn('alias', 'string');
         $migrationTable->addColumn('fk_table1_id', 'integer');
@@ -311,6 +319,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($migrationTable->getName(), $table->getName());
         $this->assertEquals($migrationTable->getCharset(), $table->getCharset());
         $this->assertEquals($migrationTable->getCollation(), $table->getCollation());
+        $this->assertEquals($migrationTable->getComment(), $table->getComment());
         $this->assertEquals($migrationTable->getPrimaryColumns(), $table->getPrimary());
         $this->assertCount(count($migrationTable->getColumns()), $table->getColumns());
         $this->assertCount(count($migrationTable->getIndexes()), $table->getIndexes());
