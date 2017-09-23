@@ -15,7 +15,7 @@ class MigrationNameCreator
         if (substr($fullClassName, 0, 1) == '\\') {
             $fullClassName = substr($fullClassName, 1);
         }
-        $classNameParts = explode('\\', ucfirst($fullClassName));
+        $classNameParts = array_map('ucfirst', explode('\\', $fullClassName));
         $className = array_pop($classNameParts);
         $namespace = implode('\\', $classNameParts);
 
