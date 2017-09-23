@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- methods copyTable + renameTable refactoring
+- choice of migration dirs in CreateCommand
+
 ### [0.9.1] - 2017-06-07
 #### Fixed
 - Reverted calling execute instead of run for InitCommand in AbstractCommand
