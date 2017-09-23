@@ -76,7 +76,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $table1->getComment());
         $table2 = $structure->getTable('table_2');
         $this->assertInstanceOf(Table::class, $table2);
-        $this->assertEquals('utf8_general_ci', $table2->getCollation());
+        $this->assertEquals('utf8_slovak_ci', $table2->getCollation());
         $this->assertEquals('Comment for table_2', $table2->getComment());
 
         $defaultSettings = [
