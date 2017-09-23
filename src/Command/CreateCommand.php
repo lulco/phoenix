@@ -4,10 +4,12 @@ namespace Phoenix\Command;
 
 use Dumper\Indenter;
 use Phoenix\Command\AbstractCommand;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CreateCommand extends AbstractCommand
 {
@@ -28,7 +30,7 @@ class CreateCommand extends AbstractCommand
         $migrationNameCreator = new MigrationNameCreator($migration);
         $filename = $migrationNameCreator->getFileName();
         $dir = $this->input->getArgument('dir');
-        $migrationDir = $this->config->getMigrationDir($dir);
+        $migrationDir = $this->chooseMigrationDir($dir);
 
         $templatePath = $this->input->getOption('template') ?: __DIR__ . '/../Templates/DefaultTemplate.phoenix';
         if (!is_file($templatePath)) {
@@ -57,5 +59,16 @@ class CreateCommand extends AbstractCommand
 
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;
+    }
+
+    private function chooseMigrationDir($dir)
+    {
+        try {
+            return $this->config->getMigrationDir($dir);
+        } catch (InvalidArgumentValueException $e) {
+            $symfonyStyle = new SymfonyStyle($this->input, $this->output);
+            $dir = $symfonyStyle->choice($e->getMessage(), $this->config->getMigrationDirs());
+            return $this->chooseMigrationDir($dir);
+        }
     }
 }
