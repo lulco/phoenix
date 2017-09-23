@@ -36,6 +36,8 @@ class MigrationTable
 
     private $collation;
 
+    private $comment;
+
     private $columns = [];
 
     private $primaryColumns = [];
@@ -351,6 +353,32 @@ class MigrationTable
     {
         return $this->copyType;
     }
+    
+    /**
+     * @param string $comment
+     * @return MigrationTable
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @return MigrationTable
+     */
+    public function unsetComment()
+    {
+        return $this->setComment('');
+    }
 
     public function create()
     {
@@ -408,6 +436,7 @@ class MigrationTable
         $table = new Table($this->getName());
         $table->setCharset($this->getCharset());
         $table->setCollation($this->getCollation());
+        $table->setComment($this->getComment());
         if ($this->getPrimaryColumns()) {
             $table->setPrimary($this->getPrimaryColumns());
         }

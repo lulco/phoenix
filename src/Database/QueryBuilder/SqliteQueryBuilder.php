@@ -188,7 +188,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     private function createNewTable(MigrationTable $table, $newTableName, $copyData = true)
     {
-        if (is_null($this->adapter)) {
+        if ($this->adapter === null) {
             throw new PhoenixException('Missing adapter');
         }
         $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
