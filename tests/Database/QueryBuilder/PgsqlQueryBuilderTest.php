@@ -389,4 +389,30 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
     }
+
+    public function testCreateTableWithComment()
+    {
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->addColumn('title', 'string');
+        $table->create();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'CREATE TABLE "table_with_comment" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,CONSTRAINT "table_with_comment_pkey" PRIMARY KEY ("id"));',
+            'COMMENT ON TABLE table_with_comment IS \'test table with comment\';',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingTable()
+    {
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->save();
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'COMMENT ON TABLE table_with_comment IS \'test table with comment\';',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
 }

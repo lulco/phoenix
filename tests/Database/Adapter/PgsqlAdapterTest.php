@@ -72,8 +72,10 @@ class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
         // check all tables
         $table1 = $structure->getTable('table_1');
         $this->assertInstanceOf(Table::class, $table1);
+        $this->assertEquals('', $table1->getComment());
         $table2 = $structure->getTable('table_2');
         $this->assertInstanceOf(Table::class, $table2);
+        $this->assertEquals('Comment for table_2', $table2->getComment());
 
         $defaultSettings = [
             'charset' => null,
@@ -313,6 +315,7 @@ class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
 
         $migrationTable2 = new MigrationTable('table_2');
         $migrationTable2->setCollation('utf8_slovak_ci');
+        $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');

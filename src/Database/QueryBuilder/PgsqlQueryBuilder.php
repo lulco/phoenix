@@ -89,6 +89,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $this->createIndex($index, $table);
         }
 
+        if ($table->getComment() !== null) {
+            $queries[] = $this->createTableComment($table);
+        }
+
         return $queries;
     }
 
@@ -164,6 +168,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         }
         $queries = array_merge($queries, $this->addPrimaryKey($table));
         $queries = array_merge($queries, $this->addForeignKeys($table));
+        if ($table->getComment() !== null) {
+            $queries[] = $this->createTableComment($table);
+        }
         return $queries;
     }
 
@@ -257,5 +264,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function createEnumSetColumn(Column $column, MigrationTable $table)
     {
         return sprintf($this->remapType($column), $table->getName(), $column->getName());
+    }
+
+    private function createTableComment(MigrationTable $table)
+    {
+        return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
     }
 }
