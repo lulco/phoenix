@@ -68,7 +68,6 @@ class SqliteAdapter extends PdoAdapter
             ColumnSettings::SETTING_DECIMALS => $decimals,
         ];
 
-        $sql = $this->execute(sprintf("SELECT sql FROM %s WHERE type = 'table' AND tbl_name='%s'", $this->loadDatabase(), $migrationTable->getName()))->fetch(PDO::FETCH_COLUMN);
         if ($type == 'varchar') {
             $type = Column::TYPE_STRING;
         } elseif ($type == 'bigint') {
@@ -77,6 +76,7 @@ class SqliteAdapter extends PdoAdapter
             $type = Column::TYPE_UUID;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
         } elseif ($type == Column::TYPE_ENUM) {
+            $sql = $this->execute(sprintf("SELECT sql FROM %s WHERE type = 'table' AND tbl_name='%s'", $this->loadDatabase(), $migrationTable->getName()))->fetch(PDO::FETCH_COLUMN);
             preg_match('/CHECK\(' . $column['name'] . ' IN \((.*?)\)\)/s', $sql, $matches);
             $settings[ColumnSettings::SETTING_VALUES] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
         }
