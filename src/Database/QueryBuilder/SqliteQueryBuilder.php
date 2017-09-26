@@ -68,7 +68,11 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function createTable(MigrationTable $table)
     {
         $queries = [];
-        $queries[] = $this->createTableQuery($table);
+        $query = 'CREATE TABLE ' . $this->escapeString($table->getName());
+        if ($table->getComment()) {
+            $query .= ' /* ' . $table->getComment() . ' */';
+        }
+        $queries[] = $query . $this->createTableQuery($table);
         foreach ($table->getIndexes() as $index) {
             $queries[] = $this->createIndex($index, $table);
         }
@@ -102,7 +106,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function alterTable(MigrationTable $table)
     {
         $queries = $this->addColumns($table);
-        if ($table->getColumnsToChange()) {
+        if ($table->getColumnsToChange() || $table->getComment() !== null) {
             $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
             $tableToRename = new MigrationTable($table->getName());
             $tableToRename->rename($tmpTableName);
@@ -188,13 +192,16 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     private function createNewTable(MigrationTable $table, $newTableName, $copyData = true)
     {
-        if (is_null($this->adapter)) {
+        if ($this->adapter === null) {
             throw new PhoenixException('Missing adapter');
         }
         $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
         $columns = array_merge($oldColumns, $table->getColumnsToChange());
 
         $newTable = new MigrationTable($table->getName(), false);
+        if ($table->getComment() !== null) {
+            $newTable->setComment($table->getComment());
+        }
         $columnNames = [];
         foreach ($columns as $column) {
             $columnNames[] = $column->getName();

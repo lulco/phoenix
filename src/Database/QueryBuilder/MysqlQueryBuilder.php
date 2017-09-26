@@ -77,6 +77,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query .= $this->createForeignKeys($table);
         $query .= ')';
         $query .= $this->createTableCharset($table);
+        $query .= $this->createTableComment($table);
         $query .= ';';
         return [$query];
     }
@@ -134,6 +135,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $query;
         }
         $queries = array_merge($queries, $this->addForeignKeys($table));
+        if ($table->getComment() !== null) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . $this->createTableComment($table) . ';';
+        }
         return $queries;
     }
 
@@ -241,7 +245,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createCharset($charset = null, $collation = null, $glue = '=')
     {
-        if (is_null($charset) && is_null($collation)) {
+        if ($charset === null && $collation === null) {
             return '';
         }
         $charsetAndCollation = '';
@@ -252,6 +256,19 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $charsetAndCollation .= " COLLATE$glue$collation";
         }
         return $charsetAndCollation;
+    }
+
+    private function createTableComment(MigrationTable $table)
+    {
+        return $this->createComment($table->getComment());
+    }
+
+    private function createComment($comment = null, $glue = '=')
+    {
+        if ($comment === null) {
+            return '';
+        }
+        return " COMMENT$glue'$comment'";
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table)

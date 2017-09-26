@@ -5,7 +5,6 @@ namespace Phoenix\Tests\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
-use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit_Framework_TestCase;
 
 class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
@@ -369,5 +368,30 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
             'RENAME TABLE `old_table_name` TO `new_table_name`;',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
+    }
+
+    public function testCreateTableWithComment()
+    {
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->addColumn('title', 'string');
+        $table->create();
+        $queryBuilder = new MysqlQueryBuilder();
+        $expectedQueries = [
+            "CREATE TABLE `table_with_comment` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`)) COMMENT='test table with comment';"
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingTable()
+    {
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->save();
+        $queryBuilder = new MysqlQueryBuilder();
+        $expectedQueries = [
+            "ALTER TABLE `table_with_comment` COMMENT='test table with comment';"
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 }

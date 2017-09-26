@@ -322,4 +322,44 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
     }
+
+    public function testCreateTableWithComment()
+    {
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->create();
+        $queryBuilder = new SqliteQueryBuilder();
+        $expectedQueries = [
+            'CREATE TABLE "table_with_comment" /* test table with comment */ ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL);',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingTable()
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->query('CREATE TABLE "table_with_comment" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL);');
+
+        $migartionCreateTable = new MigrationTable('table_with_comment');
+        $migartionCreateTable->create();
+        $this->adapter->getStructure()->update($migartionCreateTable);
+
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+        foreach ($queryBuilder->createTable($migartionCreateTable) as $query) {
+            $this->adapter->execute($query);
+        }
+
+        $table = new MigrationTable('table_with_comment');
+        $table->setComment('test table with comment');
+        $table->save();
+
+        $timestamp = date('YmdHis');
+        $expectedQueries = [
+            'ALTER TABLE "table_with_comment" RENAME TO "_table_with_comment_old_' . $timestamp . '";',
+            'CREATE TABLE "table_with_comment" /* test table with comment */ ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL);',
+            'INSERT INTO "table_with_comment" ("id") SELECT "id" FROM "_table_with_comment_old_' . $timestamp . '"',
+            'DROP TABLE "_table_with_comment_old_' . $timestamp . '"',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
 }

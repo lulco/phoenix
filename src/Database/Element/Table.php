@@ -10,6 +10,8 @@ class Table
 
     private $collation;
 
+    private $comment;
+
     private $columns = [];
 
     private $primaryColumns;
@@ -78,6 +80,24 @@ class Table
     public function getCollation()
     {
         return $this->collation;
+    }
+
+    /**
+     * @param string $comment
+     * @return Table
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
     }
 
     /**

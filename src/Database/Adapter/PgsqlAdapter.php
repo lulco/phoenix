@@ -33,6 +33,14 @@ class PgsqlAdapter extends PdoAdapter
         return $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '%s' AND table_schema='public' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    protected function createMigrationTable(array $table)
+    {
+        $migrationTable = parent::createMigrationTable($table);
+        $comment = $this->execute(sprintf("SELECT description FROM pg_description JOIN pg_class ON pg_description.objoid = pg_class.oid WHERE relname = '%s'", $table['table_name']))->fetchColumn();
+        $migrationTable->setComment($comment);
+        return $migrationTable;
+    }
+
     protected function loadColumns($database)
     {
         $columns = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public' ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
