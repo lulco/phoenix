@@ -33,7 +33,7 @@ abstract class CommonQueryBuilder
 
     protected function createTableQuery(MigrationTable $table)
     {
-        $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
+        $query = ' (';
         $columns = [];
         foreach ($table->getColumns() as $column) {
             $columns[] = $this->createColumn($column, $table);

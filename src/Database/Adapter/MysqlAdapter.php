@@ -40,6 +40,9 @@ class MysqlAdapter extends PdoAdapter
             $migrationTable->setCharset($charset);
             $migrationTable->setCollation($table['table_collation']);
         }
+        if ($table['table_comment']) {
+            $migrationTable->setComment($table['table_comment']);
+        }
         return $migrationTable;
     }
 

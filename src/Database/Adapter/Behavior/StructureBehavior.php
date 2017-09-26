@@ -18,9 +18,6 @@ trait StructureBehavior
         foreach ($tables as $table) {
             $tableName = $table['table_name'];
             $migrationTable = $this->createMigrationTable($table);
-            if (isset($table['table_comment'])) {
-                $migrationTable->setComment($table['table_comment']);
-            }
             $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
             $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
             $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);

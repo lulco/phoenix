@@ -84,7 +84,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
         }
 
-        $queries[] = $this->createTableQuery($table);
+        $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getName()) . $this->createTableQuery($table);
         foreach ($table->getIndexes() as $index) {
             $queries[] = $this->createIndex($index, $table);
         }
