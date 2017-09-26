@@ -5,6 +5,7 @@
 #### Added
 - methods copyTable + renameTable refactoring
 - choice of migration dirs in CreateCommand
+- comments for table
 
 #### Fixed
 - ucfirst for lowercase named migrations
