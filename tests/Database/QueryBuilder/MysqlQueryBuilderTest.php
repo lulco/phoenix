@@ -155,6 +155,33 @@ class MysqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
+    public function testCreateTableWithCommentOnColumn()
+    {
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_without_comment', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_with_comment', 'string', ['comment' => 'My comment']));
+        $table->create();
+
+        $queryBuilder = new MysqlQueryBuilder();
+        $expectedQueries = [
+            "CREATE TABLE `table_with_column_comment` (`id` int(11) NOT NULL AUTO_INCREMENT,`column_without_comment` varchar(255) NOT NULL,`column_with_comment` varchar(255) NOT NULL COMMENT 'My comment',PRIMARY KEY (`id`));"
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingColumn()
+    {
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('column_to_comment', 'column_to_comment', 'string', ['comment' => 'My comment']));
+        $table->save();
+
+        $queryBuilder = new MysqlQueryBuilder();
+        $expectedQueries = [
+            "ALTER TABLE `table_with_column_comment` CHANGE COLUMN `column_to_comment` `column_to_comment` varchar(255) NOT NULL COMMENT 'My comment';",
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+
     public function testIndexes()
     {
         $table = new MigrationTable('table_with_indexes');
