@@ -162,6 +162,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $col .= (!$column->getSettings()->isSigned()) ? ' unsigned' : '';
         $col .= $this->createColumnCharset($column);
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
+        $col .= $this->createComment($column->getSettings()->getComment(), ' ');
         $col .= $this->createColumnDefault($column);
         $col .= $this->createColumnPosition($column);
 

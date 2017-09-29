@@ -20,9 +20,10 @@ class Dumper
         ColumnSettings::SETTING_SIGNED => true,
         ColumnSettings::SETTING_LENGTH => [null, ''],
         ColumnSettings::SETTING_DECIMALS => [null, ''],
-        ColumnSettings::SETTING_VALUES => null,
         ColumnSettings::SETTING_CHARSET => [null, ''],
         ColumnSettings::SETTING_COLLATION => [null, ''],
+        ColumnSettings::SETTING_VALUES => null,
+        ColumnSettings::SETTING_COMMENT => [null, ''],
     ];
 
     public function __construct($indent, $baseIndent = 0)
