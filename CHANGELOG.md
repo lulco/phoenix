@@ -5,7 +5,8 @@
 #### Added
 - methods copyTable + renameTable refactoring
 - choice of migration dirs in CreateCommand
-- comments for table
+- comment for table
+- comment for column
 - PHP 7.2 compatibility
 
 #### Fixed
