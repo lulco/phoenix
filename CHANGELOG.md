@@ -6,6 +6,7 @@
 - methods copyTable + renameTable refactoring
 - choice of migration dirs in CreateCommand
 - comments for table
+- PHP 7.2 compatibility
 
 #### Fixed
 - ucfirst for lowercase named migrations

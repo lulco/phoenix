@@ -31,7 +31,7 @@ Framework agnostic database migrations for PHP.
 ## Installation
 
 ### Composer
-This library requires PHP 5.6 or later. It works also on PHP 7.0, PHP 7.1 and HHVM. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
+This library requires PHP 5.6 or later. It works also on PHP 7.0, PHP 7.1, PHP 7.2 and HHVM. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
 
 ```
 composer require lulco/phoenix
