@@ -18,6 +18,7 @@ class ColumnSettings
     const SETTING_CHARSET = 'charset';
     const SETTING_COLLATION = 'collation';
     const SETTING_VALUES = 'values';
+    const SETTING_COMMENT = 'comment';
 
     private $allowedSettingsValues = [
         self::SETTING_NULL => ['is_bool'],
@@ -31,12 +32,13 @@ class ColumnSettings
         self::SETTING_CHARSET => ['is_null', 'is_string'],
         self::SETTING_COLLATION => ['is_null', 'is_string'],
         self::SETTING_VALUES => ['is_null', 'is_array'],
+        self::SETTING_COMMENT => ['is_null', 'is_string'],
     ];
 
     private $settings = [];
 
     /**
-     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values
+     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
      */
     public function __construct(array $settings = [])
     {
@@ -140,6 +142,14 @@ class ColumnSettings
     public function getValues()
     {
         return isset($this->settings[self::SETTING_VALUES]) ? $this->settings[self::SETTING_VALUES] : null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getComment()
+    {
+        return isset($this->settings[self::SETTING_COMMENT]) ? $this->settings[self::SETTING_COMMENT] : null;
     }
 
     private function checkSettings($settings)
