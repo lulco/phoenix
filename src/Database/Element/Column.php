@@ -51,7 +51,7 @@ class Column
     /**
      * @param string $name name of column
      * @param string $type type of column
-     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values
+     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
      */
     public function __construct($name, $type, array $settings = [])
     {

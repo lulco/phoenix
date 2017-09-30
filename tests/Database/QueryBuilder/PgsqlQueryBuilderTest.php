@@ -168,6 +168,37 @@ class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
+    public function testCreateTableWithCommentOnColumn()
+    {
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_without_comment', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_with_comment', 'string', ['comment' => 'My comment']));
+        $table->create();
+
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'CREATE TABLE "table_with_column_comment" ("id" serial NOT NULL,"column_without_comment" varchar(255) NOT NULL,"column_with_comment" varchar(255) NOT NULL,CONSTRAINT "table_with_column_comment_pkey" PRIMARY KEY ("id"));',
+            "COMMENT ON COLUMN table_with_column_comment.column_with_comment IS 'My comment';",
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingColumn()
+    {
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('column_to_comment', 'column_to_comment', 'string', ['comment' => 'My comment']));
+        $table->save();
+
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'ALTER TABLE "table_with_column_comment" ALTER COLUMN "column_to_comment" TYPE varchar(255) USING column_to_comment::varchar;',
+            'ALTER TABLE "table_with_column_comment" ALTER COLUMN "column_to_comment" SET NOT NULL;',
+            'ALTER TABLE "table_with_column_comment" ALTER COLUMN "column_to_comment" DROP DEFAULT;',
+            "COMMENT ON COLUMN table_with_column_comment.column_to_comment IS 'My comment';",
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+
     public function testIndexes()
     {
         $table = new MigrationTable('table_with_indexes');

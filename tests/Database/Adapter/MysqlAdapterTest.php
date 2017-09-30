@@ -89,6 +89,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
             'autoincrement' => false,
             'signed' => true,
             'values' => null,
+            'comment' => null,
         ];
 
         // check all columns and their settings for table_1
@@ -335,7 +336,9 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         ]));
         $this->checkColumn($table2, 'col_point', Column::TYPE_POINT, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_line', Column::TYPE_LINE, array_merge($defaultSettings, []));
-        $this->checkColumn($table2, 'col_polygon', Column::TYPE_POLYGON, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_polygon', Column::TYPE_POLYGON, array_merge($defaultSettings, [
+            'comment' => 'Polygon column comment',
+        ]));
 
         // check all indexes for table_2
         $this->assertCount(2, $table2->getIndexes());
@@ -436,7 +439,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $migrationTable2->addColumn('col_set', 'set', ['null' => true, 'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz']]);
         $migrationTable2->addColumn('col_point', 'point');
         $migrationTable2->addColumn('col_line', 'line');
-        $migrationTable2->addColumn('col_polygon', 'polygon');
+        $migrationTable2->addColumn('col_polygon', 'polygon', ['comment' => 'Polygon column comment']);
         $migrationTable2->addIndex(['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE, 'named_unique_index');
         $migrationTable2->addForeignKey('col_int', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE);
         $migrationTable2->create();
@@ -461,6 +464,7 @@ class MysqlAdapterTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedSettings['autoincrement'], $column->getSettings()->isAutoincrement());
         $this->assertEquals($expectedSettings['signed'], $column->getSettings()->isSigned());
         $this->assertEquals($expectedSettings['values'], $column->getSettings()->getValues());
+        $this->assertEquals($expectedSettings['comment'], $column->getSettings()->getComment());
     }
 
     private function checkIndex(Table $table, $name, array $columns, $type, $method)

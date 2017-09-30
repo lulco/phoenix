@@ -103,6 +103,7 @@ class MysqlAdapter extends PdoAdapter
             ColumnSettings::SETTING_CHARSET => $column['CHARACTER_SET_NAME'],
             ColumnSettings::SETTING_COLLATION => $column['COLLATION_NAME'],
             ColumnSettings::SETTING_VALUES => $values,
+            ColumnSettings::SETTING_COMMENT => $column['COLUMN_COMMENT'] ?: null,
         ];
     }
 

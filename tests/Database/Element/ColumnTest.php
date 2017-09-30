@@ -29,6 +29,7 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $this->assertNull($column->getSettings()->getCharset());
         $this->assertNull($column->getSettings()->getCollation());
         $this->assertNull($column->getSettings()->getValues());
+        $this->assertNull($column->getSettings()->getComment());
     }
 
     public function testComplex()
@@ -51,6 +52,7 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $this->assertNull($column->getSettings()->getCharset());
         $this->assertNull($column->getSettings()->getCollation());
         $this->assertNull($column->getSettings()->getValues());
+        $this->assertNull($column->getSettings()->getComment());
     }
 
     public function testFullSettings()
@@ -67,6 +69,7 @@ class ColumnTest extends PHPUnit_Framework_TestCase
             'charset' => 'my_charset',
             'collation' => 'my_collation',
             'values' => ['first', 'second', 'third'],
+            'comment' => 'My comment',
         ];
 
         $column = new Column('title', 'string', $settings);
@@ -87,6 +90,7 @@ class ColumnTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('my_charset', $column->getSettings()->getCharset());
         $this->assertEquals('my_collation', $column->getSettings()->getCollation());
         $this->assertEquals(['first', 'second', 'third'], $column->getSettings()->getValues());
+        $this->assertEquals('My comment', $column->getSettings()->getComment());
     }
 
     public function testUnsupportedColumnType()
