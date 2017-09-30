@@ -103,7 +103,7 @@ class SqliteAdapter extends PdoAdapter
                     continue;
                 }
                 $indexColumns = [];
-                $indexes = $this->execute(sprintf("PRAGMA index_info('%s');", $index['name']));
+                $indexes = $this->execute(sprintf("PRAGMA index_info('%s');", $index['name']))->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($indexes as $indexColumn) {
                     $indexColumns[$indexColumn['seqno']] = $indexColumn['name'];
                 }
