@@ -107,20 +107,6 @@ class MysqlAdapter extends PdoAdapter
         ];
     }
 
-    private function getLengthAndDecimals($lengthAndDecimals = null)
-    {
-        if ($lengthAndDecimals === null) {
-            return [null, null];
-        }
-
-        $length = (int) $lengthAndDecimals;
-        $decimals = null;
-        if (strpos($lengthAndDecimals, ',')) {
-            list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
-        }
-        return [$length, $decimals];
-    }
-
     protected function loadIndexes($database)
     {
         $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);

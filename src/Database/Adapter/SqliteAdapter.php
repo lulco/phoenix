@@ -72,7 +72,7 @@ class SqliteAdapter extends PdoAdapter
         $pattern = '/"' . $column['name'] . '" (.*?)\/\*(.*?)\*\//s';
         preg_match($pattern, $sql, $matches);
         if (isset($matches[1]) && isset($matches[2]) && strpos($matches[1], ',') === false) {
-            $settings[ColumnSettings::SETTING_COMMENT]= trim($matches[2]);
+            $settings[ColumnSettings::SETTING_COMMENT] = trim($matches[2]);
         }
         if ($type == 'varchar') {
             $type = Column::TYPE_STRING;
@@ -86,20 +86,6 @@ class SqliteAdapter extends PdoAdapter
             $settings[ColumnSettings::SETTING_VALUES] = isset($matches[1]) ? explode('\',\'', substr($matches[1], 1, -1)) : [];
         }
         $migrationTable->addColumn($column['name'], $type, $settings);
-    }
-
-    private function getLengthAndDecimals($lengthAndDecimals = null)
-    {
-        if ($lengthAndDecimals === null) {
-            return [null, null];
-        }
-
-        $length = (int) $lengthAndDecimals;
-        $decimals = null;
-        if (strpos($lengthAndDecimals, ',')) {
-            list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
-        }
-        return [$length, $decimals];
     }
 
     protected function loadIndexes($database)

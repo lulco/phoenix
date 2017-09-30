@@ -14,7 +14,7 @@ use Phoenix\Exception\DatabaseQueryExecuteException;
 abstract class PdoAdapter implements AdapterInterface
 {
     use StructureBehavior;
-    
+
     /** @var PDO */
     private $pdo;
 
@@ -30,7 +30,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     /**
      * @param string|PDOStatement $sql
-     * @return PDOStatement|boolean
+     * @return PDOStatement
      * @throws DatabaseQueryExecuteException on error
      */
     public function execute($sql)
@@ -307,6 +307,20 @@ abstract class PdoAdapter implements AdapterInterface
     public function getCharset()
     {
         return $this->charset;
+    }
+
+    protected function getLengthAndDecimals($lengthAndDecimals = null)
+    {
+        if ($lengthAndDecimals === null) {
+            return [null, null];
+        }
+
+        $length = (int) $lengthAndDecimals;
+        $decimals = null;
+        if (strpos($lengthAndDecimals, ',')) {
+            list($length, $decimals) = array_map('intval', explode(',', $lengthAndDecimals, 2));
+        }
+        return [$length, $decimals];
     }
 
     private function bindDataValues($statement, $data, $prefix = '')
