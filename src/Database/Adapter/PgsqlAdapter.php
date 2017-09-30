@@ -30,12 +30,11 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadTables($database)
     {
-        return $this->execute(sprintf(
-            "SELECT *
+        return $this->execute(sprintf("
+            SELECT *
             FROM INFORMATION_SCHEMA.TABLES
             WHERE table_catalog = '%s' AND table_schema='public'
-            ORDER BY TABLE_NAME", $database)
-        )->fetchAll(PDO::FETCH_ASSOC);
+            ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
     protected function createMigrationTable(array $table)
@@ -45,8 +44,7 @@ class PgsqlAdapter extends PdoAdapter
             SELECT description
             FROM pg_description
             JOIN pg_class ON pg_description.objoid = pg_class.oid
-            WHERE relname = '%s'", $table['table_name'])
-        )->fetchColumn();
+            WHERE relname = '%s'", $table['table_name']))->fetchColumn();
 
         $migrationTable->setComment($comment);
         return $migrationTable;
@@ -57,16 +55,14 @@ class PgsqlAdapter extends PdoAdapter
         $columns = $this->execute(sprintf("
             SELECT * FROM INFORMATION_SCHEMA.COLUMNS
             WHERE table_catalog = '%s' AND table_schema = 'public'
-            ORDER BY table_name, ordinal_position", $database)
-        )->fetchAll(PDO::FETCH_ASSOC);
+            ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
 
         $comments = $this->execute(sprintf("
             SELECT c.table_name,c.column_name,pgd.description
             FROM pg_catalog.pg_statio_all_tables AS st
             INNER JOIN pg_catalog.pg_description pgd ON pgd.objoid = st.relid
             INNER JOIN information_schema.columns c ON pgd.objsubid = c.ordinal_position AND c.table_schema = st.schemaname AND c.table_name = st.relname
-            WHERE c.table_schema = 'public' AND c.table_catalog = '%s'", $database)
-        )->fetchAll(PDO::FETCH_ASSOC);
+            WHERE c.table_schema = 'public' AND c.table_catalog = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
 
         $tableColumnComments = [];
         foreach ($comments as $tableColumnComment) {
