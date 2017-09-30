@@ -110,6 +110,9 @@ class MysqlAdapter extends PdoAdapter
     protected function loadIndexes($database)
     {
         $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
+        if (!is_array($indexes)) {
+            return [];
+        }
         $tablesIndexes = [];
         foreach ($indexes as $index) {
             if (!isset($tablesIndexes[$index['TABLE_NAME']])) {

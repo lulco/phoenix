@@ -30,7 +30,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     /**
      * @param string|PDOStatement $sql
-     * @return PDOStatement
+     * @return PDOStatement|boolean
      * @throws DatabaseQueryExecuteException on error
      */
     public function execute($sql)
