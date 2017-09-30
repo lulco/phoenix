@@ -166,6 +166,49 @@ class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
+    public function testCreateTableWithCommentOnColumn()
+    {
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_without_comment', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_with_comment', 'string', ['comment' => 'My comment']));
+        $table->create();
+
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'CREATE TABLE "table_with_column_comment" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"column_without_comment" varchar(255) NOT NULL,"column_with_comment" varchar(255) NOT NULL /* My comment */);',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testAddCommentToExistingColumn()
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->query('CREATE TABLE "table_with_column_comment" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"column_to_comment" varchar(255) NOT NULL);');
+
+        $migartionCreateTable = new MigrationTable('table_with_column_comment');
+        $migartionCreateTable->addColumn('column_to_comment', 'string');
+        $migartionCreateTable->create();
+        $this->adapter->getStructure()->update($migartionCreateTable);
+
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
+        foreach ($queryBuilder->createTable($migartionCreateTable) as $query) {
+            $this->adapter->execute($query);
+        }
+
+        $table = new MigrationTable('table_with_column_comment');
+        $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('column_to_comment', 'column_to_comment', 'string', ['comment' => 'My comment']));
+        $table->save();
+
+        $timestamp = date('YmdHis');
+        $expectedQueries = [
+            'ALTER TABLE "table_with_column_comment" RENAME TO "_table_with_column_comment_old_' . $timestamp . '";',
+            'CREATE TABLE "table_with_column_comment" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,"column_to_comment" varchar(255) NOT NULL /* My comment */);',
+            'INSERT INTO "table_with_column_comment" ("id","column_to_comment") SELECT "id","column_to_comment" FROM "_table_with_column_comment_old_' . $timestamp . '"',
+            'DROP TABLE "_table_with_column_comment_old_' . $timestamp . '"',
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+
     public function testIndexes()
     {
         $table = new MigrationTable('table_with_indexes');

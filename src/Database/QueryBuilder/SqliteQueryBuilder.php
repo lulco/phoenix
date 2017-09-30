@@ -161,6 +161,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         } elseif ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             $col .= ' DEFAULT NULL';
         }
+        if ($column->getSettings()->getComment()) {
+            $col .= ' /* ' . $column->getSettings()->getComment() . ' */';
+        }
         return $col;
     }
 
