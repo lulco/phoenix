@@ -150,7 +150,7 @@ class PgsqlAdapter extends PdoAdapter
             SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
             FROM pg_index a, pg_class b, pg_class c
             WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
-            ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num");
+            ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num")->fetchAll(PDO::FETCH_ASSOC);
         $indexes = [];
         foreach ($indexRows as $indexRow) {
             if ($indexRow['indisprimary']) {
