@@ -30,22 +30,52 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadTables($database)
     {
-        return $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE table_catalog = '%s' AND table_schema='public' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        return $this->execute(sprintf(
+            "SELECT *
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE table_catalog = '%s' AND table_schema='public'
+            ORDER BY TABLE_NAME", $database)
+        )->fetchAll(PDO::FETCH_ASSOC);
     }
 
     protected function createMigrationTable(array $table)
     {
         $migrationTable = parent::createMigrationTable($table);
-        $comment = $this->execute(sprintf("SELECT description FROM pg_description JOIN pg_class ON pg_description.objoid = pg_class.oid WHERE relname = '%s'", $table['table_name']))->fetchColumn();
+        $comment = $this->execute(sprintf("
+            SELECT description
+            FROM pg_description
+            JOIN pg_class ON pg_description.objoid = pg_class.oid
+            WHERE relname = '%s'", $table['table_name'])
+        )->fetchColumn();
+
         $migrationTable->setComment($comment);
         return $migrationTable;
     }
 
     protected function loadColumns($database)
     {
-        $columns = $this->execute(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public' ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->execute(sprintf("
+            SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE table_catalog = '%s' AND table_schema = 'public'
+            ORDER BY table_name, ordinal_position", $database)
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        $comments = $this->execute(sprintf("
+            SELECT c.table_name,c.column_name,pgd.description
+            FROM pg_catalog.pg_statio_all_tables AS st
+            INNER JOIN pg_catalog.pg_description pgd ON pgd.objoid = st.relid
+            INNER JOIN information_schema.columns c ON pgd.objsubid = c.ordinal_position AND c.table_schema = st.schemaname AND c.table_name = st.relname
+            WHERE c.table_schema = 'public' AND c.table_catalog = '%s'", $database)
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        $tableColumnComments = [];
+        foreach ($comments as $tableColumnComment) {
+            $tableColumnComments[$tableColumnComment['table_name']][$tableColumnComment['column_name']] = $tableColumnComment['description'];
+        }
+
         $tablesColumns = [];
         foreach ($columns as $column) {
+            $column['comment'] = isset($tableColumnComments[$column['table_name']][$column['column_name']]) ? $tableColumnComments[$column['table_name']][$column['column_name']] : null;
             $tablesColumns[$column['table_name']][] = $column;
         }
         return $tablesColumns;
@@ -95,6 +125,7 @@ class PgsqlAdapter extends PdoAdapter
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
             ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
+            ColumnSettings::SETTING_COMMENT => $column['comment'],
         ];
         if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
             $enumType = $table . '__' . $column['column_name'];
@@ -120,10 +151,10 @@ class PgsqlAdapter extends PdoAdapter
     protected function loadIndexes($database)
     {
         $indexRows = $this->execute("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
-    SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
-    FROM pg_index a, pg_class b, pg_class c
-    WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
-    ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num");
+            SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
+            FROM pg_index a, pg_class b, pg_class c
+            WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
+            ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num");
         $indexes = [];
         foreach ($indexRows as $indexRow) {
             if ($indexRow['indisprimary']) {
@@ -140,11 +171,11 @@ class PgsqlAdapter extends PdoAdapter
     protected function loadForeignKeys($database)
     {
         $query = "SELECT tc.constraint_name, tc.table_name, kcu.column_name, kcu.ordinal_position, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name, pgc.confupdtype, pgc.confdeltype
-    FROM information_schema.table_constraints AS tc
-    JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
-    JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
-    JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
-    WHERE constraint_type = 'FOREIGN KEY'";
+            FROM information_schema.table_constraints AS tc
+            JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+            JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+            JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
+            WHERE constraint_type = 'FOREIGN KEY'";
 
         $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];

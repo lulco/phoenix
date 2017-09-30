@@ -92,7 +92,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($table->getComment() !== null) {
             $queries[] = $this->createTableComment($table);
         }
-
+        foreach ($table->getColumns() as $column) {
+            if ($column->getSettings()->getComment() !== null) {
+                $queries[] = $this->createColumnComment($table, $column);
+            }
+        }
         return $queries;
     }
 
@@ -163,6 +167,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
                 } else {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
+                }
+                if ($newColumn->getSettings()->getComment() !== null) {
+                    $queries[] = $this->createColumnComment($table, $newColumn);
                 }
             }
         }
@@ -269,5 +276,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private function createTableComment(MigrationTable $table)
     {
         return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
+    }
+
+    private function createColumnComment(MigrationTable $table, Column $column)
+    {
+        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '{$column->getSettings()->getComment()}';";
     }
 }
