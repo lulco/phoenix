@@ -5,14 +5,13 @@ namespace Phoenix\Tests\Command\CreateCommand;
 use Nette\Utils\Finder;
 use Phoenix\Command\CreateCommand;
 use Phoenix\Command\InitCommand;
-use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
-use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class CreateCommandTest extends BaseCommandTest
 {
@@ -54,6 +53,40 @@ abstract class CreateCommandTest extends BaseCommandTest
         $this->expectException(PhoenixException::class);
         $this->expectExceptionMessage('Template "non-existing-file.phoenix" doesn\'t exist or is not a regular file');
         $command->run($this->input, $this->output);
+    }
+
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    {
+        $createMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($createMigrationDir));
+        mkdir($createMigrationDir);
+        $this->assertTrue(is_dir($createMigrationDir));
+
+        $configuration = $this->configuration;
+        $configuration['migration_dirs']['create'] = $createMigrationDir;
+
+        $command = new CreateCommand();
+        $command->setConfig($configuration);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['create']);
+        $commandTester->execute(['migration' => 'test\test']);
+
+        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $this->assertCount(1, $createFiles);
+        foreach ($createFiles as $createFile) {
+            $filePath = (string)$createFile;
+
+            $migrationContent = file_get_contents($filePath);
+            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertNotContains("\t", $migrationContent);
+            $this->assertContains("    ", $migrationContent);
+
+            $classNameCreator = new ClassNameCreator($filePath);
+            $this->assertEquals('\Test\Test', $classNameCreator->getClassName());
+            unlink($filePath);
+        }
+        rmdir($createMigrationDir);
     }
 
     public function testCreateMigrationInNewDirectory()
