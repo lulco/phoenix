@@ -2,12 +2,16 @@
 
 ### [Unreleased][unreleased]
 
+### [0.10.0] - 2017-10-01
 #### Added
-- methods copyTable + renameTable refactoring
-- choice of migration dirs in CreateCommand
+- method copyTable for copy table structure, data or both
+- interactive choice of migration dirs in CreateCommand
 - comment for table
 - comment for column
 - PHP 7.2 compatibility
+
+#### Changed
+- renameTable refactoring
 
 #### Fixed
 - ucfirst for lowercase named migrations
@@ -134,7 +138,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.9.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.10.0...HEAD
+[0.10.0]: https://github.com/lulco/phoenix/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/lulco/phoenix/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/lulco/phoenix/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/lulco/phoenix/compare/0.7.0...0.8.0
