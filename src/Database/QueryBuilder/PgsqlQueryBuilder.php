@@ -224,7 +224,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function primaryKeyString(MigrationTable $table)
     {
         $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
+        foreach ($table->getPrimaryColumnNames() as $name) {
             $primaryKeys[] = $this->escapeString($name);
         }
         return 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';

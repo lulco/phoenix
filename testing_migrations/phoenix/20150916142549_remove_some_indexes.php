@@ -8,6 +8,14 @@ class RemoveSomeIndexes extends AbstractMigration
 {
     public function up()
     {
+        $this->table('table_3')
+            ->addPrimaryColumns([new \Phoenix\Database\Element\Column('id', 'integer', ['autoincrement' => true])])
+            ->save();
+
+
+
+
+
         $this->table('table_1')
             ->dropIndex('alias')
             ->save();

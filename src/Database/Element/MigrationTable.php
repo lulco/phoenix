@@ -2,6 +2,8 @@
 
 namespace Phoenix\Database\Element;
 
+use Closure;
+use InvalidArgumentException;
 use Phoenix\Behavior\ParamsCheckerBehavior;
 
 class MigrationTable
@@ -40,7 +42,11 @@ class MigrationTable
 
     private $columns = [];
 
+    private $primaryColumnNames = [];
+
     private $primaryColumns = [];
+
+    private $primaryColumnsValuesFunction;
 
     private $foreignKeys = [];
 
@@ -119,12 +125,12 @@ class MigrationTable
 
         if ($primaryColumn instanceof Column) {
             $this->columns = array_merge([$primaryColumn->getName() => $primaryColumn], $this->columns);
-            $this->primaryColumns = array_merge([$primaryColumn->getName()], $this->primaryColumns);
+            $this->primaryColumnNames = array_merge([$primaryColumn->getName()], $this->primaryColumnNames);
             return $this;
         }
 
         if (is_string($primaryColumn)) {
-            $this->primaryColumns = array_merge([$primaryColumn], $this->primaryColumns);
+            $this->primaryColumnNames = array_merge([$primaryColumn], $this->primaryColumnNames);
             return $this;
         }
 
@@ -133,6 +139,18 @@ class MigrationTable
                 $this->addPrimary($column);
             }
         }
+        return $this;
+    }
+
+    public function addPrimaryColumns(array $primaryColumns, Closure $primaryColumnsValuesFunction = null)
+    {
+        foreach ($primaryColumns as $primaryColumn) {
+            if (!$primaryColumn instanceof Column) {
+                throw new InvalidArgumentException('All primaryColumns have to be instance of "' . Column::class . '"');
+            }
+        }
+        $this->primaryColumns = $primaryColumns;
+        $this->primaryColumnsValuesFunction = $primaryColumnsValuesFunction;
         return $this;
     }
 
@@ -198,9 +216,25 @@ class MigrationTable
     /**
      * @return array
      */
+    public function getPrimaryColumnNames()
+    {
+        return $this->primaryColumnNames;
+    }
+
+    /**
+     * @return Column[]
+     */
     public function getPrimaryColumns()
     {
         return $this->primaryColumns;
+    }
+
+    /**
+     * @return Closure|null
+     */
+    public function getPrimaryColumnsValuesFunction()
+    {
+        return $this->primaryColumnsValuesFunction;
     }
 
     /**
@@ -353,7 +387,7 @@ class MigrationTable
     {
         return $this->copyType;
     }
-    
+
     /**
      * @param string $comment
      * @return MigrationTable
@@ -437,8 +471,8 @@ class MigrationTable
         $table->setCharset($this->getCharset());
         $table->setCollation($this->getCollation());
         $table->setComment($this->getComment());
-        if ($this->getPrimaryColumns()) {
-            $table->setPrimary($this->getPrimaryColumns());
+        if ($this->getPrimaryColumnNames()) {
+            $table->setPrimary($this->getPrimaryColumnNames());
         }
         foreach ($this->getColumns() as $column) {
             $table->addColumn($column);

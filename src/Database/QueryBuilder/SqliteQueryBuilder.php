@@ -149,7 +149,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected function createColumn(Column $column, MigrationTable $table)
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
+        $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumnNames()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         if ($column->getSettings()->getDefault() !== null && $column->getSettings()->getDefault() !== '') {
             $col .= ' DEFAULT ';
@@ -170,7 +170,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected function primaryKeyString(MigrationTable $table)
     {
         $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
+        foreach ($table->getPrimaryColumnNames() as $name) {
             $column = $table->getColumn($name);
             if (!$column->getSettings()->isAutoincrement()) {
                 $primaryKeys[] = $this->escapeString($column->getName());

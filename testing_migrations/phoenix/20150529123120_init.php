@@ -28,7 +28,7 @@ class Init extends AbstractMigration
             ->addForeignKey('t1_fk', 'table_1', 'id')
             ->create();
 
-        $this->table('table_3', 'identifier')
+        $this->table('table_3', false/*, 'identifier'*/)
             ->addColumn('identifier', 'uuid')
             ->addColumn('t1_fk', 'integer')
             ->addColumn('t2_fk', 'integer', ['null' => true])

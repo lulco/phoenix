@@ -38,9 +38,9 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($idColumn->getSettings()->getLength());
         $this->assertNull($idColumn->getSettings()->getDecimals());
         $this->assertTrue($idColumn->getSettings()->isAutoincrement());
-        $primaryColumns = $table->getPrimaryColumns();
-        $this->assertCount(1, $primaryColumns);
-        foreach ($primaryColumns as $primaryColumn) {
+        $primaryColumnNames = $table->getPrimaryColumnNames();
+        $this->assertCount(1, $primaryColumnNames);
+        foreach ($primaryColumnNames as $primaryColumn) {
             $this->assertTrue(is_string($primaryColumn));
         }
     }
@@ -56,7 +56,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($columns as $column) {
             $this->assertInstanceOf(Column::class, $column);
         }
-        $this->assertCount(0, $table->getPrimaryColumns());
+        $this->assertCount(0, $table->getPrimaryColumnNames());
     }
 
     public function testStringPrimaryKey()
@@ -70,7 +70,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($columns as $column) {
             $this->assertInstanceOf(Column::class, $column);
         }
-        $this->assertCount(1, $table->getPrimaryColumns());
+        $this->assertCount(1, $table->getPrimaryColumnNames());
     }
 
     public function testMultiPrimaryKey()
@@ -85,7 +85,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         foreach ($columns as $column) {
             $this->assertInstanceOf(Column::class, $column);
         }
-        $this->assertCount(2, $table->getPrimaryColumns());
+        $this->assertCount(2, $table->getPrimaryColumnNames());
     }
 
     public function testDropPrimaryKey()
@@ -208,7 +208,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
-        $this->assertCount(0, $table->getPrimaryColumns());
+        $this->assertCount(0, $table->getPrimaryColumnNames());
 
         $this->assertNull($table->create());
 
@@ -231,7 +231,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($idColumn->getSettings()->getLength());
         $this->assertNull($idColumn->getSettings()->getDecimals());
         $this->assertTrue($idColumn->getSettings()->isAutoincrement());
-        $this->assertCount(1, $table->getPrimaryColumns());
+        $this->assertCount(1, $table->getPrimaryColumnNames());
     }
 
     public function testSave()
@@ -320,7 +320,7 @@ class MigrationTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($migrationTable->getCharset(), $table->getCharset());
         $this->assertEquals($migrationTable->getCollation(), $table->getCollation());
         $this->assertEquals($migrationTable->getComment(), $table->getComment());
-        $this->assertEquals($migrationTable->getPrimaryColumns(), $table->getPrimary());
+        $this->assertEquals($migrationTable->getPrimaryColumnNames(), $table->getPrimary());
         $this->assertCount(count($migrationTable->getColumns()), $table->getColumns());
         $this->assertCount(count($migrationTable->getIndexes()), $table->getIndexes());
         $this->assertCount(count($migrationTable->getForeignKeys()), $table->getForeignKeys());

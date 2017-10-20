@@ -6,7 +6,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
 
-abstract class CommonQueryBuilder
+abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
     protected $typeMap = [];
 
@@ -52,18 +52,23 @@ abstract class CommonQueryBuilder
         if (empty($columns)) {
             return [];
         }
+        return [$this->addColumnsQuery($table, $columns) . ';'];
+    }
+
+    protected function addColumnsQuery(MigrationTable $table, array $columns)
+    {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columnList = [];
         foreach ($columns as $column) {
             $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
         }
-        $query .= implode(',', $columnList) . ';';
-        return [$query];
+        $query .= implode(',', $columnList);
+        return $query;
     }
 
     protected function createPrimaryKey(MigrationTable $table)
     {
-        if (empty($table->getPrimaryColumns())) {
+        if (empty($table->getPrimaryColumnNames())) {
             return '';
         }
         return $this->primaryKeyString($table);
@@ -71,11 +76,23 @@ abstract class CommonQueryBuilder
 
     protected function addPrimaryKey(MigrationTable $table)
     {
-        $queries = [];
         $primaryColumns = $table->getPrimaryColumns();
-        if (!empty($primaryColumns)) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table) . ';';
+        if (empty($primaryColumns)) {
+            return [];
         }
+
+        $copyTable = new MigrationTable($table->getName());
+        $newTableName = '_' . $table->getName() . '_copy_' . date('YmdHis');
+        $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_STRUCTURE);
+        $queries = $this->copyTable($copyTable);
+
+        $newTable = new MigrationTable($newTableName);
+        $newTable->addPrimary($primaryColumns);
+        $queries[] = $this->addColumnsQuery($newTable, $primaryColumns) . ',ADD ' . $this->primaryKeyString($newTable) . ';';
+
+        // if primary key is autoincrement this would work
+        $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
+        $queries = array_merge($queries, $this->copyTable($copyTable));
         return $queries;
     }
 
