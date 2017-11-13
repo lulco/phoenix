@@ -77,7 +77,7 @@ abstract class AbstractCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    final protected function execute(InputInterface $input, OutputInterface $output)
+    final public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;

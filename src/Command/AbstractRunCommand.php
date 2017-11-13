@@ -2,6 +2,7 @@
 
 namespace Phoenix\Command;
 
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,6 +56,19 @@ abstract class AbstractRunCommand extends AbstractCommand
             $executedMigrations[] = $executedMigration;
         }
         $this->outputData['executed_migrations'] = $executedMigrations;
+    }
+
+    protected function checkDirs(array $dirs)
+    {
+        if (empty($dirs)) {
+            return;
+        }
+        $migrationDirs = $this->config->getMigrationDirs();
+        foreach ($dirs as $dir) {
+            if (!array_key_exists($dir, $migrationDirs)) {
+                throw new InvalidArgumentValueException('Directory "' . $dir . '" doesn\'t exist');
+            }
+        }
     }
 
     abstract protected function findMigrations();

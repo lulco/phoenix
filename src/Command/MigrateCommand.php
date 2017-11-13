@@ -17,13 +17,16 @@ class MigrateCommand extends AbstractRunCommand
         parent::configure();
         $this->setName('migrate')
             ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
+            ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to migrate')
             ->setDescription('Run migrations');
     }
 
     protected function findMigrations()
     {
         $target = $this->input->getOption('first') ? Manager::TARGET_FIRST : Manager::TARGET_ALL;
-        return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target);
+        $dirs = $this->input->getOption('dir') ?: [];
+        $this->checkDirs($dirs);
+        return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target, $dirs);
     }
 
     protected function runMigration(AbstractMigration $migration, $dry = false)
