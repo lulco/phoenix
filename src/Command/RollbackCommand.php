@@ -18,6 +18,7 @@ class RollbackCommand extends AbstractRunCommand
         $this->setName('rollback')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to rollback')
+            ->addOption('class', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Class to rollback')
             ->setDescription('Rollback migrations');
     }
 
@@ -26,7 +27,8 @@ class RollbackCommand extends AbstractRunCommand
         $target = $this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
         $dirs = $this->input->getOption('dir') ?: [];
         $this->checkDirs($dirs);
-        return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target, $dirs);
+        $classes = $this->input->getOption('class') ?: [];
+        return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target, $dirs, $classes);
     }
 
     protected function runMigration(AbstractMigration $migration, $dry = false)

@@ -38,15 +38,16 @@ class Manager
      * @param string $type up / down
      * @param string $target all / first
      * @param array $dirs
+     * @param array $classes
      * @return AbstractMigration[]
      * @throws InvalidArgumentValueException
      */
-    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL, array $dirs = [])
+    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL, array $dirs = [], array $classes = [])
     {
         $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
         $this->inArray($target, [self::TARGET_ALL, self::TARGET_FIRST], 'Target "' . $target . '" is not allowed.');
 
-        $migrations = $this->findMigrations($type, $dirs);
+        $migrations = $this->findMigrations($type, $dirs, $classes);
         if (empty($migrations)) {
             return [];
         }
@@ -56,9 +57,9 @@ class Manager
         return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
     }
 
-    private function findMigrations($type, $dirs)
+    private function findMigrations($type, $dirs, $classes)
     {
-        $migrations = $this->findMigrationClasses($dirs);
+        $migrations = $this->findMigrationClasses($dirs, $classes);
         $executedMigrations = $this->executedMigrations();
         if ($type == self::TYPE_UP) {
             foreach (array_keys($executedMigrations) as $migrationIdentifier) {
@@ -78,7 +79,7 @@ class Manager
         return $migrationsToExecute;
     }
 
-    private function findMigrationClasses(array $dirs = [])
+    private function findMigrationClasses(array $dirs = [], array $classes = [])
     {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
@@ -92,8 +93,10 @@ class Manager
             require_once $file;
             $classNameCreator = new ClassNameCreator($file);
             $className = $classNameCreator->getClassName();
-            $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
-            $migrations[$migrationIdentifier] = new $className($this->adapter);
+            if (empty($classes) || (!empty($classes) && in_array($className, $classes))) {
+                $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
+                $migrations[$migrationIdentifier] = new $className($this->adapter);
+            }
         }
         return $migrations;
     }
