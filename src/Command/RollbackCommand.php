@@ -17,13 +17,16 @@ class RollbackCommand extends AbstractRunCommand
         parent::configure();
         $this->setName('rollback')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
+            ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to rollback')
             ->setDescription('Rollback migrations');
     }
 
     protected function findMigrations()
     {
         $target = $this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
-        return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target);
+        $dirs = $this->input->getOption('dir') ?: [];
+        $this->checkDirs($dirs);
+        return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target, $dirs);
     }
 
     protected function runMigration(AbstractMigration $migration, $dry = false)

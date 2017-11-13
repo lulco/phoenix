@@ -37,15 +37,16 @@ class Manager
     /**
      * @param string $type up / down
      * @param string $target all / first
+     * @param array $dirs
      * @return AbstractMigration[]
      * @throws InvalidArgumentValueException
      */
-    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL)
+    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL, array $dirs = [])
     {
         $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
         $this->inArray($target, [self::TARGET_ALL, self::TARGET_FIRST], 'Target "' . $target . '" is not allowed.');
 
-        $migrations = $this->findMigrations($type);
+        $migrations = $this->findMigrations($type, $dirs);
         if (empty($migrations)) {
             return [];
         }
@@ -55,9 +56,9 @@ class Manager
         return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
     }
 
-    private function findMigrations($type)
+    private function findMigrations($type, $dirs)
     {
-        $migrations = $this->findMigrationClasses();
+        $migrations = $this->findMigrationClasses($dirs);
         $executedMigrations = $this->executedMigrations();
         if ($type == self::TYPE_UP) {
             foreach (array_keys($executedMigrations) as $migrationIdentifier) {
@@ -69,16 +70,21 @@ class Manager
 
         $migrationsToExecute = [];
         foreach (array_keys($executedMigrations) as $migrationIdentifier) {
+            if (!isset($migrations[$migrationIdentifier])) {
+                continue;
+            }
             $migrationsToExecute[] = $migrations[$migrationIdentifier];
         }
         return $migrationsToExecute;
     }
 
-    private function findMigrationClasses()
+    private function findMigrationClasses(array $dirs = [])
     {
         $filesFinder = new FilesFinder();
-        foreach ($this->config->getMigrationDirs() as $directory) {
-            $filesFinder->addDirectory($directory);
+        foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
+            if (empty($dirs) || (!empty($dirs) && in_array($identifier, $dirs))) {
+                $filesFinder->addDirectory($directory);
+            }
         }
 
         $migrations = [];
