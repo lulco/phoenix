@@ -18,6 +18,7 @@ use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
 use Phoenix\Command\StatusCommand;
+use Phoenix\Command\TestCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
@@ -28,4 +29,5 @@ $application->add(new MigrateCommand());
 $application->add(new RollbackCommand());
 $application->add(new StatusCommand());
 $application->add(new DumpCommand());
+$application->add(new TestCommand());
 $application->run();

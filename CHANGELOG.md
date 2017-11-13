@@ -5,6 +5,7 @@
 #### Added
 - option to execute all migrations from selected directory(-ies) in migrate and rollback command
 - option to execute migrations via classname in migrate and rollback command
+- TestCommand to test next migration via migrate-rollback-migrate(-rollback)
 
 ### [0.10.0] - 2017-10-01
 #### Added
