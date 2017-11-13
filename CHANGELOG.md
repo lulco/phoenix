@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- option to execute all migrations from selected directory(-ies) in migrate and rollback command
+
 ### [0.10.0] - 2017-10-01
 #### Added
 - method copyTable for copy table structure, data or both
