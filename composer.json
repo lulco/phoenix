@@ -1,31 +1,31 @@
 {
-	"name": "lulco/phoenix",
-	"type": "library",
-	"description": "Database Migrations for PHP",
-	"keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
-	"license": "MIT",
-	"require": {
-		"php": ">=5.6.0",
-		"symfony/console": "^2.8|^3.1",
-		"nette/finder": "^2.3"
-	},
-	"require-dev": {
-		"nette/neon": "^2.3",
-		"symfony/yaml": "^3.1",
-		"squizlabs/php_codesniffer": "^3.0",
-		"phpunit/phpunit": "^5.4",
-		"phpmd/phpmd": "^2.3",
-		"sebastian/phpcpd": "^2.0"
-	},
-	"autoload": {
-		"classmap": ["src/"]
-	},
-	"autoload-dev": {
-		"classmap": ["tests/"]
-	},
-	"suggest": {
-		"nette/neon": "Allows use *.neon file as config file and class Phoenix\\Config\\Parser\\NeonConfigParser to parse it. Doesn't work on HHVM.",
-		"symfony/yaml": "Allows use *.yml / *.yaml file as config file and class Phoenix\\Config\\Parser\\YamlConfigParser to parse it"
-	},
-	"bin": ["bin/phoenix"]
+    "name": "lulco/phoenix",
+    "type": "library",
+    "description": "Database Migrations for PHP",
+    "keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
+    "license": "MIT",
+    "require": {
+        "php": ">= 5.6.0",
+        "symfony/console": "^2.8|^3.1",
+        "nette/finder": "^2.3"
+    },
+    "require-dev": {
+        "nette/neon": "^2.3",
+        "symfony/yaml": "^3.1",
+        "squizlabs/php_codesniffer": "^3.0",
+        "phpunit/phpunit": "^5.4",
+        "phpmd/phpmd": "^2.3",
+        "sebastian/phpcpd": "^2.0"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "autoload-dev": {
+        "classmap": ["tests/"]
+    },
+    "suggest": {
+        "nette/neon": "Allows use *.neon file as config file and class Phoenix\\Config\\Parser\\NeonConfigParser to parse it. Doesn't work on HHVM.",
+        "symfony/yaml": "Allows use *.yml / *.yaml file as config file and class Phoenix\\Config\\Parser\\YamlConfigParser to parse it"
+    },
+    "bin": ["bin/phoenix"]
 }
