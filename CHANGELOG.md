@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [0.11.0] - 2017-11-14
 #### Added
 - option to execute all migrations from selected directory(-ies) in migrate and rollback command
 - option to execute migrations via classname in migrate and rollback command
@@ -143,7 +144,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.10.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.11.0...HEAD
+[0.11.0]: https://github.com/lulco/phoenix/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/lulco/phoenix/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/lulco/phoenix/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/lulco/phoenix/compare/0.8.0...0.9.0
