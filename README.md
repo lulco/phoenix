@@ -7,9 +7,7 @@ Framework agnostic database migrations for PHP.
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
-[![Dependency Status](https://www.versioneye.com/user/projects/575d6bbd7757a00041b3b85b/badge.svg?style=flat)](https://www.versioneye.com/user/projects/575d6bbd7757a00041b3b85b)
 [![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://travis-ci.org/lulco/phoenix)
-[![HHVM supported](http://hhvm.h4cc.de/badge/lulco/phoenix.svg)](https://travis-ci.org/lulco/phoenix)
 
 ## Features
 - Validation all settings in migration before executing first query
@@ -39,7 +37,7 @@ composer require lulco/phoenix
 
 ## Usage
 
-### Create configuration file
+### [Create configuration file](docs/configuration.md)
 Create file `phoenix.php` in the root directory of your project. For example:
 ```php
 <?php
@@ -70,7 +68,7 @@ return [
 ];
 ```
 
-### Commands
+### [Commands](docs/commands.md)
 To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoenix/bin/phoenix`.
 
 ##### Available commands:
@@ -80,15 +78,16 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `rollback` - rollback migrations
 - `dump` - create migration from existing database
 - `status` - list of migrations already executed and list of migrations to execute
+- `test` - test next migration by executing migrate, rollback, migrate for it
 - `cleanup` - rollback all migrations and delete log table
 
-You can run each command with `--help` option to get more information about it.
+You can run each command with `--help` option to get more information about it or read more [here](docs/commands.md)
 
-### Init command
+### [Init command](docs/init_command.md)
 Command `php vendor/bin/phoenix init` initializes phoenix and creates database table where executed migrations will be stored in. This command is executed automatically with first run of other commands, so you don't have to run it manually.
 
-### Create first migration
-Create command `php vendor/bin/phoenix create [options] [--] <migration> [<dir>]`
+### [Create first migration](docs/create_command.md)
+Create command `php vendor/bin/phoenix create <migration> [<dir>]`
 
 ```
 php vendor/bin/phoenix create "FirstDir\MyFirstMigration" second
@@ -166,7 +165,7 @@ Implementation of correspondent `down()` method which drops table `first_table` 
 
 Now you can run `migrate` command to execute your first migration.
 
-### Migrate command
+### [Migrate command](docs/migrate_command.md)
 Migrate command `php vendor/bin/phoenix migrate` executes all available migrations. In this case you will see output like this:
 ```
 php vendor/bin/phoenix migrate
@@ -189,7 +188,7 @@ All done. Took 0.0451s
 
 If you want to rollback changes (e.g. you found out that you forgot add some column or index), you can run `rollback` command, update migration and then run `migrate` command again. Keep in mind that the best practice is to run `rollback` command before updating migration.
 
-### Rollback command
+### [Rollback command](docs/rollback_command.md)
 Rollback command `php vendor/bin/phoenix rollback` rollbacks last executed migration. In this case you will see output like this:
 ```
 php vendor/bin/phoenix rollback
@@ -209,11 +208,11 @@ Nothing to rollback
 All done. Took 0.0401s
 ```
 
-### Dump command
-Command `php vendor/bin/phoenix dump [options]` dumps actual database structure into migration file.
+### [Dump command](docs/dump_command.md)
+Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
 If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
 
-### Status command
+### [Status command](docs/status_command.md)
 Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:
 
 ```
@@ -234,7 +233,7 @@ Migrations to execute
 All done. Took 0.2016s
 ```
 
-### Cleanup command
+### [Cleanup command](docs/cleanup_command.md)
 Cleanup command `php vendor/bin/phoenix cleanup` rollbacks all executed migrations and delete log table. After executing this command, the application is in state as before executing `init` command.
 
 ```
@@ -243,4 +242,31 @@ php bin/phoenix cleanup
 Rollback for migration FirstDir\MyFirstMigration executed
 
 Phoenix cleaned
+```
+
+### [Test command](docs/test_command.md)
+Test command `php vendor/bin/phoenix test` executes first next migration, then run rollback and migrate first migration again. This command is shortcut for executing commands:
+```
+php bin/phoenix migrate --first
+php bin/phoenix rollback
+php bin/phoenix migrate --first
+```
+
+Output looks like this:
+```
+php bin/phoenix test
+Test started...
+
+Migration FirstDir\MyFirstMigration executing...
+Migration FirstDir\MyFirstMigration executed. Took 0.0456s
+
+Rollback for migration FirstDir\MyFirstMigration executing...
+Rollback for migration FirstDir\MyFirstMigration executed. Took 0.0105s
+
+Migration FirstDir\MyFirstMigration executing...
+Migration FirstDir\MyFirstMigration executed. Took 0.0378s
+
+Test finished successfully
+
+All done. Took 0.2840s
 ```
