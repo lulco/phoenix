@@ -21,8 +21,6 @@ class TestCommand extends AbstractCommand
 
     protected function runCommand()
     {
-
-
         $this->writeln('');
         $this->writeln('<comment>Test started...</comment>');
 
@@ -55,7 +53,7 @@ class TestCommand extends AbstractCommand
             $executionTime = microtime(true) - $start;
             $this->manager->logExecution($upMigration);
             $this->writeln('<info>Migration ' . $upMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
-            $this->logEx($upMigration, 'migrate', $executionTime);
+            $this->logMigration($upMigration, 'migrate', $executionTime);
         }
         return count($upMigrations);
     }
@@ -71,11 +69,11 @@ class TestCommand extends AbstractCommand
             $executionTime = microtime(true) - $start;
             $this->manager->removeExecution($downMigration);
             $this->writeln('<info>Rollback for migration ' . $downMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
-            $this->logEx($downMigration, 'rollback', $executionTime);
+            $this->logMigration($downMigration, 'rollback', $executionTime);
         }
     }
 
-    private function logEx(AbstractMigration $migration, $type, $executionTime)
+    private function logMigration(AbstractMigration $migration, $type, $executionTime)
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
