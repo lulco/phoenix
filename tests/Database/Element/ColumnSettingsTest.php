@@ -4,9 +4,9 @@ namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Exception\InvalidArgumentValueException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ColumnSettingsTest extends PHPUnit_Framework_TestCase
+class ColumnSettingsTest extends TestCase
 {
     public function testSimple()
     {

@@ -5,9 +5,9 @@ namespace Phoenix\Tests\Config;
 use Exception;
 use Phoenix\Config\Parser\ConfigParserFactory;
 use Phoenix\Exception\ConfigException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConfigParsersTest extends PHPUnit_Framework_TestCase
+class ConfigParsersTest extends TestCase
 {
     public function testParser()
     {
@@ -67,15 +67,18 @@ class ConfigParsersTest extends PHPUnit_Framework_TestCase
             ],
         ];
 
+        $counter = 0;
         foreach ($configs as $type => $configuration) {
             $configParser = ConfigParserFactory::instance($type);
             $filename = __DIR__ . '/../../example/not_found_' . $configuration['file'];
             try {
                 $configParser->parse($filename);
             } catch (Exception $e) {
+                $counter++;
                 $this->assertInstanceOf(ConfigException::class, $e);
                 $this->assertEquals('File "' . $filename . '" not found', $e->getMessage());
             }
         }
+        $this->assertEquals(4, $counter);
     }
 }

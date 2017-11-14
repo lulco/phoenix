@@ -6,9 +6,9 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class TableTest extends PHPUnit_Framework_TestCase
+class TableTest extends TestCase
 {
     public function testConstructAndSetName()
     {

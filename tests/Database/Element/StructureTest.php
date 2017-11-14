@@ -6,9 +6,9 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class StructureTest extends PHPUnit_Framework_TestCase
+class StructureTest extends TestCase
 {
     public function testEmpty()
     {

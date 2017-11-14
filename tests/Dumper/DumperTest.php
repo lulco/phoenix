@@ -8,9 +8,9 @@ use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class DumperTest extends PHPUnit_Framework_TestCase
+class DumperTest extends TestCase
 {
     public function testIndent()
     {

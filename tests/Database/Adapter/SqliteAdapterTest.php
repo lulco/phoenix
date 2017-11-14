@@ -13,9 +13,9 @@ use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\SqlitePdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SqliteAdapterTest extends PHPUnit_Framework_TestCase
+class SqliteAdapterTest extends TestCase
 {
     private $adapter;
 

@@ -4,9 +4,9 @@ namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Index;
 use Phoenix\Exception\InvalidArgumentValueException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class IndexTest extends PHPUnit_Framework_TestCase
+class IndexTest extends TestCase
 {
     public function testSimple()
     {
