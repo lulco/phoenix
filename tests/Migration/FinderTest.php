@@ -4,9 +4,9 @@ namespace Phoenix\Tests\Migration;
 
 use InvalidArgumentException;
 use Phoenix\Migration\FilesFinder;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class FilesFinderTest extends PHPUnit_Framework_TestCase
+class FilesFinderTest extends TestCase
 {
     public function testDirectories()
     {

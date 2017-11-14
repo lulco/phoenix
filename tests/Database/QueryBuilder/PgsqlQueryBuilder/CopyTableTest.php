@@ -4,9 +4,9 @@ namespace Phoenix\Tests\Database\QueryBuilder\PgsqlQueryBuilder;
 
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CopyTableTest extends PHPUnit_Framework_TestCase
+class CopyTableTest extends TestCase
 {
     public function testCopyDefault()
     {

@@ -9,9 +9,9 @@ use PDOStatement;
 use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class PdoAdapterTest extends PHPUnit_Framework_TestCase
+class PdoAdapterTest extends TestCase
 {
     private $adapter;
 

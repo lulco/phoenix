@@ -7,11 +7,11 @@ use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Tests\Helpers\Adapter\CleanupInterface;
 use Phoenix\Tests\Mock\Command\Input;
 use Phoenix\Tests\Mock\Command\Output;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class BaseCommandTest extends PHPUnit_Framework_TestCase
+abstract class BaseCommandTest extends TestCase
 {
     /** @var InputInterface */
     protected $input;

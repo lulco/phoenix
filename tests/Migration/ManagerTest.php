@@ -10,11 +10,14 @@ use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
-use PHPUnit_Framework_TestCase;
+use Phoenix\Tests\Mock\Migration\FakeMigration;
+use PHPUnit\Framework\TestCase;
 
-class ManagerTest extends PHPUnit_Framework_TestCase
+class ManagerTest extends TestCase
 {
     private $manager;
+
+    private $adapter;
 
     private $initMigration;
 
@@ -33,10 +36,10 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         ]);
         $environmentConfig = $config->getEnvironmentConfig('sqlite');
         $pdo = new PDO($environmentConfig->getDsn());
-        $adapter = new SqliteAdapter($pdo);
-        $this->manager = new Manager($config, $adapter);
+        $this->adapter = new SqliteAdapter($pdo);
+        $this->manager = new Manager($config, $this->adapter);
 
-        $this->initMigration = new Init($adapter, $config->getLogTableName());
+        $this->initMigration = new Init($this->adapter, $config->getLogTableName());
         $this->initMigration->migrate();
     }
 
@@ -105,6 +108,27 @@ class ManagerTest extends PHPUnit_Framework_TestCase
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Target "target" is not allowed.');
         $this->manager->findMigrationsToExecute('up', 'target');
+    }
+
+    public function testSkippingNonExistingMigration()
+    {
+        $executedMigrations = $this->manager->executedMigrations();
+        $this->assertTrue(is_array($executedMigrations));
+        $this->assertCount(0, $executedMigrations);
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
+        $this->assertTrue(is_array($migrations));
+        $this->assertEmpty($migrations);
+
+        $this->manager->logExecution(new FakeMigration($this->adapter));
+
+        $executedMigrations = $this->manager->executedMigrations();
+        $this->assertTrue(is_array($executedMigrations));
+        $this->assertCount(1, $executedMigrations);
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
+        $this->assertTrue(is_array($migrations));
+        $this->assertEmpty($migrations);
     }
 
     public function testExecuteLatestMigrationFirst()

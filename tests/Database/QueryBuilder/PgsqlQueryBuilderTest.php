@@ -8,9 +8,9 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class PgsqlQueryBuilderTest extends PHPUnit_Framework_TestCase
+class PgsqlQueryBuilderTest extends TestCase
 {
     private $adapter;
 

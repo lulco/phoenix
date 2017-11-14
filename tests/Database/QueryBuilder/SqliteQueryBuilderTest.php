@@ -9,9 +9,9 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\SqlitePdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SqliteQueryBuilderTest extends PHPUnit_Framework_TestCase
+class SqliteQueryBuilderTest extends TestCase
 {
     private $adapter;
 

@@ -13,9 +13,9 @@ use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class PgsqlAdapterTest extends PHPUnit_Framework_TestCase
+class PgsqlAdapterTest extends TestCase
 {
     private $adapter;
 

@@ -8,9 +8,9 @@ use Phoenix\Config\Parser\NeonConfigParser;
 use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Config\Parser\YamlConfigParser;
 use Phoenix\Exception\ConfigException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConfigParserFactoryTest extends PHPUnit_Framework_TestCase
+class ConfigParserFactoryTest extends TestCase
 {
     public function testInstance()
     {

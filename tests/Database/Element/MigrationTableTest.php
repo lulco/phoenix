@@ -8,9 +8,9 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Table;
 use Phoenix\Exception\InvalidArgumentValueException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class MigrationTableTest extends PHPUnit_Framework_TestCase
+class MigrationTableTest extends TestCase
 {
     public function testDefaultConstruct()
     {
