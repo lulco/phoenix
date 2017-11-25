@@ -6,7 +6,7 @@ use Phoenix\Exception\ConfigException;
 
 class ConfigParserFactory
 {
-    public static function instance($type)
+    public static function instance(string $type): ConfigParserInterface
     {
         $type = strtolower($type);
         if ($type == 'php') {

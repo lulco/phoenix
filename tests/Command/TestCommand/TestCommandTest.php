@@ -41,13 +41,6 @@ abstract class TestCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFile()
-    {
-        $command = new TestCommand();
-        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
-        $command->run($this->input, $this->output);
-    }
-
     public function testTestWithoutInitializing()
     {
         $command = new TestCommand();

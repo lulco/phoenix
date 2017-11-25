@@ -12,7 +12,7 @@ class RollbackCommand extends AbstractRunCommand
 
     protected $migrationInfoPrefix = 'Rollback for migration';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('rollback')
@@ -22,7 +22,7 @@ class RollbackCommand extends AbstractRunCommand
             ->setDescription('Rollback migrations');
     }
 
-    protected function findMigrations()
+    protected function findMigrations(): array
     {
         $target = $this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST;
         $dirs = $this->input->getOption('dir') ?: [];
@@ -31,7 +31,7 @@ class RollbackCommand extends AbstractRunCommand
         return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target, $dirs, $classes);
     }
 
-    protected function runMigration(AbstractMigration $migration, $dry = false)
+    protected function runMigration(AbstractMigration $migration, bool $dry = false): void
     {
         $migration->rollback($dry);
         if (!$dry) {

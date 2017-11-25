@@ -8,7 +8,7 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 class AdapterFactory
 {
-    public static function instance(EnvironmentConfig $config)
+    public static function instance(EnvironmentConfig $config): AdapterInterface
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
         if ($config->getAdapter() == 'mysql') {

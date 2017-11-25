@@ -12,7 +12,7 @@ abstract class CommonQueryBuilder
 
     protected $defaultLength = [];
 
-    protected function createType(Column $column, MigrationTable $table)
+    protected function createType(Column $column, MigrationTable $table): string
     {
         if (in_array($column->getType(), [Column::TYPE_NUMERIC, Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE])) {
             return sprintf(
@@ -26,12 +26,12 @@ abstract class CommonQueryBuilder
         return sprintf($this->remapType($column), $column->getSettings()->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
     }
 
-    protected function remapType(Column $column)
+    protected function remapType(Column $column): string
     {
-        return isset($this->typeMap[$column->getType()]) ? $this->typeMap[$column->getType()] : $column->getType();
+        return $this->typeMap[$column->getType()] ?? $column->getType();
     }
 
-    protected function createTableQuery(MigrationTable $table)
+    protected function createTableQuery(MigrationTable $table): string
     {
         $query = ' (';
         $columns = [];
@@ -46,7 +46,7 @@ abstract class CommonQueryBuilder
         return $query;
     }
 
-    protected function addColumns(MigrationTable $table)
+    protected function addColumns(MigrationTable $table): array
     {
         $columns = $table->getColumns();
         if (empty($columns)) {
@@ -61,7 +61,7 @@ abstract class CommonQueryBuilder
         return [$query];
     }
 
-    protected function createPrimaryKey(MigrationTable $table)
+    protected function createPrimaryKey(MigrationTable $table): string
     {
         if (empty($table->getPrimaryColumns())) {
             return '';
@@ -69,7 +69,7 @@ abstract class CommonQueryBuilder
         return $this->primaryKeyString($table);
     }
 
-    protected function addPrimaryKey(MigrationTable $table)
+    protected function addPrimaryKey(MigrationTable $table): array
     {
         $queries = [];
         $primaryColumns = $table->getPrimaryColumns();
@@ -79,7 +79,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function dropIndexes(MigrationTable $table)
+    protected function dropIndexes(MigrationTable $table): array
     {
         if (empty($table->getIndexesToDrop())) {
             return [];
@@ -93,7 +93,7 @@ abstract class CommonQueryBuilder
         return [$query];
     }
 
-    protected function dropColumns(MigrationTable $table)
+    protected function dropColumns(MigrationTable $table): string
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columns = [];
@@ -104,7 +104,7 @@ abstract class CommonQueryBuilder
         return $query;
     }
 
-    protected function createForeignKeys(MigrationTable $table)
+    protected function createForeignKeys(MigrationTable $table): string
     {
         if (empty($table->getForeignKeys())) {
             return '';
@@ -117,7 +117,7 @@ abstract class CommonQueryBuilder
         return ',' . implode(',', $foreignKeys);
     }
 
-    protected function addForeignKeys(MigrationTable $table)
+    protected function addForeignKeys(MigrationTable $table): array
     {
         $queries = [];
         foreach ($table->getForeignKeys() as $foreignKey) {
@@ -126,7 +126,7 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function createForeignKey(ForeignKey $foreignKey, MigrationTable $table)
+    protected function createForeignKey(ForeignKey $foreignKey, MigrationTable $table): string
     {
         $columns = [];
         foreach ($foreignKey->getColumns() as $column) {
@@ -148,7 +148,7 @@ abstract class CommonQueryBuilder
         return $constraint;
     }
 
-    protected function dropKeys(MigrationTable $table, $primaryKeyName, $foreignKeyPrefix)
+    protected function dropKeys(MigrationTable $table, string $primaryKeyName, string $foreignKeyPrefix): array
     {
         $queries = [];
         if ($table->hasPrimaryKeyToDrop()) {
@@ -160,23 +160,23 @@ abstract class CommonQueryBuilder
         return $queries;
     }
 
-    protected function dropKeyQuery(MigrationTable $table, $key)
+    protected function dropKeyQuery(MigrationTable $table, string $key): string
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
     }
 
-    abstract public function escapeString($string);
+    abstract public function escapeString(string $string): string;
 
-    protected function escapeArray(array $array)
+    protected function escapeArray(array $array): array
     {
         return array_map(function ($string) {
             return $this->escapeString($string);
         }, $array);
     }
 
-    abstract protected function createColumn(Column $column, MigrationTable $table);
+    abstract protected function createColumn(Column $column, MigrationTable $table): string;
 
-    abstract protected function primaryKeyString(MigrationTable $table);
+    abstract protected function primaryKeyString(MigrationTable $table): string;
 
-    abstract protected function createEnumSetColumn(Column $column, MigrationTable $table);
+    abstract protected function createEnumSetColumn(Column $column, MigrationTable $table): string;
 }

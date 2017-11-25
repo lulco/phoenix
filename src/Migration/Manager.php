@@ -18,16 +18,10 @@ class Manager
     const TARGET_FIRST = 'first';
     const TARGET_ALL = 'all';
 
-    /** @var Config */
     private $config;
 
-    /** @var AdapterInterface */
     private $adapter;
 
-    /**
-     * @param Config $config
-     * @param AdapterInterface $adapter
-     */
     public function __construct(Config $config, AdapterInterface $adapter)
     {
         $this->config = $config;
@@ -35,14 +29,10 @@ class Manager
     }
 
     /**
-     * @param string $type up / down
-     * @param string $target all / first
-     * @param array $dirs
-     * @param array $classes
      * @return AbstractMigration[]
      * @throws InvalidArgumentValueException
      */
-    public function findMigrationsToExecute($type = self::TYPE_UP, $target = self::TARGET_ALL, array $dirs = [], array $classes = [])
+    public function findMigrationsToExecute(string $type = self::TYPE_UP, string $target = self::TARGET_ALL, array $dirs = [], array $classes = []): array
     {
         $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
         $this->inArray($target, [self::TARGET_ALL, self::TARGET_FIRST], 'Target "' . $target . '" is not allowed.');
@@ -57,7 +47,7 @@ class Manager
         return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
     }
 
-    private function findMigrations($type, $dirs, $classes)
+    private function findMigrations(string $type, array $dirs, array $classes): array
     {
         $migrations = $this->findMigrationClasses($dirs, $classes);
         $executedMigrations = $this->executedMigrations();
@@ -79,7 +69,7 @@ class Manager
         return $migrationsToExecute;
     }
 
-    private function findMigrationClasses(array $dirs = [], array $classes = [])
+    private function findMigrationClasses(array $dirs = [], array $classes = []): array
     {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
@@ -101,11 +91,7 @@ class Manager
         return $migrations;
     }
 
-    /**
-     * returs executed migrations
-     * @return array
-     */
-    public function executedMigrations()
+    public function executedMigrations(): array
     {
         $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*', [], null, ['executed_at', 'migration_datetime']);
         $executedMigrations = [];
@@ -115,27 +101,19 @@ class Manager
         return $executedMigrations;
     }
 
-    /**
-     * adds migration to log table
-     * @param AbstractMigration $migration
-     */
-    public function logExecution(AbstractMigration $migration)
+    public function logExecution(AbstractMigration $migration): void
     {
         $data = $this->createData($migration);
         $data['executed_at'] = new DateTime();
         $this->adapter->insert($this->config->getLogTableName(), $data);
     }
 
-    /**
-     * removes migration from log table
-     * @param AbstractMigration $migration
-     */
-    public function removeExecution(AbstractMigration $migration)
+    public function removeExecution(AbstractMigration $migration): void
     {
         $this->adapter->delete($this->config->getLogTableName(), $this->createData($migration));
     }
 
-    private function createData(AbstractMigration $migration)
+    private function createData(AbstractMigration $migration): array
     {
         return [
             'classname' => $migration->getFullClassName(),

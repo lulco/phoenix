@@ -3,20 +3,21 @@
 namespace Phoenix\Command;
 
 use Phoenix\Command\AbstractCommand;
+use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanupCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('cleanup')
             ->setDescription('Rollback all migrations and delete log table');
         parent::configure();
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN);
         $executedMigrations = [];
@@ -45,7 +46,7 @@ class CleanupCommand extends AbstractCommand
         }
     }
 
-    private function addMigrationToList($migration)
+    private function addMigrationToList(AbstractMigration $migration): array
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);

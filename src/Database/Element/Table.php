@@ -20,109 +20,67 @@ class Table
 
     private $indexes = [];
 
-    /**
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @param string $name
-     * @return Table
-     */
-    public function setName($name)
+    public function setName(string $name): Table
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $charset
-     * @return Table
-     */
-    public function setCharset($charset)
+    public function setCharset(?string $charset): Table
     {
         $this->charset = $charset;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCharset()
+    public function getCharset(): ?string
     {
         return $this->charset;
     }
 
-    /**
-     * @param string $collation
-     * @return Table
-     */
-    public function setCollation($collation)
+    public function setCollation(?string $collation): Table
     {
         $this->collation = $collation;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCollation()
+    public function getCollation(): ?string
     {
         return $this->collation;
     }
 
-    /**
-     * @param string $comment
-     * @return Table
-     */
-    public function setComment($comment)
+    public function setComment(?string $comment): Table
     {
         $this->comment = $comment;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getComment()
+    public function getComment(): ?string
     {
         return $this->comment;
     }
 
-    /**
-     * set primary key(s) to table
-     * @param array|null $primaryColumns
-     */
-    public function setPrimary(array $primaryColumns = null)
+    public function setPrimary(?array $primaryColumns = null): Table
     {
         $this->primaryColumns = $primaryColumns;
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getPrimary()
+    public function getPrimary(): ?array
     {
         return $this->primaryColumns;
     }
 
-    /**
-     * @param Column $column
-     * @return Table
-     */
-    public function addColumn(Column $column)
+    public function addColumn(Column $column): Table
     {
         $this->columns[$column->getName()] = $column;
         return $this;
@@ -131,57 +89,36 @@ class Table
     /**
      * @return Column[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @param string $name
-     * @return Column|null
-     */
-    public function getColumn($name)
+    public function getColumn(string $name): ?Column
     {
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
-    /**
-     * @param string $name
-     * @return Table
-     */
-    public function removeColumn($name)
+    public function removeColumn(string $name): Table
     {
         unset($this->columns[$name]);
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @param Column $column
-     * @return Table
-     */
-    public function changeColumn($name, Column $column)
+    public function changeColumn(string $name, Column $column): Table
     {
         $this->removeColumn($name);
         $this->addColumn($column);
         return $this;
     }
 
-    /**
-     * @param Index $index
-     * @return Table
-     */
-    public function addIndex(Index $index)
+    public function addIndex(Index $index): Table
     {
         $this->indexes[$index->getName()] = $index;
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @return Index|null
-     */
-    public function getIndex($name)
+    public function getIndex(string $name): ?Index
     {
         return isset($this->indexes[$name]) ? $this->indexes[$name] : null;
     }
@@ -189,36 +126,24 @@ class Table
     /**
      * @return Index[]
      */
-    public function getIndexes()
+    public function getIndexes(): array
     {
         return $this->indexes;
     }
 
-    /**
-     * @param string $indexName
-     * @return Table
-     */
-    public function removeIndex($indexName)
+    public function removeIndex(string $indexName): Table
     {
         unset($this->indexes[$indexName]);
         return $this;
     }
 
-    /**
-     * @param ForeignKey $foreignKey
-     * @return Table
-     */
-    public function addForeignKey(ForeignKey $foreignKey)
+    public function addForeignKey(ForeignKey $foreignKey): Table
     {
         $this->foreignKeys[$foreignKey->getName()] = $foreignKey;
         return $this;
     }
 
-    /**
-     * @param string $name
-     * @return ForeignKey|null
-     */
-    public function getForeignKey($name)
+    public function getForeignKey(string $name): ?ForeignKey
     {
         return isset($this->foreignKeys[$name]) ? $this->foreignKeys[$name] : null;
     }
@@ -226,16 +151,12 @@ class Table
     /**
      * @return ForeignKey[]
      */
-    public function getForeignKeys()
+    public function getForeignKeys(): array
     {
         return $this->foreignKeys;
     }
 
-    /**
-     * @param string $foreignKeyName
-     * @return Table
-     */
-    public function removeForeignKey($foreignKeyName)
+    public function removeForeignKey(string $foreignKeyName): Table
     {
         unset($this->foreignKeys[$foreignKeyName]);
         return $this;

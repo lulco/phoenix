@@ -29,9 +29,6 @@ abstract class AbstractMigration
     /** @var array list of executed queries */
     private $executedQueries = [];
 
-    /**
-     * @param AdapterInterface $adapter
-     */
     public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
@@ -41,35 +38,22 @@ abstract class AbstractMigration
         $this->fullClassName = $classNameCreator->getClassName();
     }
 
-    /**
-     * @return string
-     */
-    final public function getDatetime()
+    final public function getDatetime(): string
     {
         return $this->datetime;
     }
 
-    /**
-     * @return string
-     */
-    final public function getClassName()
+    final public function getClassName(): string
     {
         return ltrim($this->className, '\\');
     }
 
-    /**
-     * @return string
-     */
-    final public function getFullClassName()
+    final public function getFullClassName(): string
     {
         return $this->fullClassName;
     }
 
-    /**
-     * @param boolean $dry Only create query strings, do not execute
-     * @return array
-     */
-    final public function migrate($dry = false)
+    final public function migrate(bool $dry = false): array
     {
         $this->reset();
         $this->up();
@@ -77,11 +61,7 @@ abstract class AbstractMigration
         return $this->runQueries($queries, $dry);
     }
 
-    /**
-     * @param boolean $dry Only create query strings, do not execute
-     * @return array
-     */
-    final public function rollback($dry = false)
+    final public function rollback(bool $dry = false): array
     {
         $this->reset();
         $this->down();
@@ -90,10 +70,9 @@ abstract class AbstractMigration
     }
 
     /**
-     * adds sql to list of queries to execute
-     * @param string $sql
+     * @param string|PDOStatement $sql
      */
-    final protected function execute($sql)
+    final protected function execute($sql): void
     {
         $this->queriesToExecute[] = $sql;
     }
@@ -109,7 +88,7 @@ abstract class AbstractMigration
      * other (false, null) - if your table doesn't have primary key
      * @return MigrationTable
      */
-    final protected function table($name, $primaryKey = true, $charset = null, $collation = null)
+    final protected function table(string $name, $primaryKey = true, ?string $charset = null, ?string $collation = null): MigrationTable
     {
         $table = new MigrationTable($name, $primaryKey);
         $table->setCharset($charset ?: $this->adapter->getCharset());
@@ -119,50 +98,25 @@ abstract class AbstractMigration
         return $table;
     }
 
-    /**
-     * execute SELECT query and returns result
-     * @param string $sql
-     * @return array
-     */
-    final protected function select($sql)
+    final protected function select(string $sql): array
     {
         return $this->adapter->select($sql);
     }
 
-    /**
-     * @param string $table
-     * @param string $fields
-     * @param array $conditions
-     * @param array $orders
-     * @param array $groups
-     * @return array
-     */
-    final protected function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = [])
+    final protected function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
     }
 
-    /**
-     * @param string $table
-     * @param string $fields
-     * @param array $conditions
-     * @param int|null $limit
-     * @param array $orders
-     * @param array $groups
-     * @return array
-     */
-    final protected function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = [])
+    final protected function fetchAll(string $table, string $fields = '*', array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
     }
 
     /**
      * adds insert query to list of queries to execute
-     * @param string $table
-     * @param array $data
-     * @return AbstractMigration
      */
-    final protected function insert($table, array $data)
+    final protected function insert(string $table, array $data): AbstractMigration
     {
         $this->execute($this->adapter->buildInsertQuery($table, $data));
         return $this;
@@ -176,7 +130,7 @@ abstract class AbstractMigration
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
-    final protected function update($table, array $data, array $conditions = [], $where = '')
+    final protected function update(string $table, array $data, array $conditions = [], string $where = ''): AbstractMigration
     {
         $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
         return $this;
@@ -189,19 +143,16 @@ abstract class AbstractMigration
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
-    final protected function delete($table, array $conditions = [], $where = '')
+    final protected function delete(string $table, array $conditions = [], string $where = ''): AbstractMigration
     {
         $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
         return $this;
     }
 
     /**
-     *
-     * @param boolean $dry do not execute query
-     * @return array
      * @throws DatabaseQueryExecuteException
      */
-    private function runQueries(array $queries, $dry = false)
+    private function runQueries(array $queries, bool $dry = false): array
     {
         $results = [];
         foreach ($queries as $query) {
@@ -214,31 +165,22 @@ abstract class AbstractMigration
         return $results;
     }
 
-    /**
-     * @return array
-     */
-    public function getExecutedQueries()
+    public function getExecutedQueries(): array
     {
         return $this->executedQueries;
     }
 
-    /**
-     * need override
-     */
-    abstract protected function up();
+    abstract protected function up()/*: void*/;
 
-    /**
-     * need override
-     */
-    abstract protected function down();
+    abstract protected function down()/*: void*/;
 
-    private function reset()
+    private function reset(): void
     {
         $this->executedQueries = [];
         $this->queriesToExecute = [];
     }
 
-    private function prepare()
+    private function prepare(): array
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = [];
@@ -253,7 +195,7 @@ abstract class AbstractMigration
         return $queries;
     }
 
-    private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder)
+    private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder): array
     {
         $tableQueries = [];
         if ($table->getAction() === MigrationTable::ACTION_CREATE) {

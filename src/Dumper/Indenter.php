@@ -4,7 +4,7 @@ namespace Dumper;
 
 class Indenter
 {
-    public function indent($identifier = '4spaces')
+    public function indent(string $identifier = '4spaces'): string
     {
         $indent = strtolower(str_replace([' ', '-', '_'], '', $identifier));
         if ($indent == '2spaces') {

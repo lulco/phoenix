@@ -61,12 +61,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $this->adapter = $adapter;
     }
 
-    /**
-     * generates create table query for pgsql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function createTable(MigrationTable $table)
+    public function createTable(MigrationTable $table): array
     {
         $queries = [];
         $enumSetColumns = [];
@@ -92,12 +87,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    /**
-     * generates drop table query for pgsql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function dropTable(MigrationTable $table)
+    public function dropTable(MigrationTable $table): array
     {
         return [
             sprintf('DROP TABLE %s;', $this->escapeString($table->getName())),
@@ -105,22 +95,12 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         ];
     }
 
-    /**
-     * generates rename table queries for pgsql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function renameTable(MigrationTable $table)
+    public function renameTable(MigrationTable $table): array
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
-    /**
-     * generates alter table query for pgsql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function alterTable(MigrationTable $table)
+    public function alterTable(MigrationTable $table): array
     {
         $queries = $this->dropIndexes($table);
         $queries = array_merge($queries, $this->dropKeys($table, 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey'), 'CONSTRAINT'));
@@ -173,10 +153,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function copyTable(MigrationTable $table)
+    public function copyTable(MigrationTable $table): array
     {
         if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
             return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
@@ -190,7 +167,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [$query];
     }
 
-    protected function createColumn(Column $column, MigrationTable $table)
+    protected function createColumn(Column $column, MigrationTable $table): string
     {
         $col = $this->escapeString($column->getName()) . ' ';
         if ($column->getSettings()->isAutoincrement()) {
@@ -208,7 +185,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $col;
     }
 
-    private function escapeDefault(Column $column)
+    private function escapeDefault(Column $column): string
     {
         if ($column->getType() == Column::TYPE_INTEGER) {
             $default = $column->getSettings()->getDefault();
@@ -221,7 +198,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $default;
     }
 
-    protected function primaryKeyString(MigrationTable $table)
+    protected function primaryKeyString(MigrationTable $table): string
     {
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
@@ -230,7 +207,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 
-    private function createIndex(Index $index, MigrationTable $table)
+    private function createIndex(Index $index, MigrationTable $table): string
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
@@ -241,7 +218,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return 'CREATE ' . $indexType . ' ' . $this->escapeString($index->getName()) . ' ON ' . $this->escapeString($table->getName()) . $indexMethod . ' (' . implode(',', $columns) . ');';
     }
 
-    protected function dropIndexes(MigrationTable $table)
+    protected function dropIndexes(MigrationTable $table): array
     {
         if (empty($table->getIndexesToDrop())) {
             return [];
@@ -255,17 +232,17 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [$query];
     }
 
-    public function escapeString($string)
+    public function escapeString(string $string): string
     {
         return '"' . $string . '"';
     }
 
-    protected function createEnumSetColumn(Column $column, MigrationTable $table)
+    protected function createEnumSetColumn(Column $column, MigrationTable $table): string
     {
         return sprintf($this->remapType($column), $table->getName(), $column->getName());
     }
 
-    private function createComments($table)
+    private function createComments(MigrationTable $table): array
     {
         $queries = [];
         if ($table->getComment() !== null) {
@@ -279,12 +256,12 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    private function createTableComment(MigrationTable $table)
+    private function createTableComment(MigrationTable $table): string
     {
         return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
     }
 
-    private function createColumnComment(MigrationTable $table, Column $column)
+    private function createColumnComment(MigrationTable $table, Column $column): string
     {
         return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '{$column->getSettings()->getComment()}';";
     }

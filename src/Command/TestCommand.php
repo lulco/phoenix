@@ -11,7 +11,7 @@ class TestCommand extends AbstractCommand
 {
     private $executedMigrations = [];
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('test')
@@ -19,7 +19,7 @@ class TestCommand extends AbstractCommand
             ->setDescription('Test next migration');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $this->writeln('');
         $this->writeln('<comment>Test started...</comment>');
@@ -42,7 +42,7 @@ class TestCommand extends AbstractCommand
         $this->outputData['executed_migrations'] = $this->executedMigrations;
     }
 
-    private function migrate()
+    private function migrate(): int
     {
         $upMigrations = $this->manager->findMigrationsToExecute(Manager::TYPE_UP, Manager::TARGET_FIRST);
         foreach ($upMigrations as $upMigration) {
@@ -58,7 +58,7 @@ class TestCommand extends AbstractCommand
         return count($upMigrations);
     }
 
-    private function rollback()
+    private function rollback(): void
     {
         $downMigrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, Manager::TARGET_FIRST);
         foreach ($downMigrations as $downMigration) {
@@ -73,7 +73,7 @@ class TestCommand extends AbstractCommand
         }
     }
 
-    private function logMigration(AbstractMigration $migration, $type, $executionTime)
+    private function logMigration(AbstractMigration $migration, string $type, float $executionTime): void
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);

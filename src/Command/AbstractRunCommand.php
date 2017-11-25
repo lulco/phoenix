@@ -13,13 +13,13 @@ abstract class AbstractRunCommand extends AbstractCommand
 
     protected $migrationInfoPrefix = '';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->addOption('dry', null, InputOption::VALUE_NONE, 'Only print queries, no execution');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $dry = (bool) $this->input->getOption('dry');
         if ($dry) {
@@ -58,7 +58,7 @@ abstract class AbstractRunCommand extends AbstractCommand
         $this->outputData['executed_migrations'] = $executedMigrations;
     }
 
-    protected function checkDirs(array $dirs)
+    protected function checkDirs(array $dirs): void
     {
         if (empty($dirs)) {
             return;
@@ -71,7 +71,7 @@ abstract class AbstractRunCommand extends AbstractCommand
         }
     }
 
-    abstract protected function findMigrations();
+    abstract protected function findMigrations(): array;
 
-    abstract protected function runMigration(AbstractMigration $migration, $dry = false);
+    abstract protected function runMigration(AbstractMigration $migration, bool $dry = false): void;
 }

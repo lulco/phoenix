@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DumpCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('dump')
             ->setDescription('Dump actual database structure to migration file')
@@ -27,7 +27,7 @@ class DumpCommand extends AbstractCommand
         parent::configure();
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $ignoredTables = array_map('trim', explode(',', $this->input->getOption('ignore-tables') . ',' . $this->config->getLogTableName() ? : $this->config->getLogTableName()));
 
@@ -87,7 +87,7 @@ class DumpCommand extends AbstractCommand
         $this->outputData['migration_filepath'] = $migrationPath;
     }
 
-    private function getFilteredTables(array $ignoredTables = [])
+    private function getFilteredTables(array $ignoredTables = []): array
     {
         $tables = [];
         $structure = $this->adapter->getStructure();
@@ -100,7 +100,7 @@ class DumpCommand extends AbstractCommand
         return $tables;
     }
 
-    private function loadData(array $tables = [])
+    private function loadData(array $tables = []): array
     {
         $ignoredDataTables = $this->input->getOption('ignore-data-tables')
             ? array_map('trim', explode(',', $this->input->getOption('ignore-data-tables')))

@@ -31,8 +31,9 @@ class Index
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
      * @throws InvalidArgumentValueException if index type or index method is not allowed
+     * @todo change $columns to array only
      */
-    public function __construct($columns, $name, $type = self::TYPE_NORMAL, $method = self::METHOD_DEFAULT)
+    public function __construct($columns, string $name, string $type = self::TYPE_NORMAL, string $method = self::METHOD_DEFAULT)
     {
         $this->name = $name;
         $this->type = strtoupper($type);
@@ -44,34 +45,22 @@ class Index
         $this->columns = is_array($columns) ? $columns : [$columns];
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }

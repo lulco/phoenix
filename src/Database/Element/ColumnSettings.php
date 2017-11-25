@@ -46,18 +46,12 @@ class ColumnSettings
         $this->settings = $settings;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }
 
-    /**
-     * @return boolean
-     */
-    public function allowNull()
+    public function allowNull(): bool
     {
         return isset($this->settings[self::SETTING_NULL]) ? $this->settings[self::SETTING_NULL] : false;
     }
@@ -70,89 +64,57 @@ class ColumnSettings
         return isset($this->settings[self::SETTING_DEFAULT]) ? $this->settings[self::SETTING_DEFAULT] : null;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isSigned()
+    public function isSigned(): bool
     {
         return isset($this->settings[self::SETTING_SIGNED]) ? $this->settings[self::SETTING_SIGNED] : true;
     }
 
-    /**
-     * @param mixed $default value to return if length is not set
-     * @return mixed
-     */
-    public function getLength($default = null)
+    public function getLength(?int $default = null): ?int
     {
         return isset($this->settings[self::SETTING_LENGTH]) ? $this->settings[self::SETTING_LENGTH] : $default;
     }
 
-    /**
-     * @param integer $default
-     * @return int|null
-     */
-    public function getDecimals($default = null)
+    public function getDecimals(?int $default = null): ?int
     {
         return isset($this->settings[self::SETTING_DECIMALS]) ? $this->settings[self::SETTING_DECIMALS] : $default;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isAutoincrement()
+    public function isAutoincrement(): bool
     {
         return isset($this->settings[self::SETTING_AUTOINCREMENT]) ? $this->settings[self::SETTING_AUTOINCREMENT] : false;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getAfter()
+    public function getAfter(): ?string
     {
         return isset($this->settings[self::SETTING_AFTER]) ? $this->settings[self::SETTING_AFTER] : null;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isFirst()
+    public function isFirst(): bool
     {
         return isset($this->settings[self::SETTING_FIRST]) ? $this->settings[self::SETTING_FIRST] : false;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCharset()
+    public function getCharset(): ?string
     {
         return isset($this->settings[self::SETTING_CHARSET]) ? $this->settings[self::SETTING_CHARSET] : null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getCollation()
+    public function getCollation(): ?string
     {
         return isset($this->settings[self::SETTING_COLLATION]) ? $this->settings[self::SETTING_COLLATION] : null;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getValues()
+    public function getValues(): ?array
     {
         return isset($this->settings[self::SETTING_VALUES]) ? $this->settings[self::SETTING_VALUES] : null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getComment()
+    public function getComment(): ?string
     {
         return isset($this->settings[self::SETTING_COMMENT]) ? $this->settings[self::SETTING_COMMENT] : null;
     }
 
-    private function checkSettings($settings)
+    private function checkSettings(array $settings)
     {
         $errors = [];
         $reflectionClass = new ReflectionClass($this);
@@ -172,7 +134,7 @@ class ColumnSettings
         }
     }
 
-    private function checkValue($setting, $value)
+    private function checkValue(string $setting, $value)
     {
         if (!isset($this->allowedSettingsValues[$setting])) {
             return true;

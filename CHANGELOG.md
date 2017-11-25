@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Dropped support for PHP 5.6 and PHP 7.0 and added typehints
+
 ### [0.11.0] - 2017-11-14
 #### Added
 - option to execute all migrations from selected directory(-ies) in migrate and rollback command

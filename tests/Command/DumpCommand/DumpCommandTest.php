@@ -73,6 +73,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
         $command = new DumpCommand();
         $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
 
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('There are more then 1 migration dirs. Use one of them: phoenix, dump');
@@ -99,6 +100,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
         $command = new DumpCommand();
         $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
         $this->input->setOption('dir', 'dump');
         $command->run($this->input, $this->output);
 

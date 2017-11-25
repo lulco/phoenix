@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class CreateCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('create')
@@ -24,7 +24,7 @@ class CreateCommand extends AbstractCommand
             ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $migration = $this->input->getArgument('migration');
         $migrationNameCreator = new MigrationNameCreator($migration);
@@ -61,7 +61,7 @@ class CreateCommand extends AbstractCommand
         $this->outputData['migration_filepath'] = $migrationPath;
     }
 
-    private function chooseMigrationDir($dir)
+    private function chooseMigrationDir(?string $dir): string
     {
         try {
             return $this->config->getMigrationDir($dir);

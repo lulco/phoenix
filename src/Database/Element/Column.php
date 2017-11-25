@@ -53,7 +53,7 @@ class Column
      * @param string $type type of column
      * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
      */
-    public function __construct($name, $type, array $settings = [])
+    public function __construct(string $name, string $type, array $settings = [])
     {
         $this->checkType($type);
         $this->name = $name;
@@ -61,31 +61,22 @@ class Column
         $this->settings = new ColumnSettings($settings);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return ColumnSettings
-     */
-    public function getSettings()
+    public function getSettings(): ColumnSettings
     {
         return $this->settings;
     }
 
-    private function checkType($type)
+    private function checkType(string $type): void
     {
         $reflectionClass = new ReflectionClass($this);
         $typeConstants = $reflectionClass->getConstants();
