@@ -32,7 +32,6 @@ class ForeignKey
      * @param string $onDelete
      * @param string $onUpdate
      * @throws InvalidArgumentValueException
-     * @todo change $columns and $referencedColumns to array only
      */
     public function __construct($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
     {
