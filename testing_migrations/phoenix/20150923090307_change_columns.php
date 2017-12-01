@@ -6,7 +6,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class ChangeColumns extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->table('table_2')
             ->addIndex('sorting')
@@ -27,7 +27,7 @@ class ChangeColumns extends AbstractMigration
             ->save();
     }
 
-    public function down()
+    public function down(): void
     {
         $this->table('all_types')
             ->addColumn('new_column', 'string', ['null' => true])

@@ -7,7 +7,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class AddData extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->insert('table_1', [
             'id' => 1,
@@ -104,7 +104,7 @@ class AddData extends AbstractMigration
         ]);
     }
 
-    protected function down()
+    protected function down(): void
     {
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d']);
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c']);

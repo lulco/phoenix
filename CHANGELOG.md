@@ -3,7 +3,10 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Dropped support for PHP 5.6 and PHP 7.0 and added typehints
+- dropped support for PHP 5.6, PHP 7.0 and hhvm
+- dropped support for symfony/console ^2.8
+- added typehints
+- added support for symfony/console ^4.0 and symfony/yaml ^4.0
 
 ### [0.11.0] - 2017-11-14
 #### Added

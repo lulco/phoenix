@@ -35,11 +35,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function execute($sql)
     {
-        try {
-            $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
-        } catch (PDOException $e) {
-            $res = false;
-        }
+        $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
         if ($res === false) {
             $this->throwError($sql);
         }
