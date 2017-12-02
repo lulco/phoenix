@@ -10,7 +10,7 @@ class IndexTest extends TestCase
 {
     public function testSimple()
     {
-        $index = new Index('title', 'title', Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $index = new Index(['title'], 'title', Index::TYPE_NORMAL, Index::METHOD_BTREE);
         $this->assertEquals('title', $index->getName());
         $this->assertCount(1, $index->getColumns());
         $this->assertEquals('', $index->getType());
@@ -28,18 +28,18 @@ class IndexTest extends TestCase
 
     public function testUnique()
     {
-        $index = new Index('title', 'title', Index::TYPE_UNIQUE, Index::METHOD_HASH);
+        $index = new Index(['title'], 'title', Index::TYPE_UNIQUE, Index::METHOD_HASH);
         $this->assertEquals('title', $index->getName());
         $this->assertCount(1, $index->getColumns());
         $this->assertEquals('UNIQUE', $index->getType());
         $this->assertEquals('HASH', $index->getMethod());
 
-        $index = new Index('title', 'title', 'UNIQUE');
+        $index = new Index(['title'], 'title', 'UNIQUE');
         $this->assertEquals('title', $index->getName());
         $this->assertCount(1, $index->getColumns());
         $this->assertEquals('UNIQUE', $index->getType());
 
-        $index = new Index('title', 'title', 'unique');
+        $index = new Index(['title'], 'title', 'unique');
         $this->assertEquals('title', $index->getName());
         $this->assertCount(1, $index->getColumns());
         $this->assertEquals('UNIQUE', $index->getType());
@@ -68,13 +68,13 @@ class IndexTest extends TestCase
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Index type "unknown" is not allowed');
-        new Index('title', 'title', 'unknown');
+        new Index(['title'], 'title', 'unknown');
     }
 
     public function testUnknownMethod()
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Index method "unknown" is not allowed');
-        new Index('title', 'title', '', 'unknown');
+        new Index(['title'], 'title', '', 'unknown');
     }
 }
