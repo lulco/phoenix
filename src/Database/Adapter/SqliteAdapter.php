@@ -11,10 +11,7 @@ use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 
 class SqliteAdapter extends PdoAdapter
 {
-    /**
-     * @return SqliteQueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): SqliteQueryBuilder
     {
         if (!$this->queryBuilder) {
             $this->queryBuilder = new SqliteQueryBuilder($this);
@@ -22,17 +19,17 @@ class SqliteAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    protected function loadDatabase()
+    protected function loadDatabase(): string
     {
         return 'sqlite_master';
     }
 
-    protected function loadTables($database)
+    protected function loadTables(string $database): array
     {
         return $this->execute(sprintf("SELECT name AS table_name, sql FROM %s WHERE type='table' AND name != 'sqlite_sequence'", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    protected function createMigrationTable(array $table)
+    protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
         preg_match('/CREATE TABLE(.*?)\/\*(.*?)\*\//s', $table['sql'], $matches);
@@ -40,7 +37,7 @@ class SqliteAdapter extends PdoAdapter
         return $migrationTable;
     }
 
-    protected function loadColumns($database)
+    protected function loadColumns(string $database): array
     {
         $tables = $this->loadTables($database);
         $tablesColumns = [];
@@ -50,7 +47,7 @@ class SqliteAdapter extends PdoAdapter
         return $tablesColumns;
     }
 
-    protected function addColumn(MigrationTable $migrationTable, array $column)
+    protected function addColumn(MigrationTable $migrationTable, array $column): void
     {
         preg_match('/(.*?)\((.*?)\)/', $column['type'], $matches);
         $type = $column['type'];
@@ -88,7 +85,7 @@ class SqliteAdapter extends PdoAdapter
         $migrationTable->addColumn($column['name'], $type, $settings);
     }
 
-    protected function loadIndexes($database)
+    protected function loadIndexes(string $database): array
     {
         $tables = $this->loadTables($database);
         $tablesIndexes = [];
@@ -115,7 +112,7 @@ class SqliteAdapter extends PdoAdapter
         return $tablesIndexes;
     }
 
-    private function loadPrimaryColumns($tableName)
+    private function loadPrimaryColumns(string $tableName): array
     {
         $columns = $this->execute(sprintf("PRAGMA table_info('%s')", $tableName))->fetchAll(PDO::FETCH_ASSOC);
         $primaryColumns = [];
@@ -127,7 +124,7 @@ class SqliteAdapter extends PdoAdapter
         return $primaryColumns;
     }
 
-    protected function loadForeignKeys($database)
+    protected function loadForeignKeys(string $database): array
     {
         $tables = $this->loadTables($database);
         $foreignKeys = [];
@@ -144,12 +141,12 @@ class SqliteAdapter extends PdoAdapter
         return $foreignKeys;
     }
 
-    protected function escapeString($string)
+    protected function escapeString(string $string): string
     {
         return '"' . $string . '"';
     }
 
-    protected function createRealValue($value)
+    protected function createRealValue($value): string
     {
         return is_array($value) ? implode(',', $value) : $value;
     }

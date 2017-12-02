@@ -7,7 +7,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class Check extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $logs = $this->fetchAll('phoenix_log');
         if (count($logs) != 7) {
@@ -59,7 +59,7 @@ class Check extends AbstractMigration
         }
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }

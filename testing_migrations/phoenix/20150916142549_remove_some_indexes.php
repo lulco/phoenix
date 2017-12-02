@@ -6,7 +6,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class RemoveSomeIndexes extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->table('table_1')
             ->dropIndex('alias')
@@ -18,7 +18,7 @@ class RemoveSomeIndexes extends AbstractMigration
             ->save();
     }
 
-    public function down()
+    public function down(): void
     {
         $this->table('table_2')
             ->addIndex('sorting')

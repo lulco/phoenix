@@ -8,14 +8,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InitCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('init')
             ->setDescription('Initialize phoenix');
         parent::configure();
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
         require_once $filename;

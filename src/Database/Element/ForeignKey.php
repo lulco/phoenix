@@ -33,7 +33,7 @@ class ForeignKey
      * @param string $onUpdate
      * @throws InvalidArgumentValueException
      */
-    public function __construct($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = self::DEFAULT_ACTION, $onUpdate = self::DEFAULT_ACTION)
+    public function __construct($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
     {
         if (!is_array($columns)) {
             $columns = [$columns];
@@ -53,50 +53,32 @@ class ForeignKey
         $this->inArray($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onUpdate . '" is not allowed on update');
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return implode('_', $this->columns);
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @return string
-     */
-    public function getReferencedTable()
+    public function getReferencedTable(): string
     {
         return $this->referencedTable;
     }
 
-    /**
-     * @return array
-     */
-    public function getReferencedColumns()
+    public function getReferencedColumns(): array
     {
         return $this->referencedColumns;
     }
 
-    /**
-     * @return string
-     */
-    public function getOnDelete()
+    public function getOnDelete(): string
     {
         return $this->onDelete;
     }
 
-    /**
-     * @return string
-     */
-    public function getOnUpdate()
+    public function getOnUpdate(): string
     {
         return $this->onUpdate;
     }

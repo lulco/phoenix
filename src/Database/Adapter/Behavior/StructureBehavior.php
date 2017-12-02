@@ -7,7 +7,7 @@ use Phoenix\Database\Element\Structure;
 
 trait StructureBehavior
 {
-    public function getStructure()
+    public function getStructure(): Structure
     {
         $database = $this->loadDatabase();
         $structure = new Structure();
@@ -27,31 +27,31 @@ trait StructureBehavior
         return $structure;
     }
 
-    protected function createMigrationTable(array $table)
+    protected function createMigrationTable(array $table): MigrationTable
     {
         return new MigrationTable($table['table_name'], false);
     }
 
-    protected function addColumns(MigrationTable $migrationTable, array $columns)
+    protected function addColumns(MigrationTable $migrationTable, array $columns): void
     {
         foreach ($columns as $column) {
             $this->addColumn($migrationTable, $column);
         }
     }
 
-    abstract protected function loadDatabase();
+    abstract protected function loadDatabase(): string;
 
-    abstract protected function loadTables($database);
+    abstract protected function loadTables(string $database): array;
 
-    abstract protected function loadColumns($database);
+    abstract protected function loadColumns(string $database): array;
 
-    abstract protected function loadIndexes($database);
+    abstract protected function loadIndexes(string $database): array;
 
-    abstract protected function loadForeignKeys($database);
+    abstract protected function loadForeignKeys(string $database): array;
 
-    abstract protected function addColumn(MigrationTable $migrationTable, array $column);
+    abstract protected function addColumn(MigrationTable $migrationTable, array $column): void;
 
-    private function addIndexes(MigrationTable $migrationTable, array $indexes)
+    private function addIndexes(MigrationTable $migrationTable, array $indexes): void
     {
         foreach ($indexes as $name => $index) {
             $columns = $index['columns'];
@@ -64,7 +64,7 @@ trait StructureBehavior
         }
     }
 
-    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys)
+    private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys): void
     {
         foreach ($foreignKeys as $foreignKey) {
             $columns = $foreignKey['columns'];

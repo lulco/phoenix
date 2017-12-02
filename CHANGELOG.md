@@ -2,6 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- dropped support for PHP 5.6, PHP 7.0 and hhvm
+- dropped support for symfony/console ^2.8
+- added typehints
+- added support for symfony/console ^4.0 and symfony/yaml ^4.0
+
 ### [0.11.0] - 2017-11-14
 #### Added
 - option to execute all migrations from selected directory(-ies) in migrate and rollback command

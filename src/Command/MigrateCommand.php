@@ -12,7 +12,7 @@ class MigrateCommand extends AbstractRunCommand
 
     protected $migrationInfoPrefix = 'Migration';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('migrate')
@@ -22,7 +22,7 @@ class MigrateCommand extends AbstractRunCommand
             ->setDescription('Run migrations');
     }
 
-    protected function findMigrations()
+    protected function findMigrations(): array
     {
         $target = $this->input->getOption('first') ? Manager::TARGET_FIRST : Manager::TARGET_ALL;
         $dirs = $this->input->getOption('dir') ?: [];
@@ -31,7 +31,7 @@ class MigrateCommand extends AbstractRunCommand
         return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target, $dirs, $classes);
     }
 
-    protected function runMigration(AbstractMigration $migration, $dry = false)
+    protected function runMigration(AbstractMigration $migration, bool $dry = false): void
     {
         $migration->migrate($dry);
         if (!$dry) {

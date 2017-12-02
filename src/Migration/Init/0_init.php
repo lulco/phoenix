@@ -10,13 +10,13 @@ class Init extends AbstractMigration
 {
     private $logTableName;
 
-    public function __construct(AdapterInterface $adapter, $logTableName)
+    public function __construct(AdapterInterface $adapter, string $logTableName)
     {
         parent::__construct($adapter);
         $this->logTableName = $logTableName;
     }
 
-    protected function up()
+    protected function up(): void
     {
         $this->table($this->logTableName)
             ->addColumn('migration_datetime', Column::TYPE_STRING)
@@ -25,7 +25,7 @@ class Init extends AbstractMigration
             ->create();
     }
 
-    protected function down()
+    protected function down(): void
     {
         $this->table($this->logTableName)
             ->drop();

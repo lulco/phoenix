@@ -41,13 +41,6 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFile()
-    {
-        $command = new StatusCommand();
-        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
-        $command->run($this->input, $this->output);
-    }
-
     public function testStatusWithoutInitializing()
     {
         $command = new StatusCommand();
@@ -55,7 +48,6 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
-
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);

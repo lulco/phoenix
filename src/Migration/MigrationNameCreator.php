@@ -10,7 +10,7 @@ class MigrationNameCreator
 
     private $fileName;
 
-    public function __construct($fullClassName)
+    public function __construct(string $fullClassName)
     {
         if (substr($fullClassName, 0, 1) == '\\') {
             $fullClassName = substr($fullClassName, 1);
@@ -24,7 +24,7 @@ class MigrationNameCreator
         $this->namespace = $namespace;
     }
 
-    private function createFileName($className)
+    private function createFileName(string $className): string
     {
         $fileName = '';
         $length = strlen($className);
@@ -38,17 +38,17 @@ class MigrationNameCreator
         return date('YmdHis') . $fileName . '.php';
     }
 
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
 
-    public function getFileName()
+    public function getFileName(): string
     {
         return $this->fileName;
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }

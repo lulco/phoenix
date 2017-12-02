@@ -59,36 +59,22 @@ class MigrationTable
     private $copyType;
 
     /**
-     * @param string $name
      * @param mixed $primaryKey
      */
-    public function __construct($name, $primaryKey = true)
+    public function __construct(string $name, $primaryKey = true)
     {
         $this->name = $name;
         $this->tmpPrimaryKey = $primaryKey;
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     * @param array $settings
-     * @return MigrationTable
-     */
-    public function addColumn($name, $type, array $settings = [])
+    public function addColumn(string $name, string $type, array $settings = []): MigrationTable
     {
         $column = new Column($name, $type, $settings);
         $this->columns[$column->getName()] = $column;
         return $this;
     }
 
-    /**
-     * @param string $oldName
-     * @param string $newName
-     * @param string $type
-     * @param array $settings
-     * @return MigrationTable
-     */
-    public function changeColumn($oldName, $newName, $type, array $settings = [])
+    public function changeColumn(string $oldName, string $newName, string $type, array $settings = []): MigrationTable
     {
         $newColumn = new Column($newName, $type, $settings);
         if (isset($this->columns[$oldName])) {
@@ -110,7 +96,7 @@ class MigrationTable
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
      */
-    public function addPrimary($primaryColumn)
+    public function addPrimary($primaryColumn): MigrationTable
     {
         if ($primaryColumn === true) {
             $primaryColumn = new Column('id', Column::TYPE_INTEGER, [ColumnSettings::SETTING_AUTOINCREMENT => true]);
@@ -136,18 +122,12 @@ class MigrationTable
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNewName()
+    public function getNewName(): ?string
     {
         return $this->newName;
     }
@@ -155,34 +135,23 @@ class MigrationTable
     /**
      * @return Column[]
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @param string $name
-     * @return Column|null
-     */
-    public function getColumn($name)
+    public function getColumn(string $name): ?Column
     {
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
-    /**
-     * @param string $name
-     * @return MigrationTable
-     */
-    public function dropColumn($name)
+    public function dropColumn(string $name): MigrationTable
     {
         $this->columnsToDrop[] = $name;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getColumnsToDrop()
+    public function getColumnsToDrop(): array
     {
         return $this->columnsToDrop;
     }
@@ -190,15 +159,12 @@ class MigrationTable
     /**
      * @return Column[]
      */
-    public function getColumnsToChange()
+    public function getColumnsToChange(): array
     {
         return $this->columnsToChange;
     }
 
-    /**
-     * @return array
-     */
-    public function getPrimaryColumns()
+    public function getPrimaryColumns(): array
     {
         return $this->primaryColumns;
     }
@@ -210,7 +176,7 @@ class MigrationTable
      * @param string $name name of index
      * @return MigrationTable
      */
-    public function addIndex($columns, $type = Index::TYPE_NORMAL, $method = Index::METHOD_DEFAULT, $name = '')
+    public function addIndex($columns, string $type = Index::TYPE_NORMAL, string $method = Index::METHOD_DEFAULT, string $name = ''): MigrationTable
     {
         $index = new Index($columns, $this->createIndexName($columns, $name), $type, $method);
         $this->indexes[] = $index;
@@ -220,16 +186,15 @@ class MigrationTable
     /**
      * @return Index[]
      */
-    public function getIndexes()
+    public function getIndexes(): array
     {
         return $this->indexes;
     }
 
     /**
      * @param string|array $columns
-     * @return MigrationTable
      */
-    public function dropIndex($columns)
+    public function dropIndex($columns): MigrationTable
     {
         $indexName = $this->createIndexName($columns);
         return $this->dropIndexByName($indexName);
@@ -239,16 +204,13 @@ class MigrationTable
      * @param string $indexName
      * @return MigrationTable
      */
-    public function dropIndexByName($indexName)
+    public function dropIndexByName(string $indexName): MigrationTable
     {
         $this->indexesToDrop[] = $indexName;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getIndexesToDrop()
+    public function getIndexesToDrop(): array
     {
         return $this->indexesToDrop;
     }
@@ -261,7 +223,7 @@ class MigrationTable
      * @param string $onUpdate
      * @return MigrationTable
      */
-    public function addForeignKey($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = ForeignKey::DEFAULT_ACTION, $onUpdate = ForeignKey::DEFAULT_ACTION)
+    public function addForeignKey($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = ForeignKey::DEFAULT_ACTION, string $onUpdate = ForeignKey::DEFAULT_ACTION): MigrationTable
     {
         $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
         return $this;
@@ -270,16 +232,15 @@ class MigrationTable
     /**
      * @return ForeignKey[]
      */
-    public function getForeignKeys()
+    public function getForeignKeys(): array
     {
         return $this->foreignKeys;
     }
 
     /**
      * @param string|array $columns
-     * @return MigrationTable
      */
-    public function dropForeignKey($columns)
+    public function dropForeignKey($columns): MigrationTable
     {
         if (!is_array($columns)) {
             $columns = [$columns];
@@ -288,121 +249,88 @@ class MigrationTable
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getForeignKeysToDrop()
+    public function getForeignKeysToDrop(): array
     {
         return $this->foreignKeysToDrop;
     }
 
-    /**
-     * @return MigrationTable
-     */
-    public function dropPrimaryKey()
+    public function dropPrimaryKey(): MigrationTable
     {
         $this->dropPrimaryKey = true;
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasPrimaryKeyToDrop()
+    public function hasPrimaryKeyToDrop(): bool
     {
         return $this->dropPrimaryKey;
     }
 
-    /**
-     * @param string $charset
-     * @return MigrationTable
-     */
-    public function setCharset($charset)
+    public function setCharset(?string $charset): MigrationTable
     {
         $this->charset = $charset;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCharset()
+    public function getCharset(): ?string
     {
         return $this->charset;
     }
 
-    /**
-     * @param string $collation
-     * @return MigrationTable
-     */
-    public function setCollation($collation)
+    public function setCollation(?string $collation): MigrationTable
     {
         $this->collation = $collation;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCollation()
+    public function getCollation(): ?string
     {
         return $this->collation;
     }
 
-    public function getCopyType()
+    public function getCopyType(): string
     {
         return $this->copyType;
     }
-    
-    /**
-     * @param string $comment
-     * @return MigrationTable
-     */
-    public function setComment($comment)
+
+    public function setComment(?string $comment): MigrationTable
     {
         $this->comment = $comment;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getComment()
+    public function getComment(): ?string
     {
         return $this->comment;
     }
 
-    /**
-     * @return MigrationTable
-     */
-    public function unsetComment()
+    public function unsetComment(): MigrationTable
     {
         return $this->setComment('');
     }
 
-    public function create()
+    public function create(): void
     {
         $this->action = self::ACTION_CREATE;
         $this->addPrimary($this->tmpPrimaryKey);
     }
 
-    public function save()
+    public function save(): void
     {
         $this->action = self::ACTION_ALTER;
     }
 
-    public function drop()
+    public function drop(): void
     {
         $this->action = self::ACTION_DROP;
     }
 
-    public function rename($newName)
+    public function rename(string $newName): void
     {
         $this->action = self::ACTION_RENAME;
         $this->newName = $newName;
     }
 
-    public function copy($newName, $copyType = self::COPY_ONLY_STRUCTURE)
+    public function copy(string $newName, string $copyType = self::COPY_ONLY_STRUCTURE): void
     {
         $this->inArray($copyType, [self::COPY_ONLY_STRUCTURE, self::COPY_ONLY_DATA, self::COPY_STRUCTURE_AND_DATA], 'Copy type "' . $copyType . '" is not allowed');
 
@@ -411,12 +339,12 @@ class MigrationTable
         $this->copyType = $copyType;
     }
 
-    public function getAction()
+    public function getAction(): string
     {
         return $this->action;
     }
 
-    private function createIndexName($columns, $name = '')
+    private function createIndexName($columns, string $name = ''): string
     {
         if ($name) {
             return $name;
@@ -428,10 +356,7 @@ class MigrationTable
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
 
-    /**
-     * @return Table
-     */
-    public function toTable()
+    public function toTable(): Table
     {
         $table = new Table($this->getName());
         $table->setCharset($this->getCharset());

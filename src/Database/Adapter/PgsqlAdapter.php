@@ -12,10 +12,7 @@ use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
 class PgsqlAdapter extends PdoAdapter
 {
-    /**
-     * @return PgsqlQueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): PgsqlQueryBuilder
     {
         if (!$this->queryBuilder) {
             $this->queryBuilder = new PgsqlQueryBuilder($this);
@@ -23,12 +20,12 @@ class PgsqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    protected function loadDatabase()
+    protected function loadDatabase(): string
     {
         return $this->execute('SELECT current_database()')->fetchColumn();
     }
 
-    protected function loadTables($database)
+    protected function loadTables(string $database): array
     {
         return $this->execute(sprintf("
             SELECT *
@@ -37,7 +34,7 @@ class PgsqlAdapter extends PdoAdapter
             ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    protected function createMigrationTable(array $table)
+    protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
         $comment = $this->execute(sprintf("
@@ -50,7 +47,7 @@ class PgsqlAdapter extends PdoAdapter
         return $migrationTable;
     }
 
-    protected function loadColumns($database)
+    protected function loadColumns(string $database): array
     {
         $columns = $this->execute(sprintf("
             SELECT * FROM INFORMATION_SCHEMA.COLUMNS
@@ -77,14 +74,14 @@ class PgsqlAdapter extends PdoAdapter
         return $tablesColumns;
     }
 
-    protected function addColumn(MigrationTable $migrationTable, array $column)
+    protected function addColumn(MigrationTable $migrationTable, array $column): void
     {
         $type = $this->remapType($column['data_type']);
         $settings = $this->prepareSettings($type, $column, $migrationTable->getName());
         $migrationTable->addColumn($column['column_name'], $type, $settings);
     }
 
-    private function remapType($type)
+    private function remapType(string $type): string
     {
         $types = [
             'smallint' => Column::TYPE_SMALL_INTEGER,
@@ -101,10 +98,10 @@ class PgsqlAdapter extends PdoAdapter
             'USER-DEFINED' => Column::TYPE_ENUM,
             'ARRAY' => Column::TYPE_SET,
         ];
-        return isset($types[$type]) ? $types[$type] : $type;
+        return $types[$type] ?? $type;
     }
 
-    private function prepareSettings($type, $column, $table)
+    private function prepareSettings(string $type, array $column, string $table): array
     {
         $length = null;
         $decimals = null;
@@ -130,7 +127,7 @@ class PgsqlAdapter extends PdoAdapter
         return $settings;
     }
 
-    private function prepareDefault($column, $type)
+    private function prepareDefault(array $column, string $type)
     {
         if (!$column['column_default']) {
             return null;
@@ -144,7 +141,7 @@ class PgsqlAdapter extends PdoAdapter
         return $default;
     }
 
-    protected function loadIndexes($database)
+    protected function loadIndexes(string $database): array
     {
         $indexRows = $this->execute("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
             SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
@@ -164,7 +161,7 @@ class PgsqlAdapter extends PdoAdapter
         return $indexes;
     }
 
-    protected function loadForeignKeys($database)
+    protected function loadForeignKeys(string $database): array
     {
         $query = "SELECT tc.constraint_name, tc.table_name, kcu.column_name, kcu.ordinal_position, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name, pgc.confupdtype, pgc.confdeltype
             FROM information_schema.table_constraints AS tc
@@ -185,7 +182,7 @@ class PgsqlAdapter extends PdoAdapter
         return $foreignKeys;
     }
 
-    private function remapForeignKeyAction($action)
+    private function remapForeignKeyAction(string $action): string
     {
         $actionMap = [
             'a' => ForeignKey::NO_ACTION,
@@ -193,15 +190,15 @@ class PgsqlAdapter extends PdoAdapter
             'n' => ForeignKey::SET_NULL,
             'r' => ForeignKey::RESTRICT,
         ];
-        return isset($actionMap[$action]) ? $actionMap[$action] : $action;
+        return $actionMap[$action] ?? $action;
     }
 
-    protected function escapeString($string)
+    protected function escapeString(string $string): string
     {
         return '"' . $string . '"';
     }
 
-    protected function createRealValue($value)
+    protected function createRealValue($value): string
     {
         return is_array($value) ? '{' . implode(',', $value) . '}' : $value;
     }
