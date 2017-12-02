@@ -16,6 +16,8 @@ Framework agnostic database migrations for PHP.
 - Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
 - Dump command for creating migration from existing database
+- Test command for testing new migration executing migrate, rollback, migrate
+- Status command that shows list of executed migrations and list of migrations to execute
 - json output format for all commands
 - Namespaces in migration classes
 - Own migration templates
@@ -104,12 +106,12 @@ use Phoenix\Migration\AbstractMigration;
 
 class MyFirstMigration extends AbstractMigration
 {
-    protected function up()
+    protected function up(): void
     {
         
     }
 
-    protected function down()
+    protected function down(): void
     {
         
     }
@@ -142,7 +144,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class MyFirstMigration extends AbstractMigration
 {
-    protected function up()
+    protected function up(): void
     {
         $this->table('first_table')
             ->addColumn('title', 'string')
@@ -156,7 +158,7 @@ class MyFirstMigration extends AbstractMigration
 ```
 Implementation of correspondent `down()` method which drops table `first_table` looks like below:
 ```php
-    protected function down()
+    protected function down(): void
     {
         $this->table('first_table')
             ->drop();
