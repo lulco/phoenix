@@ -10,7 +10,7 @@ class ForeignKeyTest extends TestCase
 {
     public function testSimple()
     {
-        $foreignKey = new ForeignKey('title', 'ref_table');
+        $foreignKey = new ForeignKey(['title'], 'ref_table');
         $this->assertEquals('title', $foreignKey->getName());
         $this->assertCount(1, $foreignKey->getColumns());
         $this->assertEquals(['title'], $foreignKey->getColumns());
@@ -36,7 +36,7 @@ class ForeignKeyTest extends TestCase
 
     public function testRestrict()
     {
-        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'RESTRICT');
+        $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'restrict', 'RESTRICT');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
         $this->assertCount(1, $foreignKey->getColumns());
         $this->assertEquals(['foreign_key_id'], $foreignKey->getColumns());
@@ -49,7 +49,7 @@ class ForeignKeyTest extends TestCase
 
     public function testSetNull()
     {
-        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'set null', 'SET NULL');
+        $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'set null', 'SET NULL');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
         $this->assertCount(1, $foreignKey->getColumns());
         $this->assertEquals(['foreign_key_id'], $foreignKey->getColumns());
@@ -62,7 +62,7 @@ class ForeignKeyTest extends TestCase
 
     public function testCascadeAndNoAction()
     {
-        $foreignKey = new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'Cascade', 'No Action');
+        $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'Cascade', 'No Action');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
         $this->assertCount(1, $foreignKey->getColumns());
         $this->assertEquals(['foreign_key_id'], $foreignKey->getColumns());
@@ -77,13 +77,13 @@ class ForeignKeyTest extends TestCase
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Action "unknown" is not allowed on delete');
-        new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'unknown');
+        new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'unknown');
     }
 
     public function testUnknownMethod()
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Action "unknown" is not allowed on update');
-        new ForeignKey('foreign_key_id', 'foreign_table', 'id', 'restrict', 'unknown');
+        new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'restrict', 'unknown');
     }
 }

@@ -53,7 +53,7 @@ class TableTest extends TestCase
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('fk_table1_id', 'integer')));
         $this->assertInstanceOf(Table::class, $table->setPrimary(['id']));
         $this->assertInstanceOf(Table::class, $table->addIndex(new Index(['alias'], Index::TYPE_UNIQUE)));
-        $this->assertInstanceOf(Table::class, $table->addForeignKey(new ForeignKey('fk_table1_id', 'table1')));
+        $this->assertInstanceOf(Table::class, $table->addForeignKey(new ForeignKey(['fk_table1_id'], 'table1')));
 
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(['id'], $table->getPrimary());
@@ -83,7 +83,7 @@ class TableTest extends TestCase
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('fk_table1_id', 'integer')));
         $this->assertInstanceOf(Table::class, $table->setPrimary(['id']));
         $this->assertInstanceOf(Table::class, $table->addIndex(new Index(['alias'], 'alias_index', Index::TYPE_UNIQUE)));
-        $this->assertInstanceOf(Table::class, $table->addForeignKey(new ForeignKey('fk_table1_id', 'table1')));
+        $this->assertInstanceOf(Table::class, $table->addForeignKey(new ForeignKey(['fk_table1_id'], 'table1')));
 
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(['id'], $table->getPrimary());
