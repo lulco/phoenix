@@ -178,6 +178,9 @@ class MigrationTable
      */
     public function addIndex($columns, string $type = Index::TYPE_NORMAL, string $method = Index::METHOD_DEFAULT, string $name = ''): MigrationTable
     {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
         $index = new Index($columns, $this->createIndexName($columns, $name), $type, $method);
         $this->indexes[] = $index;
         return $this;
@@ -196,14 +199,13 @@ class MigrationTable
      */
     public function dropIndex($columns): MigrationTable
     {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
         $indexName = $this->createIndexName($columns);
         return $this->dropIndexByName($indexName);
     }
 
-    /**
-     * @param string $indexName
-     * @return MigrationTable
-     */
     public function dropIndexByName(string $indexName): MigrationTable
     {
         $this->indexesToDrop[] = $indexName;
@@ -344,15 +346,12 @@ class MigrationTable
         return $this->action;
     }
 
-    private function createIndexName($columns, string $name = ''): string
+    private function createIndexName(array $columns, string $name = ''): string
     {
         if ($name) {
             return $name;
         }
 
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
 
