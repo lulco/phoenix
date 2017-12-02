@@ -26,24 +26,12 @@ class ForeignKey
     private $onUpdate;
 
     /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @throws InvalidArgumentValueException
+     * @throws InvalidArgumentValueException if onDelete action or onUpdate action is not allowed
      */
-    public function __construct($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
+    public function __construct(array $columns, string $referencedTable, array $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
     {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
         $this->columns = $columns;
         $this->referencedTable = $referencedTable;
-
-        if (!is_array($referencedColumns)) {
-            $referencedColumns = [$referencedColumns];
-        }
         $this->referencedColumns = $referencedColumns;
 
         $this->onDelete = strtoupper($onDelete);

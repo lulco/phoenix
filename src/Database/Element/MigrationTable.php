@@ -227,6 +227,12 @@ class MigrationTable
      */
     public function addForeignKey($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = ForeignKey::DEFAULT_ACTION, string $onUpdate = ForeignKey::DEFAULT_ACTION): MigrationTable
     {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        if (!is_array($referencedColumns)) {
+            $referencedColumns = [$referencedColumns];
+        }
         $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
         return $this;
     }
