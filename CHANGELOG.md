@@ -2,11 +2,11 @@
 
 ### [Unreleased][unreleased]
 
+### [0.12.0] - 2017-12-06
 #### Changed
 - dropped support for PHP 5.6, PHP 7.0 and hhvm
-- dropped support for symfony/console ^2.8
+- dropped support for symfony/console ^2.8 and added support for symfony/console ^4.0 and symfony/yaml ^4.0
 - added typehints
-- added support for symfony/console ^4.0 and symfony/yaml ^4.0
 
 ### [0.11.0] - 2017-11-14
 #### Added
@@ -150,7 +150,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.11.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.12.0...HEAD
+[0.12.0]: https://github.com/lulco/phoenix/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/lulco/phoenix/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/lulco/phoenix/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/lulco/phoenix/compare/0.9.0...0.9.1
