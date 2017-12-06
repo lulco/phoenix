@@ -209,7 +209,11 @@ class Dumper
         return $defaultSettings;
     }
 
-    private function transformValue($value): string
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function transformValue($value)
     {
         if (is_bool($value)) {
             $value = $value ? 'true' : 'false';

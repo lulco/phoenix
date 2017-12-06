@@ -5,10 +5,8 @@ namespace Phoenix\Database\Adapter;
 use DateTime;
 use InvalidArgumentException;
 use PDO;
-use PDOException;
 use PDOStatement;
 use Phoenix\Database\Adapter\Behavior\StructureBehavior;
-use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
 abstract class PdoAdapter implements AdapterInterface
@@ -20,7 +18,6 @@ abstract class PdoAdapter implements AdapterInterface
 
     private $charset;
 
-    /** @var QueryBuilderInterface */
     protected $queryBuilder;
 
     public function __construct(PDO $pdo)
@@ -30,7 +27,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     /**
      * @param string|PDOStatement $sql
-     * @return PDOStatement|boolean
+     * @return PDOStatement|bool
      * @throws DatabaseQueryExecuteException on error
      */
     public function execute($sql)
@@ -118,7 +115,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     public function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array
     {
-        $statement = $this->buildFetchQuery($table, $fields, $conditions, 1, $orders, $groups);
+        $statement = $this->buildFetchQuery($table, $fields, $conditions, '1', $orders, $groups);
         $this->execute($statement);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
@@ -330,7 +327,7 @@ abstract class PdoAdapter implements AdapterInterface
     private function throwError($query)
     {
         $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_r($query, true) . ' fails' : ''), $errorInfo[1]);
     }
 
     abstract protected function escapeString(string $string): string;

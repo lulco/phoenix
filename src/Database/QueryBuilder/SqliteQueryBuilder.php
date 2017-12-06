@@ -150,6 +150,9 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $primaryKeys = [];
         foreach ($table->getPrimaryColumns() as $name) {
             $column = $table->getColumn($name);
+            if ($column === null) {
+                continue;
+            }
             if (!$column->getSettings()->isAutoincrement()) {
                 $primaryKeys[] = $this->escapeString($column->getName());
             }
@@ -212,7 +215,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         if ($column->getType() == Column::TYPE_ENUM) {
             $values = $column->getSettings()->getValues();
         } elseif ($column->getType() === Column::TYPE_SET) {
-            $this->createSetCombinations($column->getSettings()->getValues(), '', $values);
+            $this->createSetCombinations($column->getSettings()->getValues() ?: [], '', $values);
         }
         return sprintf($this->remapType($column), $column->getName(), implode(',', array_map(function ($value) {
             return "'$value'";
