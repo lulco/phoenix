@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [0.12.1] - 2017-12-18
 #### Fixed
 - binding for null and boolean values
 
@@ -153,7 +154,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.12.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.12.1...HEAD
+[0.12.1]: https://github.com/lulco/phoenix/compare/0.12.0...0.12.1
 [0.12.0]: https://github.com/lulco/phoenix/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/lulco/phoenix/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/lulco/phoenix/compare/0.9.1...0.10.0
