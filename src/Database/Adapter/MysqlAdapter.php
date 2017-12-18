@@ -142,7 +142,7 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
         return '`' . $string . '`';
     }
 
-    protected function createRealValue($value): string
+    protected function createRealValue($value): ?string
     {
         return is_array($value) ? implode(',', $value) : $value;
     }

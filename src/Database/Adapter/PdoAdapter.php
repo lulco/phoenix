@@ -272,7 +272,7 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->charset;
     }
 
-    protected function getLengthAndDecimals($lengthAndDecimals = null)
+    protected function getLengthAndDecimals(?string $lengthAndDecimals = null)
     {
         if ($lengthAndDecimals === null) {
             return [null, null];
@@ -286,7 +286,7 @@ abstract class PdoAdapter implements AdapterInterface
         return [$length, $decimals];
     }
 
-    private function bindDataValues($statement, $data, $prefix = '')
+    private function bindDataValues(PDOStatement $statement, array $data, string $prefix = '')
     {
         foreach ($data as $key => $value) {
             if ($value instanceof DateTime) {
@@ -303,7 +303,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
     }
 
-    private function bindCondition(PDOStatement $statement, $key, $condition)
+    private function bindCondition(PDOStatement $statement, string $key, $condition)
     {
         if (!is_array($condition)) {
             $statement->bindValue('where_' . $key, $condition);
@@ -332,5 +332,5 @@ abstract class PdoAdapter implements AdapterInterface
 
     abstract protected function escapeString(string $string): string;
 
-    abstract protected function createRealValue($value): string;
+    abstract protected function createRealValue($value): ?string;
 }

@@ -12,7 +12,7 @@ class Init extends AbstractMigration
         $this->table('table_1')
             ->addColumn('title', 'string', ['charset' => 'utf16'])
             ->addColumn('alias', 'string', ['length' => 100])
-            ->addColumn('is_active', 'boolean', ['default' => false])
+            ->addColumn('is_active', 'boolean', ['default' => true])
             ->addColumn('bodytext', 'text', ['null' => true])
             ->addColumn('self_fk', 'integer', ['null' => true])
             ->addIndex('alias', 'unique')

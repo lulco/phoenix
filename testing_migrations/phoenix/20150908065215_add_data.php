@@ -13,6 +13,8 @@ class AddData extends AbstractMigration
             'id' => 1,
             'title' => 'First item',
             'alias' => 'first-item',
+            'is_active' => false,
+            'self_fk' => null,
         ]);
 
         $this->insert('table_1', [
@@ -58,7 +60,8 @@ class AddData extends AbstractMigration
         ]);
 
         $this->update('table_1', [
-            'title' => 'Renamed second item'
+            'title' => 'Renamed second item',
+            'is_active' => true,
         ], ['id' => 2]);
 
         $this->insert('all_types', [
