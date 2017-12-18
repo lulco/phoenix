@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- binding for null and boolean values
+
 ### [0.12.0] - 2017-12-06
 #### Changed
 - dropped support for PHP 5.6, PHP 7.0 and hhvm
