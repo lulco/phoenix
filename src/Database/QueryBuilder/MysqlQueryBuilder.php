@@ -134,7 +134,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 $columns[] = $column->getName();
             }
 
-            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . '(' . implode(',', $columns) . ') SELECT ' . implode(',', $columns) . ' FROM ' . $this->escapeString($table->getName()) . ';';
+            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' (' . implode(',', $columns) . ') SELECT ' . implode(',', $columns) . ' FROM ' . $this->escapeString($table->getName()) . ';';
         }
         return $queries;
     }

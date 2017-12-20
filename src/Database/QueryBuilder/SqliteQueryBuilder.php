@@ -5,7 +5,6 @@ namespace Phoenix\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Exception\PhoenixException;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -168,9 +167,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     private function createNewTable(MigrationTable $table, string $newTableName, bool $copyData = true): array
     {
-        if ($this->adapter === null) {
-            throw new PhoenixException('Missing adapter');
-        }
         $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
         $newPrimaryColumnNames = $this->getNewPrimaryColumnNames($table);
         $columns = array_merge($table->getPrimaryColumns(), $oldColumns, $table->getColumnsToChange());

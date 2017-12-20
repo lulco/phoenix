@@ -280,7 +280,6 @@ class MysqlQueryBuilderTest extends TestCase
         $expectedQueries = [
             'ALTER TABLE `change_primary_key` DROP PRIMARY KEY;',
             'ALTER TABLE `change_primary_key` ADD PRIMARY KEY (`new_primary`);',
-
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
 

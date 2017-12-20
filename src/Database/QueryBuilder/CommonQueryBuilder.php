@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use InvalidArgumentException;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -85,10 +86,17 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     protected function addPrimaryKey(MigrationTable $table): array
     {
         $primaryColumns = $table->getPrimaryColumns();
-        if (empty($primaryColumns)) {
+        $primaryColumnNames = $table->getPrimaryColumnNames();
+        // TODO move to MigrationTable
+        if (!empty($primaryColumns) && !empty($primaryColumnNames)) {
+            throw new InvalidArgumentException('Cannot combine addPrimary() and addPrimaryColumns() in one migration');
+        }
+        if (empty($primaryColumns) && empty($primaryColumnNames)) {
             return [];
         }
-
+        if (!empty($primaryColumnNames)) {
+            return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table) . ';'];
+        }
         $copyTable = new MigrationTable($table->getName());
         $newTableName = '_' . $table->getName() . '_copy_' . date('YmdHis');
         $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_STRUCTURE);

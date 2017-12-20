@@ -24,26 +24,6 @@ class CopyTableTest extends TestCase
         $this->adapter = new SqliteAdapter($pdo);
     }
 
-    public function testMissingAdapter()
-    {
-        $table = new MigrationTable('missing_adapter');
-        $table->addColumn('title', 'string');
-        $table->create();
-
-        $queryBuilder = new SqliteQueryBuilder($this->adapter);
-        foreach ($queryBuilder->createTable($table) as $query) {
-            $this->adapter->execute($query);
-        }
-
-        $table = new MigrationTable('missing_adapter');
-        $table->copy('new_missing_adapter');
-
-        $queryBuilder = new SqliteQueryBuilder($this->adapter);
-        $this->expectException(PhoenixException::class);
-        $this->expectExceptionMessage('Missing adapter');
-        $queryBuilder->copyTable($table);
-    }
-
     public function testCopyDefault()
     {
         $table = new MigrationTable('copy_default');
