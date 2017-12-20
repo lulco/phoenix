@@ -2,20 +2,14 @@
 
 namespace Phoenix\TestingMigrations;
 
+use Phoenix\Database\Element\Column;
 use Phoenix\Migration\AbstractMigration;
+use Ramsey\Uuid\Uuid;
 
 class RemoveSomeIndexes extends AbstractMigration
 {
     public function up(): void
     {
-        $this->table('table_3')
-            ->addPrimaryColumns([new \Phoenix\Database\Element\Column('id', 'integer', ['autoincrement' => true])])
-            ->save();
-
-
-
-
-
         $this->table('table_1')
             ->dropIndex('alias')
             ->save();

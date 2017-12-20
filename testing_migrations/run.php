@@ -20,18 +20,18 @@ $configuration = [
             'password' => '123',
             'charset' => 'utf8',
         ],
-//        'pgsql' => [
-//            'adapter' => 'pgsql',
-//            'db_name' => 'phoenix',
-//            'host' => 'localhost',
-//            'username' => 'postgres',
-//            'password' => '123',
-//            'charset' => 'utf8',
-//        ],
-//        'sqlite' => [
-//            'adapter' => 'sqlite',
-//            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
-//        ],
+        'pgsql' => [
+            'adapter' => 'pgsql',
+            'db_name' => 'phoenix',
+            'host' => 'localhost',
+            'username' => 'postgres',
+            'password' => '123',
+            'charset' => 'utf8',
+        ],
+        'sqlite' => [
+            'adapter' => 'sqlite',
+            'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
+        ],
     ],
 ];
 
@@ -50,11 +50,11 @@ foreach (array_keys($configuration['environments']) as $environment) {
         foreach ($migrations as $migration) {
             $migration->migrate();
             $manager->logExecution($migration);
-//            $migration->rollback();
-//            $manager->removeExecution($migration);
-//            $migration->migrate();
-//            $manager->logExecution($migration);
-            print_R($migration->getExecutedQueries());
+            $migration->rollback();
+            $manager->removeExecution($migration);
+            $migration->migrate();
+            $manager->logExecution($migration);
+//            print_R($migration->getExecutedQueries());
         }
     } while ($migrations);
     echo "All OK\n\n";

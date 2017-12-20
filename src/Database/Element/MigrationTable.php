@@ -140,6 +140,12 @@ class MigrationTable
         return $this;
     }
 
+    public function setName(string $name): MigrationTable
+    {
+        $this->name = $name;
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;

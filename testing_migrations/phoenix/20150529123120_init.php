@@ -28,12 +28,16 @@ class Init extends AbstractMigration
             ->addForeignKey('t1_fk', 'table_1', 'id')
             ->create();
 
-        $this->table('table_3', false/*, 'identifier'*/)
+        $this->table('table_3', false)
             ->addColumn('identifier', 'uuid')
             ->addColumn('t1_fk', 'integer')
             ->addColumn('t2_fk', 'integer', ['null' => true])
             ->addForeignKey('t1_fk', 'table_1', 'id', ForeignKey::RESTRICT, ForeignKey::RESTRICT)
             ->addForeignKey('t2_fk', 'table_2', 'id')
+            ->create();
+
+        $this->table('table_4', false)
+            ->addColumn('title', 'string')
             ->create();
 
         $this->table('all_types', 'identifier')
@@ -75,6 +79,7 @@ class Init extends AbstractMigration
     protected function down(): void
     {
         $this->table('all_types')->drop();
+        $this->table('table_4')->drop();
         $this->table('table_3')->drop();
         $this->table('table_2')->drop();
         $this->table('table_1')->drop();

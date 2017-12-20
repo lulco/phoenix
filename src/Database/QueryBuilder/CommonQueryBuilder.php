@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
@@ -11,6 +12,13 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     protected $typeMap = [];
 
     protected $defaultLength = [];
+
+    protected $adapter;
+
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
 
     protected function createType(Column $column, MigrationTable $table): string
     {
@@ -93,6 +101,18 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         // if primary key is autoincrement this would work
         $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
         $queries = array_merge($queries, $this->copyTable($copyTable));
+
+        $tableToDeleteName = '_' . $table->getName() . '_to_delete_' . date('YmdHis');
+        $table->rename($tableToDeleteName);
+        $queries = array_merge($queries, $this->renameTable($table));
+
+        $copyTable->setName($newTableName);
+        $copyTable->rename($table->getName());
+        $table->setName($tableToDeleteName);
+
+        $queries = array_merge($queries, $this->renameTable($copyTable));
+        $queries = array_merge($queries, $this->dropTable($table));
+
         return $queries;
     }
 

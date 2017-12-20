@@ -38,7 +38,7 @@ class CopyTableTest extends TestCase
         $table = new MigrationTable('missing_adapter');
         $table->copy('new_missing_adapter');
 
-        $queryBuilder = new SqliteQueryBuilder();
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
         $this->expectException(PhoenixException::class);
         $this->expectExceptionMessage('Missing adapter');
         $queryBuilder->copyTable($table);

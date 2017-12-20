@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
@@ -58,13 +57,6 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_FLOAT => [10, 0],
         Column::TYPE_DOUBLE => [10, 0],
     ];
-
-    private $adapter;
-
-    public function __construct(AdapterInterface $adapter = null)
-    {
-        $this->adapter = $adapter;
-    }
 
     public function createTable(MigrationTable $table): array
     {
