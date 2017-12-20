@@ -2,83 +2,37 @@
 
 namespace Phoenix\Database\Adapter;
 
+use PDOStatement;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 interface AdapterInterface
 {
     /**
-     * @param mixed $sql
+     * @param string|PDOStatement $sql
      */
     public function execute($sql);
 
     /**
-     * @param string $table
-     * @param array $data
      * @return mixed last inserted id
      */
-    public function insert($table, array $data);
+    public function insert(string $table, array $data);
 
-    /**
-     * @param string $table
-     * @param array $data
-     */
-    public function buildInsertQuery($table, array $data);
+    public function buildInsertQuery(string $table, array $data): PDOStatement;
 
-    /**
-     * @param string $table
-     * @param array $data
-     * @param array $conditions
-     * @param string $where
-     */
-    public function update($table, array $data, array $conditions = [], $where = '');
+    public function update(string $table, array $data, array $conditions = [], string $where = ''): bool;
 
-    /**
-     * @param string $table
-     * @param array $data
-     * @param array $conditions
-     * @param string $where
-     */
-    public function buildUpdateQuery($table, array $data, array $conditions = [], $where = '');
+    public function buildUpdateQuery(string $table, array $data, array $conditions = [], string $where = ''): PDOStatement;
 
-    /**
-     * @param string $table
-     * @param array $conditions
-     * @param string $where
-     */
-    public function delete($table, array $conditions = [], $where = '');
+    public function delete(string $table, array $conditions = [], string $where = ''): bool;
 
-    /**
-     * @param string $sql
-     * @return array
-     */
-    public function select($sql);
+    public function buildDeleteQuery(string $table, array $conditions = [], string $where = ''): PDOStatement;
 
-    /**
-     * @param string $table
-     * @param string $fields
-     * @param array $conditions
-     * @param array $orders
-     * @param array $groups
-     */
-    public function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = []);
+    public function select(string $sql): array;
 
-    /**
-     * @param string $table
-     * @param string $fields
-     * @param array $conditions
-     * @param string|null $limit
-     * @param array $orders
-     * @param array $groups
-     */
-    public function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = []);
+    public function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array;
 
-    /**
-     * @param string $table
-     * @param array $conditions
-     * @param string $where
-     */
-    public function buildDeleteQuery($table, array $conditions = [], $where = '');
+    public function fetchAll(string $table, string $fields = '*', array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array;
 
     /**
      * @return QueryBuilderInterface
@@ -89,33 +43,23 @@ interface AdapterInterface
      * Initiates a transaction
      * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
-    public function startTransaction();
+    public function startTransaction(): bool;
 
     /**
      * Commits a transaction
      * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
-    public function commit();
+    public function commit(): bool;
 
     /**
      * Rolls back a transaction
      * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
      */
-    public function rollback();
+    public function rollback(): bool;
 
-    /**
-     * @param string $charset
-     * @return AdapterInterface
-     */
-    public function setCharset($charset);
+    public function setCharset(string $charset): AdapterInterface;
 
-    /**
-     * @return string
-     */
-    public function getCharset();
+    public function getCharset(): ?string;
 
-    /**
-     * @return Structure
-     */
-    public function getStructure();
+    public function getStructure(): Structure;
 }

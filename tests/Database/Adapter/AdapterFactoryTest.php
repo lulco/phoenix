@@ -8,9 +8,9 @@ use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Exception\InvalidArgumentValueException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class AdapterFactoryTest extends PHPUnit_Framework_TestCase
+class AdapterFactoryTest extends TestCase
 {
     public function testMysql()
     {

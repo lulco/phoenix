@@ -2,6 +2,25 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Add a primary key on an existing table
+
+### [0.12.1] - 2017-12-18
+#### Fixed
+- binding for null and boolean values
+
+### [0.12.0] - 2017-12-06
+#### Changed
+- dropped support for PHP 5.6, PHP 7.0 and hhvm
+- dropped support for symfony/console ^2.8 and added support for symfony/console ^4.0 and symfony/yaml ^4.0
+- added typehints
+
+### [0.11.0] - 2017-11-14
+#### Added
+- option to execute all migrations from selected directory(-ies) in migrate and rollback command
+- option to execute migrations via classname in migrate and rollback command
+- TestCommand to test next migration via migrate-rollback-migrate(-rollback)
+
 ### [0.10.0] - 2017-10-01
 #### Added
 - method copyTable for copy table structure, data or both
@@ -138,7 +157,10 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/0.10.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/0.12.1...HEAD
+[0.12.1]: https://github.com/lulco/phoenix/compare/0.12.0...0.12.1
+[0.12.0]: https://github.com/lulco/phoenix/compare/0.11.0...0.12.0
+[0.11.0]: https://github.com/lulco/phoenix/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/lulco/phoenix/compare/0.9.1...0.10.0
 [0.9.1]: https://github.com/lulco/phoenix/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/lulco/phoenix/compare/0.8.0...0.9.0

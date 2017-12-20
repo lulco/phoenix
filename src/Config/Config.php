@@ -26,17 +26,17 @@ class Config
         }
     }
 
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return $this->configuration;
     }
 
-    public function getMigrationDirs()
+    public function getMigrationDirs(): array
     {
         return $this->configuration['migration_dirs'];
     }
 
-    public function getMigrationDir($dir = null)
+    public function getMigrationDir(?string $dir = null): string
     {
         if ($dir === null) {
             if (count($this->configuration['migration_dirs']) > 1) {
@@ -52,12 +52,12 @@ class Config
         throw new InvalidArgumentValueException('Directory "' . $dir . '" doesn\'t exist. Use: ' . implode(', ', array_keys($this->configuration['migration_dirs'])));
     }
 
-    public function getLogTableName()
+    public function getLogTableName(): string
     {
         return $this->configuration['log_table_name'];
     }
 
-    public function getDefaultEnvironment()
+    public function getDefaultEnvironment(): string
     {
         if ($this->configuration['default_environment']) {
             return $this->configuration['default_environment'];
@@ -65,7 +65,7 @@ class Config
         return current(array_keys($this->configuration['environments']));
     }
 
-    public function getEnvironmentConfig($environment)
+    public function getEnvironmentConfig(string $environment): EnvironmentConfig
     {
         return new EnvironmentConfig($this->configuration['environments'][$environment]);
     }

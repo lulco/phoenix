@@ -7,14 +7,14 @@ use Symfony\Component\Console\Helper\Table;
 
 class StatusCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('status')
             ->setDescription('List of migrations already executed and list of migrations to execute');
         parent::configure();
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $executedMigrations = [];
         foreach ($this->manager->executedMigrations() as $migration) {
@@ -41,7 +41,7 @@ class StatusCommand extends AbstractCommand
         }
     }
 
-    private function printTable(array $headers, array $rows, $header, $noItemsText)
+    private function printTable(array $headers, array $rows, string $header, string $noItemsText): void
     {
         $this->writeln('');
         $this->writeln("<comment>$header</comment>");

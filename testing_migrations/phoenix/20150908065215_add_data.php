@@ -7,12 +7,14 @@ use Phoenix\Migration\AbstractMigration;
 
 class AddData extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->insert('table_1', [
             'id' => 1,
             'title' => 'First item',
             'alias' => 'first-item',
+            'is_active' => false,
+            'self_fk' => null,
         ]);
 
         $this->insert('table_1', [
@@ -58,7 +60,8 @@ class AddData extends AbstractMigration
         ]);
 
         $this->update('table_1', [
-            'title' => 'Renamed second item'
+            'title' => 'Renamed second item',
+            'is_active' => true,
         ], ['id' => 2]);
 
         $this->insert('all_types', [
@@ -104,7 +107,7 @@ class AddData extends AbstractMigration
         ]);
     }
 
-    protected function down()
+    protected function down(): void
     {
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d']);
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c']);

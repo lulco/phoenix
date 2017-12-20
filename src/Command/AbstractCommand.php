@@ -43,11 +43,7 @@ abstract class AbstractCommand extends Command
      */
     protected $outputData = [];
 
-    /**
-     * @param string $name
-     * @return AbstractCommand
-     */
-    public function setName($name)
+    public function setName($name): Command
     {
         if (!$this->getName()) {
             return parent::setName($name);
@@ -55,7 +51,7 @@ abstract class AbstractCommand extends Command
         return $this;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED, 'Environment');
         $this->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to config file');
@@ -63,21 +59,13 @@ abstract class AbstractCommand extends Command
         $this->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: default, json', 'default');
     }
 
-    /**
-     * @param array $configuration
-     * @return AbstractCommand
-     */
-    public function setConfig(array $configuration)
+    public function setConfig(array $configuration): AbstractCommand
     {
         $this->config = new Config($configuration);
         return $this;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
-    final protected function execute(InputInterface $input, OutputInterface $output)
+    final public function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->input = $input;
         $this->output = $output;
@@ -94,17 +82,20 @@ abstract class AbstractCommand extends Command
         $this->finishCommand();
     }
 
-    protected function writeln($message, $options = 0)
+    /**
+     * @param string|array $message
+     */
+    protected function writeln($message, int $options = 0): void
     {
         $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
     }
 
-    protected function isDefaultOutput()
+    protected function isDefaultOutput(): bool
     {
         return $this->input->getOption('output-format') === null || $this->input->getOption('output-format') === 'default';
     }
 
-    private function finishCommand()
+    private function finishCommand(): void
     {
         $executionTime = microtime(true) - $this->start;
         if ($this->input->getOption('output-format') === 'json') {
@@ -117,7 +108,7 @@ abstract class AbstractCommand extends Command
         $this->output->writeln('');
     }
 
-    private function loadConfig()
+    private function loadConfig(): Config
     {
         if ($this->config) {
             return $this->config;
@@ -134,7 +125,7 @@ abstract class AbstractCommand extends Command
         return $this->parseConfig($configFile);
     }
 
-    private function getDefaultConfig()
+    private function getDefaultConfig(): ?string
     {
         $defaultConfigFiles = [
             'phoenix.php',
@@ -150,7 +141,7 @@ abstract class AbstractCommand extends Command
         return null;
     }
 
-    private function parseConfig($configFile)
+    private function parseConfig(string $configFile): Config
     {
         if ($configFile && !file_exists($configFile)) {
             throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
@@ -162,7 +153,7 @@ abstract class AbstractCommand extends Command
         return new Config($configuration);
     }
 
-    private function check()
+    private function check(): void
     {
         try {
             $executedMigrations = $this->manager->executedMigrations();
@@ -183,5 +174,5 @@ abstract class AbstractCommand extends Command
         }
     }
 
-    abstract protected function runCommand();
+    abstract protected function runCommand(): void;
 }

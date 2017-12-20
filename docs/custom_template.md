@@ -1,6 +1,6 @@
 ## Custom template
 
-Custom templates can be used in create and dump command if option `--template` is set.
+Custom templates can be used with create and dump command if option `--template` is set.
 Template is simple text file where the migration structure is set. Default template looks like this:
 
 ```
@@ -10,12 +10,12 @@ Template is simple text file where the migration structure is set. Default templ
 
 class ###CLASSNAME### extends AbstractMigration
 {
-###INDENT###protected function up()
+###INDENT###protected function up(): void
 ###INDENT###{
 ###UP###
 ###INDENT###}
 
-###INDENT###protected function down()
+###INDENT###protected function down(): void
 ###INDENT###{
 ###DOWN###
 ###INDENT###}

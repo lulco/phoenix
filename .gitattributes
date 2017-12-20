@@ -7,7 +7,6 @@
 CHANGELOG.md export-ignore
 docs/ export-ignore
 example/ export-ignore
-humbug.json.dist export-ignore
 LICENSE export-ignore
 phpunit.xml.dist export-ignore
 README.md export-ignore

@@ -26,24 +26,12 @@ class ForeignKey
     private $onUpdate;
 
     /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @throws InvalidArgumentValueException
+     * @throws InvalidArgumentValueException if onDelete action or onUpdate action is not allowed
      */
-    public function __construct($columns, $referencedTable, $referencedColumns = ['id'], $onDelete = self::DEFAULT_ACTION, $onUpdate = self::DEFAULT_ACTION)
+    public function __construct(array $columns, string $referencedTable, array $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
     {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
         $this->columns = $columns;
         $this->referencedTable = $referencedTable;
-
-        if (!is_array($referencedColumns)) {
-            $referencedColumns = [$referencedColumns];
-        }
         $this->referencedColumns = $referencedColumns;
 
         $this->onDelete = strtoupper($onDelete);
@@ -53,50 +41,32 @@ class ForeignKey
         $this->inArray($this->onUpdate, [self::DEFAULT_ACTION, self::RESTRICT, self::NO_ACTION, self::CASCADE, self::SET_NULL], 'Action "' . $onUpdate . '" is not allowed on update');
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return implode('_', $this->columns);
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @return string
-     */
-    public function getReferencedTable()
+    public function getReferencedTable(): string
     {
         return $this->referencedTable;
     }
 
-    /**
-     * @return array
-     */
-    public function getReferencedColumns()
+    public function getReferencedColumns(): array
     {
         return $this->referencedColumns;
     }
 
-    /**
-     * @return string
-     */
-    public function getOnDelete()
+    public function getOnDelete(): string
     {
         return $this->onDelete;
     }
 
-    /**
-     * @return string
-     */
-    public function getOnUpdate()
+    public function getOnUpdate(): string
     {
         return $this->onUpdate;
     }

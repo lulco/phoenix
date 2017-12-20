@@ -11,10 +11,7 @@ use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
 {
-    /**
-     * @return MysqlQueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): MysqlQueryBuilder
     {
         if (!$this->queryBuilder) {
             $this->queryBuilder = new MysqlQueryBuilder($this);
@@ -22,17 +19,17 @@ class MysqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
-    protected function loadDatabase()
+    protected function loadDatabase(): string
     {
         return $this->execute('SELECT database()')->fetchColumn();
     }
 
-    protected function loadTables($database)
+    protected function loadTables(string $database): array
     {
         return $this->execute(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    protected function createMigrationTable(array $table)
+    protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
         if ($table['table_collation']) {
@@ -46,7 +43,7 @@ class MysqlAdapter extends PdoAdapter
         return $migrationTable;
     }
 
-    private function remapType($type)
+    private function remapType(string $type): string
     {
         $types = [
             'int' => Column::TYPE_INTEGER,
@@ -57,10 +54,10 @@ class MysqlAdapter extends PdoAdapter
             'varchar' => Column::TYPE_STRING,
             'linestring' => Column::TYPE_LINE,
         ];
-        return isset($types[$type]) ? $types[$type] : $type;
+        return $types[$type] ?? $type;
     }
 
-    protected function loadColumns($database)
+    protected function loadColumns(string $database): array
     {
         $columns = $this->execute(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesColumns = [];
@@ -70,7 +67,7 @@ class MysqlAdapter extends PdoAdapter
         return $tablesColumns;
     }
 
-    protected function addColumn(MigrationTable $migrationTable, array $column)
+    protected function addColumn(MigrationTable $migrationTable, array $column): void
     {
         $type = $this->remapType($column['DATA_TYPE']);
         $settings = $this->prepareSettings($column);
@@ -85,7 +82,7 @@ class MysqlAdapter extends PdoAdapter
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }
 
-    private function prepareSettings($column)
+    private function prepareSettings(array $column): array
     {
         preg_match('/(.*?)\((.*?)\)(.*)/', $column['COLUMN_TYPE'], $matches);
         $values = null;
@@ -107,7 +104,7 @@ class MysqlAdapter extends PdoAdapter
         ];
     }
 
-    protected function loadIndexes($database)
+    protected function loadIndexes(string $database): array
     {
         $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesIndexes = [];
@@ -122,7 +119,7 @@ class MysqlAdapter extends PdoAdapter
         return $tablesIndexes;
     }
 
-    protected function loadForeignKeys($database)
+    protected function loadForeignKeys(string $database): array
     {
         $query = sprintf('SELECT * FROM information_schema.KEY_COLUMN_USAGE
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
@@ -140,12 +137,12 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
         return $foreignKeys;
     }
 
-    protected function escapeString($string)
+    protected function escapeString(string $string): string
     {
         return '`' . $string . '`';
     }
 
-    protected function createRealValue($value)
+    protected function createRealValue($value): ?string
     {
         return is_array($value) ? implode(',', $value) : $value;
     }

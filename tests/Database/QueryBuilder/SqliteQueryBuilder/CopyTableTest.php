@@ -8,9 +8,9 @@ use Phoenix\Database\QueryBuilder\SqliteQueryBuilder;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Tests\Helpers\Adapter\SqliteCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\SqlitePdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CopyTableTest extends PHPUnit_Framework_TestCase
+class CopyTableTest extends TestCase
 {
     private $adapter;
 

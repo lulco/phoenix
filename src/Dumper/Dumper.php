@@ -26,7 +26,7 @@ class Dumper
         ColumnSettings::SETTING_COMMENT => [null, ''],
     ];
 
-    public function __construct($indent, $baseIndent = 0)
+    public function __construct(string $indent, int $baseIndent = 0)
     {
         $this->indent = $indent;
         $this->baseIndent = $baseIndent;
@@ -34,9 +34,8 @@ class Dumper
 
     /**
      * @param Table[] $tables
-     * @return string
      */
-    public function dumpTablesUp(array $tables = [])
+    public function dumpTablesUp(array $tables = []): string
     {
         $tableMigrations = [];
         foreach ($tables as $table) {
@@ -66,9 +65,8 @@ class Dumper
 
     /**
      * @param Table[] $tables
-     * @return string
      */
-    public function dumpForeignKeysUp(array $tables = [])
+    public function dumpForeignKeysUp(array $tables = []): string
     {
         $foreignKeysMigrations = [];
         foreach ($tables as $table) {
@@ -91,9 +89,8 @@ class Dumper
 
     /**
      * @param array $data data for migration in format table => rows
-     * @return string
      */
-    public function dumpDataUp(array $data = [])
+    public function dumpDataUp(array $data = []): string
     {
         $dataMigrations = [];
         foreach ($data as $table => $rows) {
@@ -116,9 +113,8 @@ class Dumper
 
     /**
      * @param Table[] $tables
-     * @return string
      */
-    public function dumpTablesDown(array $tables = [])
+    public function dumpTablesDown(array $tables = []): string
     {
         $downMigrations = [];
         foreach ($tables as $table) {
@@ -131,9 +127,8 @@ class Dumper
 
     /**
      * @param Table[] $tables
-     * @return string
      */
-    public function dumpForeignKeysDown(array $tables = [])
+    public function dumpForeignKeysDown(array $tables = []): string
     {
         $downForeignKeysMigrations = [];
         foreach ($tables as $table) {
@@ -151,12 +146,12 @@ class Dumper
         return implode("\n\n", $downForeignKeysMigrations);
     }
 
-    private function indent($multiplier = 0)
+    private function indent(int $multiplier = 0): string
     {
         return str_repeat($this->indent, $multiplier + $this->baseIndent);
     }
 
-    private function columnsToString(array $columns)
+    private function columnsToString(array $columns): string
     {
         $columns = array_map(function ($column) {
             return "'$column'";
@@ -165,7 +160,7 @@ class Dumper
         return count($columns) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
     }
 
-    private function valuesToString(array $values)
+    private function valuesToString(array $values): string
     {
         $values = array_map(function ($value) {
             return "'$value'";
@@ -173,7 +168,7 @@ class Dumper
         return '[' . implode(', ', $values) . ']';
     }
 
-    private function settingsToString(Column $column, Table $table)
+    private function settingsToString(Column $column, Table $table): string
     {
         $settings = $column->getSettings();
         $defaultSettings = $this->defaultSettings($column, $table);
@@ -194,7 +189,7 @@ class Dumper
         return ', [' . implode(', ', $settingsList) . ']';
     }
 
-    private function defaultSettings(Column $column, Table $table)
+    private function defaultSettings(Column $column, Table $table): array
     {
         $defaultSettings = $this->defaultSettings;
         $defaultSettings[ColumnSettings::SETTING_CHARSET][] = $table->getCharset();
@@ -214,6 +209,10 @@ class Dumper
         return $defaultSettings;
     }
 
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
     private function transformValue($value)
     {
         if (is_bool($value)) {
@@ -226,7 +225,7 @@ class Dumper
         return $value;
     }
 
-    private function foreignKeyActions(ForeignKey $foreignKey)
+    private function foreignKeyActions(ForeignKey $foreignKey): string
     {
         $onDelete = strtolower($foreignKey->getOnDelete());
         $onUpdate = strtolower($foreignKey->getOnUpdate());

@@ -6,6 +6,7 @@ use Phoenix\Command\CleanupCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -107,6 +108,46 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $messagesAll = $output->getMessages();
 
         $this->assertGreaterThan(count($messagesFirst[0]), count($messagesAll[0]));
+    }
+
+    public function testMigrateDir()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+
+        $input = $this->createInput();
+        $input->setOption('first', true);
+        $input->setOption('dir', ['phoenix']);
+        $output = new Output();
+        $command->run($input, $output);
+        $messagesFirst = $output->getMessages();
+
+        $command = new CleanupCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $input = $this->createInput();
+        $input->setOption('dir', ['phoenix']);
+        $output = new Output();
+        $command->run($input, $output);
+        $messagesAll = $output->getMessages();
+
+        $this->assertGreaterThan(count($messagesFirst[0]), count($messagesAll[0]));
+    }
+
+    public function testMigrateUnknownDir()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+
+        $input = $this->createInput();
+        $input->setOption('dir', ['xxx']);
+        $output = new Output();
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Directory "xxx" doesn\'t exist');
+        $command->run($input, $output);
     }
 
     public function testDryRun()

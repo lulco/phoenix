@@ -5,10 +5,8 @@ namespace Phoenix\Database\Adapter;
 use DateTime;
 use InvalidArgumentException;
 use PDO;
-use PDOException;
 use PDOStatement;
 use Phoenix\Database\Adapter\Behavior\StructureBehavior;
-use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
 abstract class PdoAdapter implements AdapterInterface
@@ -20,7 +18,6 @@ abstract class PdoAdapter implements AdapterInterface
 
     private $charset;
 
-    /** @var QueryBuilderInterface */
     protected $queryBuilder;
 
     public function __construct(PDO $pdo)
@@ -30,16 +27,12 @@ abstract class PdoAdapter implements AdapterInterface
 
     /**
      * @param string|PDOStatement $sql
-     * @return PDOStatement|boolean
+     * @return PDOStatement|bool
      * @throws DatabaseQueryExecuteException on error
      */
     public function execute($sql)
     {
-        try {
-            $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
-        } catch (PDOException $e) {
-            $res = false;
-        }
+        $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
         if ($res === false) {
             $this->throwError($sql);
         }
@@ -49,17 +42,14 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($table, array $data)
+    public function insert(string $table, array $data)
     {
         $statement = $this->buildInsertQuery($table, $data);
         $this->execute($statement);
         return $this->pdo->lastInsertId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildInsertQuery($table, array $data)
+    public function buildInsertQuery(string $table, array $data): PDOStatement
     {
         $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
         $statement = $this->pdo->prepare($query);
@@ -76,19 +66,13 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update($table, array $data, array $conditions = [], $where = '')
+    public function update(string $table, array $data, array $conditions = [], string $where = ''): bool
     {
         $statement = $this->buildUpdateQuery($table, $data, $conditions, $where);
         return $this->execute($statement);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildUpdateQuery($table, array $data, array $conditions = [], $where = '')
+    public function buildUpdateQuery(string $table, array $data, array $conditions = [], string $where = ''): PDOStatement
     {
         $values = [];
         foreach (array_keys($data) as $key) {
@@ -104,19 +88,13 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function delete($table, array $conditions = [], $where = '')
+    public function delete(string $table, array $conditions = [], string $where = ''): bool
     {
         $statement = $this->buildDeleteQuery($table, $conditions, $where);
         return $this->execute($statement);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildDeleteQuery($table, array $conditions = [], $where = '')
+    public function buildDeleteQuery(string $table, array $conditions = [], string $where = ''): PDOStatement
     {
         $query = sprintf('DELETE FROM %s%s;', $this->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
@@ -127,38 +105,29 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function select($sql)
+    public function select(string $sql): array
     {
-        if (strpos($sql, 'SELECT ') === 0) {
+        if (strpos(strtoupper($sql), 'SELECT ') === 0) {
             return $this->execute($sql)->fetchAll(PDO::FETCH_ASSOC);
         }
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function fetch($table, $fields = '*', array $conditions = [], array $orders = [], array $groups = [])
+    public function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array
     {
-        $statement = $this->buildFetchQuery($table, $fields, $conditions, 1, $orders, $groups);
+        $statement = $this->buildFetchQuery($table, $fields, $conditions, '1', $orders, $groups);
         $this->execute($statement);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function fetchAll($table, $fields = '*', array $conditions = [], $limit = null, array $orders = [], array $groups = [])
+    public function fetchAll(string $table, string $fields = '*', array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         $statement = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
         $this->execute($statement);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function buildFetchQuery($table, $fields, array $conditions = [], $limit = null, array $orders = [], array $groups = [])
+    private function buildFetchQuery(string $table, string $fields, array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): PDOStatement
     {
         $query = sprintf('SELECT %s FROM %s%s%s%s%s;', $fields, $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
         $statement = $this->pdo->prepare($query);
@@ -169,7 +138,7 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
 
-    private function createKeys($data)
+    private function createKeys(array $data): string
     {
         $keys = [];
         if ($this->isMulti($data)) {
@@ -181,7 +150,7 @@ abstract class PdoAdapter implements AdapterInterface
         return '(' . implode(', ', $keys) . ')';
     }
 
-    private function createValues($data)
+    private function createValues(array $data): string
     {
         if (!$this->isMulti($data)) {
             return $this->createValueString($data);
@@ -193,12 +162,12 @@ abstract class PdoAdapter implements AdapterInterface
         return implode(', ', $values);
     }
 
-    private function createValue($key, $prefix = '')
+    private function createValue(string $key, string $prefix = ''): string
     {
         return ':' . $prefix . $key;
     }
 
-    private function createValueString($data, $prefix = '')
+    private function createValueString(array $data, string $prefix = ''): string
     {
         $values = [];
         foreach (array_keys($data) as $key) {
@@ -207,7 +176,7 @@ abstract class PdoAdapter implements AdapterInterface
         return '(' . implode(', ', $values) . ')';
     }
 
-    private function createWhere(array $conditions = [], $where = '')
+    private function createWhere(array $conditions = [], string $where = ''): string
     {
         if (empty($conditions) && $where == '') {
             return '';
@@ -223,7 +192,7 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
     }
 
-    private function addCondition($key, $value)
+    private function addCondition(string $key, $value): string
     {
         if (!is_array($value)) {
             return $this->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
@@ -235,7 +204,7 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
     }
 
-    private function createLimit($limit = null)
+    private function createLimit(?string $limit = null): string
     {
         if (!$limit) {
             return '';
@@ -243,7 +212,7 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' LIMIT %s', $limit);
     }
 
-    private function createOrder(array $orders = [])
+    private function createOrder(array $orders = []): string
     {
         if (empty($orders)) {
             return '';
@@ -260,7 +229,7 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' ORDER BY %s', implode(', ', $listOfOrders));
     }
 
-    private function createGroup(array $groups = [])
+    private function createGroup(array $groups = []): string
     {
         if (empty($groups)) {
             return '';
@@ -271,7 +240,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function startTransaction()
+    public function startTransaction(): bool
     {
         return $this->pdo->beginTransaction();
     }
@@ -279,7 +248,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit(): bool
     {
         return $this->pdo->commit();
     }
@@ -287,29 +256,23 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function rollback()
+    public function rollback(): bool
     {
         return $this->pdo->rollBack();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setCharset($charset)
+    public function setCharset(string $charset): AdapterInterface
     {
         $this->charset = $charset;
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCharset()
+    public function getCharset(): ?string
     {
         return $this->charset;
     }
 
-    protected function getLengthAndDecimals($lengthAndDecimals = null)
+    protected function getLengthAndDecimals(?string $lengthAndDecimals = null)
     {
         if ($lengthAndDecimals === null) {
             return [null, null];
@@ -323,7 +286,7 @@ abstract class PdoAdapter implements AdapterInterface
         return [$length, $decimals];
     }
 
-    private function bindDataValues($statement, $data, $prefix = '')
+    private function bindDataValues(PDOStatement $statement, array $data, string $prefix = '')
     {
         foreach ($data as $key => $value) {
             if ($value instanceof DateTime) {
@@ -340,7 +303,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
     }
 
-    private function bindCondition(PDOStatement $statement, $key, $condition)
+    private function bindCondition(PDOStatement $statement, string $key, $condition)
     {
         if (!is_array($condition)) {
             $statement->bindValue('where_' . $key, $condition);
@@ -351,7 +314,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
     }
 
-    private function isMulti($data)
+    private function isMulti(array $data): bool
     {
         foreach ($data as $item) {
             if (!is_array($item)) {
@@ -364,10 +327,10 @@ abstract class PdoAdapter implements AdapterInterface
     private function throwError($query)
     {
         $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_R($query, true) . ' fails' : ''), $errorInfo[1]);
+        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_r($query, true) . ' fails' : ''), $errorInfo[1]);
     }
 
-    abstract protected function escapeString($string);
+    abstract protected function escapeString(string $string): string;
 
-    abstract protected function createRealValue($value);
+    abstract protected function createRealValue($value): ?string;
 }

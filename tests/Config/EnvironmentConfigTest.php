@@ -3,9 +3,9 @@
 namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\EnvironmentConfig;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
+class EnvironmentConfigTest extends TestCase
 {
     public function testAdapterAndConfiguredDsn()
     {
@@ -21,7 +21,7 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertNull($environmentConfig->getUsername());
         $this->assertNull($environmentConfig->getPassword());
     }
-    
+
     public function testAdapterAndConfiguredDsnWithPortAndCharset()
     {
         $config = [
@@ -38,7 +38,7 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertNull($environmentConfig->getUsername());
         $this->assertNull($environmentConfig->getPassword());
     }
-    
+
     public function testPgsqlAdapterAndConfiguredDsnWithCharset()
     {
         $environmentConfig = new EnvironmentConfig([
@@ -52,7 +52,7 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertNull($environmentConfig->getUsername());
         $this->assertNull($environmentConfig->getPassword());
     }
-    
+
     public function testCustomDsn()
     {
         $environmentConfig = new EnvironmentConfig([
@@ -64,7 +64,7 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertNull($environmentConfig->getUsername());
         $this->assertNull($environmentConfig->getPassword());
     }
-    
+
     public function testUsernameAndPassword()
     {
         $environmentConfig = new EnvironmentConfig([
@@ -79,7 +79,7 @@ class EnvironmentConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test_username', $environmentConfig->getUsername());
         $this->assertEquals('test_password', $environmentConfig->getPassword());
     }
-    
+
     public function testUsernameAndPasswordWithCustomDsn()
     {
         $environmentConfig = new EnvironmentConfig([

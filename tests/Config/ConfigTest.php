@@ -6,9 +6,9 @@ use Phoenix\Config\Config;
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
     public function testDefaults()
     {

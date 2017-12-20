@@ -1,32 +1,32 @@
 <?php
 
-namespace Phoenix\Tests\Command\StatusCommand;
+namespace Phoenix\Tests\Command\TestCommand;
 
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
-use Phoenix\Command\StatusCommand;
+use Phoenix\Command\TestCommand;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class StatusCommandTest extends BaseCommandTest
+abstract class TestCommandTest extends BaseCommandTest
 {
     public function testDefaultName()
     {
-        $command = new StatusCommand();
-        $this->assertEquals('status', $command->getName());
+        $command = new TestCommand();
+        $this->assertEquals('test', $command->getName());
     }
 
     public function testCustomName()
     {
-        $command = new StatusCommand('my_status');
-        $this->assertEquals('my_status', $command->getName());
+        $command = new TestCommand('my_test');
+        $this->assertEquals('my_test', $command->getName());
     }
 
     public function testMissingDefaultConfig()
     {
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         $command->run($this->input, $this->output);
@@ -34,16 +34,16 @@ abstract class StatusCommandTest extends BaseCommandTest
 
     public function testUserConfigFileNotFound()
     {
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $this->input->setOption('config', 'xyz.neon');
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
         $command->run($this->input, $this->output);
     }
 
-    public function testStatusWithoutInitializing()
+    public function testTestWithoutInitializing()
     {
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
 
@@ -51,14 +51,28 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);
-        $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][6]);
-        $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][7]);
-        $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][9]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][11]);
+        $this->assertEquals('<comment>Test started...</comment>' . "\n", $messages[0][6]);
+        $this->assertEquals('<comment>Test finished successfully</comment>' . "\n", $messages[0][17]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithInitializing()
+    public function testTestWithoutInitializingWithCleanup()
+    {
+        $command = new TestCommand();
+        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
+        $this->input->setOption('cleanup', true);
+        $command->run($this->input, $this->output);
+
+        $messages = $this->output->getMessages();
+        $this->assertTrue(is_array($messages));
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertEquals('<info>Phoenix initialized</info>' . "\n", $messages[0][1]);
+        $this->assertEquals('<comment>Test started...</comment>' . "\n", $messages[0][6]);
+        $this->assertEquals('<comment>Test finished successfully</comment>' . "\n", $messages[0][20]);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+    }
+
+    public function testTestWithInitializing()
     {
         $input = $this->createInput();
         $output = new Output();
@@ -66,45 +80,19 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages();
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
-        $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][2]);
-        $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][4]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][6]);
-        $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+        $this->assertEquals('<comment>Test started...</comment>' . "\n", $messages[0][1]);
+        $this->assertEquals('<comment>Test finished successfully</comment>' . "\n", $messages[0][12]);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusAfterOneExecutedMigration()
-    {
-        $input = $this->createInput();
-        $input->setOption('first', true);
-        $output = new Output();
-        $command = new MigrateCommand();
-        $command->setConfig($this->configuration);
-        $command->run($input, $output);
-
-        $command = new StatusCommand();
-        $command->setConfig($this->configuration);
-        $command->run($this->input, $this->output);
-
-        $messages = $this->output->getMessages();
-
-        $this->assertTrue(is_array($messages));
-        $this->assertArrayHasKey(0, $messages);
-        $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
-        $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][8]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][10]);
-        $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
-    }
-
-    public function testStatusAfterAllMigrationsExecuted()
+    public function testTestAfterAllMigrationsExecuted()
     {
         $input = $this->createInput();
         $output = new Output();
@@ -118,9 +106,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $executedMigrationsCount = (count($output->getMessages(0)) - 3) / 3;
-
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $command->setConfig($this->configuration);
         $command->run($this->input, $this->output);
 
@@ -128,23 +114,20 @@ abstract class StatusCommandTest extends BaseCommandTest
 
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
-        $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
-        $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][7 + $executedMigrationsCount]);
-        $this->assertEquals('<info>No migrations to execute</info>' . "\n", $messages[0][8 + $executedMigrationsCount]);
+        $this->assertEquals('<comment>Test started...</comment>' . "\n", $messages[0][1]);
+        $this->assertEquals('<comment>Nothing to test</comment>' . "\n", $messages[0][3]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithJsonOutputAfterOneExecutedMigration()
+    public function testTestWithJsonOutput()
     {
         $input = $this->createInput();
-        $input->setOption('first', true);
         $output = new Output();
-        $command = new MigrateCommand();
+        $command = new InitCommand();
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $command->setConfig($this->configuration);
         $this->input->setOption('output-format', 'json');
         $command->run($this->input, $this->output);
@@ -158,22 +141,28 @@ abstract class StatusCommandTest extends BaseCommandTest
 
         $message = json_decode($messages[0], true);
         $this->assertArrayHasKey('executed_migrations', $message);
-        $this->assertArrayHasKey('migrations_to_execute', $message);
         $this->assertNotEmpty($message['executed_migrations']);
-        $this->assertNotEmpty($message['migrations_to_execute']);
+
+        foreach ($message['executed_migrations'] as $executedMigration) {
+            $this->assertArrayHasKey('classname', $executedMigration);
+            $this->assertArrayHasKey('type', $executedMigration);
+            $this->assertArrayHasKey('execution_time', $executedMigration);
+            $this->assertArrayNotHasKey('executed_queries', $executedMigration);
+        }
     }
 
-    public function testStatusWithJsonOutputAfterAllMigrationsExecuted()
+    public function testTestWithJsonOutputVeryVerbose()
     {
         $input = $this->createInput();
         $output = new Output();
-        $command = new MigrateCommand();
+        $command = new InitCommand();
         $command->setConfig($this->configuration);
         $command->run($input, $output);
 
-        $command = new StatusCommand();
+        $command = new TestCommand();
         $command->setConfig($this->configuration);
         $this->input->setOption('output-format', 'json');
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
         $command->run($this->input, $this->output);
 
         $messages = $this->output->getMessages(0);
@@ -185,8 +174,13 @@ abstract class StatusCommandTest extends BaseCommandTest
 
         $message = json_decode($messages[0], true);
         $this->assertArrayHasKey('executed_migrations', $message);
-        $this->assertArrayHasKey('migrations_to_execute', $message);
         $this->assertNotEmpty($message['executed_migrations']);
-        $this->assertEmpty($message['migrations_to_execute']);
+
+        foreach ($message['executed_migrations'] as $executedMigration) {
+            $this->assertArrayHasKey('classname', $executedMigration);
+            $this->assertArrayHasKey('type', $executedMigration);
+            $this->assertArrayHasKey('execution_time', $executedMigration);
+            $this->assertArrayHasKey('executed_queries', $executedMigration);
+        }
     }
 }

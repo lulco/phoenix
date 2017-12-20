@@ -11,17 +11,17 @@ class EnvironmentConfig
         $this->configuration = $configuration;
     }
 
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return $this->configuration;
     }
 
-    public function getAdapter()
+    public function getAdapter(): string
     {
         return $this->configuration['adapter'];
     }
 
-    public function getDsn()
+    public function getDsn(): string
     {
         if ($this->checkConfigValue('dsn')) {
             return $this->configuration['dsn'];
@@ -40,22 +40,22 @@ class EnvironmentConfig
         return $dsn;
     }
 
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return isset($this->configuration['username']) ? $this->configuration['username'] : null;
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return isset($this->configuration['password']) ? $this->configuration['password'] : null;
     }
 
-    public function getCharset()
+    public function getCharset(): string
     {
         return isset($this->configuration['charset']) ? $this->configuration['charset'] : 'utf8';
     }
 
-    private function checkConfigValue($key)
+    private function checkConfigValue(string $key): bool
     {
         return isset($this->configuration[$key]) && $this->configuration[$key];
     }

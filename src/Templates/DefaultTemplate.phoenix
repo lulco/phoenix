@@ -4,12 +4,12 @@
 
 class ###CLASSNAME### extends AbstractMigration
 {
-###INDENT###protected function up()
+###INDENT###protected function up(): void
 ###INDENT###{
 ###UP###
 ###INDENT###}
 
-###INDENT###protected function down()
+###INDENT###protected function down(): void
 ###INDENT###{
 ###DOWN###
 ###INDENT###}

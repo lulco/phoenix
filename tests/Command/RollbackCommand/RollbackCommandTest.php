@@ -6,6 +6,7 @@ use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Command\RollbackCommand;
 use Phoenix\Exception\ConfigException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,13 +39,6 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->input->setOption('config', 'xyz.neon');
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
-        $command->run($this->input, $this->output);
-    }
-
-    public function testUserConfigFile()
-    {
-        $command = new RollbackCommand();
-        $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
         $command->run($this->input, $this->output);
     }
 
@@ -141,6 +135,55 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<info>Nothing to rollback</info>' . "\n", $messages[0][1]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+    }
+
+    public function testRollbackDir()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $input = $this->createInput();
+        $input->setOption('dir', ['phoenix']);
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages();
+        $this->assertTrue(is_array($messages));
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertCount(6, $messages[0]);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+
+        $input = $this->createInput();
+        $input->setOption('dir', ['phoenix']);
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $command->run($input, $output);
+
+        $messages = $output->getMessages();
+        $this->assertTrue(is_array($messages));
+        $this->assertArrayHasKey(0, $messages);
+        $this->assertCount(6, $messages[0]);
+        $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
+    }
+
+    public function testRollbackUnknownDir()
+    {
+        $command = new MigrateCommand();
+        $command->setConfig($this->configuration);
+        $command->run($this->input, $this->output);
+
+        $input = $this->createInput();
+        $input->setOption('dir', ['xxx']);
+        $output = new Output();
+        $command = new RollbackCommand();
+        $command->setConfig($this->configuration);
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Directory "xxx" doesn\'t exist');
+        $command->run($input, $output);
     }
 
     public function testDryRun()

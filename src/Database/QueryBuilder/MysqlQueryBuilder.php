@@ -66,12 +66,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $this->adapter = $adapter;
     }
 
-    /**
-     * generates create table query for mysql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function createTable(MigrationTable $table)
+    public function createTable(MigrationTable $table): array
     {
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName()) . ' (';
         $columns = [];
@@ -90,32 +85,17 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [$query];
     }
 
-    /**
-     * generates drop table query for mysql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function dropTable(MigrationTable $table)
+    public function dropTable(MigrationTable $table): array
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
 
-    /**
-     * generates rename table queries for mysql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function renameTable(MigrationTable $table)
+    public function renameTable(MigrationTable $table): array
     {
         return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
-    /**
-     * generates alter table query for mysql
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function alterTable(MigrationTable $table)
+    public function alterTable(MigrationTable $table): array
     {
         $queries = $this->dropIndexes($table);
         if ($table->getColumnsToChange()) {
@@ -149,10 +129,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function copyTable(MigrationTable $table)
+    public function copyTable(MigrationTable $table): array
     {
         $queries = [];
         if ($table->getCopyType() !== MigrationTable::COPY_ONLY_DATA) {
@@ -170,7 +147,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $queries;
     }
 
-    protected function createColumn(Column $column, MigrationTable $table)
+    protected function createColumn(Column $column, MigrationTable $table): string
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= (!$column->getSettings()->isSigned()) ? ' unsigned' : '';
@@ -184,7 +161,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $col;
     }
 
-    private function createColumnDefault(Column $column)
+    private function createColumnDefault(Column $column): string
     {
         if ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             return ' DEFAULT NULL';
@@ -204,7 +181,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return '';
     }
 
-    private function createColumnPosition(Column $column)
+    private function createColumnPosition(Column $column): string
     {
         if ($column->getSettings()->getAfter() !== null) {
             return ' AFTER ' . $this->escapeString($column->getSettings()->getAfter());
@@ -215,13 +192,13 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return '';
     }
 
-    protected function primaryKeyString(MigrationTable $table)
+    protected function primaryKeyString(MigrationTable $table): string
     {
         $primaryKeys = $this->escapeArray($table->getPrimaryColumnNames());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 
-    private function createIndexes(MigrationTable $table)
+    private function createIndexes(MigrationTable $table): string
     {
         if (empty($table->getIndexes())) {
             return '';
@@ -234,7 +211,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return ',' . implode(',', $indexes);
     }
 
-    private function createIndex(Index $index)
+    private function createIndex(Index $index): string
     {
         $columns = $this->escapeArray($index->getColumns());
         $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
@@ -242,23 +219,23 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $indexType . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . $indexMethod;
     }
 
-    public function escapeString($string)
+    public function escapeString(string $string): string
     {
         return '`' . $string . '`';
     }
 
-    private function createColumnCharset(Column $column)
+    private function createColumnCharset(Column $column): string
     {
         return $this->createCharset($column->getSettings()->getCharset(), $column->getSettings()->getCollation(), ' ');
     }
 
-    private function createTableCharset(MigrationTable $table)
+    private function createTableCharset(MigrationTable $table): string
     {
         $tableCharset = $this->createCharset($table->getCharset(), $table->getCollation());
         return $tableCharset ? ' DEFAULT' . $tableCharset : '';
     }
 
-    private function createCharset($charset = null, $collation = null, $glue = '=')
+    private function createCharset(?string $charset = null, ?string $collation = null, string $glue = '='): string
     {
         if ($charset === null && $collation === null) {
             return '';
@@ -273,12 +250,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $charsetAndCollation;
     }
 
-    private function createTableComment(MigrationTable $table)
+    private function createTableComment(MigrationTable $table): string
     {
         return $this->createComment($table->getComment());
     }
 
-    private function createComment($comment = null, $glue = '=')
+    private function createComment(?string $comment = null, string $glue = '='): string
     {
         if ($comment === null) {
             return '';
@@ -286,7 +263,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return " COMMENT$glue'$comment'";
     }
 
-    protected function createEnumSetColumn(Column $column, MigrationTable $table)
+    protected function createEnumSetColumn(Column $column, MigrationTable $table): string
     {
         return sprintf(
             $this->remapType($column),

@@ -48,6 +48,7 @@ abstract class CreateCommandTest extends BaseCommandTest
     {
         $command = new CreateCommand();
         $command->setConfig($this->configuration);
+        $this->input->setArgument('migration', '\MyNamespace\MyFirstMigration');
         $this->input->setOption('template', 'non-existing-file.phoenix');
 
         $this->expectException(PhoenixException::class);
@@ -111,6 +112,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->setConfig($configuration);
         $this->input->setArgument('migration', '\MyNamespace\MyFirstMigration');
         $this->input->setArgument('dir', 'create');
+        $this->input->setOption('indent', '4spaces');
         $command->run($this->input, $this->output);
 
         $createFiles = Finder::find('*')->in($createMigrationDir);

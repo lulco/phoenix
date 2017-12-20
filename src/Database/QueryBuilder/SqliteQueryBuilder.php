@@ -60,12 +60,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         $this->adapter = $adapter;
     }
 
-    /**
-     * generates create table queries for sqlite
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function createTable(MigrationTable $table)
+    public function createTable(MigrationTable $table): array
     {
         $queries = [];
         $query = 'CREATE TABLE ' . $this->escapeString($table->getName());
@@ -79,31 +74,17 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $queries;
     }
 
-    /**
-     * generates drop table query for sqlite
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function dropTable(MigrationTable $table)
+    public function dropTable(MigrationTable $table): array
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
 
-    /**
-     * generates rename table queries for sqlite
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function renameTable(MigrationTable $table)
+    public function renameTable(MigrationTable $table): array
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
-    /**
-     * @param MigrationTable $table
-     * @return array list of queries
-     */
-    public function alterTable(MigrationTable $table)
+    public function alterTable(MigrationTable $table): array
     {
         $queries = $this->addColumns($table);
         if ($table->getColumnsToChange() || $table->getComment() !== null) {
@@ -120,10 +101,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $queries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function copyTable(MigrationTable $table)
+    public function copyTable(MigrationTable $table): array
     {
         if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
             return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
@@ -146,7 +124,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $queries;
     }
 
-    protected function createColumn(Column $column, MigrationTable $table)
+    protected function createColumn(Column $column, MigrationTable $table): string
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
         $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumnNames()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
@@ -167,11 +145,14 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $col;
     }
 
-    protected function primaryKeyString(MigrationTable $table)
+    protected function primaryKeyString(MigrationTable $table): string
     {
         $primaryKeys = [];
         foreach ($table->getPrimaryColumnNames() as $name) {
             $column = $table->getColumn($name);
+            if ($column === null) {
+                continue;
+            }
             if (!$column->getSettings()->isAutoincrement()) {
                 $primaryKeys[] = $this->escapeString($column->getName());
             }
@@ -182,7 +163,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 
-    private function createIndex(Index $index, MigrationTable $table)
+    private function createIndex(Index $index, MigrationTable $table): string
     {
         $columns = [];
         foreach ($index->getColumns() as $column) {
@@ -193,7 +174,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $query;
     }
 
-    private function createNewTable(MigrationTable $table, $newTableName, $copyData = true)
+    private function createNewTable(MigrationTable $table, string $newTableName, bool $copyData = true): array
     {
         if ($this->adapter === null) {
             throw new PhoenixException('Missing adapter');
@@ -223,25 +204,25 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         return $queries;
     }
 
-    public function escapeString($string)
+    public function escapeString(string $string): string
     {
         return '"' . $string . '"';
     }
 
-    protected function createEnumSetColumn(Column $column, MigrationTable $table)
+    protected function createEnumSetColumn(Column $column, MigrationTable $table): string
     {
         $values = [];
         if ($column->getType() == Column::TYPE_ENUM) {
             $values = $column->getSettings()->getValues();
         } elseif ($column->getType() === Column::TYPE_SET) {
-            $this->createSetCombinations($column->getSettings()->getValues(), '', $values);
+            $this->createSetCombinations($column->getSettings()->getValues() ?: [], '', $values);
         }
         return sprintf($this->remapType($column), $column->getName(), implode(',', array_map(function ($value) {
             return "'$value'";
         }, $values)));
     }
 
-    private function createSetCombinations($arr, $tmpString, &$combinations)
+    private function createSetCombinations(array $arr, string $tmpString, array &$combinations): void
     {
         if ($tmpString != '') {
             $combinations[] = $tmpString;

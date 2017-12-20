@@ -7,12 +7,12 @@ use Phoenix\Migration\AbstractMigration;
 
 class Init extends AbstractMigration
 {
-    protected function up()
+    protected function up(): void
     {
         $this->table('table_1')
             ->addColumn('title', 'string', ['charset' => 'utf16'])
             ->addColumn('alias', 'string', ['length' => 100])
-            ->addColumn('is_active', 'boolean', ['default' => false])
+            ->addColumn('is_active', 'boolean', ['default' => true])
             ->addColumn('bodytext', 'text', ['null' => true])
             ->addColumn('self_fk', 'integer', ['null' => true])
             ->addIndex('alias', 'unique')
@@ -72,7 +72,7 @@ class Init extends AbstractMigration
             ->create();
     }
 
-    protected function down()
+    protected function down(): void
     {
         $this->table('all_types')->drop();
         $this->table('table_3')->drop();

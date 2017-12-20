@@ -3,8 +3,9 @@
 namespace Phoenix\Tests\Dumper;
 
 use Dumper\Indenter;
+use PHPUnit\Framework\TestCase;
 
-class IndenterTest extends \PHPUnit_Framework_TestCase
+class IndenterTest extends TestCase
 {
     public function testDefault()
     {

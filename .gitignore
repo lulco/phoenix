@@ -1,12 +1,7 @@
-/coverage/
-/build/
-/vendor/
+/coverage
+/build
+/vendor
 /composer.lock
-/humbuglog.txt
-/humbuglog.json
-/phpmd.html
 /testing_migrations/run.sh
 /testing_migrations/phoenix.sqlite
 /tests_local.sh
-/tests_local_hhvm.sh
-/humbug_local.sh

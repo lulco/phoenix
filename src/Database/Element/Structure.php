@@ -9,7 +9,7 @@ class Structure
     /** @var Table[] */
     private $tables = [];
 
-    public function update(MigrationTable $migrationTable)
+    public function update(MigrationTable $migrationTable): Structure
     {
         $this->tables[$migrationTable->getName()] = $migrationTable->toTable();
         return $this;
@@ -18,17 +18,13 @@ class Structure
     /**
      * @return Table[]
      */
-    public function getTables()
+    public function getTables(): array
     {
         return $this->tables;
     }
 
-    /**
-     * @param string $tableName
-     * @return Table|null
-     */
-    public function getTable($tableName)
+    public function getTable(string $tableName): ?Table
     {
-        return isset($this->tables[$tableName]) ? $this->tables[$tableName] : null;
+        return $this->tables[$tableName] ?? null;
     }
 }

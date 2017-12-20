@@ -13,9 +13,9 @@ use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class MysqlAdapterTest extends PHPUnit_Framework_TestCase
+class MysqlAdapterTest extends TestCase
 {
     private $adapter;
 
