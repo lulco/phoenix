@@ -42,7 +42,7 @@ class SqliteAdapter extends PdoAdapter
         $tables = $this->loadTables($database);
         $tablesColumns = [];
         foreach ($tables as $table) {
-            $tablesColumns[$table['table_name']]= $this->execute('PRAGMA table_info(' . $this->escapeString($table['table_name']) . ')')->fetchAll(PDO::FETCH_ASSOC);
+            $tablesColumns[$table['table_name']] = $this->execute('PRAGMA table_info(' . $this->escapeString($table['table_name']) . ')')->fetchAll(PDO::FETCH_ASSOC);
         }
         return $tablesColumns;
     }

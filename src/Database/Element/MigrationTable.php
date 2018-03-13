@@ -30,7 +30,7 @@ class MigrationTable
 
     const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
-    private $action = self::ACTION_ALTER;
+    private $action;
 
     private $tmpPrimaryKey;
 
@@ -244,7 +244,7 @@ class MigrationTable
 
     public function getAction(): string
     {
-        return $this->action;
+        return $this->action ?: self::ACTION_ALTER;
     }
 
     public function toTable(): Table
