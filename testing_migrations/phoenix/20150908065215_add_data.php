@@ -59,6 +59,18 @@ class AddData extends AbstractMigration
             't2_fk' => 1,
         ]);
 
+        $this->insert('table_4', [
+            [
+                'title' => 'Item 1',
+            ],
+            [
+                'title' => 'Item 2',
+            ],
+            [
+                'title' => 'Item 3',
+            ],
+        ]);
+
         $this->update('table_1', [
             'title' => 'Renamed second item',
             'is_active' => true,
@@ -111,6 +123,7 @@ class AddData extends AbstractMigration
     {
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d']);
         $this->delete('all_types', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c']);
+        $this->delete('table_4');
         $this->delete('table_3', ['identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465b']);
         $this->delete('table_3', ['identifier' => '6fedffa4-897e-41b1-ba00-185b7c1726d2']);
         $this->delete('table_2', ['id' => 2]);

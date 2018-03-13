@@ -12,7 +12,7 @@ class Check extends AbstractMigration
     public function up(): void
     {
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 7) {
+        if (count($logs) != 10) {
             throw new Exception('Wrong count');
         }
 
@@ -29,20 +29,23 @@ class Check extends AbstractMigration
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at'
             ],
             'table_3' => [
-                'identifier', 't1_fk', 't2_fk',
+                'identifier', 't1_fk', 't2_fk', 'id',
+            ],
+            'table_4' => [
+                'title',
             ],
             'new_table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at'
             ],
             'new_table_3' => [
-                'identifier', 't1_fk', 't2_fk',
+                'identifier', 't1_fk', 't2_fk', 'id',
             ],
         ];
 
         foreach ($tableColumns as $table => $columns) {
             $firstItem = $this->fetch($table);
             if (count($firstItem) != count($columns)) {
-                throw new Exception('Wrong number of columns in first item');
+                throw new Exception('Wrong number of columns in first item of table ' . $table);
             }
             $items = $this->fetchAll($table);
             if (!$items) {

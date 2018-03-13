@@ -2,7 +2,6 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
@@ -53,13 +52,6 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private $typeCastMap = [
         Column::TYPE_STRING => 'varchar',
     ];
-
-    private $adapter;
-
-    public function __construct(AdapterInterface $adapter = null)
-    {
-        $this->adapter = $adapter;
-    }
 
     public function createTable(MigrationTable $table): array
     {
@@ -201,7 +193,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function primaryKeyString(MigrationTable $table): string
     {
         $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
+        foreach ($table->getPrimaryColumnNames() as $name) {
             $primaryKeys[] = $this->escapeString($name);
         }
         return 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey') . ' PRIMARY KEY (' . implode(',', $primaryKeys) . ')';

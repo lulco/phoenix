@@ -128,7 +128,13 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName()) . ';';
         }
         if ($table->getCopyType() !== MigrationTable::COPY_ONLY_STRUCTURE) {
-            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';';
+            $oldTable = $this->adapter->getStructure()->getTable($table->getName());
+            $columns = [];
+            foreach ($oldTable->getColumns() as $column) {
+                $columns[] = $column->getName();
+            }
+
+            $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' (' . implode(',', $columns) . ') SELECT ' . implode(',', $columns) . ' FROM ' . $this->escapeString($table->getName()) . ';';
         }
         return $queries;
     }
@@ -180,7 +186,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected function primaryKeyString(MigrationTable $table): string
     {
-        $primaryKeys = $this->escapeArray($table->getPrimaryColumns());
+        $primaryKeys = $this->escapeArray($table->getPrimaryColumnNames());
         return 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
     }
 

@@ -15,6 +15,7 @@ Framework agnostic database migrations for PHP.
 - Migrate up and down
 - Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
+- Add an autoincrement primary column to an existing table
 - Dump command for creating migration from existing database
 - Test command for testing new migration executing migrate, rollback, migrate
 - Status command that shows list of executed migrations and list of migrations to execute

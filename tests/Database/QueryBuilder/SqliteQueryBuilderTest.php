@@ -371,7 +371,7 @@ class SqliteQueryBuilderTest extends TestCase
         $table = new MigrationTable('table_with_comment');
         $table->setComment('test table with comment');
         $table->create();
-        $queryBuilder = new SqliteQueryBuilder();
+        $queryBuilder = new SqliteQueryBuilder($this->adapter);
         $expectedQueries = [
             'CREATE TABLE "table_with_comment" /* test table with comment */ ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL);',
         ];

@@ -2,15 +2,24 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use InvalidArgumentException;
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
 
-abstract class CommonQueryBuilder
+abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
     protected $typeMap = [];
 
     protected $defaultLength = [];
+
+    protected $adapter;
+
+    public function __construct(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
 
     protected function createType(Column $column, MigrationTable $table): string
     {
@@ -52,18 +61,23 @@ abstract class CommonQueryBuilder
         if (empty($columns)) {
             return [];
         }
+        return [$this->addColumnsQuery($table, $columns) . ';'];
+    }
+
+    protected function addColumnsQuery(MigrationTable $table, array $columns)
+    {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columnList = [];
         foreach ($columns as $column) {
             $columnList[] = 'ADD COLUMN ' . $this->createColumn($column, $table);
         }
-        $query .= implode(',', $columnList) . ';';
-        return [$query];
+        $query .= implode(',', $columnList);
+        return $query;
     }
 
     protected function createPrimaryKey(MigrationTable $table): string
     {
-        if (empty($table->getPrimaryColumns())) {
+        if (empty($table->getPrimaryColumnNames())) {
             return '';
         }
         return $this->primaryKeyString($table);
@@ -71,11 +85,42 @@ abstract class CommonQueryBuilder
 
     protected function addPrimaryKey(MigrationTable $table): array
     {
-        $queries = [];
         $primaryColumns = $table->getPrimaryColumns();
-        if (!empty($primaryColumns)) {
-            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table) . ';';
+        $primaryColumnNames = $table->getPrimaryColumnNames();
+        // TODO move to MigrationTable
+        if (!empty($primaryColumns) && !empty($primaryColumnNames)) {
+            throw new InvalidArgumentException('Cannot combine addPrimary() and addPrimaryColumns() in one migration');
         }
+        if (empty($primaryColumns) && empty($primaryColumnNames)) {
+            return [];
+        }
+        if (!empty($primaryColumnNames)) {
+            return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->primaryKeyString($table) . ';'];
+        }
+        $copyTable = new MigrationTable($table->getName());
+        $newTableName = '_' . $table->getName() . '_copy_' . date('YmdHis');
+        $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_STRUCTURE);
+        $queries = $this->copyTable($copyTable);
+
+        $newTable = new MigrationTable($newTableName);
+        $newTable->addPrimary($primaryColumns);
+        $queries[] = $this->addColumnsQuery($newTable, $primaryColumns) . ',ADD ' . $this->primaryKeyString($newTable) . ';';
+
+        // if primary key is autoincrement this would work
+        $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
+        $queries = array_merge($queries, $this->copyTable($copyTable));
+
+        $tableToDeleteName = '_' . $table->getName() . '_to_delete_' . date('YmdHis');
+        $table->rename($tableToDeleteName);
+        $queries = array_merge($queries, $this->renameTable($table));
+
+        $copyTable->setName($newTableName);
+        $copyTable->rename($table->getName());
+        $table->setName($tableToDeleteName);
+
+        $queries = array_merge($queries, $this->renameTable($copyTable));
+        $queries = array_merge($queries, $this->dropTable($table));
+
         return $queries;
     }
 

@@ -14,7 +14,7 @@ class MysqlAdapter extends PdoAdapter
     public function getQueryBuilder(): MysqlQueryBuilder
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new MysqlQueryBuilder();
+            $this->queryBuilder = new MysqlQueryBuilder($this);
         }
         return $this->queryBuilder;
     }

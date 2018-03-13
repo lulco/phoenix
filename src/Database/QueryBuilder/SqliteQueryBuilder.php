@@ -2,11 +2,9 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
-use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
-use Phoenix\Exception\PhoenixException;
 
 class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -53,13 +51,6 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         Column::TYPE_VARBINARY => 255,
     ];
 
-    private $adapter;
-
-    public function __construct(AdapterInterface $adapter = null)
-    {
-        $this->adapter = $adapter;
-    }
-
     public function createTable(MigrationTable $table): array
     {
         $queries = [];
@@ -87,7 +78,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     public function alterTable(MigrationTable $table): array
     {
         $queries = $this->addColumns($table);
-        if ($table->getColumnsToChange() || $table->getComment() !== null) {
+        if ($table->getPrimaryColumns() || $table->getColumnsToChange() || $table->getColumnsToDrop() || $table->getComment() !== null) {
             $tmpTableName = '_' . $table->getName() . '_old_' . date('YmdHis');
             $tableToRename = new MigrationTable($table->getName());
             $tableToRename->rename($tmpTableName);
@@ -127,7 +118,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected function createColumn(Column $column, MigrationTable $table): string
     {
         $col = $this->escapeString($column->getName()) . ' ' . $this->createType($column, $table);
-        $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumns()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
+        $col .= $column->getSettings()->isAutoincrement() && in_array($column->getName(), $table->getPrimaryColumnNames()) ? ' PRIMARY KEY AUTOINCREMENT' : '';
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         if ($column->getSettings()->getDefault() !== null && $column->getSettings()->getDefault() !== '') {
             $col .= ' DEFAULT ';
@@ -148,7 +139,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
     protected function primaryKeyString(MigrationTable $table): string
     {
         $primaryKeys = [];
-        foreach ($table->getPrimaryColumns() as $name) {
+        foreach ($table->getPrimaryColumnNames() as $name) {
             $column = $table->getColumn($name);
             if ($column === null) {
                 continue;
@@ -176,11 +167,16 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
     private function createNewTable(MigrationTable $table, string $newTableName, bool $copyData = true): array
     {
-        if ($this->adapter === null) {
-            throw new PhoenixException('Missing adapter');
-        }
         $oldColumns = $this->adapter->getStructure()->getTable($table->getName())->getColumns();
-        $columns = array_merge($oldColumns, $table->getColumnsToChange());
+        $newPrimaryColumnNames = $this->getNewPrimaryColumnNames($table);
+        $columns = array_merge($table->getPrimaryColumns(), $oldColumns, $table->getColumnsToChange());
+
+        $oldColumnNames = array_combine(array_keys($oldColumns), array_keys($oldColumns));
+        $columnsToDropNames = [];
+        foreach ($table->getColumnsToDrop() as $columnToDrop) {
+            unset($oldColumnNames[$columnToDrop]);
+            $columnsToDropNames[] = $columnToDrop;
+        }
 
         $newTable = new MigrationTable($table->getName(), false);
         if ($table->getComment() !== null) {
@@ -188,7 +184,12 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
         }
         $columnNames = [];
         foreach ($columns as $column) {
-            $columnNames[] = $column->getName();
+            if (in_array($column->getName(), $columnsToDropNames)) {
+                continue;
+            }
+            if (!in_array($column->getName(), $newPrimaryColumnNames)) {
+                $columnNames[] = $column->getName();
+            }
             if ($column->getSettings()->isAutoincrement()) {
                 $newTable->addPrimary($column);
                 continue;
@@ -199,7 +200,7 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
 
         $queries = $this->createTable($newTable);
         if ($copyData) {
-            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray(array_keys($oldColumns))) . ' FROM ' . $this->escapeString($newTableName);
+            $queries[] = 'INSERT INTO ' . $this->escapeString($newTable->getName()) . ' (' . implode(',', $this->escapeArray($columnNames)) . ') SELECT ' . implode(',', $this->escapeArray($oldColumnNames)) . ' FROM ' . $this->escapeString($newTableName);
         }
         return $queries;
     }
@@ -239,5 +240,14 @@ class SqliteQueryBuilder extends CommonQueryBuilder implements QueryBuilderInter
                 $combinations[] = $combination;
             }
         }
+    }
+
+    private function getNewPrimaryColumnNames(MigrationTable $table)
+    {
+        $primaryColumnNames = [];
+        foreach ($table->getPrimaryColumns() as $primaryColumn) {
+            $primaryColumnNames[] = $primaryColumn->getName();
+        }
+        return $primaryColumnNames;
     }
 }
