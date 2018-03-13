@@ -2,8 +2,16 @@
 
 namespace Phoenix\Database\Element\Behavior;
 
+use Phoenix\Behavior\ParamsCheckerBehavior;
+
 trait CopyTableBehavior
 {
+    use ParamsCheckerBehavior;
+    
+    private $action;
+
+    private $newName;
+
     private $copyType;
 
     public function getCopyType(): string

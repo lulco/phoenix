@@ -2,19 +2,17 @@
 
 namespace Phoenix\Database\Element;
 
-use Closure;
-use InvalidArgumentException;
-use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Database\Element\Behavior\CopyTableBehavior;
 use Phoenix\Database\Element\Behavior\ForeignKeyBehavior;
 use Phoenix\Database\Element\Behavior\IndexBehavior;
+use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 
 class MigrationTable
 {
     use CopyTableBehavior;
     use ForeignKeyBehavior;
     use IndexBehavior;
-    use ParamsCheckerBehavior;
+    use PrimaryColumnsBehavior;
 
     const ACTION_CREATE = 'create';
 
@@ -49,10 +47,6 @@ class MigrationTable
     private $columns = [];
 
     private $primaryColumnNames = [];
-
-    private $primaryColumns = [];
-
-    private $primaryColumnsValuesFunction;
 
     private $columnsToDrop = [];
 
@@ -124,18 +118,6 @@ class MigrationTable
         return $this;
     }
 
-    public function addPrimaryColumns(array $primaryColumns, Closure $primaryColumnsValuesFunction = null)
-    {
-        foreach ($primaryColumns as $primaryColumn) {
-            if (!$primaryColumn instanceof Column) {
-                throw new InvalidArgumentException('All primaryColumns have to be instance of "' . Column::class . '"');
-            }
-        }
-        $this->primaryColumns = $primaryColumns;
-        $this->primaryColumnsValuesFunction = $primaryColumnsValuesFunction;
-        return $this;
-    }
-
     public function setName(string $name): MigrationTable
     {
         $this->name = $name;
@@ -187,22 +169,6 @@ class MigrationTable
     public function getPrimaryColumnNames(): array
     {
         return $this->primaryColumnNames;
-    }
-
-    /**
-     * @return Column[]
-     */
-    public function getPrimaryColumns(): array
-    {
-        return $this->primaryColumns;
-    }
-
-    /**
-     * @return Closure|null
-     */
-    public function getPrimaryColumnsValuesFunction()
-    {
-        return $this->primaryColumnsValuesFunction;
     }
 
     public function dropPrimaryKey(): MigrationTable

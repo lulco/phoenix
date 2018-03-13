@@ -67,4 +67,6 @@ trait IndexBehavior
 
         return 'idx_' . $this->getName() . '_' . implode('_', $columns);
     }
+
+    abstract public function getName();
 }
