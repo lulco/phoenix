@@ -22,6 +22,7 @@ before_script:
 
 script:
     - mkdir -p build/logs
+    - composer outdated -D --strict
     - php vendor/bin/phpcs src/ --standard=PSR2 -n
     - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 

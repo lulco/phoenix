@@ -2,6 +2,8 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Database\Element\Behavior\CharsetAndCollationBehavior;
+use Phoenix\Database\Element\Behavior\ColumnsToChangeBehavior;
 use Phoenix\Database\Element\Behavior\ColumnsToDropBehavior;
 use Phoenix\Database\Element\Behavior\CommentBehavior;
 use Phoenix\Database\Element\Behavior\CopyTableBehavior;
@@ -12,6 +14,8 @@ use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 
 class MigrationTable
 {
+    use CharsetAndCollationBehavior;
+    use ColumnsToChangeBehavior;
     use ColumnsToDropBehavior;
     use CommentBehavior;
     use CopyTableBehavior;
@@ -44,15 +48,9 @@ class MigrationTable
 
     private $newName;
 
-    private $charset;
-
-    private $collation;
-
     private $columns = [];
 
     private $primaryColumnNames = [];
-
-    private $columnsToChange = [];
 
     /**
      * @param mixed $primaryKey @see addPrimary()
@@ -67,18 +65,6 @@ class MigrationTable
     {
         $column = new Column($name, $type, $settings);
         $this->columns[$column->getName()] = $column;
-        return $this;
-    }
-
-    public function changeColumn(string $oldName, string $newName, string $type, array $settings = []): MigrationTable
-    {
-        $newColumn = new Column($newName, $type, $settings);
-        if (isset($this->columns[$oldName])) {
-            $this->columns[$oldName] = $newColumn;
-            return $this;
-        }
-
-        $this->columnsToChange[$oldName] = $newColumn;
         return $this;
     }
 
@@ -147,39 +133,9 @@ class MigrationTable
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
-    /**
-     * @return Column[]
-     */
-    public function getColumnsToChange(): array
-    {
-        return $this->columnsToChange;
-    }
-
     public function getPrimaryColumnNames(): array
     {
         return $this->primaryColumnNames;
-    }
-
-    public function setCharset(?string $charset): MigrationTable
-    {
-        $this->charset = $charset;
-        return $this;
-    }
-
-    public function getCharset(): ?string
-    {
-        return $this->charset;
-    }
-
-    public function setCollation(?string $collation): MigrationTable
-    {
-        $this->collation = $collation;
-        return $this;
-    }
-
-    public function getCollation(): ?string
-    {
-        return $this->collation;
     }
 
     public function create(): void

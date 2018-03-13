@@ -23,5 +23,4 @@ trait CommentBehavior
     {
         return $this->setComment('');
     }
-
 }
