@@ -4,9 +4,7 @@
 
 #### Added
 - Added methods tableExist, tableColumnExists and getTable to migration
-
-#### Fixed
-- Add a primary key on an existing table
+- Added posibility to add an autoincrement primary key on an existing table
 
 ### [0.12.1] - 2017-12-18
 #### Fixed
