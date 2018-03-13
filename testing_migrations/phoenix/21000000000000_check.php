@@ -3,6 +3,8 @@
 namespace Phoenix\TestingMigrations;
 
 use Exception;
+use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\Table;
 use Phoenix\Migration\AbstractMigration;
 
 class Check extends AbstractMigration
@@ -74,6 +76,30 @@ class Check extends AbstractMigration
         $item3 = $this->fetch('renamed_table_1', '*', ['id' => 3]);
         if ((bool)$item3['is_active'] !== true) {
             throw new Exception('is_active for item with id 3 should be false');
+        }
+
+        if ($this->tableExists('non_existing_table')) {
+            throw new Exception('non_existing_table exists!');
+        }
+
+        if ($this->tableColumnExists('non_existing_table', 'some_column')) {
+            throw new Exception('non_existing_table.some_column exists!');
+        }
+
+        if ($this->tableColumnExists('table_2', 'non_existing_column')) {
+            throw new Exception('table_2.non_existing_column exists!');
+        }
+
+        if ($this->getTable('non_existing_table') !== null) {
+            throw new Exception('non_existing_table is not null');
+        }
+
+        if (!($this->getTable('table_2') instanceof Table)) {
+            throw new Exception('table_2 is not a Table');
+        }
+
+        if (!($this->getTable('table_2')->getColumn('title') instanceof Column)) {
+            throw new Exception('table_2.title is not a Column');
         }
     }
 

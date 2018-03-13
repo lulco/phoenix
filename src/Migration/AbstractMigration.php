@@ -5,6 +5,7 @@ namespace Phoenix\Migration;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use ReflectionClass;
@@ -96,6 +97,25 @@ abstract class AbstractMigration
 
         $this->queriesToExecute[] = $table;
         return $table;
+    }
+
+    final protected function tableExists(string $name): bool
+    {
+        return $this->adapter->getStructure()->getTable($name) !== null;
+    }
+
+    final protected function tableColumnExists(string $tableName, string $columnName): bool
+    {
+        $table = $this->getTable($tableName);
+        if ($table === null) {
+            return false;
+        }
+        return $table->getColumn($columnName) !== null;
+    }
+
+    final protected function getTable(string $name): ?Table
+    {
+        return $this->adapter->getStructure()->getTable($name);
     }
 
     final protected function select(string $sql): array

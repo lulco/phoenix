@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Added methods tableExist, tableColumnExists and getTable to migration
+
 #### Fixed
 - Add a primary key on an existing table
 
