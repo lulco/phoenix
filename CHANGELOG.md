@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Added methods tableExist, tableColumnExists and getTable to migration
+
 ### [0.12.1] - 2017-12-18
 #### Fixed
 - binding for null and boolean values

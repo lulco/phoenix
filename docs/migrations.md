@@ -38,3 +38,23 @@ $this->table('users')
 $this->table('users')
     ->rename('frontend_users');
 ```
+
+#### Check if table exists
+```
+if ($this->tableExists('users')) {
+    // do something
+}
+```
+
+#### Check if column in table exists
+```
+if ($this->tableColumnExists('users', 'username') {
+    // do something
+}
+```
+
+#### Get Table structure
+```
+$table = $this->getTable('users');
+$usernameColumn = $table->getColumn('username');
+```
