@@ -32,7 +32,7 @@ class Check extends AbstractMigration
                 'identifier', 't1_fk', 't2_fk', 'id',
             ],
             'table_4' => [
-                'title',
+                'title', 'identifier'
             ],
             'new_table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at'
