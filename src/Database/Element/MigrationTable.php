@@ -2,14 +2,20 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Database\Element\Behavior\ColumnsToDropBehavior;
+use Phoenix\Database\Element\Behavior\CommentBehavior;
 use Phoenix\Database\Element\Behavior\CopyTableBehavior;
+use Phoenix\Database\Element\Behavior\DropPrimaryKeyBehavior;
 use Phoenix\Database\Element\Behavior\ForeignKeyBehavior;
 use Phoenix\Database\Element\Behavior\IndexBehavior;
 use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 
 class MigrationTable
 {
+    use ColumnsToDropBehavior;
+    use CommentBehavior;
     use CopyTableBehavior;
+    use DropPrimaryKeyBehavior;
     use ForeignKeyBehavior;
     use IndexBehavior;
     use PrimaryColumnsBehavior;
@@ -42,17 +48,11 @@ class MigrationTable
 
     private $collation;
 
-    private $comment;
-
     private $columns = [];
 
     private $primaryColumnNames = [];
 
-    private $columnsToDrop = [];
-
     private $columnsToChange = [];
-
-    private $dropPrimaryKey = false;
 
     /**
      * @param mixed $primaryKey @see addPrimary()
@@ -147,17 +147,6 @@ class MigrationTable
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
-    public function dropColumn(string $name): MigrationTable
-    {
-        $this->columnsToDrop[] = $name;
-        return $this;
-    }
-
-    public function getColumnsToDrop(): array
-    {
-        return $this->columnsToDrop;
-    }
-
     /**
      * @return Column[]
      */
@@ -169,17 +158,6 @@ class MigrationTable
     public function getPrimaryColumnNames(): array
     {
         return $this->primaryColumnNames;
-    }
-
-    public function dropPrimaryKey(): MigrationTable
-    {
-        $this->dropPrimaryKey = true;
-        return $this;
-    }
-
-    public function hasPrimaryKeyToDrop(): bool
-    {
-        return $this->dropPrimaryKey;
     }
 
     public function setCharset(?string $charset): MigrationTable
@@ -202,22 +180,6 @@ class MigrationTable
     public function getCollation(): ?string
     {
         return $this->collation;
-    }
-
-    public function setComment(?string $comment): MigrationTable
-    {
-        $this->comment = $comment;
-        return $this;
-    }
-
-    public function getComment(): ?string
-    {
-        return $this->comment;
-    }
-
-    public function unsetComment(): MigrationTable
-    {
-        return $this->setComment('');
     }
 
     public function create(): void
