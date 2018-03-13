@@ -2,13 +2,27 @@
 
 namespace Phoenix\Database\Element;
 
-use Closure;
-use InvalidArgumentException;
-use Phoenix\Behavior\ParamsCheckerBehavior;
+use Phoenix\Database\Element\Behavior\CharsetAndCollationBehavior;
+use Phoenix\Database\Element\Behavior\ColumnsToChangeBehavior;
+use Phoenix\Database\Element\Behavior\ColumnsToDropBehavior;
+use Phoenix\Database\Element\Behavior\CommentBehavior;
+use Phoenix\Database\Element\Behavior\CopyTableBehavior;
+use Phoenix\Database\Element\Behavior\DropPrimaryKeyBehavior;
+use Phoenix\Database\Element\Behavior\ForeignKeyBehavior;
+use Phoenix\Database\Element\Behavior\IndexBehavior;
+use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 
 class MigrationTable
 {
-    use ParamsCheckerBehavior;
+    use CharsetAndCollationBehavior;
+    use ColumnsToChangeBehavior;
+    use ColumnsToDropBehavior;
+    use CommentBehavior;
+    use CopyTableBehavior;
+    use DropPrimaryKeyBehavior;
+    use ForeignKeyBehavior;
+    use IndexBehavior;
+    use PrimaryColumnsBehavior;
 
     const ACTION_CREATE = 'create';
 
@@ -26,7 +40,7 @@ class MigrationTable
 
     const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
-    private $action = self::ACTION_ALTER;
+    private $action;
 
     private $tmpPrimaryKey;
 
@@ -34,35 +48,9 @@ class MigrationTable
 
     private $newName;
 
-    private $charset;
-
-    private $collation;
-
-    private $comment;
-
     private $columns = [];
 
     private $primaryColumnNames = [];
-
-    private $primaryColumns = [];
-
-    private $primaryColumnsValuesFunction;
-
-    private $foreignKeys = [];
-
-    private $indexes = [];
-
-    private $columnsToDrop = [];
-
-    private $foreignKeysToDrop = [];
-
-    private $indexesToDrop = [];
-
-    private $columnsToChange = [];
-
-    private $dropPrimaryKey = false;
-
-    private $copyType;
 
     /**
      * @param mixed $primaryKey @see addPrimary()
@@ -77,18 +65,6 @@ class MigrationTable
     {
         $column = new Column($name, $type, $settings);
         $this->columns[$column->getName()] = $column;
-        return $this;
-    }
-
-    public function changeColumn(string $oldName, string $newName, string $type, array $settings = []): MigrationTable
-    {
-        $newColumn = new Column($newName, $type, $settings);
-        if (isset($this->columns[$oldName])) {
-            $this->columns[$oldName] = $newColumn;
-            return $this;
-        }
-
-        $this->columnsToChange[$oldName] = $newColumn;
         return $this;
     }
 
@@ -128,18 +104,6 @@ class MigrationTable
         return $this;
     }
 
-    public function addPrimaryColumns(array $primaryColumns, Closure $primaryColumnsValuesFunction = null)
-    {
-        foreach ($primaryColumns as $primaryColumn) {
-            if (!$primaryColumn instanceof Column) {
-                throw new InvalidArgumentException('All primaryColumns have to be instance of "' . Column::class . '"');
-            }
-        }
-        $this->primaryColumns = $primaryColumns;
-        $this->primaryColumnsValuesFunction = $primaryColumnsValuesFunction;
-        return $this;
-    }
-
     public function setName(string $name): MigrationTable
     {
         $this->name = $name;
@@ -169,191 +133,9 @@ class MigrationTable
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
-    public function dropColumn(string $name): MigrationTable
-    {
-        $this->columnsToDrop[] = $name;
-        return $this;
-    }
-
-    public function getColumnsToDrop(): array
-    {
-        return $this->columnsToDrop;
-    }
-
-    /**
-     * @return Column[]
-     */
-    public function getColumnsToChange(): array
-    {
-        return $this->columnsToChange;
-    }
-
     public function getPrimaryColumnNames(): array
     {
         return $this->primaryColumnNames;
-    }
-
-    /**
-     * @return Column[]
-     */
-    public function getPrimaryColumns(): array
-    {
-        return $this->primaryColumns;
-    }
-
-    /**
-     * @return Closure|null
-     */
-    public function getPrimaryColumnsValuesFunction()
-    {
-        return $this->primaryColumnsValuesFunction;
-    }
-
-    /**
-     * @param string|array $columns name(s) of column(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
-     * @param string $name name of index
-     * @return MigrationTable
-     */
-    public function addIndex($columns, string $type = Index::TYPE_NORMAL, string $method = Index::METHOD_DEFAULT, string $name = ''): MigrationTable
-    {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        $index = new Index($columns, $this->createIndexName($columns, $name), $type, $method);
-        $this->indexes[] = $index;
-        return $this;
-    }
-
-    /**
-     * @return Index[]
-     */
-    public function getIndexes(): array
-    {
-        return $this->indexes;
-    }
-
-    /**
-     * @param string|array $columns
-     */
-    public function dropIndex($columns): MigrationTable
-    {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        $indexName = $this->createIndexName($columns);
-        return $this->dropIndexByName($indexName);
-    }
-
-    public function dropIndexByName(string $indexName): MigrationTable
-    {
-        $this->indexesToDrop[] = $indexName;
-        return $this;
-    }
-
-    public function getIndexesToDrop(): array
-    {
-        return $this->indexesToDrop;
-    }
-
-    /**
-     * @param string|array $columns
-     * @param string $referencedTable
-     * @param string|array $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @return MigrationTable
-     */
-    public function addForeignKey($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = ForeignKey::DEFAULT_ACTION, string $onUpdate = ForeignKey::DEFAULT_ACTION): MigrationTable
-    {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        if (!is_array($referencedColumns)) {
-            $referencedColumns = [$referencedColumns];
-        }
-        $this->foreignKeys[] = new ForeignKey($columns, $referencedTable, $referencedColumns, $onDelete, $onUpdate);
-        return $this;
-    }
-
-    /**
-     * @return ForeignKey[]
-     */
-    public function getForeignKeys(): array
-    {
-        return $this->foreignKeys;
-    }
-
-    /**
-     * @param string|array $columns
-     */
-    public function dropForeignKey($columns): MigrationTable
-    {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        $this->foreignKeysToDrop[] = implode('_', $columns);
-        return $this;
-    }
-
-    public function getForeignKeysToDrop(): array
-    {
-        return $this->foreignKeysToDrop;
-    }
-
-    public function dropPrimaryKey(): MigrationTable
-    {
-        $this->dropPrimaryKey = true;
-        return $this;
-    }
-
-    public function hasPrimaryKeyToDrop(): bool
-    {
-        return $this->dropPrimaryKey;
-    }
-
-    public function setCharset(?string $charset): MigrationTable
-    {
-        $this->charset = $charset;
-        return $this;
-    }
-
-    public function getCharset(): ?string
-    {
-        return $this->charset;
-    }
-
-    public function setCollation(?string $collation): MigrationTable
-    {
-        $this->collation = $collation;
-        return $this;
-    }
-
-    public function getCollation(): ?string
-    {
-        return $this->collation;
-    }
-
-    public function getCopyType(): string
-    {
-        return $this->copyType;
-    }
-
-    public function setComment(?string $comment): MigrationTable
-    {
-        $this->comment = $comment;
-        return $this;
-    }
-
-    public function getComment(): ?string
-    {
-        return $this->comment;
-    }
-
-    public function unsetComment(): MigrationTable
-    {
-        return $this->setComment('');
     }
 
     public function create(): void
@@ -378,27 +160,9 @@ class MigrationTable
         $this->newName = $newName;
     }
 
-    public function copy(string $newName, string $copyType = self::COPY_ONLY_STRUCTURE): void
-    {
-        $this->inArray($copyType, [self::COPY_ONLY_STRUCTURE, self::COPY_ONLY_DATA, self::COPY_STRUCTURE_AND_DATA], 'Copy type "' . $copyType . '" is not allowed');
-
-        $this->action = self::ACTION_COPY;
-        $this->newName = $newName;
-        $this->copyType = $copyType;
-    }
-
     public function getAction(): string
     {
-        return $this->action;
-    }
-
-    private function createIndexName(array $columns, string $name = ''): string
-    {
-        if ($name) {
-            return $name;
-        }
-
-        return 'idx_' . $this->getName() . '_' . implode('_', $columns);
+        return $this->action ?: self::ACTION_ALTER;
     }
 
     public function toTable(): Table
