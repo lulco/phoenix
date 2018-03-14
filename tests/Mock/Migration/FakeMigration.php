@@ -6,12 +6,12 @@ use Phoenix\Migration\AbstractMigration;
 
 class FakeMigration extends AbstractMigration
 {
-    protected function up()
+    protected function up(): void
     {
 
     }
 
-    protected function down()
+    protected function down(): void
     {
 
     }
