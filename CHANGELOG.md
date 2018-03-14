@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
+
 #### Added
 - Added methods tableExist, tableColumnExists and getTable to migration
 - Added posibility to add an autoincrement primary key on an existing table
