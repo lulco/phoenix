@@ -123,12 +123,12 @@ abstract class AbstractMigration
         return $this->adapter->select($sql);
     }
 
-    final protected function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array
+    final protected function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
     }
 
-    final protected function fetchAll(string $table, string $fields = '*', array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
+    final protected function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
     }

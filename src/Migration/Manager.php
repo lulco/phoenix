@@ -93,7 +93,7 @@ class Manager
 
     public function executedMigrations(): array
     {
-        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*', [], null, ['executed_at', 'migration_datetime']);
+        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), ['*'], [], null, ['executed_at', 'migration_datetime']);
         $executedMigrations = [];
         foreach ($migrations as $migration) {
             $executedMigrations[$migration['migration_datetime'] . '|' . $migration['classname']] = $migration;
