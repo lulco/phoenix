@@ -2,9 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- second parameter of methods fetchAll and fetch `string $fields = '*'` has been changed to `array $fields = ['*']` (BC Break - fix: change string to array)
+
 #### Added
-- Added methods tableExist, tableColumnExists and getTable to migration
-- Added posibility to add an autoincrement primary key on an existing table
+- methods tableExists, tableColumnExists and getTable to migration
+- posibility to add an autoincrement primary key on an existing table
 
 ### [0.12.1] - 2017-12-18
 #### Fixed
