@@ -53,24 +53,3 @@ or dsn:
     ],
 ],
 ```
-#### SQLite
-
-Define file path:
-```
-'environments' => [
-    'env5' => [
-        'adapter' => 'sqlite',
-        'dsn' => 'sqlite:' . __DIR__ . '/phoenix.sqlite',
-    ],
-],
-```
-
-or use memory:
-```
-'environments' => [
-    'env6' => [
-        'adapter' => 'sqlite',
-        'dsn' => 'sqlite::memory:',
-    ],
-],
-```

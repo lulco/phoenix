@@ -3,7 +3,10 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
+- added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
+
+#### Removed
+- removed support for sqlite adapter
 
 ### [0.13.0] - 2018-03-14
 #### Changed
