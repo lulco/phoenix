@@ -2,7 +2,7 @@
 
 namespace Phoenix\TestingMigrations;
 
-use Nette\Utils\DateTime;
+use DateTime;
 use Phoenix\Migration\AbstractMigration;
 
 class AddData extends AbstractMigration
