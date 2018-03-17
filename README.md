@@ -27,7 +27,6 @@ Framework agnostic database migrations for PHP.
 ## Supported adapters
 - MySql
 - PostgreSQL
-- SQLite
 
 ## Installation
 

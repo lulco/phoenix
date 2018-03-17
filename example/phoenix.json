@@ -18,10 +18,6 @@
             "password": "123",
             "db_name": "phoenix",
             "charset": "utf8"
-        },
-        "sqlite": {
-            "adapter": "sqlite",
-            "dsn": "sqlite::%%ACTUAL_DIR%%/../testing_migrations/phoenix.sqlite"
         }
     }
 }

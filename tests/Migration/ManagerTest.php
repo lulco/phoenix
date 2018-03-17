@@ -2,14 +2,14 @@
 
 namespace Phoenix\Tests\Migration;
 
-use PDO;
 use Phoenix\Config\Config;
-use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
+use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
+use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use Phoenix\Tests\Mock\Migration\FakeMigration;
 use PHPUnit\Framework\TestCase;
 
@@ -28,19 +28,28 @@ class ManagerTest extends TestCase
                 __DIR__ . '/../fake/structure/migration_directory_1/',
             ],
             'environments' => [
-                'sqlite' => [
-                    'adapter' => 'sqlite',
-                    'dsn' => 'sqlite::memory:'
+                'mysql' => [
+                    'adapter' => 'mysql',
+                    'host' => getenv('PHOENIX_MYSQL_HOST'),
+                    'port' => getenv('PHOENIX_MYSQL_PORT'),
+                    'username' => getenv('PHOENIX_MYSQL_USERNAME'),
+                    'password' => getenv('PHOENIX_MYSQL_PASSWORD'),
+                    'db_name' => getenv('PHOENIX_MYSQL_DATABASE'),
+                    'charset' => getenv('PHOENIX_MYSQL_CHARSET'),
                 ],
-            ]
+            ],
         ]);
-        $environmentConfig = $config->getEnvironmentConfig('sqlite');
-        $pdo = new PDO($environmentConfig->getDsn());
-        $this->adapter = new SqliteAdapter($pdo);
-        $this->manager = new Manager($config, $this->adapter);
+        $pdo = new MysqlPdo();
+        $adapter = new MysqlCleanupAdapter($pdo);
+        $adapter->cleanupDatabase();
+
+        $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
+        $this->adapter = new MysqlCleanupAdapter($pdo);
 
         $this->initMigration = new Init($this->adapter, $config->getLogTableName());
         $this->initMigration->migrate();
+
+        $this->manager = new Manager($config, $this->adapter);
     }
 
     public function testMigrations()
@@ -88,12 +97,6 @@ class ManagerTest extends TestCase
 
         $downMigrations = $this->manager->findMigrationsToExecute('down');
         $this->checkMigrations($downMigrations, 2, [0 => '20150518091732', 1 => '20150428140909']);
-
-        $this->initMigration->rollback();
-
-        $this->expectException(DatabaseQueryExecuteException::class);
-        $this->expectExceptionMessage('SQLSTATE[HY000]: no such table: phoenix_log.');
-        $this->manager->executedMigrations();
     }
 
     public function testWrongType()

@@ -6,13 +6,13 @@ use Phoenix\Migration\AbstractMigration;
 
 class Third extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
-        
+
     }
-    
-    public function down()
+
+    public function down(): void
     {
-        
+
     }
 }

@@ -3,10 +3,12 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Replaced nette/finder with symfony/finder
+- added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
+- replaced nette/finder with symfony/finder
 
 #### Removed
-- Removed nette/utils
+- removed support for sqlite adapter
+- removed nette/utils
 
 ### [0.13.0] - 2018-03-14
 #### Changed
