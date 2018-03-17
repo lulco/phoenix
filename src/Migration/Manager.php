@@ -2,7 +2,7 @@
 
 namespace Phoenix\Migration;
 
-use Nette\Utils\DateTime;
+use DateTime;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
@@ -93,7 +93,7 @@ class Manager
 
     public function executedMigrations(): array
     {
-        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), '*', [], null, ['executed_at', 'migration_datetime']);
+        $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), ['*'], [], null, ['executed_at', 'migration_datetime']);
         $executedMigrations = [];
         foreach ($migrations as $migration) {
             $executedMigrations[$migration['migration_datetime'] . '|' . $migration['classname']] = $migration;

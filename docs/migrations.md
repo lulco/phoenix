@@ -39,6 +39,13 @@ $this->table('users')
     ->rename('frontend_users');
 ```
 
+#### Add an autoincrement primary column to an existing table
+```
+$this->table('table_without_primary_key')
+    ->addPrimaryColumns([new Column('id', 'integer', ['autoincrement' => true])])
+    ->save();
+```
+
 #### Check if table exists
 ```
 if ($this->tableExists('users')) {

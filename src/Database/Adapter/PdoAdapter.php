@@ -113,23 +113,23 @@ abstract class PdoAdapter implements AdapterInterface
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }
 
-    public function fetch(string $table, string $fields = '*', array $conditions = [], array $orders = [], array $groups = []): array
+    public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): array
     {
         $statement = $this->buildFetchQuery($table, $fields, $conditions, '1', $orders, $groups);
         $this->execute($statement);
         return $statement->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function fetchAll(string $table, string $fields = '*', array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
+    public function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         $statement = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
         $this->execute($statement);
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function buildFetchQuery(string $table, string $fields, array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): PDOStatement
+    private function buildFetchQuery(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): PDOStatement
     {
-        $query = sprintf('SELECT %s FROM %s%s%s%s%s;', $fields, $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
+        $query = sprintf('SELECT %s FROM %s%s%s%s%s;', implode(', ', $fields), $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
         $statement = $this->pdo->prepare($query);
         if (!$statement) {
             $this->throwError($statement);

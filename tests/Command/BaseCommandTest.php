@@ -2,7 +2,6 @@
 
 namespace Phoenix\Tests\Command;
 
-use Nette\Utils\Finder;
 use Phoenix\Config\Parser\PhpConfigParser;
 use Phoenix\Tests\Helpers\Adapter\CleanupInterface;
 use Phoenix\Tests\Mock\Command\Input;
@@ -10,6 +9,7 @@ use Phoenix\Tests\Mock\Command\Output;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 abstract class BaseCommandTest extends TestCase
 {
@@ -33,7 +33,7 @@ abstract class BaseCommandTest extends TestCase
         // delete additional migration dir
         $newMigrationDir = __DIR__ . '/../../testing_migrations/new';
         if (file_exists($newMigrationDir)) {
-            $newFiles = Finder::find('*')->in($newMigrationDir);
+            $newFiles = Finder::create()->files()->in($newMigrationDir);
             foreach ($newFiles as $newFile) {
                 $filePath = (string)$newFile;
                 unlink($filePath);

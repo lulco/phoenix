@@ -23,19 +23,19 @@ class Check extends AbstractMigration
 
         $tableColumns = [
             'renamed_table_1' => [
-                'id', 'title', 'alias', 'is_active', 'bodytext', 'self_fk'
+                'id', 'title', 'alias', 'is_active', 'bodytext', 'self_fk',
             ],
             'table_2' => [
-                'id', 'title', 'new_sorting', 't1_fk', 'created_at'
+                'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],
             'table_3' => [
                 'identifier', 't1_fk', 't2_fk', 'id',
             ],
             'table_4' => [
-                'title', 'identifier'
+                'title', 'identifier',
             ],
             'new_table_2' => [
-                'id', 'title', 'new_sorting', 't1_fk', 'created_at'
+                'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],
             'new_table_3' => [
                 'identifier', 't1_fk', 't2_fk', 'id',
@@ -63,17 +63,17 @@ class Check extends AbstractMigration
             }
         }
 
-        $item1 = $this->fetch('renamed_table_1', '*', ['id' => 1]);
+        $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 1]);
         if ((bool)$item1['is_active'] !== false) {
             throw new Exception('is_active for item with id 1 should be false');
         }
 
-        $item2 = $this->fetch('renamed_table_1', '*', ['id' => 2]);
+        $item2 = $this->fetch('renamed_table_1', ['*'], ['id' => 2]);
         if ((bool)$item2['is_active'] !== true) {
             throw new Exception('is_active for item with id 2 should be true');
         }
 
-        $item3 = $this->fetch('renamed_table_1', '*', ['id' => 3]);
+        $item3 = $this->fetch('renamed_table_1', ['*'], ['id' => 3]);
         if ((bool)$item3['is_active'] !== true) {
             throw new Exception('is_active for item with id 3 should be false');
         }
