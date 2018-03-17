@@ -3,7 +3,7 @@
 namespace Phoenix\Migration;
 
 use InvalidArgumentException;
-use Nette\Utils\Finder;
+use Symfony\Component\Finder\Finder;
 
 class FilesFinder
 {
@@ -52,7 +52,7 @@ class FilesFinder
     {
         $files = [];
         foreach ($this->directories as $directory) {
-            $phpFiles = Finder::findFiles('*.php')->in($directory);
+            $phpFiles = Finder::create()->files()->name('*.php')->in($directory);
             foreach ($phpFiles as $file) {
                 $files[] = (string) $file;
             }

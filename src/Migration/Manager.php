@@ -2,7 +2,7 @@
 
 namespace Phoenix\Migration;
 
-use Nette\Utils\DateTime;
+use DateTime;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
