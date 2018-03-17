@@ -2,7 +2,6 @@
 
 namespace Phoenix\Tests\Command\CreateCommand;
 
-use Nette\Utils\Finder;
 use Phoenix\Command\CreateCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Exception\ConfigException;
@@ -12,6 +11,7 @@ use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Finder\Finder;
 
 abstract class CreateCommandTest extends BaseCommandTest
 {
@@ -73,7 +73,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $commandTester->setInputs(['create']);
         $commandTester->execute(['migration' => 'test\test']);
 
-        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $createFiles = Finder::create()->files()->in($createMigrationDir);
         $this->assertCount(1, $createFiles);
         foreach ($createFiles as $createFile) {
             $filePath = (string)$createFile;
@@ -105,7 +105,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $initCommand->setConfig($configuration);
         $initCommand->run($input, new Output());
 
-        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $createFiles = Finder::create()->files()->in($createMigrationDir);
         $this->assertCount(0, $createFiles);
 
         $command = new CreateCommand();
@@ -115,7 +115,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $this->input->setOption('indent', '4spaces');
         $command->run($this->input, $this->output);
 
-        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $createFiles = Finder::create()->files()->in($createMigrationDir);
         $this->assertCount(1, $createFiles);
         foreach ($createFiles as $createFile) {
             $filePath = (string)$createFile;
@@ -157,7 +157,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $initCommand->setConfig($configuration);
         $initCommand->run($input, new Output());
 
-        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $createFiles = Finder::create()->files()->in($createMigrationDir);
         $this->assertCount(0, $createFiles);
 
         $command = new CreateCommand();
@@ -167,7 +167,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $this->input->setOption('indent', 'tab');
         $command->run($this->input, $this->output);
 
-        $createFiles = Finder::find('*')->in($createMigrationDir);
+        $createFiles = Finder::create()->files()->in($createMigrationDir);
         $this->assertCount(1, $createFiles);
         foreach ($createFiles as $createFile) {
             $filePath = (string)$createFile;

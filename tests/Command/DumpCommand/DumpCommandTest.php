@@ -2,7 +2,6 @@
 
 namespace Phoenix\Tests\Command\DumpCommand;
 
-use Nette\Utils\Finder;
 use Phoenix\Command\DumpCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
@@ -13,6 +12,7 @@ use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 
 abstract class DumpCommandTest extends BaseCommandTest
 {
@@ -90,7 +90,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $configuration = $this->configuration;
         $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(0, $dumpFiles);
 
         $initCommand = new InitCommand();
@@ -104,7 +104,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $this->input->setOption('dir', 'dump');
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(1, $dumpFiles);
         foreach ($dumpFiles as $dumpFile) {
             $filePath = (string)$dumpFile;
@@ -140,7 +140,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $configuration = $this->configuration;
         $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(0, $dumpFiles);
 
         $migrateCommand = new MigrateCommand();
@@ -159,7 +159,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(1, $dumpFiles);
         foreach ($dumpFiles as $dumpFile) {
             $filePath = (string)$dumpFile;
@@ -192,7 +192,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $configuration = $this->configuration;
         $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(0, $dumpFiles);
 
         $migrateCommand = new MigrateCommand();
@@ -212,7 +212,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::find('*')->in($dumpMigrationDir);
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
         $this->assertCount(1, $dumpFiles);
         foreach ($dumpFiles as $dumpFile) {
             $filePath = (string)$dumpFile;

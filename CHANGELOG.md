@@ -2,6 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Replaced nette/finder with symfony/finder
+
+#### Removed
+- Removed nette/utils
+
 ### [0.13.0] - 2018-03-14
 #### Changed
 - second parameter of methods fetchAll and fetch `string $fields = '*'` has been changed to `array $fields = ['*']` (BC Break - fix: change string to array)
