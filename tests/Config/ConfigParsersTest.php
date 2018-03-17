@@ -46,7 +46,6 @@ class ConfigParsersTest extends TestCase
             $this->assertArrayHasKey('phoenix', $config['migration_dirs']);
             $this->assertArrayHasKey('environments', $config);
             $this->assertArrayHasKey('mysql', $config['environments']);
-            $this->assertArrayHasKey('sqlite', $config['environments']);
         }
     }
 

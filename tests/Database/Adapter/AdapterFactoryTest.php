@@ -6,7 +6,6 @@ use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Adapter\PgsqlAdapter;
-use Phoenix\Database\Adapter\SqliteAdapter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
@@ -30,15 +29,6 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(PgsqlAdapter::class, AdapterFactory::instance($config));
     }
 
-    public function testSqlite()
-    {
-        $config = new EnvironmentConfig([
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite::memory:',
-        ]);
-        $this->assertInstanceOf(SqliteAdapter::class, AdapterFactory::instance($config));
-    }
-
     public function testUnknown()
     {
         $config = new EnvironmentConfig([
@@ -47,7 +37,7 @@ class AdapterFactoryTest extends TestCase
         ]);
 
         $this->expectException(InvalidArgumentValueException::class);
-        $this->expectExceptionMessage('Unknown adapter "unknown". Use one of value: "mysql", "pgsql", "sqlite".');
+        $this->expectExceptionMessage('Unknown adapter "unknown". Use one of value: "mysql", "pgsql".');
         AdapterFactory::instance($config);
     }
 }
