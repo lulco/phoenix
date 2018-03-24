@@ -64,7 +64,7 @@ class Check extends AbstractMigration
         }
 
         $table4Count = $this->fetch('table_4', ['count(*) as cnt']);
-        if (intval($table4Count['cnt']) !== 10000) {
+        if (intval($table4Count['cnt']) !== 1000) {
             throw new Exception('Items count in table_4 is not 3, but ' . $table4Count['cnt']);
         }
 

@@ -60,7 +60,7 @@ class AddData extends AbstractMigration
         ]);
 
         $multiInsertData = [];
-        for ($i = 1; $i <= 10000; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
             $multiInsertData[] = [
                 'title' => 'Item ' . $i
             ];
