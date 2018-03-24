@@ -3,6 +3,7 @@
 namespace Phoenix\Database\QueryBuilder;
 
 use InvalidArgumentException;
+use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -106,7 +107,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $newTable->addPrimary($primaryColumns);
         $queries[] = $this->addColumnsQuery($newTable, $primaryColumns) . ',ADD ' . $this->primaryKeyString($newTable) . ';';
 
-        // if primary key is autoincrement this would work
+        $copyTable->addPrimaryColumns($table->getPrimaryColumns(), $table->getPrimaryColumnsValuesFunction(), $table->getDataChunkSize());
         $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
         $queries = array_merge($queries, $this->copyTable($copyTable));
 
@@ -208,6 +209,35 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     protected function dropKeyQuery(MigrationTable $table, string $key): string
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
+    }
+
+    protected function copyAndAddData(MigrationTable $table): array
+    {
+        $chunkSize = $table->getDataChunkSize();
+        if ($chunkSize !== null) {
+            $queries = [];
+            $res = $this->adapter->fetch($table->getName(), ['count(*) AS cnt']);
+            $totalCount = $res['cnt'];
+            $pages = ceil($totalCount / $chunkSize);
+            for ($i = 0; $i < $pages; $i++) {
+                $limit = $chunkSize . ' OFFSET ' . ($i * $chunkSize);
+                $data = $this->adapter->fetchAll($table->getName(), ['*'], [], $limit);
+                $queries[] = $this->createCopyAndAddDataQuery($table, $data);
+            }
+            return $queries;
+        }
+
+        $data = $this->adapter->fetchAll($table->getName());
+        return empty($data) ? [] : [$this->createCopyAndAddDataQuery($table, $data)];
+    }
+
+    private function createCopyAndAddDataQuery(MigrationTable $table, array $oldData): PDOStatement
+    {
+        $newData = [];
+        foreach ($oldData as $row) {
+            $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
+        }
+        return $this->adapter->buildInsertQuery($table->getNewName(), $newData);
     }
 
     abstract public function escapeString(string $string): string;

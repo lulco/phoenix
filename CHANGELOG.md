@@ -18,6 +18,9 @@
 - methods tableExists, tableColumnExists and getTable to migration
 - posibility to add an autoincrement primary key on an existing table
 
+#### Fixed
+- Add a primary key on an existing table
+
 ### [0.12.1] - 2017-12-18
 #### Fixed
 - binding for null and boolean values
