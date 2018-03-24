@@ -148,6 +148,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function copyTable(MigrationTable $table): array
     {
         if ($table->getCopyType() === MigrationTable::COPY_ONLY_DATA) {
+            if ($table->getPrimaryColumnsValuesFunction()) {
+                return $this->copyAndAddData($table);
+            }
             return ['INSERT INTO ' . $this->escapeString($table->getNewName()) . ' SELECT * FROM ' . $this->escapeString($table->getName()) . ';'];
         }
 

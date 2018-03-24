@@ -59,17 +59,13 @@ class AddData extends AbstractMigration
             't2_fk' => 1,
         ]);
 
-        $this->insert('table_4', [
-            [
-                'title' => 'Item 1',
-            ],
-            [
-                'title' => 'Item 2',
-            ],
-            [
-                'title' => 'Item 3',
-            ],
-        ]);
+        $multiInsertData = [];
+        for ($i = 1; $i <= 10000; $i++) {
+            $multiInsertData[] = [
+                'title' => 'Item ' . $i
+            ];
+        }
+        $this->insert('table_4', $multiInsertData);
 
         $this->update('table_1', [
             'title' => 'Renamed second item',

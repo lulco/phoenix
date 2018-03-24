@@ -106,7 +106,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $newTable->addPrimary($primaryColumns);
         $queries[] = $this->addColumnsQuery($newTable, $primaryColumns) . ',ADD ' . $this->primaryKeyString($newTable) . ';';
 
-        // if primary key is autoincrement this would work
+        $copyTable->addPrimaryColumns($table->getPrimaryColumns(), $table->getPrimaryColumnsValuesFunction());
         $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
         $queries = array_merge($queries, $this->copyTable($copyTable));
 
@@ -208,6 +208,21 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     protected function dropKeyQuery(MigrationTable $table, string $key): string
     {
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
+    }
+
+    protected function copyAndAddData(MigrationTable $table): array
+    {
+        $newData = [];
+        // TODO chunk data
+        $data = $this->adapter->fetchAll($table->getName());
+        foreach ($data as $row) {
+            $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
+        }
+        $queries = [];
+        if (!empty($newData)) {
+            $queries[] = $this->adapter->buildInsertQuery($table->getNewName(), $newData);
+        }
+        return $queries;
     }
 
     abstract public function escapeString(string $string): string;

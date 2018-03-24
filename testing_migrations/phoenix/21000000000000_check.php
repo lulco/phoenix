@@ -63,6 +63,11 @@ class Check extends AbstractMigration
             }
         }
 
+        $table4Count = $this->fetch('table_4', ['count(*) as cnt']);
+        if (intval($table4Count['cnt']) !== 10000) {
+            throw new Exception('Items count in table_4 is not 3, but ' . $table4Count['cnt']);
+        }
+
         $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 1]);
         if ((bool)$item1['is_active'] !== false) {
             throw new Exception('is_active for item with id 1 should be false');
