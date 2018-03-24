@@ -15,10 +15,8 @@ class AdapterFactory
             $adapter = new MysqlAdapter($pdo);
         } elseif ($config->getAdapter() == 'pgsql') {
             $adapter = new PgsqlAdapter($pdo);
-        } elseif ($config->getAdapter() == 'sqlite') {
-            $adapter = new SqliteAdapter($pdo);
         } else {
-            throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql", "sqlite".');
+            throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql".');
         }
         $adapter->setCharset($config->getCharset());
         return $adapter;

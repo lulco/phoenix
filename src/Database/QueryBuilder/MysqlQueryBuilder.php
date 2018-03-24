@@ -128,12 +128,16 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = 'CREATE TABLE ' . $this->escapeString($table->getNewName()) . ' LIKE ' . $this->escapeString($table->getName()) . ';';
         }
         if ($table->getCopyType() !== MigrationTable::COPY_ONLY_STRUCTURE) {
+            if ($table->getPrimaryColumnsValuesFunction()) {
+                $queries = array_merge($queries, $this->copyAndAddData($table));
+                return $queries;
+            }
+
             $oldTable = $this->adapter->getStructure()->getTable($table->getName());
             $columns = [];
             foreach ($oldTable->getColumns() as $column) {
                 $columns[] = $column->getName();
             }
-
             $queries[] = 'INSERT INTO ' . $this->escapeString($table->getNewName()) . ' (' . implode(',', $columns) . ') SELECT ' . implode(',', $columns) . ' FROM ' . $this->escapeString($table->getName()) . ';';
         }
         return $queries;

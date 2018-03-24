@@ -21,9 +21,5 @@ return [
             'db_name' => 'phoenix',
             'charset' => 'utf8',
         ],
-        'sqlite' => [
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite:' . __DIR__ . '/../testing_migrations/phoenix.sqlite',
-        ],
     ],
 ];

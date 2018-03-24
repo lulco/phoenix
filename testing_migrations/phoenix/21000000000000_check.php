@@ -23,19 +23,19 @@ class Check extends AbstractMigration
 
         $tableColumns = [
             'renamed_table_1' => [
-                'id', 'title', 'alias', 'is_active', 'bodytext', 'self_fk'
+                'id', 'title', 'alias', 'is_active', 'bodytext', 'self_fk',
             ],
             'table_2' => [
-                'id', 'title', 'new_sorting', 't1_fk', 'created_at'
+                'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],
             'table_3' => [
                 'identifier', 't1_fk', 't2_fk', 'id',
             ],
             'table_4' => [
-                'title',
+                'title', 'identifier',
             ],
             'new_table_2' => [
-                'id', 'title', 'new_sorting', 't1_fk', 'created_at'
+                'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],
             'new_table_3' => [
                 'identifier', 't1_fk', 't2_fk', 'id',
@@ -61,6 +61,11 @@ class Check extends AbstractMigration
                     }
                 }
             }
+        }
+
+        $table4Count = $this->fetch('table_4', ['count(*) as cnt']);
+        if (intval($table4Count['cnt']) !== 1000) {
+            throw new Exception('Items count in table_4 is not 3, but ' . $table4Count['cnt']);
         }
 
         $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 1]);

@@ -4,15 +4,13 @@ use Phoenix\Migration\AbstractMigration;
 
 class SecondChangeOfSomething extends AbstractMigration
 {
-    protected $useTransaction = true;
-    
-    public function up()
+    public function up(): void
     {
-        
+
     }
-    
-    public function down()
+
+    public function down(): void
     {
-        
+
     }
 }

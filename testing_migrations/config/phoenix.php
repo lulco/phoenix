@@ -23,9 +23,5 @@ return [
             'db_name' => getenv('PHOENIX_PGSQL_DATABASE'),
             'charset' => getenv('PHOENIX_PGSQL_CHARSET'),
         ],
-        'sqlite' => [
-            'adapter' => 'sqlite',
-            'dsn' => 'sqlite:' . __DIR__ . '/../phoenix.sqlite',
-        ],
     ],
 ];

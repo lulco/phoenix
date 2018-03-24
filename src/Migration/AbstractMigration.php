@@ -190,9 +190,9 @@ abstract class AbstractMigration
         return $this->executedQueries;
     }
 
-    abstract protected function up()/*: void*/;
+    abstract protected function up(): void;
 
-    abstract protected function down()/*: void*/;
+    abstract protected function down(): void;
 
     private function reset(): void
     {
