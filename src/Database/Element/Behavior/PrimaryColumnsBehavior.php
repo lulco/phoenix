@@ -13,7 +13,9 @@ trait PrimaryColumnsBehavior
 
     private $primaryColumnsValuesFunction;
 
-    public function addPrimaryColumns(array $primaryColumns, Closure $primaryColumnsValuesFunction = null): MigrationTable
+    private $dataChunkSize;
+
+    public function addPrimaryColumns(array $primaryColumns, ?Closure $primaryColumnsValuesFunction = null, ?int $dataChunkSize = null): MigrationTable
     {
         foreach ($primaryColumns as $primaryColumn) {
             if (!$primaryColumn instanceof Column) {
@@ -22,6 +24,7 @@ trait PrimaryColumnsBehavior
         }
         $this->primaryColumns = $primaryColumns;
         $this->primaryColumnsValuesFunction = $primaryColumnsValuesFunction;
+        $this->dataChunkSize = $dataChunkSize;
         return $this;
     }
 
@@ -36,5 +39,10 @@ trait PrimaryColumnsBehavior
     public function getPrimaryColumnsValuesFunction(): ?Closure
     {
         return $this->primaryColumnsValuesFunction;
+    }
+
+    public function getDataChunkSize(): ?int
+    {
+        return $this->dataChunkSize;
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Phoenix\TestingMigrations;
 
-use Phoenix\Database\Element\Column;
 use Phoenix\Migration\AbstractMigration;
-use Ramsey\Uuid\Uuid;
 
 class RemoveSomeIndexes extends AbstractMigration
 {

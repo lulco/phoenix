@@ -3,6 +3,7 @@
 namespace Phoenix\Database\QueryBuilder;
 
 use InvalidArgumentException;
+use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -106,7 +107,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $newTable->addPrimary($primaryColumns);
         $queries[] = $this->addColumnsQuery($newTable, $primaryColumns) . ',ADD ' . $this->primaryKeyString($newTable) . ';';
 
-        $copyTable->addPrimaryColumns($table->getPrimaryColumns(), $table->getPrimaryColumnsValuesFunction());
+        $copyTable->addPrimaryColumns($table->getPrimaryColumns(), $table->getPrimaryColumnsValuesFunction(), $table->getDataChunkSize());
         $copyTable->copy($newTableName, MigrationTable::COPY_ONLY_DATA);
         $queries = array_merge($queries, $this->copyTable($copyTable));
 
@@ -212,17 +213,31 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
 
     protected function copyAndAddData(MigrationTable $table): array
     {
-        $newData = [];
-        // TODO chunk data
+        $chunkSize = $table->getDataChunkSize();
+        if ($chunkSize !== null) {
+            $queries = [];
+            $res = $this->adapter->fetch($table->getName(), ['count(*) AS cnt']);
+            $totalCount = $res['cnt'];
+            $pages = ceil($totalCount / $chunkSize);
+            for ($i = 0; $i < $pages; $i++) {
+                $limit = $chunkSize . ' OFFSET ' . ($i * $chunkSize);
+                $data = $this->adapter->fetchAll($table->getName(), ['*'], [], $limit);
+                $queries[] = $this->createCopyAndAddDataQuery($table, $data);
+            }
+            return $queries;
+        }
+
         $data = $this->adapter->fetchAll($table->getName());
-        foreach ($data as $row) {
+        return empty($data) ? [] : [$this->createCopyAndAddDataQuery($table, $data)];
+    }
+
+    private function createCopyAndAddDataQuery(MigrationTable $table, array $oldData): PDOStatement
+    {
+        $newData = [];
+        foreach ($oldData as $row) {
             $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
         }
-        $queries = [];
-        if (!empty($newData)) {
-            $queries[] = $this->adapter->buildInsertQuery($table->getNewName(), $newData);
-        }
-        return $queries;
+        return $this->adapter->buildInsertQuery($table->getNewName(), $newData);
     }
 
     abstract public function escapeString(string $string): string;

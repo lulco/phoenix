@@ -20,6 +20,17 @@ class AddPrimaryColumns extends AbstractMigration
                 return $row;
             })
             ->save();
+
+        $this->table('table_4')
+            ->dropColumn('identifier')
+            ->save();
+
+        $this->table('table_4')
+            ->addPrimaryColumns([new Column('identifier', 'uuid')], function (array $row) {
+                $row['identifier'] = (string) Uuid::uuid4();
+                return $row;
+            }, 100)
+            ->save();
     }
 
     public function down(): void
