@@ -10,6 +10,9 @@
 - removed support for sqlite adapter
 - removed nette/utils
 
+#### Fixed
+- Typehint for fetch method
+
 ### [0.13.0] - 2018-03-14
 #### Changed
 - second parameter of methods fetchAll and fetch `string $fields = '*'` has been changed to `array $fields = ['*']` (BC Break - fix: change string to array)

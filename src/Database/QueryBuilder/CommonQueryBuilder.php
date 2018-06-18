@@ -88,7 +88,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     {
         $primaryColumns = $table->getPrimaryColumns();
         $primaryColumnNames = $table->getPrimaryColumnNames();
-        // TODO move to MigrationTable
+        // move to MigrationTable
         if (!empty($primaryColumns) && !empty($primaryColumnNames)) {
             throw new InvalidArgumentException('Cannot combine addPrimary() and addPrimaryColumns() in one migration');
         }
