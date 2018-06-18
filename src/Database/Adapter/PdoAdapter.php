@@ -113,11 +113,12 @@ abstract class PdoAdapter implements AdapterInterface
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }
 
-    public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): array
+    public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array
     {
         $statement = $this->buildFetchQuery($table, $fields, $conditions, '1', $orders, $groups);
         $this->execute($statement);
-        return $statement->fetch(PDO::FETCH_ASSOC);
+        $res = $statement->fetch(PDO::FETCH_ASSOC);
+        return $res ?: null;
     }
 
     public function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array

@@ -30,7 +30,7 @@ interface AdapterInterface
 
     public function select(string $sql): array;
 
-    public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): array;
+    public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array;
 
     public function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array;
 
