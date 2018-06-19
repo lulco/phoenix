@@ -1,7 +1,7 @@
 ## Configuration
-Before start using phoenix you need to create configuration file. If you don't want to set `--config` option to phoenix commands, name of your configuration file has to be one of phoenix.php, phoenix.yml, phoenix.neon or phoenix.json and it  has to be stored at the same directory as you execute phoenix from, e.g. project root.
+Before start using phoenix you need to create configuration file. If you don't want to set `--config` option to phoenix commands, name of your configuration file has to be one of phoenix.php, phoenix.yml, phoenix.neon or phoenix.json and it has to be stored at the same directory as you execute phoenix from, e.g. project root.
 
-Basically configuration is an array which is passed to phoenix commands. Files with extensions yml (yaml), neon and json are parsed, php configuration file is included. It means that php file have to return an configuration array directly.
+Basically configuration is an array which is passed to phoenix commands. Files with extensions yml (yaml), neon and json are parsed, php configuration file is included. It means that php file has to return an configuration array directly.
 
 Configuration array consist of four parts:
 - `log_table_name` - string - default "phoenix_log"
@@ -13,7 +13,7 @@ Configuration array consist of four parts:
 Let's say you want to create configuration file, where `log_table_name` is "my_phoenix_log", you have two `migration_dirs` (first and second, which are located in the same directory as configuration file), also two `environments` both uses mysql adapter, and your `default_environment` is "local". Now we show you, how this config looks like using different type of configuration files:
 
 #### phoenix.php
-```
+```php
 <?php
 return [
     'log_table_name' => 'my_phoenix_log',

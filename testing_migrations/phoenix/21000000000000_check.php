@@ -11,6 +11,11 @@ class Check extends AbstractMigration
 {
     public function up(): void
     {
+        $rowZero = $this->fetch('phoenix_log', ['*'], ['id' => 0]);
+        if ($rowZero !== null) {
+            throw new Exception('Row zero should not exist');
+        }
+
         $logs = $this->fetchAll('phoenix_log');
         if (count($logs) != 10) {
             throw new Exception('Wrong count');
