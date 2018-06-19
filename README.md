@@ -156,6 +156,33 @@ class MyFirstMigration extends AbstractMigration
     }
 }
 ```
+
+Or you can use raw sql:
+```php
+<?php
+
+namespace FirstDir;
+
+use Phoenix\Migration\AbstractMigration;
+
+class MyFirstMigration extends AbstractMigration
+{
+    protected function up(): void
+    {
+        $this->execute('CREATE TABLE `first_table` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `title` varchar(255) NOT NULL,
+                `url` varchar(255) NOT NULL,
+                `sorting` int(11) NOT NULL,
+                `created_at` datetime NOT NULL,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `idx_first_table_url` (`url`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+        );
+    }
+}
+```
+
 Implementation of correspondent `down()` method which drops table `first_table` looks like below:
 ```php
     protected function down(): void
@@ -188,7 +215,7 @@ Nothing to migrate
 All done. Took 0.0451s
 ```
 
-If you want to rollback changes (e.g. you found out that you forgot add some column or index), you can run `rollback` command, update migration and then run `migrate` command again. Keep in mind that the best practice is to run `rollback` command before updating migration.
+If you want to rollback changes (e.g. you found out that you forgot add some column or index), you can run `rollback` command, update migration and then run `migrate` command again. Keep in mind that the best practice is to run `rollback` command before updating migration code.
 
 ### [Rollback command](docs/rollback_command.md)
 Rollback command `php vendor/bin/phoenix rollback` rollbacks last executed migration. In this case you will see output like this:
