@@ -55,7 +55,7 @@ class CopyTableTest extends TestCase
             ->create();
 
         foreach ($queryBuilder->createTable($table) as $query) {
-            $this->adapter->execute($query);
+            $this->adapter->query($query);
         }
 
         $table = new MigrationTable('copy_only_data');
@@ -76,7 +76,7 @@ class CopyTableTest extends TestCase
             ->create();
 
         foreach ($queryBuilder->createTable($table) as $query) {
-            $this->adapter->execute($query);
+            $this->adapter->query($query);
         }
 
         $table = new MigrationTable('copy_structure_and_data');

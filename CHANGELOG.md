@@ -5,6 +5,7 @@
 #### Changed
 - added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
 - replaced nette/finder with symfony/finder
+- PDOAdapter::execute splitted into PDOAdapter::execute(PDOStatement $sql) and PDOAdapter::query(string $sql)
 
 #### Removed
 - removed support for sqlite adapter

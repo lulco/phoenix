@@ -28,15 +28,15 @@ class PdoAdapterTest extends TestCase
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
 
         $this->adapter->startTransaction();
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
-        $this->adapter->execute('INSERT INTO `phoenix_test_table` VALUES (1, "first");');
-        $this->adapter->execute('INSERT INTO `phoenix_test_table` VALUES (2, "second");');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('INSERT INTO `phoenix_test_table` VALUES (1, "first");');
+        $this->adapter->query('INSERT INTO `phoenix_test_table` VALUES (2, "second");');
         $this->adapter->commit();
     }
 
     public function testInsert()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second']));
 
@@ -51,14 +51,14 @@ class PdoAdapterTest extends TestCase
 
     public function testMultiInsert()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', [['id' => 1, 'title' => 'first'], ['id' => 2, 'title' => 'second']]));
         $this->assertCount(2, $this->adapter->fetchAll('phoenix_test_table'));
     }
 
     public function testUpdate()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
         $item = $this->adapter->fetch('phoenix_test_table', ['title'], ['id' => 1]);
         $this->assertEquals('first', $item['title']);
@@ -89,7 +89,7 @@ class PdoAdapterTest extends TestCase
 
     public function testSelect()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second']));
 
@@ -108,7 +108,7 @@ class PdoAdapterTest extends TestCase
 
     public function testFetchAll()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second']));
 
@@ -123,7 +123,7 @@ class PdoAdapterTest extends TestCase
 
     public function testDelete()
     {
-        $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => 'second']));
 
@@ -168,8 +168,8 @@ class PdoAdapterTest extends TestCase
 
         $this->adapter->startTransaction();
         try {
-            $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
-            $this->adapter->execute('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+            $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
+            $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
             $this->adapter->commit();
         } catch (DatabaseQueryExecuteException $e) {
             $this->assertEquals(1050, $e->getCode());

@@ -227,7 +227,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return [$query];
     }
 
-    public function escapeString(string $string): string
+    public function escapeString(?string $string): string
     {
         return '"' . $string . '"';
     }

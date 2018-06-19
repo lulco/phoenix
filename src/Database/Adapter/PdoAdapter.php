@@ -25,14 +25,18 @@ abstract class PdoAdapter implements AdapterInterface
         $this->pdo = $pdo;
     }
 
-    /**
-     * @param string|PDOStatement $sql
-     * @return PDOStatement|bool
-     * @throws DatabaseQueryExecuteException on error
-     */
-    public function execute($sql)
+    public function execute(PDOStatement $sql): bool
     {
-        $res = $sql instanceof PDOStatement ? $sql->execute() : $this->pdo->query($sql);
+        $res = $sql->execute();
+        if ($res === false) {
+            $this->throwError($sql);
+        }
+        return $res;
+    }
+
+    public function query(string $sql): PDOStatement
+    {
+        $res = $this->pdo->query($sql);
         if ($res === false) {
             $this->throwError($sql);
         }
@@ -108,7 +112,7 @@ abstract class PdoAdapter implements AdapterInterface
     public function select(string $sql): array
     {
         if (strpos(strtoupper($sql), 'SELECT ') === 0) {
-            return $this->execute($sql)->fetchAll(PDO::FETCH_ASSOC);
+            return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
         }
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }

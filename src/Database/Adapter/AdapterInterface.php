@@ -8,11 +8,10 @@ use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 
 interface AdapterInterface
 {
-    /**
-     * @param string|PDOStatement $sql
-     */
-    public function execute($sql);
+    public function execute(PDOStatement $sql): bool;
 
+    public function query(string $sql): PDOStatement;
+    
     /**
      * @return mixed last inserted id
      */
@@ -41,19 +40,19 @@ interface AdapterInterface
 
     /**
      * Initiates a transaction
-     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @return bool
      */
     public function startTransaction(): bool;
 
     /**
      * Commits a transaction
-     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @return bool
      */
     public function commit(): bool;
 
     /**
      * Rolls back a transaction
-     * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
+     * @return bool
      */
     public function rollback(): bool;
 
