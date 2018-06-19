@@ -240,7 +240,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return $this->adapter->buildInsertQuery($table->getNewName(), $newData);
     }
 
-    abstract public function escapeString(string $string): string;
+    abstract public function escapeString(?string $string): string;
 
     protected function escapeArray(array $array): array
     {

@@ -24,6 +24,9 @@ script:
     - mkdir -p build/logs
     - composer outdated -D --strict
     - php vendor/bin/phpcs src/ --standard=PSR2 -n
+    - composer require phpstan/phpstan --dev
+    - vendor/bin/phpstan analyze src --level=max
+    - composer remove phpstan/phpstan --dev
     - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:

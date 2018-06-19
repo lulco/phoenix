@@ -177,7 +177,7 @@ abstract class AbstractMigration
         $results = [];
         foreach ($queries as $query) {
             if (!$dry) {
-                $result = $this->adapter->execute($query);
+                $result = $query instanceof PDOStatement ? $this->adapter->execute($query) : $this->adapter->query($query)->fetchAll();
                 $results[] = $result;
             }
             $this->executedQueries[] = $query instanceof PDOStatement ? $query->queryString : $query;

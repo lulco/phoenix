@@ -21,12 +21,12 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadDatabase(): string
     {
-        return $this->execute('SELECT database()')->fetchColumn();
+        return $this->query('SELECT database()')->fetchColumn();
     }
 
     protected function loadTables(string $database): array
     {
-        return $this->execute(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        return $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
     }
 
     protected function createMigrationTable(array $table): MigrationTable
@@ -59,7 +59,7 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadColumns(string $database): array
     {
-        $columns = $this->execute(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $columns = $this->query(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesColumns = [];
         foreach ($columns as $column) {
             $tablesColumns[$column['TABLE_NAME']][] = $column;
@@ -106,7 +106,7 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadIndexes(string $database): array
     {
-        $indexes = $this->execute(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $indexes = $this->query(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesIndexes = [];
         foreach ($indexes as $index) {
             if (!isset($tablesIndexes[$index['TABLE_NAME']])) {
@@ -125,7 +125,7 @@ class MysqlAdapter extends PdoAdapter
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
 AND information_schema.KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
 WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
-        $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
+        $foreignKeyColumns = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
             $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];

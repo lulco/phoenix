@@ -215,7 +215,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return $indexType . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . $indexMethod;
     }
 
-    public function escapeString(string $string): string
+    public function escapeString(?string $string): string
     {
         return '`' . $string . '`';
     }

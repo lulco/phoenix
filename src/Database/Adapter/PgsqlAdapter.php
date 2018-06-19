@@ -22,12 +22,12 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadDatabase(): string
     {
-        return $this->execute('SELECT current_database()')->fetchColumn();
+        return $this->query('SELECT current_database()')->fetchColumn();
     }
 
     protected function loadTables(string $database): array
     {
-        return $this->execute(sprintf("
+        return $this->query(sprintf("
             SELECT *
             FROM INFORMATION_SCHEMA.TABLES
             WHERE table_catalog = '%s' AND table_schema='public'
@@ -37,7 +37,7 @@ class PgsqlAdapter extends PdoAdapter
     protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
-        $comment = $this->execute(sprintf("
+        $comment = $this->query(sprintf("
             SELECT description
             FROM pg_description
             JOIN pg_class ON pg_description.objoid = pg_class.oid
@@ -49,12 +49,12 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadColumns(string $database): array
     {
-        $columns = $this->execute(sprintf("
+        $columns = $this->query(sprintf("
             SELECT * FROM INFORMATION_SCHEMA.COLUMNS
             WHERE table_catalog = '%s' AND table_schema = 'public'
             ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
 
-        $comments = $this->execute(sprintf("
+        $comments = $this->query(sprintf("
             SELECT c.table_name,c.column_name,pgd.description
             FROM pg_catalog.pg_statio_all_tables AS st
             INNER JOIN pg_catalog.pg_description pgd ON pgd.objoid = st.relid
@@ -122,7 +122,7 @@ class PgsqlAdapter extends PdoAdapter
         ];
         if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
             $enumType = $table . '__' . $column['column_name'];
-            $settings[ColumnSettings::SETTING_VALUES] = $this->execute("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
+            $settings[ColumnSettings::SETTING_VALUES] = $this->query("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
         }
         return $settings;
     }
@@ -143,7 +143,7 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadIndexes(string $database): array
     {
-        $indexRows = $this->execute("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
+        $indexRows = $this->query("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
             SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
             FROM pg_index a, pg_class b, pg_class c
             WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
@@ -170,7 +170,7 @@ class PgsqlAdapter extends PdoAdapter
             JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
             WHERE constraint_type = 'FOREIGN KEY'";
 
-        $foreignKeyColumns = $this->execute($query)->fetchAll(PDO::FETCH_ASSOC);
+        $foreignKeyColumns = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
             $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];

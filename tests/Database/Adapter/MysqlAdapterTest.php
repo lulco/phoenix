@@ -53,7 +53,7 @@ class MysqlAdapterTest extends TestCase
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = $queryBuilder->createTable($migrationTable);
         foreach ($queries as $query) {
-            $this->adapter->execute($query);
+            $this->adapter->query($query);
         }
 
         $updatedStructure = $this->adapter->getStructure();
@@ -403,7 +403,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->create();
         $queries1 = $queryBuilder->createTable($migrationTable1);
         foreach ($queries1 as $query) {
-            $this->adapter->execute($query);
+            $this->adapter->query($query);
         }
 
         $migrationTable2 = new MigrationTable('table_2');
@@ -445,7 +445,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->create();
         $queries2 = $queryBuilder->createTable($migrationTable2);
         foreach ($queries2 as $query) {
-            $this->adapter->execute($query);
+            $this->adapter->query($query);
         }
     }
 
