@@ -30,7 +30,7 @@ class ConfigParsersTest extends TestCase
 
         foreach ($configs as $type => $configuration) {
             $configParser = ConfigParserFactory::instance($type);
-            $filename = __DIR__ . '/../../example/' . $configuration['file'];
+            $filename = __DIR__ . '/../../config_example/' . $configuration['file'];
             $classname = isset($configuration['class']) ? $configuration['class'] : null;
             if ($classname && class_exists($classname)) {
                 $config = $configParser->parse($filename);
@@ -69,7 +69,7 @@ class ConfigParsersTest extends TestCase
         $counter = 0;
         foreach ($configs as $type => $configuration) {
             $configParser = ConfigParserFactory::instance($type);
-            $filename = __DIR__ . '/../../example/not_found_' . $configuration['file'];
+            $filename = __DIR__ . '/../../config_example/not_found_' . $configuration['file'];
             try {
                 $configParser->parse($filename);
             } catch (Exception $e) {
