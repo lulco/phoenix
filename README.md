@@ -68,6 +68,8 @@ return [
             'charset' => 'utf8',
         ],
     ],
+    'default_environment' => 'local',
+    'log_table_name' => 'phoenix_log',
 ];
 ```
 
