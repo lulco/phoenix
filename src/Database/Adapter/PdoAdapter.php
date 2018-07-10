@@ -37,10 +37,10 @@ abstract class PdoAdapter implements AdapterInterface
     public function query(string $sql): PDOStatement
     {
         $res = $this->pdo->query($sql);
-        if ($res instanceof PDOStatement) {
-            return $res;
+        if (!$res instanceof PDOStatement) {
+            $this->throwError($sql);
         }
-        $this->throwError($sql);
+        return $res;
     }
 
     /**
