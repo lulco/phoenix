@@ -235,7 +235,9 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     {
         $newData = [];
         foreach ($oldData as $row) {
-            $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
+            if ($table->getPrimaryColumnsValuesFunction() !== null) {
+                $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
+            }
         }
         return $this->adapter->buildInsertQuery($table->getNewName(), $newData);
     }
