@@ -110,7 +110,7 @@ abstract class AbstractCommand extends Command
 
     private function loadConfig(): Config
     {
-        if ($this->config) {
+        if ($this->config !== null) {
             return $this->config;
         }
 

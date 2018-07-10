@@ -14,7 +14,7 @@ class Table
 
     private $columns = [];
 
-    private $primaryColumns;
+    private $primaryColumns = [];
 
     private $foreignKeys = [];
 
@@ -69,13 +69,13 @@ class Table
         return $this->comment;
     }
 
-    public function setPrimary(?array $primaryColumns = null): Table
+    public function setPrimary(array $primaryColumns): Table
     {
         $this->primaryColumns = $primaryColumns;
         return $this;
     }
 
-    public function getPrimary(): ?array
+    public function getPrimary(): array
     {
         return $this->primaryColumns;
     }

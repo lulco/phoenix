@@ -27,7 +27,7 @@ class TableTest extends TestCase
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('fk_table1_id', 'integer')));
 
         $this->assertEquals('test', $table->getName());
-        $this->assertNull($table->getPrimary());
+        $this->assertEmpty($table->getPrimary());
         $this->assertNull($table->getCharset());
         $this->assertNull($table->getCollation());
         $this->assertNull($table->getComment());

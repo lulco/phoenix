@@ -37,10 +37,10 @@ abstract class PdoAdapter implements AdapterInterface
     public function query(string $sql): PDOStatement
     {
         $res = $this->pdo->query($sql);
-        if ($res === false) {
-            $this->throwError($sql);
+        if ($res instanceof PDOStatement) {
+            return $res;
         }
-        return $res;
+        $this->throwError($sql);
     }
 
     /**
@@ -57,9 +57,6 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $query = sprintf('INSERT INTO %s %s VALUES %s;', $this->escapeString(addslashes($table)), $this->createKeys($data), $this->createValues($data));
         $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
         if (!$this->isMulti($data)) {
             $this->bindDataValues($statement, $data);
             return $statement;
@@ -84,9 +81,6 @@ abstract class PdoAdapter implements AdapterInterface
         }
         $query = sprintf('UPDATE %s SET %s%s;', $this->escapeString(addslashes($table)), implode(', ', $values), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
         $this->bindDataValues($statement, $data);
         $this->bindConditions($statement, $conditions);
         return $statement;
@@ -102,9 +96,6 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $query = sprintf('DELETE FROM %s%s;', $this->escapeString(addslashes($table)), $this->createWhere($conditions, $where));
         $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
         $this->bindConditions($statement, $conditions);
         return $statement;
     }
@@ -136,9 +127,6 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $query = sprintf('SELECT %s FROM %s%s%s%s%s;', implode(', ', $fields), $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
         $statement = $this->pdo->prepare($query);
-        if (!$statement) {
-            $this->throwError($statement);
-        }
         $this->bindConditions($statement, $conditions);
         return $statement;
     }
