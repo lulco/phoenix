@@ -110,7 +110,7 @@ abstract class AbstractCommand extends Command
 
     private function loadConfig(): Config
     {
-        if ($this->config) {
+        if ($this->config !== null) {
             return $this->config;
         }
 
@@ -159,7 +159,7 @@ abstract class AbstractCommand extends Command
             $executedMigrations = $this->manager->executedMigrations();
         } catch (DatabaseQueryExecuteException $e) {
             $executedMigrations = false;
-            if (!($this instanceof InitCommand)) {
+            if (!$this instanceof InitCommand) {
                 $init = new InitCommand();
                 $init->setConfig($this->config->getConfiguration());
                 $verbosity = $this->output->getVerbosity();

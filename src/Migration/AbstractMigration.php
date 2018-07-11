@@ -205,7 +205,7 @@ abstract class AbstractMigration
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
-            if (!($queryToExecute instanceof MigrationTable)) {
+            if (!$queryToExecute instanceof MigrationTable) {
                 $queries[] = $queryToExecute;
                 continue;
             }
