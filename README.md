@@ -54,6 +54,7 @@ return [
         'local' => [
             'adapter' => 'mysql',
             'host' => 'localhost',
+            'port' => 3306, // optional
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_db',
@@ -62,6 +63,7 @@ return [
         'production' => [
             'adapter' => 'mysql',
             'host' => 'production_host',
+            'port' => 3306, // optional
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_production_db',
@@ -72,6 +74,7 @@ return [
     'log_table_name' => 'phoenix_log',
 ];
 ```
+Read more about configuration [here](docs/configuration.md)
 
 ### [Commands](docs/commands.md)
 To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoenix/bin/phoenix`.
@@ -302,3 +305,4 @@ Test finished successfully
 
 All done. Took 0.2840s
 ```
+Read more about commands [here](docs/commands.md)

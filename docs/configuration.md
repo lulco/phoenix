@@ -25,10 +25,11 @@ return [
         'local' => [
             'adapter' => 'mysql',
             'host' => 'localhost',
+            'port' => 3306, // optional
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_db',
-            'charset' => 'utf8',
+            'charset' => 'utf8', // optional
         ],
         'production' => [
             'adapter' => 'mysql',
@@ -54,10 +55,11 @@ environments:
   local:
     adapter: mysql
     host: localhost
+    port: 3306 # optional
     username: user
     password: pass
     db_name: my_db
-    charset: utf8
+    charset: utf8 # optional
   production
     adapter: mysql
     host: production_host
@@ -78,10 +80,11 @@ environments:
     local:
         adapter: mysql
         host: localhost
+        port: 3306 # optional
         username: user
         password: pass
         db_name: my_db
-        charset: utf8
+        charset: utf8 # optional
     production
         adapter: mysql
         host: production_host
@@ -106,6 +109,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
         "local": {
             "adapter": "mysql",
             "host": "localhost",
+            "port": "3306", // optional
             "username": "user",
             "password": "pass",
             "db_name": "my_db",
