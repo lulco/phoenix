@@ -72,6 +72,7 @@ class Init extends AbstractMigration
             ->addColumn('col_point', 'point', ['null' => true])
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])
+            ->addColumn('col_time', 'time', ['null' => true])
             ->addIndex(['col_string', 'col_integer'])
             ->create();
     }

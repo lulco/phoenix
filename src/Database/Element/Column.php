@@ -38,6 +38,7 @@ class Column
     const TYPE_POINT = 'point';
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';
+    const TYPE_TIME = 'time';
 
     /** @var string */
     private $name;

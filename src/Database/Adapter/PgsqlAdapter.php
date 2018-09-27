@@ -97,6 +97,7 @@ class PgsqlAdapter extends PdoAdapter
             'timestamp without time zone' => Column::TYPE_DATETIME,
             'USER-DEFINED' => Column::TYPE_ENUM,
             'ARRAY' => Column::TYPE_SET,
+            'time without time zone' => Column::TYPE_TIME,
         ];
         return $types[$type] ?? $type;
     }
