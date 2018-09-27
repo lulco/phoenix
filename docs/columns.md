@@ -36,3 +36,4 @@ There are several types in Phoenix, but not all adapters allows all types. This 
 | point         | point      | point         |
 | line          | linestring | line          |
 | polygon       | polygon    | polygon       |
+| time          | time       | time          |

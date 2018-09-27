@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Added time column type
+
 ### [1.0.0] - 2018-06-20
 #### Changed
 - added return type (:void) for up() and down() methods in AbstractMigration (BC Break - Fix: add return type :void to all migrations)
