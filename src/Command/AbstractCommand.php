@@ -86,7 +86,7 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param string|array $message
+     * @param string|array $messages
      */
     protected function writeln($messages, int $options = 0): void
     {

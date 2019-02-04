@@ -160,6 +160,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private function createColumnDefault(Column $column): string
     {
         if ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
+            if ($column->getType() === Column::TYPE_TIMESTAMP) {
+                return ' NULL DEFAULT NULL';
+            }
             return ' DEFAULT NULL';
         }
 
