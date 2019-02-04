@@ -13,7 +13,7 @@ class MysqlQueryBuilderTest extends TestCase
 {
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
         $this->adapter = new MysqlAdapter($pdo);

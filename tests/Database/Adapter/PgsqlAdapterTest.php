@@ -19,7 +19,7 @@ class PgsqlAdapterTest extends TestCase
 {
     private $adapter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $pdo = new PgsqlPdo();
         $adapter = new PgsqlCleanupAdapter($pdo);

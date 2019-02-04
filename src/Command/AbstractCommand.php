@@ -86,11 +86,14 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param string|iterable $message
+     * @param string|array $message
      */
-    protected function writeln($message, int $options = 0): void
+    protected function writeln($messages, int $options = 0): void
     {
-        $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
+        $messages = is_array($messages) ? $messages : [$messages];
+        foreach ($messages as $message) {
+            $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
+        }
     }
 
     protected function isDefaultOutput(): bool

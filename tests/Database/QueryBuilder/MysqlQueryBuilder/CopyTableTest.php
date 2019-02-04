@@ -13,7 +13,7 @@ class CopyTableTest extends TestCase
 {
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $pdo = new MysqlPdo();
         $adapter = new MysqlCleanupAdapter($pdo);

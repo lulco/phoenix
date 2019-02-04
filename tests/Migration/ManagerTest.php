@@ -21,7 +21,7 @@ class ManagerTest extends TestCase
 
     private $initMigration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = new Config([
             'migration_dirs' => [

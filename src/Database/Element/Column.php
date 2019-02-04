@@ -25,7 +25,9 @@ class Column
     const TYPE_BLOB = 'blob';
     const TYPE_LONG_BLOB = 'longblob';
     const TYPE_DATE = 'date';
+    const TYPE_TIME = 'time';
     const TYPE_DATETIME = 'datetime';
+    const TYPE_TIMESTAMP = 'timestamp';
     const TYPE_UUID = 'uuid';
     const TYPE_JSON = 'json';
     const TYPE_CHAR = 'char';
@@ -38,7 +40,6 @@ class Column
     const TYPE_POINT = 'point';
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';
-    const TYPE_TIME = 'time';
 
     /** @var string */
     private $name;
@@ -53,6 +54,7 @@ class Column
      * @param string $name name of column
      * @param string $type type of column
      * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
+     * @throws InvalidArgumentValueException if setting is not allowed
      */
     public function __construct(string $name, string $type, array $settings = [])
     {

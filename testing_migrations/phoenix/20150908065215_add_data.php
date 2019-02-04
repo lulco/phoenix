@@ -93,6 +93,7 @@ class AddData extends AbstractMigration
             'col_enum' => 'xxx',
             'col_set' => ['yyy', 'zzz'],
             'col_time' => '10:20:30',
+            'timestamp' => new DateTime(),
         ]);
 
         $this->insert('all_types', [
@@ -114,6 +115,7 @@ class AddData extends AbstractMigration
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),
             'col_time' => '20:30:40',
+            'timestamp' => new DateTime(),
         ]);
     }
 
