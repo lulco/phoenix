@@ -20,7 +20,9 @@ There are several types in Phoenix, but not all adapters allows all types. This 
 | string        | varchar    | varchar       |
 | boolean       | tinyint(1) | bool          |
 | date          | date       | date          |
+| time          | time       | time          |
 | datetime      | datetime   | timestamp(6)  |
+| timestamp     | timestamp  | timestamp(6)  |
 | tinytext      | tinytext   | text          |
 | mediumtext    | mediumtext | text          |
 | text          | text       | text          |
@@ -36,4 +38,3 @@ There are several types in Phoenix, but not all adapters allows all types. This 
 | point         | point      | point         |
 | line          | linestring | line          |
 | polygon       | polygon    | polygon       |
-| time          | time       | time          |
