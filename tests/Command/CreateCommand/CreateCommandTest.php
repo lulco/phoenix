@@ -81,7 +81,7 @@ abstract class CreateCommandTest extends BaseCommandTest
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
-            $this->assertContains("    ", $migrationContent);
+            $this->assertStringContainsString("    ", $migrationContent);
 
             $classNameCreator = new ClassNameCreator($filePath);
             $this->assertEquals('\Test\Test', $classNameCreator->getClassName());
@@ -123,7 +123,7 @@ abstract class CreateCommandTest extends BaseCommandTest
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
-            $this->assertContains("    ", $migrationContent);
+            $this->assertStringContainsString("    ", $migrationContent);
 
             $classNameCreator = new ClassNameCreator($filePath);
             $this->assertEquals('\MyNamespace\MyFirstMigration', $classNameCreator->getClassName());
@@ -174,7 +174,7 @@ abstract class CreateCommandTest extends BaseCommandTest
 
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
-            $this->assertContains("\t", $migrationContent);
+            $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
 
             $classNameCreator = new ClassNameCreator($filePath);

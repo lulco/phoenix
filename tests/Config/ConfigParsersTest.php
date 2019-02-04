@@ -39,7 +39,7 @@ class ConfigParsersTest extends TestCase
                     $config = $configParser->parse($filename);
                 } catch (Exception $e) {
                     $this->assertInstanceOf(ConfigException::class, $e);
-                    $this->assertContains($classname, $e->getMessage());
+                    $this->assertStringContainsString($classname, $e->getMessage());
                 }
             }
             $this->assertArrayHasKey('migration_dirs', $config);
