@@ -41,7 +41,11 @@ abstract class AbstractCommand extends Command
      */
     protected $outputData = [];
 
-    public function setName($name): self
+    /**
+     * @param string $name
+     * @return self|Command
+     */
+    public function setName($name)
     {
         if (!$this->getName()) {
             return parent::setName($name);
