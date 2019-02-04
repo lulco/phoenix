@@ -2,8 +2,6 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Command\AbstractCommand;
-use Phoenix\Command\InitCommand;
 use Phoenix\Config\Config;
 use Phoenix\Config\Parser\ConfigParserFactory;
 use Phoenix\Database\Adapter\AdapterFactory;
@@ -43,7 +41,7 @@ abstract class AbstractCommand extends Command
      */
     protected $outputData = [];
 
-    public function setName($name): Command
+    public function setName($name): self
     {
         if (!$this->getName()) {
             return parent::setName($name);
@@ -65,7 +63,7 @@ abstract class AbstractCommand extends Command
         return $this;
     }
 
-    final public function execute(InputInterface $input, OutputInterface $output): void
+    final public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
         $this->output = $output;
@@ -80,6 +78,7 @@ abstract class AbstractCommand extends Command
         $this->start = microtime(true);
         $this->runCommand();
         $this->finishCommand();
+        return 0;
     }
 
     /**
