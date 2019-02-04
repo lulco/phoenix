@@ -25,6 +25,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_BOOLEAN => 'bool',
         Column::TYPE_DATE => 'date',
         Column::TYPE_DATETIME => 'timestamp(6)',
+        Column::TYPE_TIMESTAMP => 'timestamp(6)',
         Column::TYPE_TINY_TEXT => 'text',
         Column::TYPE_MEDIUM_TEXT => 'text',
         Column::TYPE_TEXT => 'text',

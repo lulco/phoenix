@@ -22,7 +22,7 @@ abstract class BaseCommandTest extends TestCase
     /** @var array */
     protected $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // delete root config
         $rootConfigPath = __DIR__ . '/../../phoenix.php';

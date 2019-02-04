@@ -19,7 +19,7 @@ class MysqlAdapterTest extends TestCase
 {
     private $adapter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $pdo = new MysqlPdo();
         $adapter = new MysqlCleanupAdapter($pdo);

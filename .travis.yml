@@ -10,6 +10,7 @@ addons:
 php:
     - 7.1
     - 7.2
+    - 7.3
 
 sudo: false
 
@@ -23,10 +24,15 @@ before_script:
 script:
     - mkdir -p build/logs
     - composer outdated -D --strict
-    - php vendor/bin/phpcs src/ --standard=PSR2 -n
+    - composer require squizlabs/php_codesniffer --dev
+    - php vendor/bin/phpcs src --standard=PSR2 -n
+    - composer remove squizlabs/php_codesniffer --dev
     - composer require phpstan/phpstan --dev
     - vendor/bin/phpstan analyze src --level=5
     - composer remove phpstan/phpstan --dev
+    - composer require efabrica/php-extensions-finder --dev
+    - vendor/bin/php-extensions-finder check src tests
+    - composer remove efabrica/php-extensions-finder --dev
     - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:

@@ -12,7 +12,7 @@ class CopyTableTest extends TestCase
 {
     private $adapter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $pdo = new PgsqlPdo(getenv('PHOENIX_PGSQL_DATABASE'));
         $this->adapter = new PgsqlAdapter($pdo);

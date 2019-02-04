@@ -6,14 +6,15 @@
     "license": "MIT",
     "require": {
         "php": ">= 7.1",
+        "ext-json": "*",
+        "ext-pdo": "*",
         "symfony/console": "^3.1|^4.0",
         "symfony/finder": "^3.1|^4.0"
     },
     "require-dev": {
         "nette/neon": "^2.3",
         "symfony/yaml": "^3.1|^4.0",
-        "squizlabs/php_codesniffer": "^3.3",
-        "phpunit/phpunit": "^7.2",
+        "phpunit/phpunit": ">7.2",
         "ramsey/uuid": "^3.7"
     },
     "autoload": {
