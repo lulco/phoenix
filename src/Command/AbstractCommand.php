@@ -11,6 +11,7 @@ use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\WrongCommandException;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -47,7 +48,12 @@ abstract class AbstractCommand extends Command
      */
     public function setName($name)
     {
-        if (!$this->getName()) {
+        try {
+            $actualName = $this->getName();
+        } catch (LogicException $e) {
+            $actualName = null;
+        }
+        if (!$actualName) {
             return parent::setName($name);
         }
         return $this;

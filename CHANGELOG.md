@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Fixed setting name - broken in symfony/console 4.3.4
+
 ### [1.1.0] - 2019-02-11
 #### Added
 - Added time column type
