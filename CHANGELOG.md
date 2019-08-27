@@ -2,6 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Freezed symfony/console to <4.3.4
+
+#### Added
+- Added support for nette/neon ^3.0
+
 ### [1.1.0] - 2019-02-11
 #### Added
 - Added time column type
