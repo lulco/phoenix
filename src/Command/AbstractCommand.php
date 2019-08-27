@@ -49,11 +49,11 @@ abstract class AbstractCommand extends Command
     public function setName($name)
     {
         try {
-            $actualName = $this->getName();
+            $actualName = $this->getName() ?: null;
         } catch (LogicException $e) {
             $actualName = null;
         }
-        if (!$actualName) {
+        if ($actualName !== null) {
             return parent::setName($name);
         }
         return $this;
