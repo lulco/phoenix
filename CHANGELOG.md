@@ -3,7 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Freezed symfony/console to <4.3.4
+- Freezed symfony/console to >=3.1 <3.4.31|>=4.0 <4.3.4
 
 #### Added
 - Added support for nette/neon ^3.0

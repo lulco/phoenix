@@ -14,7 +14,7 @@ class AddData extends AbstractMigration
             'title' => 'First item',
             'alias' => 'first-item',
             'is_active' => false,
-//            'self_fk' => null,
+            'self_fk' => null,
         ]);
 
         $this->insert('table_1', [
@@ -22,13 +22,13 @@ class AddData extends AbstractMigration
                 'id' => 2,
                 'title' => 'Second item',
                 'alias' => 'second-item',
-//                'self_fk' => 1,
+                'self_fk' => 1,
             ],
             [
                 'id' => 3,
                 'title' => 'Third item',
                 'alias' => 'third-item',
-//                'self_fk' => 2,
+                'self_fk' => 2,
             ]
         ]);
 
