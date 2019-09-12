@@ -23,7 +23,7 @@ before_script:
 
 script:
     - mkdir -p build/logs
-    - composer outdated -D --strict
+    - composer outdated -D --strict --ignore symfony/console
     - composer require squizlabs/php_codesniffer --dev
     - php vendor/bin/phpcs src --standard=PSR2 -n
     - composer remove squizlabs/php_codesniffer --dev
