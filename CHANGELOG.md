@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.1.1] - 2019-09-12
 #### Changed
 - Freezed symfony/console to >=3.1 <3.4.31|>=4.0 <4.3.4
 
@@ -189,7 +190,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.1.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.1.1...HEAD
+[1.1.1]: https://github.com/lulco/phoenix/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/lulco/phoenix/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/lulco/phoenix/compare/0.13.0...1.0.0
 [0.13.0]: https://github.com/lulco/phoenix/compare/0.12.1...0.13.0
