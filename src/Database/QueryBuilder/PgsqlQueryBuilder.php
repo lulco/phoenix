@@ -3,6 +3,7 @@
 namespace Phoenix\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 
@@ -187,6 +188,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $default = $column->getSettings()->getDefault();
         } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
+        } elseif ($column->getType() == Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() == ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+            $default = 'CURRENT_TIMESTAMP';
         } else {
             $default = "'" . $column->getSettings()->getDefault() . "'";
         }

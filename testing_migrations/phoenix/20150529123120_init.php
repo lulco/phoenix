@@ -2,6 +2,7 @@
 
 namespace Phoenix\TestingMigrations;
 
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Migration\AbstractMigration;
 
@@ -73,7 +74,7 @@ class Init extends AbstractMigration
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])
             ->addColumn('col_time', 'time', ['null' => true])
-            ->addColumn('col_timestamp', 'timestamp', ['null' => true])
+            ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
             ->addIndex(['col_string', 'col_integer'])
             ->create();
     }

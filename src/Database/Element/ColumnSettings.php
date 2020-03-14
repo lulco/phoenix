@@ -35,6 +35,8 @@ class ColumnSettings
         self::SETTING_COMMENT => ['is_null', 'is_string'],
     ];
 
+    const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
+
     private $settings = [];
 
     /**
