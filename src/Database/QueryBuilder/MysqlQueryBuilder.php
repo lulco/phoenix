@@ -3,6 +3,7 @@
 namespace Phoenix\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 
@@ -173,6 +174,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
             if ($column->getType() == Column::TYPE_BOOLEAN) {
                 return $default .= intval($column->getSettings()->getDefault());
+            }
+            if ($column->getType() == Column::TYPE_TIMESTAMP && ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+                return $default .= 'CURRENT_TIMESTAMP';
             }
             return $default .= "'" . $column->getSettings()->getDefault() . "'";
         }

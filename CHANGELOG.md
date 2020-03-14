@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp` 
+
 ### [1.1.1] - 2019-09-12
 #### Changed
 - Freezed symfony/console to >=3.1 <3.4.31|>=4.0 <4.3.4
