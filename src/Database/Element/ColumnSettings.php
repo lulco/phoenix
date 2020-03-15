@@ -123,7 +123,7 @@ class ColumnSettings
         $reflectionClass = new ReflectionClass($this);
         $settingsConstants = $reflectionClass->getConstants();
         foreach ($settings as $setting => $value) {
-            if (!in_array($setting, $settingsConstants)) {
+            if (!in_array($setting, $settingsConstants, true)) {
                 $errors[] = 'Setting "' . $setting . '" is not allowed.';
             }
             $checkedValue = $this->checkValue($setting, $value);

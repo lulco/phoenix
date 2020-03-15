@@ -60,7 +60,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = [];
         $enumSetColumns = [];
         foreach ($table->getColumns() as $column) {
-            if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+            if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                 $enumSetColumns[] = $column;
             }
         }
@@ -113,7 +113,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($oldColumnName != $newColumn->getName()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
-                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
                     $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
                     foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
@@ -168,7 +168,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ';
         if ($column->getSettings()->isAutoincrement()) {
-            $col .= $column->getType() == Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
         } else {
             $col .= $this->createType($column, $table);
         }
@@ -184,11 +184,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function escapeDefault(Column $column): string
     {
-        if ($column->getType() == Column::TYPE_INTEGER) {
+        if ($column->getType() === Column::TYPE_INTEGER) {
             $default = $column->getSettings()->getDefault();
-        } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
+        } elseif ($column->getType() === Column::TYPE_BOOLEAN) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
-        } elseif ($column->getType() == Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() == ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+        } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
             $default = "'" . $column->getSettings()->getDefault() . "'";

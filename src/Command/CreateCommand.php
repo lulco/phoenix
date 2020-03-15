@@ -3,7 +3,6 @@
 namespace Phoenix\Command;
 
 use Dumper\Indenter;
-use Phoenix\Command\AbstractCommand;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;

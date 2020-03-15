@@ -26,7 +26,7 @@ script:
     - mkdir -p build/logs
     - composer outdated -D --strict --ignore symfony/console --ignore symfony/finder --ignore symfony/yaml
     - composer require squizlabs/php_codesniffer --dev
-    - php vendor/bin/phpcs src --standard=PSR2 -n
+    - vendor/bin/phpcs src --standard=PSR2 -n
     - composer remove squizlabs/php_codesniffer --dev
     - composer require phpstan/phpstan --dev
     - vendor/bin/phpstan analyze src --level=5
@@ -34,7 +34,7 @@ script:
     - composer require efabrica/php-extensions-finder --dev
     - vendor/bin/php-extensions-finder check src tests
     - composer remove efabrica/php-extensions-finder --dev
-    - php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+    - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:
     - wget https://scrutinizer-ci.com/ocular.phar

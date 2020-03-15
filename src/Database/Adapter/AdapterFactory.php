@@ -19,7 +19,7 @@ class AdapterFactory
 
         if ($config->getAdapter() === 'mysql') {
             $adapter = new MysqlAdapter($pdo);
-        } elseif ($config->getAdapter() == 'pgsql') {
+        } elseif ($config->getAdapter() === 'pgsql') {
             $adapter = new PgsqlAdapter($pdo);
         } else {
             throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql".');

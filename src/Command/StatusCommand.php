@@ -2,7 +2,6 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Command\AbstractCommand;
 use Symfony\Component\Console\Helper\Table;
 
 class StatusCommand extends AbstractCommand
