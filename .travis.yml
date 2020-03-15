@@ -4,18 +4,14 @@ services:
     - mysql
     - postgresql
 
+addons:
+    postgresql: "9.4"
+
 php:
     - 7.1
     - 7.2
     - 7.3
     - 7.4
-
-matrix:
-    include:
-        - addons:
-          postgresql: "9.4"
-        - addons:
-          postgresql: "10"
 
 sudo: false
 
