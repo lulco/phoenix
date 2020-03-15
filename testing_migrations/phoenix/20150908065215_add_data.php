@@ -14,7 +14,7 @@ class AddData extends AbstractMigration
             'title' => 'First item',
             'alias' => 'first-item',
             'is_active' => false,
-            'self_fk' => null,
+//            'self_fk' => null,
         ]);
 //
 //        $this->insert('table_1', [
