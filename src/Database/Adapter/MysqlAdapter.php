@@ -149,6 +149,11 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
 
     protected function createRealValue($value): ?string
     {
-        return is_array($value) ? implode(',', $value) : $value;
+        if (is_array($value)) {
+            return implode(',', $value);
+        } elseif (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+        return $value;
     }
 }

@@ -36,6 +36,20 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(MysqlQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
+    public function testMysqlVersion508()
+    {
+        $config = new EnvironmentConfig([
+            'adapter' => 'mysql',
+            'version' => '5.0.8',
+            'dsn' => 'sqlite::memory:',
+        ]);
+        $adapter = AdapterFactory::instance($config);
+        $this->assertInstanceOf(MysqlAdapter::class, $adapter);
+        $queryBuilder = $adapter->getQueryBuilder();
+        $this->assertInstanceOf(MysqlQueryBuilder::class, $queryBuilder);
+        $this->assertNotInstanceOf(MysqlWithJsonQueryBuilder::class, $queryBuilder);
+    }
+
     public function testMysqlVersion578()
     {
         $config = new EnvironmentConfig([
