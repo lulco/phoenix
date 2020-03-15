@@ -113,7 +113,7 @@ class MysqlAdapter extends PdoAdapter
                 $tablesIndexes[$index['TABLE_NAME']] = [];
             }
             $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = $index['COLUMN_NAME'];
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] === 0 ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
             $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
         return $tablesIndexes;

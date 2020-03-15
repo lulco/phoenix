@@ -106,9 +106,9 @@ class PgsqlAdapter extends PdoAdapter
     {
         $length = null;
         $decimals = null;
-        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR])) {
+        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR], true)) {
             $length = $column['character_maximum_length'];
-        } elseif (in_array($type, [Column::TYPE_NUMERIC])) {
+        } elseif (in_array($type, [Column::TYPE_NUMERIC], true)) {
             $length = $column['numeric_precision'];
             $decimals = $column['numeric_scale'];
         }
@@ -121,7 +121,7 @@ class PgsqlAdapter extends PdoAdapter
             ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
             ColumnSettings::SETTING_COMMENT => $column['comment'],
         ];
-        if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
+        if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
             $enumType = $table . '__' . $column['column_name'];
             $settings[ColumnSettings::SETTING_VALUES] = $this->query("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
         }

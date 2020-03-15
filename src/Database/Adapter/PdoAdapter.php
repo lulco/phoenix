@@ -212,7 +212,7 @@ abstract class PdoAdapter implements AdapterInterface
         }
         $listOfOrders = [];
         foreach ($orders as $column => $way) {
-            if (!in_array(strtoupper($way), ['ASC', 'DESC'])) {
+            if (!in_array(strtoupper($way), ['ASC', 'DESC'], true)) {
                 $column = $way;
                 $way = 'ASC';
             }

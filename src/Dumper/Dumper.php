@@ -175,7 +175,7 @@ class Dumper
 
         $settingsList = [];
         foreach ($settings->getSettings() as $setting => $value) {
-            if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting])) {
+            if (is_array($defaultSettings[$setting]) && in_array($value, $defaultSettings[$setting], true)) {
                 continue;
             } elseif ($value === $defaultSettings[$setting]) {
                 continue;

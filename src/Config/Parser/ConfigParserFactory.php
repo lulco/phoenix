@@ -12,7 +12,7 @@ class ConfigParserFactory
         if ($type === 'php') {
             return new PhpConfigParser();
         }
-        if (in_array($type, ['yml', 'yaml'])) {
+        if (in_array($type, ['yml', 'yaml'], true)) {
             return new YamlConfigParser();
         }
         if ($type === 'neon') {

@@ -2,8 +2,14 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Changed comparation `==` to `===` and added strict parameter to in_array
+
 #### Added
 - Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp` 
+
+#### Fixed
+- Fixed tests on travis
 
 ### [1.1.1] - 2019-09-12
 #### Changed

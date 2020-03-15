@@ -60,7 +60,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = [];
         $enumSetColumns = [];
         foreach ($table->getColumns() as $column) {
-            if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+            if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                 $enumSetColumns[] = $column;
             }
         }
@@ -113,7 +113,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 if ($oldColumnName != $newColumn->getName()) {
                     $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
                 }
-                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET])) {
+                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                     $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
                     $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
                     foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
