@@ -12,15 +12,13 @@ class AdapterFactory
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
 
-        // TODO $config->getVersion() - force the version default null and will be taken from server
-        sscanf($pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '%d.%d.%d', $v1, $v2, $v3);
-//        var_dump($v1, $v2, $v3);
-//        var_dump($pdo->getAttribute(PDO::ATTR_SERVER_VERSION));
+        sscanf($config->getVersion() ?? $pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '%d.%d.%d', $v1, $v2, $v3);
+        $version = implode('.', array_filter([$v1, $v2, $v3]));
 
         if ($config->getAdapter() === 'mysql') {
-            $adapter = new MysqlAdapter($pdo);
+            $adapter = new MysqlAdapter($pdo, $version);
         } elseif ($config->getAdapter() === 'pgsql') {
-            $adapter = new PgsqlAdapter($pdo);
+            $adapter = new PgsqlAdapter($pdo, $version);
         } else {
             throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql".');
         }

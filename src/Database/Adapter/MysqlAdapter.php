@@ -8,13 +8,18 @@ use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
 {
     public function getQueryBuilder(): MysqlQueryBuilder
     {
         if (!$this->queryBuilder) {
-            $this->queryBuilder = new MysqlQueryBuilder($this);
+            if ($this->version && version_compare($this->version, '5.7.8', '>=')) {
+                $this->queryBuilder = new MysqlWithJsonQueryBuilder($this);
+            } else {
+                $this->queryBuilder = new MysqlQueryBuilder($this);
+            }
         }
         return $this->queryBuilder;
     }
@@ -89,7 +94,7 @@ class MysqlAdapter extends PdoAdapter
         if ($column['DATA_TYPE'] === Column::TYPE_ENUM || $column['DATA_TYPE'] === Column::TYPE_SET) {
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
-        list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
+        list($length, $decimals) = $this->getLengthAndDecimals($matches[2] ?? null);
         return [
             ColumnSettings::SETTING_AUTOINCREMENT => $column['EXTRA'] === 'auto_increment',
             ColumnSettings::SETTING_NULL => $column['IS_NULLABLE'] === 'YES',

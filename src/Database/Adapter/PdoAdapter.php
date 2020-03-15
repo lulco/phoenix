@@ -18,11 +18,14 @@ abstract class PdoAdapter implements AdapterInterface
 
     private $charset;
 
+    protected $version;
+
     protected $queryBuilder;
 
-    public function __construct(PDO $pdo)
+    public function __construct(PDO $pdo, ?string $version = null)
     {
         $this->pdo = $pdo;
+        $this->version = $version;
     }
 
     public function execute(PDOStatement $sql): bool

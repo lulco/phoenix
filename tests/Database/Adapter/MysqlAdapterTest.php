@@ -10,6 +10,7 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
+use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
@@ -17,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 
 class MysqlAdapterTest extends TestCase
 {
+    private $pdo;
+
     private $adapter;
 
     protected function setUp(): void
@@ -25,14 +28,26 @@ class MysqlAdapterTest extends TestCase
         $adapter = new MysqlCleanupAdapter($pdo);
         $adapter->cleanupDatabase();
 
-        $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
-        $this->adapter = new MysqlAdapter($pdo);
+        $this->pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
+        $this->adapter = new MysqlAdapter($this->pdo);
     }
 
     public function testGetQueryBuilder()
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
         $this->assertInstanceOf(MysqlQueryBuilder::class, $this->adapter->getQueryBuilder());
+
+        $adapter = new MysqlAdapter($this->pdo, '5.6.5');
+        $this->assertInstanceOf(MysqlQueryBuilder::class, $adapter->getQueryBuilder());
+
+        $adapter = new MysqlAdapter($this->pdo, '5.7.8');
+        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
+
+        $adapter = new MysqlAdapter($this->pdo, '5.7.29');
+        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
+
+        $adapter = new MysqlAdapter($this->pdo, '8.0.19');
+        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
     public function testGetEmptyStructureAndUpdate()
