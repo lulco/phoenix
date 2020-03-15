@@ -2,7 +2,7 @@
     "name": "lulco/phoenix",
     "type": "library",
     "description": "Database Migrations for PHP",
-    "keywords": ["PHP", "Database", "Migrations", "Multiple folders"],
+    "keywords": ["PHP", "Database", "Migrations", "Multiple folders", "Query builder", "Create", "Migrate", "Rollback", "Dump", "Status"],
     "license": "MIT",
     "require": {
         "php": ">= 7.1",
