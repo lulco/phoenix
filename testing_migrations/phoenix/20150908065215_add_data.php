@@ -21,22 +21,14 @@ class AddData extends AbstractMigration
             'id' => 2,
             'title' => 'Second item',
             'alias' => 'second-item',
-            'self_fk' => null,
+            'self_fk' => 1,
         ]);
 
         $this->insert('table_1', [
-            [
-                'id' => 3,
-                'title' => 'Third item',
-                'alias' => 'third-item',
-                'self_fk' => 1,
-            ],
-            [
-                'id' => 4,
-                'title' => 'Fourth item',
-                'alias' => 'fourth-item',
-                'self_fk' => 2,
-            ],
+            'id' => 3,
+            'title' => 'Third item',
+            'alias' => 'third-item',
+            'self_fk' => 2,
         ]);
 
         $this->insert('table_2', [
@@ -138,6 +130,5 @@ class AddData extends AbstractMigration
         $this->delete('table_1', ['id' => 1]);
         $this->delete('table_1', ['id' => 2]);
         $this->delete('table_1', ['id' => 3]);
-        $this->delete('table_1', ['id' => 4]);
     }
 }
