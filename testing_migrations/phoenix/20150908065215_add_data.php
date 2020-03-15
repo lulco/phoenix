@@ -9,13 +9,13 @@ class AddData extends AbstractMigration
 {
     public function up(): void
     {
-        $this->insert('table_1', [
-            'id' => 1,
-            'title' => 'First item',
-            'alias' => 'first-item',
-            'is_active' => false,
+//        $this->insert('table_1', [
+//            'id' => 1,
+//            'title' => 'First item',
+//            'alias' => 'first-item',
+//            'is_active' => false,
 //            'self_fk' => null,
-        ]);
+//        ]);
 //
 //        $this->insert('table_1', [
 //            [
@@ -33,6 +33,7 @@ class AddData extends AbstractMigration
 //        ]);
 
         // temporary changed to plain queries because of failing tests on travis - not sure the reason
+        $this->execute("INSERT INTO table_1 (id, title, alias, is_active, self_fk) VALUES (1, 'First item', 'first-item', false, null);");
         $this->execute("INSERT INTO table_1 (id, title, alias, self_fk) VALUES (2, 'Second item', 'second-item', 1);");
         $this->execute("INSERT INTO table_1 (id, title, alias, self_fk) VALUES (3, 'Third item', 'third-item', 2);");
 
