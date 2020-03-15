@@ -11,7 +11,13 @@ class AdapterFactory
     public static function instance(EnvironmentConfig $config): AdapterInterface
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
-        if ($config->getAdapter() == 'mysql') {
+
+        // TODO $config->getVersion() - force the version default null and will be taken from server
+        sscanf($pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '%d.%d.%d', $v1, $v2, $v3);
+//        var_dump($v1, $v2, $v3);
+//        var_dump($pdo->getAttribute(PDO::ATTR_SERVER_VERSION));
+
+        if ($config->getAdapter() === 'mysql') {
             $adapter = new MysqlAdapter($pdo);
         } elseif ($config->getAdapter() == 'pgsql') {
             $adapter = new PgsqlAdapter($pdo);
