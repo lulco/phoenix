@@ -114,7 +114,7 @@ class PgsqlAdapter extends PdoAdapter
         }
 
         $settings = [
-            ColumnSettings::SETTING_NULL => $column['is_nullable'] == 'YES',
+            ColumnSettings::SETTING_NULL => $column['is_nullable'] === 'YES',
             ColumnSettings::SETTING_DEFAULT => $this->prepareDefault($column, $type),
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
@@ -136,7 +136,7 @@ class PgsqlAdapter extends PdoAdapter
         $default = $column['column_default'];
         if ($type === Column::TYPE_BOOLEAN) {
             $default = $default === 'true';
-        } elseif (substr($default, 0, 6) == 'NULL::' || substr($default, 0, 7) == 'nextval') {
+        } elseif (substr($default, 0, 6) === 'NULL::' || substr($default, 0, 7) === 'nextval') {
             $default = null;
         }
         return $default;

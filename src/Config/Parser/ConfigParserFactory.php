@@ -9,7 +9,7 @@ class ConfigParserFactory
     public static function instance(string $type): ConfigParserInterface
     {
         $type = strtolower($type);
-        if ($type == 'php') {
+        if ($type === 'php') {
             return new PhpConfigParser();
         }
         if (in_array($type, ['yml', 'yaml'])) {

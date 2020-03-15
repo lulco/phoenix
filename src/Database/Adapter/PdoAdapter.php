@@ -171,7 +171,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private function createWhere(array $conditions = [], string $where = ''): string
     {
-        if (empty($conditions) && $where == '') {
+        if (empty($conditions) && $where === '') {
             return '';
         }
 

@@ -56,7 +56,7 @@ trait StructureBehavior
         foreach ($indexes as $name => $index) {
             $columns = $index['columns'];
             ksort($columns);
-            if ($name == 'PRIMARY') {
+            if ($name === 'PRIMARY') {
                 $migrationTable->addPrimary($columns);
                 continue;
             }

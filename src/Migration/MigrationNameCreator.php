@@ -12,7 +12,7 @@ class MigrationNameCreator
 
     public function __construct(string $fullClassName)
     {
-        if (substr($fullClassName, 0, 1) == '\\') {
+        if (substr($fullClassName, 0, 1) === '\\') {
             $fullClassName = substr($fullClassName, 1);
         }
         $classNameParts = array_map('ucfirst', explode('\\', $fullClassName));
@@ -30,7 +30,7 @@ class MigrationNameCreator
         $length = strlen($className);
         for ($i = 0; $i < $length; $i++) {
             $char = $className[$i];
-            if ($char == strtoupper($char)) {
+            if ($char === strtoupper($char)) {
                 $fileName .= '_';
             }
             $fileName .= strtolower($char);

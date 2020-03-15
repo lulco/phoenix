@@ -168,7 +168,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ';
         if ($column->getSettings()->isAutoincrement()) {
-            $col .= $column->getType() == Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
         } else {
             $col .= $this->createType($column, $table);
         }
@@ -184,11 +184,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function escapeDefault(Column $column): string
     {
-        if ($column->getType() == Column::TYPE_INTEGER) {
+        if ($column->getType() === Column::TYPE_INTEGER) {
             $default = $column->getSettings()->getDefault();
-        } elseif ($column->getType() == Column::TYPE_BOOLEAN) {
+        } elseif ($column->getType() === Column::TYPE_BOOLEAN) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
-        } elseif ($column->getType() == Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() == ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+        } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
             $default = "'" . $column->getSettings()->getDefault() . "'";
