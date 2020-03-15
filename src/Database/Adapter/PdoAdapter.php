@@ -328,5 +328,9 @@ abstract class PdoAdapter implements AdapterInterface
 
     abstract protected function escapeString(string $string): string;
 
-    abstract protected function createRealValue($value): ?string;
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    abstract protected function createRealValue($value);
 }
