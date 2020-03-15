@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Database\Element;
 
+use InvalidArgumentException;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
@@ -328,5 +329,13 @@ class MigrationTableTest extends TestCase
         $this->assertEquals($migrationTable->getColumn('title'), $table->getColumn('title'));
         $this->assertEquals($migrationTable->getColumn('alias'), $table->getColumn('alias'));
         $this->assertEquals($migrationTable->getColumn('fk_table1_id'), $table->getColumn('fk_table1_id'));
+    }
+
+    public function testTryingToAddPrimaryColumnAsStrings()
+    {
+        $table = new MigrationTable('add_primary_columns');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('All primaryColumns have to be instance of "' . Column::class . '"');
+        $table->addPrimaryColumns(['id']);
     }
 }

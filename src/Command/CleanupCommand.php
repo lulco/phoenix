@@ -2,7 +2,6 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Command\AbstractCommand;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;

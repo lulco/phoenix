@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Database\QueryBuilder;
 
+use InvalidArgumentException;
 use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\MigrationTable;
@@ -447,5 +448,27 @@ class PgsqlQueryBuilderTest extends TestCase
             'COMMENT ON TABLE table_with_comment IS \'test table with comment\';',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
+    }
+
+    public function testAddPrimaryColumnsAndColumnNamesException()
+    {
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $table = new MigrationTable('add_primary_columns', false);
+        $table->addColumn('title', 'string')
+            ->addColumn('bodytext', 'text')
+            ->create();
+
+        foreach ($queryBuilder->createTable($table) as $query) {
+            $this->adapter->query($query);
+        }
+
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $table = new MigrationTable('add_primary_columns');
+        $table->addPrimary(new Column('id', 'integer'));
+        $table->addPrimaryColumns([new Column('identifier', 'string')]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot combine addPrimary() and addPrimaryColumns() in one migration');
+        $queryBuilder->alterTable($table);
     }
 }

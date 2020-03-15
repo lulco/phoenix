@@ -71,10 +71,10 @@ class MysqlAdapter extends PdoAdapter
     {
         $type = $this->remapType($column['DATA_TYPE']);
         $settings = $this->prepareSettings($column);
-        if ($type == Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] == 36) {
+        if ($type === Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] === 36) {
             $type = Column::TYPE_UUID;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
-        } elseif ($type == Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] == 1) {
+        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1) {
             $type = Column::TYPE_BOOLEAN;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
@@ -86,17 +86,17 @@ class MysqlAdapter extends PdoAdapter
     {
         preg_match('/(.*?)\((.*?)\)(.*)/', $column['COLUMN_TYPE'], $matches);
         $values = null;
-        if ($column['DATA_TYPE'] == Column::TYPE_ENUM || $column['DATA_TYPE'] == Column::TYPE_SET) {
+        if ($column['DATA_TYPE'] === Column::TYPE_ENUM || $column['DATA_TYPE'] === Column::TYPE_SET) {
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
         list($length, $decimals) = $this->getLengthAndDecimals(isset($matches[2]) ? $matches[2] : null);
         return [
-            ColumnSettings::SETTING_AUTOINCREMENT => $column['EXTRA'] == 'auto_increment',
-            ColumnSettings::SETTING_NULL => $column['IS_NULLABLE'] == 'YES',
+            ColumnSettings::SETTING_AUTOINCREMENT => $column['EXTRA'] === 'auto_increment',
+            ColumnSettings::SETTING_NULL => $column['IS_NULLABLE'] === 'YES',
             ColumnSettings::SETTING_DEFAULT => $column['COLUMN_DEFAULT'],
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
-            ColumnSettings::SETTING_SIGNED => !(isset($matches[3]) && trim($matches[3]) == 'unsigned'),
+            ColumnSettings::SETTING_SIGNED => !(isset($matches[3]) && trim($matches[3]) === 'unsigned'),
             ColumnSettings::SETTING_CHARSET => $column['CHARACTER_SET_NAME'],
             ColumnSettings::SETTING_COLLATION => $column['COLLATION_NAME'],
             ColumnSettings::SETTING_VALUES => $values,
@@ -113,8 +113,8 @@ class MysqlAdapter extends PdoAdapter
                 $tablesIndexes[$index['TABLE_NAME']] = [];
             }
             $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = $index['COLUMN_NAME'];
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] == 0 ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] == 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] == 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
         return $tablesIndexes;
     }

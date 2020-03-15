@@ -4,7 +4,6 @@ namespace Phoenix\Command;
 
 use Dumper\Dumper;
 use Dumper\Indenter;
-use Phoenix\Command\AbstractCommand;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;
 use Symfony\Component\Console\Input\InputOption;
@@ -92,7 +91,7 @@ class DumpCommand extends AbstractCommand
         $tables = [];
         $structure = $this->adapter->getStructure();
         foreach ($structure->getTables() as $table) {
-            if (in_array($table->getName(), $ignoredTables)) {
+            if (in_array($table->getName(), $ignoredTables, true)) {
                 continue;
             }
             $tables[] = $table;
@@ -108,7 +107,7 @@ class DumpCommand extends AbstractCommand
 
         $data = [];
         foreach ($tables as $table) {
-            if (in_array($table->getName(), $ignoredDataTables)) {
+            if (in_array($table->getName(), $ignoredDataTables, true)) {
                 continue;
             }
             $data[$table->getName()] = $this->adapter->fetchAll($table->getName());

@@ -83,7 +83,7 @@ class Column
     {
         $reflectionClass = new ReflectionClass($this);
         $typeConstants = $reflectionClass->getConstants();
-        if (!in_array($type, $typeConstants)) {
+        if (!in_array($type, $typeConstants, true)) {
             throw new InvalidArgumentValueException('Type "' . $type . '" is not allowed.');
         }
     }

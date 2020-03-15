@@ -41,17 +41,17 @@ class Manager
         if (empty($migrations)) {
             return [];
         }
-        if ($type == self::TYPE_DOWN) {
+        if ($type === self::TYPE_DOWN) {
             $migrations = array_reverse($migrations);
         }
-        return $target == self::TARGET_ALL ? $migrations : [current($migrations)];
+        return $target === self::TARGET_ALL ? $migrations : [current($migrations)];
     }
 
     private function findMigrations(string $type, array $dirs, array $classes): array
     {
         $migrations = $this->findMigrationClasses($dirs, $classes);
         $executedMigrations = $this->executedMigrations();
-        if ($type == self::TYPE_UP) {
+        if ($type === self::TYPE_UP) {
             foreach (array_keys($executedMigrations) as $migrationIdentifier) {
                 unset($migrations[$migrationIdentifier]);
             }
@@ -73,7 +73,7 @@ class Manager
     {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
-            if (empty($dirs) || (!empty($dirs) && in_array($identifier, $dirs))) {
+            if (empty($dirs) || (!empty($dirs) && in_array($identifier, $dirs, true))) {
                 $filesFinder->addDirectory($directory);
             }
         }
@@ -83,7 +83,7 @@ class Manager
             require_once $file;
             $classNameCreator = new ClassNameCreator($file);
             $className = $classNameCreator->getClassName();
-            if (empty($classes) || (!empty($classes) && in_array($className, $classes))) {
+            if (empty($classes) || (!empty($classes) && in_array($className, $classes, true))) {
                 $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
                 $migrations[$migrationIdentifier] = new $className($this->adapter);
             }

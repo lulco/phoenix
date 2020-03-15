@@ -31,7 +31,7 @@ class EnvironmentConfig
             $dsn .= ';port=' . $this->configuration['port'];
         }
         if ($this->checkConfigValue('charset')) {
-            if ($this->configuration['adapter'] == 'pgsql') {
+            if ($this->configuration['adapter'] === 'pgsql') {
                 $dsn .= ';options=\'--client_encoding=' . $this->configuration['charset'] . '\'';
             } else {
                 $dsn .= ';charset=' . $this->configuration['charset'];

@@ -106,22 +106,22 @@ class PgsqlAdapter extends PdoAdapter
     {
         $length = null;
         $decimals = null;
-        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR])) {
+        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR], true)) {
             $length = $column['character_maximum_length'];
-        } elseif (in_array($type, [Column::TYPE_NUMERIC])) {
+        } elseif (in_array($type, [Column::TYPE_NUMERIC], true)) {
             $length = $column['numeric_precision'];
             $decimals = $column['numeric_scale'];
         }
 
         $settings = [
-            ColumnSettings::SETTING_NULL => $column['is_nullable'] == 'YES',
+            ColumnSettings::SETTING_NULL => $column['is_nullable'] === 'YES',
             ColumnSettings::SETTING_DEFAULT => $this->prepareDefault($column, $type),
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
             ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
             ColumnSettings::SETTING_COMMENT => $column['comment'],
         ];
-        if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET])) {
+        if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
             $enumType = $table . '__' . $column['column_name'];
             $settings[ColumnSettings::SETTING_VALUES] = $this->query("SELECT unnest(enum_range(NULL::$enumType))")->fetchAll(PDO::FETCH_COLUMN);
         }
@@ -136,7 +136,7 @@ class PgsqlAdapter extends PdoAdapter
         $default = $column['column_default'];
         if ($type === Column::TYPE_BOOLEAN) {
             $default = $default === 'true';
-        } elseif (substr($default, 0, 6) == 'NULL::' || substr($default, 0, 7) == 'nextval') {
+        } elseif (substr($default, 0, 6) === 'NULL::' || substr($default, 0, 7) === 'nextval') {
             $default = null;
         }
         return $default;
