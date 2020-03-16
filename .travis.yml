@@ -29,7 +29,7 @@ script:
     - vendor/bin/phpcs src --standard=PSR2 -n
     - composer remove squizlabs/php_codesniffer --dev
     - composer require phpstan/phpstan --dev
-    - vendor/bin/phpstan analyze src --level=5
+    - vendor/bin/phpstan analyze src --level=5 --no-progress
     - composer remove phpstan/phpstan --dev
     - composer require efabrica/php-extensions-finder --dev
     - vendor/bin/php-extensions-finder check src tests

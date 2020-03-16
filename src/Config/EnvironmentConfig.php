@@ -42,17 +42,22 @@ class EnvironmentConfig
 
     public function getUsername(): ?string
     {
-        return isset($this->configuration['username']) ? $this->configuration['username'] : null;
+        return $this->configuration['username'] ?? null;
     }
 
     public function getPassword(): ?string
     {
-        return isset($this->configuration['password']) ? $this->configuration['password'] : null;
+        return $this->configuration['password'] ?? null;
     }
 
     public function getCharset(): string
     {
-        return isset($this->configuration['charset']) ? $this->configuration['charset'] : 'utf8';
+        return $this->configuration['charset'] ?? 'utf8';
+    }
+
+    public function getVersion(): ?string
+    {
+        return $this->configuration['version'] ?? null;
     }
 
     private function checkConfigValue(string $key): bool

@@ -32,9 +32,11 @@ There are several types in Phoenix, but not all adapters allows all types. This 
 | blob          | blob       | bytea         |
 | longblob      | longblob   | bytea         |
 | uuid          | char(36)   | uuid          |
-| json          | text       | json          |
+| json          | text/json* | json          |
 | enum          | enum       | USER-DEFINED  |
 | set           | set        | ARRAY         |
 | point         | point      | point         |
 | line          | linestring | line          |
 | polygon       | polygon    | polygon       |
+
+* Depends on version of MySQL (text for < 5.7.8, json for >= 5.7.8)

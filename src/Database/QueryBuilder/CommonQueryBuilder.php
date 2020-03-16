@@ -11,8 +11,6 @@ use Phoenix\Database\Element\MigrationTable;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
-    protected $typeMap = [];
-
     protected $defaultLength = [];
 
     protected $adapter;
@@ -38,7 +36,8 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
 
     protected function remapType(Column $column): string
     {
-        return $this->typeMap[$column->getType()] ?? $column->getType();
+        $typeMap = $this->typeMap();
+        return $typeMap[$column->getType()] ?? $column->getType();
     }
 
     protected function createTableQuery(MigrationTable $table): string
@@ -256,4 +255,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     abstract protected function primaryKeyString(MigrationTable $table): string;
 
     abstract protected function createEnumSetColumn(Column $column, MigrationTable $table): string;
+
+    abstract protected function typeMap(): array;
 }

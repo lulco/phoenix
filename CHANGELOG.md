@@ -6,7 +6,8 @@
 - Changed comparation `==` to `===` and added strict parameter to in_array
 
 #### Added
-- Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp` 
+- Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
+- Added support for json column type for newer versions of mysql (>= 5.7.8)
 
 #### Fixed
 - Fixed tests on travis

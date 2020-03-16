@@ -202,7 +202,7 @@ class PgsqlAdapter extends PdoAdapter
     /**
      * {@inheritdoc}
      */
-    protected function createRealValue($value): ?string
+    protected function createRealValue($value)
     {
         if ($value === false) {
             return 'false';

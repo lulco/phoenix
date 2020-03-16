@@ -18,11 +18,14 @@ abstract class PdoAdapter implements AdapterInterface
 
     private $charset;
 
+    protected $version;
+
     protected $queryBuilder;
 
-    public function __construct(PDO $pdo)
+    public function __construct(PDO $pdo, ?string $version = null)
     {
         $this->pdo = $pdo;
+        $this->version = $version;
     }
 
     public function execute(PDOStatement $sql): bool
@@ -325,5 +328,9 @@ abstract class PdoAdapter implements AdapterInterface
 
     abstract protected function escapeString(string $string): string;
 
-    abstract protected function createRealValue($value): ?string;
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    abstract protected function createRealValue($value);
 }
