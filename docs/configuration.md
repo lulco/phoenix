@@ -24,6 +24,7 @@ return [
     'environments' => [
         'local' => [
             'adapter' => 'mysql',
+            'version' => '5.7.0', // optional - if not set it is requested from server 
             'host' => 'localhost',
             'port' => 3306, // optional
             'username' => 'user',
@@ -54,6 +55,7 @@ migration_dirs:
 environments:
   local:
     adapter: mysql
+    version: '5.7.0' # optional - if not set it is requested from server
     host: localhost
     port: 3306 # optional
     username: user
@@ -79,6 +81,7 @@ migration_dirs:
 environments:
     local:
         adapter: mysql
+        version: '5.7.0' # optional - if not set it is requested from server
         host: localhost
         port: 3306 # optional
         username: user
@@ -108,6 +111,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
     "environments": {
         "local": {
             "adapter": "mysql",
+            "version": "5.7.0", // optional - if not set it is requested from server
             "host": "localhost",
             "port": "3306", // optional
             "username": "user",

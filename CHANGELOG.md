@@ -2,12 +2,13 @@
 
 ### [Unreleased][unreleased]
 
+### [1.2.0] - 2020-03-16
 #### Changed
+- Added support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))
 - Changed comparation `==` to `===` and added strict parameter to in_array
 
 #### Added
 - Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
-- Added support for json column type for newer versions of mysql (>= 5.7.8)
 
 #### Fixed
 - Fixed tests on travis
@@ -200,7 +201,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.1.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/lulco/phoenix/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/lulco/phoenix/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/lulco/phoenix/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/lulco/phoenix/compare/0.13.0...1.0.0
