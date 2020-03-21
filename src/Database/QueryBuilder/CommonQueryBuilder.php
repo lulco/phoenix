@@ -184,10 +184,10 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $constraint = 'CONSTRAINT ' . $this->escapeString($table->getName() . '_' . $foreignKey->getName());
         $constraint .= ' FOREIGN KEY (' . implode(',', $columns) . ')';
         $constraint .= ' REFERENCES ' . $this->escapeString($foreignKey->getReferencedTable()) . ' (' . implode(',', $referencedColumns) . ')';
-        if ($foreignKey->getOnDelete() != ForeignKey::DEFAULT_ACTION) {
+        if ($foreignKey->getOnDelete() !== ForeignKey::DEFAULT_ACTION) {
             $constraint .= ' ON DELETE ' . $foreignKey->getOnDelete();
         }
-        if ($foreignKey->getOnUpdate() != ForeignKey::DEFAULT_ACTION) {
+        if ($foreignKey->getOnUpdate() !== ForeignKey::DEFAULT_ACTION) {
             $constraint .= ' ON UPDATE ' . $foreignKey->getOnUpdate();
         }
         return $constraint;

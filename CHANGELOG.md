@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- Added method renameColumn() to migrations
+
 ### [1.2.0] - 2020-03-16
 #### Changed
 - Added support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))

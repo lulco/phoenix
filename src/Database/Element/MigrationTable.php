@@ -5,6 +5,7 @@ namespace Phoenix\Database\Element;
 use Phoenix\Database\Element\Behavior\CharsetAndCollationBehavior;
 use Phoenix\Database\Element\Behavior\ColumnsToChangeBehavior;
 use Phoenix\Database\Element\Behavior\ColumnsToDropBehavior;
+use Phoenix\Database\Element\Behavior\ColumnsToRenameBehavior;
 use Phoenix\Database\Element\Behavior\CommentBehavior;
 use Phoenix\Database\Element\Behavior\CopyTableBehavior;
 use Phoenix\Database\Element\Behavior\DropPrimaryKeyBehavior;
@@ -17,6 +18,7 @@ class MigrationTable
     use CharsetAndCollationBehavior;
     use ColumnsToChangeBehavior;
     use ColumnsToDropBehavior;
+    use ColumnsToRenameBehavior;
     use CommentBehavior;
     use CopyTableBehavior;
     use DropPrimaryKeyBehavior;

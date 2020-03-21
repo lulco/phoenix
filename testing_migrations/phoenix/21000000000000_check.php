@@ -17,12 +17,12 @@ class Check extends AbstractMigration
         }
 
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) != 10) {
+        if (count($logs) !== 11) {
             throw new Exception('Wrong count');
         }
 
         $res = $this->select('SELECT COUNT(*) AS log_count FROM phoenix_log');
-        if (count($logs) != $res[0]['log_count']) {
+        if (count($logs) !== intval($res[0]['log_count'])) {
             throw new Exception('Counts don\'t match');
         }
 
@@ -37,7 +37,7 @@ class Check extends AbstractMigration
                 'identifier', 't1_fk', 't2_fk', 'id',
             ],
             'table_4' => [
-                'title', 'identifier',
+                'title', 'id',
             ],
             'new_table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at',
@@ -49,7 +49,7 @@ class Check extends AbstractMigration
 
         foreach ($tableColumns as $table => $columns) {
             $firstItem = $this->fetch($table);
-            if (count($firstItem) != count($columns)) {
+            if (count($firstItem) !== count($columns)) {
                 throw new Exception('Wrong number of columns in first item of table ' . $table);
             }
             $items = $this->fetchAll($table);
@@ -57,7 +57,7 @@ class Check extends AbstractMigration
                 throw new Exception('No data in table "' . $table . '"');
             }
             foreach ($items as $item) {
-                if (count($item) != count($columns)) {
+                if (count($item) !== count($columns)) {
                     throw new Exception('Wrong number of columns in item');
                 }
                 foreach ($columns as $column) {
@@ -70,7 +70,7 @@ class Check extends AbstractMigration
 
         $table4Count = $this->fetch('table_4', ['count(*) as cnt']);
         if (intval($table4Count['cnt']) !== 1000) {
-            throw new Exception('Items count in table_4 is not 3, but ' . $table4Count['cnt']);
+            throw new Exception('Items count in table_4 is not 1000, but ' . $table4Count['cnt']);
         }
 
         $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 1]);

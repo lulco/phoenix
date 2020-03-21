@@ -16,11 +16,13 @@ $this->table('users')
 ```
 
 #### Change table
-Add column, drop column, change column, add index, drop index, add foreign key, drop foreign key
+Add column, drop column, rename column, change column, add index, drop index, add foreign key, drop foreign key
 ```php
 $this->table('users')
     ->addColumn('email', 'string')
     ->dropColumn('second_column')
+    ->renameColumn('asdf', 'alias')
+    ->changeColumn('xyz', 'zyx', 'string')
     ->addIndex('email', 'unique')
     ->addForeignKey('self_fk', 'users', 'id')
     ->dropIndex('username')
@@ -55,7 +57,7 @@ if ($this->tableExists('users')) {
 
 #### Check if column in table exists
 ```php
-if ($this->tableColumnExists('users', 'username') {
+if ($this->tableColumnExists('users', 'username')) {
     // do something
 }
 ```
