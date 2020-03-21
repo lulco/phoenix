@@ -15,7 +15,7 @@ Framework agnostic database migrations for PHP.
 - Multiple migration directories
 - Migrate up and down
 - Print executed queries (in debug mode -vvv)
-- Dry run - executing up or down migrations without real executing queries. Commands just print queries which will be executed in non-dry mode
+- Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
 - Add an autoincrement primary column to an existing table
 - Dump command for creating migration from existing database
 - Test command for testing new migration executing migrate, rollback, migrate
@@ -74,7 +74,9 @@ return [
     'log_table_name' => 'phoenix_log',
 ];
 ```
-Read more about configuration [here](docs/configuration.md)
+Read more about configuration [here](docs/configuration.md).
+
+REMEMBER: migrations do some structure changes to the database, therefore the database user used for these migrations has to be able to do these changes.
 
 ### [Commands](docs/commands.md)
 To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoenix/bin/phoenix`.
