@@ -24,7 +24,7 @@ trait ColumnsToChangeBehavior
     }
 
     /**
-     * @return array<string, Column>
+     * @return Column[]
      */
     public function getColumnsToChange(): array
     {
