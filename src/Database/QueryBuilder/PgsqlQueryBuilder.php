@@ -111,37 +111,40 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
         }
 
-        if ($table->getColumnsToChange()) {
-            foreach ($table->getColumnsToChange() as $oldColumnName => $newColumn) {
-                if ($oldColumnName != $newColumn->getName()) {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
+        foreach ($table->getColumnsToRename() as $oldName => $newName) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldName) . ' TO ' . $this->escapeString($newName) . ';';
+        }
+
+        foreach ($table->getColumnsToChange() as $oldColumnName => $newColumn) {
+            if ($oldColumnName !== $newColumn->getName()) {
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME COLUMN ' . $this->escapeString($oldColumnName) . ' TO ' . $this->escapeString($newColumn->getName()) . ';';
+            }
+            if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
+                $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
+                $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
+                foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
+                    $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
                 }
-                if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
-                    $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
-                    $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
-                    foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
-                        $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
-                    }
-                    foreach (array_diff($newColumn->getSettings()->getValues(), $tableInfo->getColumn($oldColumnName)->getSettings()->getValues()) as $newValue) {
-                        $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
-                    }
-                } else {
-                    $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
+                foreach (array_diff($newColumn->getSettings()->getValues(), $tableInfo->getColumn($oldColumnName)->getSettings()->getValues()) as $newValue) {
+                    $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
                 }
-                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . $cast . ';';
-                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . ($newColumn->getSettings()->allowNull() ? 'DROP' : 'SET') . ' NOT NULL;';
-                if ($newColumn->getSettings()->getDefault() === null && $newColumn->getSettings()->allowNull()) {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
-                } elseif ($newColumn->getSettings()->getDefault()) {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
-                } else {
-                    $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
-                }
-                if ($newColumn->getSettings()->getComment() !== null) {
-                    $queries[] = $this->createColumnComment($table, $newColumn);
-                }
+            } else {
+                $cast = (isset($this->typeCastMap[$newColumn->getType()]) ? $this->typeCastMap[$newColumn->getType()] : $newColumn->getType());
+            }
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' TYPE ' . $this->createType($newColumn, $table) . ' USING ' . $newColumn->getName() . '::' . $cast . ';';
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . ($newColumn->getSettings()->allowNull() ? 'DROP' : 'SET') . ' NOT NULL;';
+            if ($newColumn->getSettings()->getDefault() === null && $newColumn->getSettings()->allowNull()) {
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT NULL;';
+            } elseif ($newColumn->getSettings()->getDefault()) {
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'SET DEFAULT ' . $this->escapeDefault($newColumn) . ';';
+            } else {
+                $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ALTER COLUMN ' . $this->escapeString($newColumn->getName()) . ' ' . 'DROP DEFAULT;';
+            }
+            if ($newColumn->getSettings()->getComment() !== null) {
+                $queries[] = $this->createColumnComment($table, $newColumn);
             }
         }
+
         $queries = array_merge($queries, $this->addPrimaryKey($table));
         $queries = array_merge($queries, $this->addForeignKeys($table));
         if ($table->getComment() !== null) {
