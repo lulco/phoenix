@@ -2,8 +2,6 @@
 
 namespace Phoenix\Database\Element;
 
-use Phoenix\Database\Element\MigrationTable;
-
 class Structure
 {
     /** @var Table[] */
@@ -11,7 +9,12 @@ class Structure
 
     public function update(MigrationTable $migrationTable): Structure
     {
-        $this->tables[$migrationTable->getName()] = $migrationTable->toTable();
+        return $this->add($migrationTable->toTable());
+    }
+
+    public function add(Table $table): Structure
+    {
+        $this->tables[$table->getName()] = $table;
         return $this;
     }
 
