@@ -113,7 +113,6 @@ namespace PHPSTORM_META
 
     registerArgumentsSet(
         'phoenix_index_types',
-
         \Phoenix\Database\Element\Index::TYPE_UNIQUE,
         \Phoenix\Database\Element\Index::TYPE_FULLTEXT,
         \Phoenix\Database\Element\Index::TYPE_NORMAL,
