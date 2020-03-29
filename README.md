@@ -24,6 +24,7 @@ Framework agnostic database migrations for PHP.
 - Namespaces in migration classes
 - Own migration templates
 - Easy integration to any PHP application
+- PHPStorm suggestions (works even better with deep-assoc-completion plugin)
 
 ## Supported adapters
 - MySql
