@@ -3,6 +3,23 @@
 namespace PHPSTORM_META
 {
     registerArgumentsSet(
+        'phoenix_table_primary_key',
+        true,
+        false,
+        'column_name',
+        null,
+        ['column1_name', 'column2_name'],
+        new \Phoenix\Database\Element\Column('column_name', 'column_type'),
+        [new \Phoenix\Database\Element\Column('column1_name', 'column1_type'), new \Phoenix\Database\Element\Column('column2_name', 'column2_type')]
+    );
+
+    expectedArguments(
+        \Phoenix\Migration\AbstractMigration::table(),
+        1,
+        argumentsSet('phoenix_table_primary_key')
+    );
+
+    registerArgumentsSet(
         'phoenix_column_types',
         'integer',
         'string',
@@ -91,18 +108,6 @@ namespace PHPSTORM_META
         'collation' => null, // default value = null / type = string
         'comment' => null, // default value = null / type = string
         'values' => null, // default value = null / type = array
-        \Phoenix\Database\Element\ColumnSettings::SETTING_NULL => true, // default value = false / type = bool
-        \Phoenix\Database\Element\ColumnSettings::SETTING_DEFAULT => null, // default value = null / type = int
-        \Phoenix\Database\Element\ColumnSettings::SETTING_LENGTH => null, // default value = null / type = int
-        \Phoenix\Database\Element\ColumnSettings::SETTING_DECIMALS => null, // default value = null / type = int
-        \Phoenix\Database\Element\ColumnSettings::SETTING_AUTOINCREMENT => false, // default value = false / type = bool
-        \Phoenix\Database\Element\ColumnSettings::SETTING_SIGNED => true, // default value = true / type = bool
-        \Phoenix\Database\Element\ColumnSettings::SETTING_AFTER => null, // default value = null / type = string
-        \Phoenix\Database\Element\ColumnSettings::SETTING_FIRST => false, // default value = false / type = bool
-        \Phoenix\Database\Element\ColumnSettings::SETTING_CHARSET => null, // default value = null / type = string
-        \Phoenix\Database\Element\ColumnSettings::SETTING_COLLATION => null, // default value = null / type = string
-        \Phoenix\Database\Element\ColumnSettings::SETTING_COMMENT => null, // default value = null / type = string
-        \Phoenix\Database\Element\ColumnSettings::SETTING_VALUES => null // default value = null / type = array
     ]);
 
     expectedArguments(
@@ -140,9 +145,40 @@ namespace PHPSTORM_META
         'hash',
         ''
     );
+
     expectedArguments(
         \Phoenix\Database\Element\Behavior\IndexBehavior::addIndex(),
         2,
         argumentsSet('phoenix_index_methods')
+    );
+
+    registerArgumentsSet(
+        'phoenix_foreign_key_actions',
+        \Phoenix\Database\Element\ForeignKey::CASCADE,
+        \Phoenix\Database\Element\ForeignKey::RESTRICT,
+        \Phoenix\Database\Element\ForeignKey::SET_NULL,
+        \Phoenix\Database\Element\ForeignKey::NO_ACTION,
+        \Phoenix\Database\Element\ForeignKey::DEFAULT_ACTION,
+        'CASCADE',
+        'RESTRICT',
+        'SET NULL',
+        'NO ACTION',
+        'cascade',
+        'restrict',
+        'set null',
+        'no action',
+        ''
+    );
+
+    expectedArguments(
+        \Phoenix\Database\Element\Behavior\ForeignKeyBehavior::addForeignKey(),
+        3,
+        argumentsSet('phoenix_foreign_key_actions')
+    );
+
+    expectedArguments(
+        \Phoenix\Database\Element\Behavior\ForeignKeyBehavior::addForeignKey(),
+        4,
+        argumentsSet('phoenix_foreign_key_actions')
     );
 }

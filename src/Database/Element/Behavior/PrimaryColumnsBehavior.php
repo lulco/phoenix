@@ -15,6 +15,12 @@ trait PrimaryColumnsBehavior
 
     private $dataChunkSize;
 
+    /**
+     * @param Column[] $primaryColumns
+     * @param Closure|null $primaryColumnsValuesFunction
+     * @param int|null $dataChunkSize
+     * @return MigrationTable
+     */
     public function addPrimaryColumns(array $primaryColumns, ?Closure $primaryColumnsValuesFunction = null, ?int $dataChunkSize = null): MigrationTable
     {
         foreach ($primaryColumns as $primaryColumn) {
