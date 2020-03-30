@@ -47,8 +47,7 @@ class TableComparator
         $foreignKeysToAdd = array_diff_key($targetForeignKeys, $sourceForeignKeys);
         $foreignKeysToChange = [];
 
-        if (
-            count($primaryColumnsToDrop) + count($primaryColumnsToAdd) +
+        if (count($primaryColumnsToDrop) + count($primaryColumnsToAdd) +
             count($columnsToDrop) + count($columnsToAdd) + count($columnsToChange) +
             count($indexesToDrop) + count($indexesToAdd) + count($indexesToChange) +
             count($foreignKeysToDrop) + count($foreignKeysToAdd) + count($foreignKeysToChange)
@@ -98,7 +97,7 @@ class TableComparator
             $migrationTable->addIndex($indexToAdd->getColumns(), $indexToAdd->getType(), $indexToAdd->getMethod(), $indexToAdd->getName());
         }
 
-        foreach($foreignKeysToDrop as $foreignKeyToDrop) {
+        foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
             $migrationTable->dropForeignKey($foreignKeyToDrop);
         }
 

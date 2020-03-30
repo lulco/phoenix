@@ -30,7 +30,6 @@ class Dumper
     {
         $this->indent = $indent;
         $this->baseIndent = $baseIndent;
-
     }
 
     public function dumpTables(array $tables): string
