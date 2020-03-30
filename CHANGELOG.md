@@ -4,6 +4,7 @@
 
 #### Added
 - Added method renameColumn() to migrations
+- Added PHPStorm meta for better suggestions
 - Added diff command for creating migration from diff of two databases
 
 ### [1.2.0] - 2020-03-16
