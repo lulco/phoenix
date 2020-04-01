@@ -39,6 +39,9 @@ class Check extends AbstractMigration
             'table_4' => [
                 'title', 'id',
             ],
+            'table_5' => [
+                'id', 'title',
+            ],
             'new_table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],

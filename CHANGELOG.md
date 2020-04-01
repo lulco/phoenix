@@ -6,6 +6,7 @@
 - Added method renameColumn() to migrations
 - Added PHPStorm meta for better suggestions
 - Added migration datetime to json output of migrate / rollback commands for future purpose
+- Added smallserial as primary in pqsql
 
 ### [1.2.0] - 2020-03-16
 #### Changed
@@ -16,7 +17,7 @@
 - Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
 
 #### Fixed
-- Fixed tests on travis
+- Tests on travis
 
 ### [1.1.1] - 2019-09-12
 #### Changed
