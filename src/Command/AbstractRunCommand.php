@@ -33,6 +33,7 @@ abstract class AbstractRunCommand extends AbstractCommand
         }
 
         $executedMigrations = [];
+        /** @var AbstractMigration $migration */
         foreach ($migrations as $migration) {
             $this->writeln('');
             $this->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executing</info>');
@@ -47,6 +48,7 @@ abstract class AbstractRunCommand extends AbstractCommand
             $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
             $executedMigration = [
+                'datetime' => $migration->getDatetime(),
                 'classname' => $migration->getClassName(),
                 'execution_time' => $executionTime,
             ];
