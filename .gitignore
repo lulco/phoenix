@@ -2,6 +2,3 @@
 /build/
 /vendor/
 /composer.lock
-/testing_migrations/run.sh
-/tests_local.sh
-/.idea
