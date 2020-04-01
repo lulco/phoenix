@@ -41,6 +41,11 @@ class Init extends AbstractMigration
             ->addColumn('title', 'string')
             ->create();
 
+        $this->table('table_5', 'id')
+            ->addColumn('id', 'smallinteger', ['autoincrement' => true])
+            ->addColumn('title', 'string', ['length' => 100])
+            ->create();
+
         $this->table('all_types', 'identifier')
             ->addColumn('identifier', 'uuid')
             ->addColumn('col_tinyinteger', 'tinyinteger')
@@ -76,12 +81,14 @@ class Init extends AbstractMigration
             ->addColumn('col_time', 'time', ['null' => true])
             ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
             ->addIndex(['col_string', 'col_integer'])
+            ->addForeignKey('col_smallinteger', 'table_5', 'id', ForeignKey::CASCADE, ForeignKey::CASCADE)
             ->create();
     }
 
     protected function down(): void
     {
         $this->table('all_types')->drop();
+        $this->table('table_5')->drop();
         $this->table('table_4')->drop();
         $this->table('table_3')->drop();
         $this->table('table_2')->drop();

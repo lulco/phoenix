@@ -67,6 +67,18 @@ class AddData extends AbstractMigration
         }
         $this->insert('table_4', $multiInsertData);
 
+        $this->insert('table_5', [
+            [
+                'title' => 'Item 1',
+            ],
+            [
+                'title' => 'Item 2',
+            ],
+            [
+                'title' => 'Item 3',
+            ],
+        ]);
+
         $this->update('table_1', [
             'title' => 'Renamed second item',
             'is_active' => true,
@@ -75,7 +87,7 @@ class AddData extends AbstractMigration
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c',
             'col_tinyinteger' => 50,
-            'col_smallinteger' => 50,
+            'col_smallinteger' => 1,
             'col_mediuminteger' => 50,
             'col_integer' => 50,
             'col_bigint' => 1234567890,
@@ -99,7 +111,7 @@ class AddData extends AbstractMigration
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465d',
             'col_tinyinteger' => 50,
-            'col_smallinteger' => 50,
+            'col_smallinteger' => 2,
             'col_mediuminteger' => 50,
             'col_integer' => 150,
             'col_bigint' => 9876543210,

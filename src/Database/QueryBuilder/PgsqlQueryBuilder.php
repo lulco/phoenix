@@ -174,7 +174,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ';
         if ($column->getSettings()->isAutoincrement()) {
-            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : ($column->getType() === Column::TYPE_SMALL_INTEGER ? 'smallserial' : 'serial');
         } else {
             $col .= $this->createType($column, $table);
         }
