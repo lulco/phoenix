@@ -86,6 +86,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
     }
 
+    public function truncateTable(MigrationTable $table): array
+    {
+        return [sprintf('TRUNCATE TABLE %s', $this->escapeString($table->getName()))];
+    }
+
     public function renameTable(MigrationTable $table): array
     {
         return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($table->getNewName()) . ';'];

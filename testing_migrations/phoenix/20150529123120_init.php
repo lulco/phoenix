@@ -46,6 +46,10 @@ class Init extends AbstractMigration
             ->addColumn('title', 'string', ['length' => 100])
             ->create();
 
+        $this->table('table_6')
+            ->addColumn('title', 'string', ['length' => 100])
+            ->create();
+
         $this->table('all_types', 'identifier')
             ->addColumn('identifier', 'uuid')
             ->addColumn('col_tinyinteger', 'tinyinteger')
@@ -88,6 +92,7 @@ class Init extends AbstractMigration
     protected function down(): void
     {
         $this->table('all_types')->drop();
+        $this->table('table_6')->drop();
         $this->table('table_5')->drop();
         $this->table('table_4')->drop();
         $this->table('table_3')->drop();
