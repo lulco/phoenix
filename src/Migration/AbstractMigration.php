@@ -228,6 +228,8 @@ abstract class AbstractMigration
             $tableQueries = $queryBuilder->dropTable($table);
         } elseif ($table->getAction() === MigrationTable::ACTION_COPY) {
             $tableQueries = $queryBuilder->copyTable($table);
+        } elseif ($table->getAction() === MigrationTable::ACTION_TRUNCATE) {
+            $tableQueries = $queryBuilder->truncateTable($table);
         }
         return $tableQueries;
     }

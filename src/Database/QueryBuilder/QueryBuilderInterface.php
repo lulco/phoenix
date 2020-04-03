@@ -37,6 +37,12 @@ interface QueryBuilderInterface
     public function copyTable(MigrationTable $table): array;
 
     /**
+     * @param MigrationTable $table
+     * @return array list of queries
+     */
+    public function truncateTable(MigrationTable $table): array;
+
+    /**
      * @param string $string
      * @return string escaped string
      */

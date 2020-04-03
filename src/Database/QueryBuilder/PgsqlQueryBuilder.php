@@ -92,6 +92,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         ];
     }
 
+    public function truncateTable(MigrationTable $table): array
+    {
+        return [sprintf('TRUNCATE TABLE %s', $this->escapeString($table->getName()))];
+    }
+
     public function renameTable(MigrationTable $table): array
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];

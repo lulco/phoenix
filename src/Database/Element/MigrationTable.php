@@ -36,6 +36,8 @@ class MigrationTable
 
     const ACTION_COPY = 'copy';
 
+    const ACTION_TRUNCATE = 'truncate';
+
     const COPY_ONLY_STRUCTURE = 'only_structure';
 
     const COPY_ONLY_DATA = 'only_data';
@@ -160,6 +162,11 @@ class MigrationTable
     {
         $this->action = self::ACTION_RENAME;
         $this->newName = $newName;
+    }
+
+    public function truncate(): void
+    {
+        $this->action = self::ACTION_TRUNCATE;
     }
 
     public function getAction(): string
