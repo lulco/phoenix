@@ -6,12 +6,14 @@ use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use PHPUnit\Framework\TestCase;
@@ -75,6 +77,64 @@ class MysqlAdapterTest extends TestCase
         $this->assertInstanceOf(Structure::class, $updatedStructure);
         $this->assertCount(1, $updatedStructure->getTables());
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
+    }
+
+    public function testUniqueIndexWithLengthSpecified()
+    {
+        $queryBuilder = $this->adapter->getQueryBuilder();
+
+        $migrationTable = new MigrationTable('table_with_unique_index_with_length_10');
+        $migrationTable->setCollation('utf8_general_ci');
+        $migrationTable->addColumn('title', 'string');
+        $migrationTable->addIndex(new IndexColumn('title', ['length' => 10]), Index::TYPE_UNIQUE);
+        $migrationTable->create();
+
+        $queries = $queryBuilder->createTable($migrationTable);
+        foreach ($queries as $query) {
+            $this->adapter->query($query);
+        }
+
+        $structure = $this->adapter->getStructure();
+        $this->assertInstanceOf(Structure::class, $structure);
+        $this->assertCount(1, $structure->getTables());
+        // check table
+        $table = $structure->getTable('table_with_unique_index_with_length_10');
+        $this->assertInstanceOf(Table::class, $table);
+
+        $defaultSettings = [
+            'charset' => null,
+            'collation' => null,
+            'default' => null,
+            'null' => false,
+            'length' => null,
+            'decimals' => null,
+            'autoincrement' => false,
+            'signed' => true,
+            'values' => null,
+            'comment' => null,
+        ];
+
+        // check columns
+        $this->checkColumn($table, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
+            'length' => 11,
+            'autoincrement' => true,
+        ]));
+        $this->checkColumn($table, 'title', Column::TYPE_STRING, array_merge($defaultSettings, [
+            'length' => 255,
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+        ]));
+
+        $this->checkIndex($table, 'idx_table_with_unique_index_with_length_10_title_l10', [new IndexColumn('title',['length' => 10])], Index::TYPE_UNIQUE, Index::METHOD_BTREE);  // HASH not working
+
+        $this->adapter->insert('table_with_unique_index_with_length_10', [
+            'title' => 'This is my item number 1',
+        ]);
+
+        $this->expectException(DatabaseQueryExecuteException::class);
+        $this->adapter->insert('table_with_unique_index_with_length_10', [
+            'title' => 'This is my item number 2',
+        ]);
     }
 
     public function testFullStructure()
@@ -227,10 +287,10 @@ class MysqlAdapterTest extends TestCase
         // check all indexes for table_1
         $this->assertCount(3, $table1->getIndexes());
 
-        $this->checkIndex($table1, 'idx_table_1_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
-        $this->checkIndex($table1, 'idx_table_1_col_string', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);  // HASH not working
-        // $this->checkIndex($table1, 'idx_table_1_col_text', ['col_text'], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);  // full text index not working on InnoDB Engine for MySql <= 5.6
-        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', ['col_mediumint', 'col_bigint'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $this->checkIndex($table1, 'idx_table_1_col_int', [new IndexColumn('col_int')], Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $this->checkIndex($table1, 'idx_table_1_col_string', [new IndexColumn('col_string')], Index::TYPE_UNIQUE, Index::METHOD_BTREE);  // HASH not working
+//         $this->checkIndex($table1, 'idx_table_1_col_text', [new IndexColumn('col_text')], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);  // full text index not working on InnoDB Engine for MySql <= 5.6
+        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', [new IndexColumn('col_mediumint'), new IndexColumn('col_bigint')], Index::TYPE_NORMAL, Index::METHOD_BTREE);
 
         // check all foreign keys for table_1
         $this->assertCount(0, $table1->getForeignKeys());
@@ -358,9 +418,9 @@ class MysqlAdapterTest extends TestCase
         // check all indexes for table_2
         $this->assertCount(2, $table2->getIndexes());
         $this->assertNull($table2->getIndex('idx_table_2_col_string'));
-        $this->checkIndex($table2, 'named_unique_index', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);
+        $this->checkIndex($table2, 'named_unique_index', [new IndexColumn('col_string')], Index::TYPE_UNIQUE, Index::METHOD_BTREE);
         // index based on foreign key
-        $this->checkIndex($table2, 'table_2_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_BTREE);
+        $this->checkIndex($table2, 'table_2_col_int', [new IndexColumn('col_int')], Index::TYPE_NORMAL, Index::METHOD_BTREE);
 
         // check all foreign keys for table_2
         $this->assertCount(1, $table2->getForeignKeys());

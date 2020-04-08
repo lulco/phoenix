@@ -8,6 +8,7 @@
 - Added migration datetime to json output of migrate / rollback commands for future purpose
 - Added smallserial as primary in pqsql
 - Added method truncate() to migrations
+- Added settings order and length to index columns
 
 ### [1.2.0] - 2020-03-16
 #### Changed
