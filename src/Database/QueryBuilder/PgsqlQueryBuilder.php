@@ -5,6 +5,8 @@ namespace Phoenix\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
+use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
@@ -92,6 +94,11 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         ];
     }
 
+    public function truncateTable(MigrationTable $table): array
+    {
+        return [sprintf('TRUNCATE TABLE %s', $this->escapeString($table->getName()))];
+    }
+
     public function renameTable(MigrationTable $table): array
     {
         return ['ALTER TABLE ' . $this->escapeString($table->getName()) . ' RENAME TO ' . $this->escapeString($table->getNewName()) . ';'];
@@ -174,7 +181,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $col = $this->escapeString($column->getName()) . ' ';
         if ($column->getSettings()->isAutoincrement()) {
-            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : 'serial';
+            $col .= $column->getType() === Column::TYPE_BIG_INTEGER ? 'bigserial' : ($column->getType() === Column::TYPE_SMALL_INTEGER ? 'smallserial' : 'serial');
         } else {
             $col .= $this->createType($column, $table);
         }
@@ -215,8 +222,20 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private function createIndex(Index $index, MigrationTable $table): string
     {
         $columns = [];
-        foreach ($index->getColumns() as $column) {
-            $columns[] = $this->escapeString($column);
+        /** @var IndexColumn $indexColumn */
+        foreach ($index->getColumns() as $indexColumn) {
+            $indexColumnSettings = $indexColumn->getSettings()->getNonDefaultSettings();
+            $name = $this->escapeString($indexColumn->getName());
+            $lengthSetting = $indexColumnSettings[IndexColumnSettings::SETTING_LENGTH] ?? null;
+            if ($lengthSetting) {
+                $name = 'SUBSTRING(' . $name . ' FOR ' . $lengthSetting . ')';
+            }
+            $columnParts = [$name];
+            $order = $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] ?? null;
+            if ($order) {
+                $columnParts[] = $order;
+            }
+            $columns[] = implode(' ', $columnParts);
         }
         $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
         $indexMethod = $index->getMethod() ? ' USING ' . $index->getMethod() : '';

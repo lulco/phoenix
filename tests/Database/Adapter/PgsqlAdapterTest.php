@@ -6,11 +6,13 @@ use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
 use PHPUnit\Framework\TestCase;
@@ -62,11 +64,136 @@ class PgsqlAdapterTest extends TestCase
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
     }
 
+    public function testUniqueIndexWithLengthSpecified()
+    {
+        $this->markTestSkipped();
+
+        $queryBuilder = $this->adapter->getQueryBuilder();
+
+        $migrationTable = new MigrationTable('unique_index_length_10');
+        $migrationTable->setCollation('utf8_general_ci');
+        $migrationTable->addColumn('title', 'string');
+        $migrationTable->addColumn('alias', 'string');
+        $migrationTable->addColumn('blabla', 'text');
+        $migrationTable->addIndex(new IndexColumn('title', ['length' => 10]), Index::TYPE_UNIQUE);
+        $migrationTable->addIndex([new IndexColumn('title', ['length' => 15]), new IndexColumn('alias', ['length' => 10])]);
+        $migrationTable->addIndex([new IndexColumn('title', ['length' => 10]), new IndexColumn('alias'), new IndexColumn('blabla', ['length' => 20])]);
+        $migrationTable->create();
+
+        $queries = $queryBuilder->createTable($migrationTable);
+        foreach ($queries as $query) {
+            $this->adapter->query($query);
+        }
+
+        $structure = $this->adapter->getStructure();
+        $this->assertInstanceOf(Structure::class, $structure);
+        $this->assertCount(1, $structure->getTables());
+        // check table
+        $table = $structure->getTable('unique_index_length_10');
+        $this->assertInstanceOf(Table::class, $table);
+
+        $defaultSettings = [
+            'charset' => null,
+            'collation' => null,
+            'default' => null,
+            'null' => false,
+            'length' => null,
+            'decimals' => null,
+            'autoincrement' => false,
+            'signed' => true,
+            'values' => null,
+            'comment' => null,
+        ];
+
+        // check columns
+        $this->checkColumn($table, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
+            'autoincrement' => true,
+        ]));
+        $this->checkColumn($table, 'title', Column::TYPE_STRING, array_merge($defaultSettings, [
+            'length' => 255,
+        ]));
+
+        $this->checkIndex($table, 'idx_unique_index_length_10_title_l15_alias_l10', [new IndexColumn('title',['length' => 15]), new IndexColumn('alias',['length' => 10])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table, 'idx_unique_index_length_10_title_l10_alias_blabla_20', [new IndexColumn('title', ['length' => 10]), new IndexColumn('alias'), new IndexColumn('blabla', ['length' => 20])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table, 'idx_unique_index_length_10_title_l10', [new IndexColumn('title',['length' => 10])], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+
+        $this->adapter->insert('unique_index_length_10', [
+            'title' => 'This is my item number 1',
+        ]);
+
+        $this->expectException(DatabaseQueryExecuteException::class);
+        $this->adapter->insert('unique_index_length_10', [
+            'title' => 'This is my item number 2',
+        ]);
+    }
+
+    public function testIndexWithOrderSpecified()
+    {
+        $queryBuilder = $this->adapter->getQueryBuilder();
+
+        $migrationTable = new MigrationTable('ordered_index');
+        $migrationTable->setCollation('utf8_general_ci');
+        $migrationTable->addColumn('created_at', 'datetime');
+        $migrationTable->addColumn('updated_at', 'datetime');
+        $migrationTable->addColumn('title', 'string');
+        $migrationTable->addIndex([
+            new IndexColumn('created_at', ['order' => 'DESC']),
+            new IndexColumn('updated_at', ['order' => 'ASC']),
+            new IndexColumn('title', ['order' => 'DESC'])
+        ]);
+        $migrationTable->create();
+
+        $queries = $queryBuilder->createTable($migrationTable);
+        foreach ($queries as $query) {
+            $this->adapter->query($query);
+        }
+
+        $structure = $this->adapter->getStructure();
+        $this->assertInstanceOf(Structure::class, $structure);
+        $this->assertCount(1, $structure->getTables());
+        // check table
+        $table = $structure->getTable('ordered_index');
+        $this->assertInstanceOf(Table::class, $table);
+
+        $defaultSettings = [
+            'charset' => null,
+            'collation' => null,
+            'default' => null,
+            'null' => false,
+            'length' => null,
+            'decimals' => null,
+            'autoincrement' => false,
+            'signed' => true,
+            'values' => null,
+            'comment' => null,
+        ];
+
+        // check columns
+        $this->checkColumn($table, 'id', Column::TYPE_INTEGER, array_merge($defaultSettings, [
+            'autoincrement' => true,
+        ]));
+        $this->checkColumn($table, 'created_at', Column::TYPE_DATETIME, array_merge($defaultSettings, [
+
+        ]));
+        $this->checkColumn($table, 'updated_at', Column::TYPE_DATETIME, array_merge($defaultSettings, [
+
+        ]));
+        $this->checkColumn($table, 'title', Column::TYPE_STRING, array_merge($defaultSettings, [
+            'length' => 255,
+        ]));
+
+        $this->checkIndex($table, 'idx_ordered_index_created_at_odesc_updated_at_title_odesc', [
+            new IndexColumn('created_at', ['order' => 'DESC']),
+            new IndexColumn('updated_at'),
+            new IndexColumn('title', ['order' => 'DESC'])
+        ], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+    }
+
     public function testFullStructure()
     {
         $this->prepareStructure();
 
-        $structure = $this->adapter->getStructure(true);
+        $structure = $this->adapter->getStructure();
         $this->assertInstanceOf(Structure::class, $structure);
         $this->assertCount(2, $structure->getTables());
         // check all tables
@@ -168,10 +295,10 @@ class PgsqlAdapterTest extends TestCase
         $this->assertCount(3, $table1->getIndexes());
 
         // TODO try to load hash and btree methods
-        $this->checkIndex($table1, 'idx_table_1_col_int', ['col_int'], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
-        $this->checkIndex($table1, 'idx_table_1_col_string', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
-        // $this->checkIndex($table1, 'idx_table_1_col_text', ['col_text'], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);
-        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', ['col_mediumint', 'col_bigint'], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table1, 'idx_table_1_col_int', [new IndexColumn('col_int')], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table1, 'idx_table_1_col_string', [new IndexColumn('col_string')], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+        // $this->checkIndex($table1, 'idx_table_1_col_text', [new IndexColumn('col_text')], Index::TYPE_FULLTEXT, Index::METHOD_DEFAULT);
+        $this->checkIndex($table1, 'idx_table_1_col_mediumint_col_bigint', [new IndexColumn('col_mediumint'), new IndexColumn('col_bigint')], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
 
         // check all foreign keys for table_1
         $this->assertCount(0, $table1->getForeignKeys());
@@ -252,8 +379,8 @@ class PgsqlAdapterTest extends TestCase
         $this->assertNull($table2->getIndex('idx_table_2_col_string'));
 
         // TODO try to load hash and btree methods
-        $this->checkIndex($table2, 'named_unique_index', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
-        // $this->checkIndex($table2, 'named_unique_index', ['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE);
+        $this->checkIndex($table2, 'named_unique_index', [new IndexColumn('col_string')], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+        // $this->checkIndex($table2, 'named_unique_index', [new IndexColumn('col_string')], Index::TYPE_UNIQUE, Index::METHOD_BTREE);
         // index based on foreign key is not created
         $this->assertNull($table2->getIndex('table_2_col_int'));
 

@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter\Behavior;
 
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 
@@ -18,9 +19,9 @@ trait StructureBehavior
         foreach ($tables as $table) {
             $tableName = $table['table_name'];
             $migrationTable = $this->createMigrationTable($table);
-            $this->addColumns($migrationTable, isset($columns[$tableName]) ? $columns[$tableName] : []);
-            $this->addIndexes($migrationTable, isset($indexes[$tableName]) ? $indexes[$tableName] : []);
-            $this->addForeignKeys($migrationTable, isset($foreignKeys[$tableName]) ? $foreignKeys[$tableName] : []);
+            $this->addColumns($migrationTable, $columns[$tableName] ?? []);
+            $this->addIndexes($migrationTable, $indexes[$tableName] ?? []);
+            $this->addForeignKeys($migrationTable, $foreignKeys[$tableName] ?? []);
             $migrationTable->create();
             $structure->update($migrationTable);
         }
@@ -57,6 +58,9 @@ trait StructureBehavior
             $columns = $index['columns'];
             ksort($columns);
             if ($name === 'PRIMARY') {
+                $columns = array_map(function (IndexColumn $column) {
+                    return $column->getName();
+                }, $columns);
                 $migrationTable->addPrimary($columns);
                 continue;
             }

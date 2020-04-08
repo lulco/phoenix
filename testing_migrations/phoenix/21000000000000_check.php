@@ -17,7 +17,7 @@ class Check extends AbstractMigration
         }
 
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) !== 11) {
+        if (count($logs) !== 12) {
             throw new Exception('Wrong count');
         }
 
@@ -39,6 +39,12 @@ class Check extends AbstractMigration
             'table_4' => [
                 'title', 'id',
             ],
+            'table_5' => [
+                'id', 'title',
+            ],
+            'table_6' => [
+                'id', 'title',
+            ],
             'new_table_2' => [
                 'id', 'title', 'new_sorting', 't1_fk', 'created_at',
             ],
@@ -49,11 +55,19 @@ class Check extends AbstractMigration
 
         foreach ($tableColumns as $table => $columns) {
             $firstItem = $this->fetch($table);
-            if (count($firstItem) !== count($columns)) {
+            if ($table === 'table_6') {
+                if ($firstItem) {
+                    throw new Exception('There should be no data in table "' . $table . '"');
+                }
+            } elseif (count($firstItem) !== count($columns)) {
                 throw new Exception('Wrong number of columns in first item of table ' . $table);
             }
             $items = $this->fetchAll($table);
-            if (!$items) {
+            if ($table === 'table_6') {
+                if (count($items) > 0) {
+                    throw new Exception('There should be no data in table "' . $table . '"');
+                }
+            } elseif (count($items) === 0) {
                 throw new Exception('No data in table "' . $table . '"');
             }
             foreach ($items as $item) {

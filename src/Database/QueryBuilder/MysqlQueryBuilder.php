@@ -5,6 +5,8 @@ namespace Phoenix\Database\QueryBuilder;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
+use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 
 class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
@@ -84,6 +86,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function dropTable(MigrationTable $table): array
     {
         return ['DROP TABLE ' . $this->escapeString($table->getName())];
+    }
+
+    public function truncateTable(MigrationTable $table): array
+    {
+        return [sprintf('TRUNCATE TABLE %s', $this->escapeString($table->getName()))];
     }
 
     public function renameTable(MigrationTable $table): array
@@ -231,7 +238,22 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createIndex(Index $index): string
     {
-        $columns = $this->escapeArray($index->getColumns());
+        $columns = [];
+        /** @var IndexColumn $indexColumn */
+        foreach ($index->getColumns() as $indexColumn) {
+            $indexColumnSettings = $indexColumn->getSettings()->getNonDefaultSettings();
+            $lengthSetting = $indexColumnSettings[IndexColumnSettings::SETTING_LENGTH] ?? null;
+            $length = '';
+            if ($lengthSetting) {
+                $length = '(' . $lengthSetting . ')';
+            }
+            $columnParts = [$this->escapeString($indexColumn->getName()) . $length];
+            $order = $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] ?? null;
+            if ($order) {
+                $columnParts[] = $order;
+            }
+            $columns[] = implode(' ', $columnParts);
+        }
         $indexType = $index->getType() ? $index->getType() . ' INDEX' : 'INDEX';
         $indexMethod = $index->getMethod() ? ' USING ' . $index->getMethod() : '';
         return $indexType . ' ' . $this->escapeString($index->getName()) . ' (' . implode(',', $columns) . ')' . $indexMethod;

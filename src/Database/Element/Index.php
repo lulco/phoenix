@@ -17,6 +17,7 @@ class Index
     const METHOD_BTREE = 'BTREE';
     const METHOD_HASH = 'HASH';
 
+    /** @var IndexColumn[] */
     private $columns = [];
 
     private $name;
@@ -26,6 +27,10 @@ class Index
     private $method;
 
     /**
+     * @param IndexColumn[] $columns
+     * @param string $name
+     * @param string $type
+     * @param string $method
      * @throws InvalidArgumentValueException if index type or index method is not allowed
      */
     public function __construct(array $columns, string $name, string $type = self::TYPE_NORMAL, string $method = self::METHOD_DEFAULT)
@@ -44,6 +49,9 @@ class Index
         return $this->name;
     }
 
+    /**
+     * @return IndexColumn[]
+     */
     public function getColumns(): array
     {
         return $this->columns;

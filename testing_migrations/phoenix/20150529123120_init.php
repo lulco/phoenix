@@ -4,6 +4,7 @@ namespace Phoenix\TestingMigrations;
 
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Migration\AbstractMigration;
 
 class Init extends AbstractMigration
@@ -16,7 +17,7 @@ class Init extends AbstractMigration
             ->addColumn('is_active', 'boolean', ['default' => true])
             ->addColumn('bodytext', 'text', ['null' => true])
             ->addColumn('self_fk', 'integer', ['null' => true])
-            ->addIndex('alias', 'unique')
+            ->addIndex(new IndexColumn('alias', ['length' => 10]), 'unique')
             ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
             ->create();
 
@@ -39,6 +40,15 @@ class Init extends AbstractMigration
 
         $this->table('table_4', false)
             ->addColumn('title', 'string')
+            ->create();
+
+        $this->table('table_5', 'id')
+            ->addColumn('id', 'smallinteger', ['autoincrement' => true])
+            ->addColumn('title', 'string', ['length' => 100])
+            ->create();
+
+        $this->table('table_6')
+            ->addColumn('title', 'string', ['length' => 100])
             ->create();
 
         $this->table('all_types', 'identifier')
@@ -75,13 +85,16 @@ class Init extends AbstractMigration
             ->addColumn('col_polygon', 'polygon', ['null' => true])
             ->addColumn('col_time', 'time', ['null' => true])
             ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
-            ->addIndex(['col_string', 'col_integer'])
+            ->addIndex([new IndexColumn('col_string', ['order' => 'DESC']), new IndexColumn('col_integer', ['order' => 'DESC'])])
+            ->addForeignKey('col_smallinteger', 'table_5', 'id', ForeignKey::CASCADE, ForeignKey::CASCADE)
             ->create();
     }
 
     protected function down(): void
     {
         $this->table('all_types')->drop();
+        $this->table('table_6')->drop();
+        $this->table('table_5')->drop();
         $this->table('table_4')->drop();
         $this->table('table_3')->drop();
         $this->table('table_2')->drop();

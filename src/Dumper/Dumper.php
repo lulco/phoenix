@@ -6,6 +6,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\IndexColumn;
 
 class Dumper
 {
@@ -73,7 +74,7 @@ class Dumper
             }
             foreach ($table->getIndexes() as $index) {
                 $tableMigration .= $this->indent(1) . "->addIndex(";
-                $tableMigration .= $this->columnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
+                $tableMigration .= $this->indexColumnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }
             $action = $table->getAction() === MigrationTable::ACTION_ALTER ? 'save' : $table->getAction();
             $tableMigration .= $this->indent(1) . "->$action();";
@@ -174,6 +175,39 @@ class Dumper
             return '';
         }
         return ', [' . implode(', ', $settingsList) . ']';
+    }
+
+    /**
+     * @param IndexColumn[] $indexColumns
+     * @return string
+     */
+    private function indexColumnsToString(array $indexColumns): string
+    {
+        $columns = [];
+        $useOnlyNames = true;
+        foreach ($indexColumns as $indexColumn) {
+            $indexColumnSettings = $indexColumn->getSettings()->getNonDefaultSettings();
+            $columns[$indexColumn->getName()] = $indexColumnSettings;
+            if (!empty($indexColumnSettings)) {
+                $useOnlyNames = false;
+            }
+        }
+
+        if ($useOnlyNames) {
+            return $this->columnsToString(array_keys($columns));
+        }
+
+        $columnsList = [];
+        foreach ($columns as $column => $settings) {
+            $settingsList = [];
+            foreach ($settings as $setting => $value) {
+                $value = $this->transformValue($value);
+                $settingsList[] = "'$setting' => $value";
+            }
+            $columnsList[] = "new \\" . IndexColumn::class . "('$column', [" . implode(', ', $settingsList) . "])";
+        }
+        $implodedColumns = implode(', ', $columnsList);
+        return count($columnsList) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
     }
 
     private function defaultSettings(Column $column, MigrationTable $table): array
