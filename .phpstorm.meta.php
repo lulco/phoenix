@@ -116,6 +116,17 @@ namespace PHPSTORM_META
         argumentsSet('phoenix_column_settings')
     );
 
+    registerArgumentsSet('phoenix_index_column_settings', [
+        'order' => 'DESC', // default value = ASC / type = string
+        'length' => null, // default value = null / type = int
+    ]);
+
+    expectedArguments(
+        \Phoenix\Database\Element\IndexColumn::__construct(),
+        1,
+        argumentsSet('phoenix_index_column_settings')
+    );
+
     registerArgumentsSet(
         'phoenix_index_types',
         \Phoenix\Database\Element\Index::TYPE_UNIQUE,

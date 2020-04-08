@@ -7,6 +7,8 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
+use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 
@@ -144,18 +146,35 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadIndexes(string $database): array
     {
-        $indexRows = $this->query("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary FROM (
-            SELECT a.indrelid, a.indisunique, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
+
+        // there are too many indexes which are not required - try to select only those from actual database
+        $indexRows = $this->query("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary, a.indoption FROM (
+            SELECT a.indrelid, a.indisunique, a.indoption, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
             FROM pg_index a, pg_class b, pg_class c
             WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
             ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num")->fetchAll(PDO::FETCH_ASSOC);
         $indexes = [];
         foreach ($indexRows as $indexRow) {
             if ($indexRow['indisprimary']) {
-                $indexes[$indexRow['relname']]['PRIMARY']['columns'][] = $indexRow['attname'];
+                $indexes[$indexRow['relname']]['PRIMARY']['columns'][] = new IndexColumn($indexRow['attname']);
                 continue;
             }
-            $indexes[$indexRow['relname']][$indexRow['index_name']]['columns'][] = $indexRow['attname'];
+
+            $settings = [];
+
+            $position = count($indexes[$indexRow['relname']][$indexRow['index_name']]['columns'] ?? []);
+            $indoptions = explode(' ', $indexRow['indoption']);
+            $indoption = $indoptions[$position] ?? 0;
+
+            if ($indoption & 1) {
+                $settings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
+            }
+
+            if ($indoption & 2) {
+                // ready for NULLS FIRST
+            }
+
+            $indexes[$indexRow['relname']][$indexRow['index_name']]['columns'][] = new IndexColumn($indexRow['attname'], $settings);
             $indexes[$indexRow['relname']][$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
             $indexes[$indexRow['relname']][$indexRow['index_name']]['method'] = Index::METHOD_DEFAULT;
         }

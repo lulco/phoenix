@@ -2,6 +2,7 @@
 
 namespace Phoenix\TestingMigrations;
 
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Migration\AbstractMigration;
 
 class RemoveSomeIndexes extends AbstractMigration
@@ -9,7 +10,7 @@ class RemoveSomeIndexes extends AbstractMigration
     public function up(): void
     {
         $this->table('table_1')
-            ->dropIndex('alias')
+            ->dropIndex(new IndexColumn('alias', ['length' => 10]))
             ->save();
 
         $this->table('table_2')
@@ -26,7 +27,7 @@ class RemoveSomeIndexes extends AbstractMigration
             ->save();
 
         $this->table('table_1')
-            ->addIndex('alias', 'unique')
+            ->addIndex(new IndexColumn('alias', ['length' => 10]), 'unique')
             ->save();
     }
 }
