@@ -33,6 +33,10 @@ class Dumper
         $this->baseIndent = $baseIndent;
     }
 
+    /**
+     * @param MigrationTable[] $tables
+     * @return string
+     */
     public function dumpTables(array $tables): string
     {
         $tableMigrations = [];
@@ -83,6 +87,10 @@ class Dumper
         return implode("\n\n", $tableMigrations);
     }
 
+    /**
+     * @param MigrationTable[] $tables
+     * @return string
+     */
     public function dumpForeignKeys(array $tables): string
     {
         $foreignKeysMigrations = [];
