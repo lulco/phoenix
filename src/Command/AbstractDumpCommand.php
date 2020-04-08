@@ -7,8 +7,10 @@ use Dumper\Dumper;
 use Dumper\Indenter;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationCreator;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 abstract class AbstractDumpCommand extends AbstractCommand
 {
@@ -41,7 +43,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $down = $this->createUpDown($targetStructure, $sourceStructure, $dumper, 'down');
 
         $dir = $this->input->getOption('dir');
-        $migrationDir = $this->config->getMigrationDir($dir);
+        $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create($up, $down, $migrationDir);
 
         $this->writeln('');
@@ -94,5 +96,16 @@ abstract class AbstractDumpCommand extends AbstractCommand
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
         return implode("\n\n", array_filter($parts));
+    }
+
+    private function chooseMigrationDir(?string $dir): string
+    {
+        try {
+            return $this->config->getMigrationDir($dir);
+        } catch (InvalidArgumentValueException $e) {
+            $symfonyStyle = new SymfonyStyle($this->input, $this->output);
+            $dir = $symfonyStyle->choice($e->getMessage(), $this->config->getMigrationDirs());
+            return $this->chooseMigrationDir($dir);
+        }
     }
 }
