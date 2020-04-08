@@ -9,3 +9,6 @@ Framework agnostic database migrations for PHP.
   - [rollback](rollback_command.md)
   - [status](status_command.md)
   - [cleanup](cleanup_command.md)
+- [Migrations](migrations.md)
+  - [columns](columns.md)
+  - [indexes](indexes.md)

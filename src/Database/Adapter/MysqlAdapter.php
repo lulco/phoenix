@@ -6,6 +6,8 @@ use PDO;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
+use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
@@ -117,7 +119,16 @@ class MysqlAdapter extends PdoAdapter
             if (!isset($tablesIndexes[$index['TABLE_NAME']])) {
                 $tablesIndexes[$index['TABLE_NAME']] = [];
             }
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = $index['COLUMN_NAME'];
+
+            $indexColumnSettings = [];
+            if ($index['SUB_PART']) {
+                $indexColumnSettings[IndexColumnSettings::SETTING_LENGTH] = (int) $index['SUB_PART'];
+            }
+            if ($index['COLLATION'] === 'D') {
+                $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
+            }
+
+            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = new IndexColumn($index['COLUMN_NAME'], $indexColumnSettings);
             $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
             $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
