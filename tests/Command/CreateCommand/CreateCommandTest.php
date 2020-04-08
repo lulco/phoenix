@@ -50,9 +50,10 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->setConfig($this->configuration);
         $this->input->setArgument('migration', '\MyNamespace\MyFirstMigration');
         $this->input->setOption('template', 'non-existing-file.phoenix');
+        $this->input->setOption('indent', '4spaces');
 
         $this->expectException(PhoenixException::class);
-        $this->expectExceptionMessage('Template "non-existing-file.phoenix" doesn\'t exist or is not a regular file');
+        $this->expectExceptionMessage('Template "non-existing-file.phoenix" not found');
         $command->run($this->input, $this->output);
     }
 

@@ -12,6 +12,7 @@ use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Finder\Finder;
 
 abstract class DumpCommandTest extends BaseCommandTest
@@ -55,16 +56,22 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command = new DumpCommand();
         $command->setConfig($this->configuration);
         $this->input->setOption('template', 'non-existing-file.phoenix');
+        $this->input->setOption('indent', '4spaces');
 
         $this->expectException(PhoenixException::class);
         $this->expectExceptionMessage('Template "non-existing-file.phoenix" not found');
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableException()
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
     {
+        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($dumpMigrationDir));
+        mkdir($dumpMigrationDir);
+        $this->assertTrue(is_dir($dumpMigrationDir));
+
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = __DIR__ . '/../../../testing_migrations/new';
+        $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
 
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -75,9 +82,25 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command->setConfig($configuration);
         $this->input->setOption('indent', '4spaces');
 
-        $this->expectException(InvalidArgumentValueException::class);
-        $this->expectExceptionMessage('There are more then 1 migration dirs. Use one of them: phoenix, dump');
-        $command->run($this->input, $this->output);
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['dump']);
+        $commandTester->execute([]);
+
+        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
+        $this->assertCount(1, $dumpFiles);
+        foreach ($dumpFiles as $dumpFile) {
+            $filePath = (string)$dumpFile;
+
+            $migrationContent = file_get_contents($filePath);
+            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringNotContainsString("\t", $migrationContent);
+            $this->assertStringContainsString("    ", $migrationContent);
+
+            $classNameCreator = new ClassNameCreator($filePath);
+            $this->assertEquals('\Initialization', $classNameCreator->getClassName());
+            unlink($filePath);
+        }
+        rmdir($dumpMigrationDir);
     }
 
     public function testDumpCommandAfterInit()
