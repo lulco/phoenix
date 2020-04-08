@@ -10,6 +10,9 @@
 - Added method truncate() to migrations
 - Added settings order and length to index columns
 
+#### Changed
+- Unfreezed symfony/console and added versions 3.4.31 and 4.3.4 to conflict
+
 ### [1.2.0] - 2020-03-16
 #### Changed
 - Added support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))
