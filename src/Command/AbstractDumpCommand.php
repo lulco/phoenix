@@ -58,7 +58,10 @@ abstract class AbstractDumpCommand extends AbstractCommand
 
     abstract protected function shouldLoadData(): bool;
 
-    abstract protected function loadData(array $tables): array;
+    protected function loadData(array $tables): array
+    {
+        return [];
+    }
 
     /**
      * @param Structure $sourceStructure

@@ -38,41 +38,52 @@ class TableComparator
 
         $indexesToDrop = array_diff(array_keys($sourceIndexes), array_keys($targetIndexes));
         $indexesToAdd = array_diff_key($targetIndexes, $sourceIndexes);
-        $indexesToChange = [];
 
         $sourceForeignKeys = $sourceTable->getForeignKeys();
         $targetForeignKeys = $targetTable->getForeignKeys();
 
         $foreignKeysToDrop = array_diff(array_keys($sourceForeignKeys), array_keys($targetForeignKeys));
         $foreignKeysToAdd = array_diff_key($targetForeignKeys, $sourceForeignKeys);
-        $foreignKeysToChange = [];
 
-        if (count($primaryColumnsToDrop) + count($primaryColumnsToAdd) +
-            count($columnsToDrop) + count($columnsToAdd) + count($columnsToChange) +
-            count($indexesToDrop) + count($indexesToAdd) + count($indexesToChange) +
-            count($foreignKeysToDrop) + count($foreignKeysToAdd) + count($foreignKeysToChange)
-            === 0
-        ) {
-            return null;
-        }
+        $returnMigrationTable = false;
 
         $migrationTable = new MigrationTable($sourceTable->getName());
+        $returnMigrationTable = $returnMigrationTable || $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable);
+        $returnMigrationTable = $returnMigrationTable || $this->handleColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $columnsToDrop, $columnsToAdd, $columnsToChange);
+        $returnMigrationTable = $returnMigrationTable || $this->handleIndexes($migrationTable, $indexesToDrop, $indexesToAdd);
+        $returnMigrationTable = $returnMigrationTable || $this->handleForeignKeys($migrationTable, $foreignKeysToDrop, $foreignKeysToAdd);
+
+        return $returnMigrationTable ? $migrationTable : null;
+    }
+
+    private function handlePrimaryColumns(MigrationTable $migrationTable, array $primaryColumnsToDrop, array $primaryColumnsToAdd, Table $targetTable): bool
+    {
+        $changeMade = false;
         if (!empty($primaryColumnsToDrop)) {
             $migrationTable->dropPrimaryKey();
+            $changeMade = true;
         }
         $primaryColumns = [];
         foreach ($primaryColumnsToAdd as $primaryColumnToAdd) {
             $primaryColumns[] = $targetTable->getColumn($primaryColumnToAdd);
+            $changeMade = true;
         }
         if (!empty($primaryColumns)) {
             $migrationTable->addPrimaryColumns($primaryColumns);
+            $changeMade = true;
         }
+        return $changeMade;
+    }
 
+    private function handleColumns(MigrationTable $migrationTable, array $primaryColumnsToDrop, array $primaryColumnsToAdd, array $columnsToDrop, array $columnsToAdd, array $columnsToChange): bool
+    {
+        $changeMade = false;
         foreach ($columnsToDrop as $columnToDrop) {
             if (in_array($columnToDrop, $primaryColumnsToDrop, true)) {
                 continue;
             }
             $migrationTable->dropColumn($columnToDrop);
+            $changeMade = true;
         }
 
         /** @var Column $columnToAdd */
@@ -81,31 +92,46 @@ class TableComparator
                 continue;
             }
             $migrationTable->addColumn($columnToAdd->getName(), $columnToAdd->getType(), $columnToAdd->getSettings()->getSettings());
+            $changeMade = true;
         }
 
         /** @var Column $columnToChange */
         foreach ($columnsToChange as $columnToChangeName => $columnToChange) {
             $migrationTable->changeColumn($columnToChangeName, $columnToChange->getName(), $columnToChange->getType(), $columnToChange->getSettings()->getSettings());
+            $changeMade = true;
         }
+        return $changeMade;
+    }
 
+    private function handleIndexes(MigrationTable $migrationTable, array $indexesToDrop, array $indexesToAdd): bool
+    {
+        $changeMade = false;
         foreach ($indexesToDrop as $indexToDrop) {
             $migrationTable->dropIndexByName($indexToDrop);
+            $changeMade = true;
         }
 
         /** @var Index $indexToAdd */
         foreach ($indexesToAdd as $indexToAdd) {
             $migrationTable->addIndex($indexToAdd->getColumns(), $indexToAdd->getType(), $indexToAdd->getMethod(), $indexToAdd->getName());
+            $changeMade = true;
         }
+        return $changeMade;
+    }
 
+    private function handleForeignKeys(MigrationTable $migrationTable, array $foreignKeysToDrop, array $foreignKeysToAdd): bool
+    {
+            $changeMade = false;
         foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
             $migrationTable->dropForeignKey($foreignKeyToDrop);
+            $changeMade = true;
         }
 
         /** @var ForeignKey $foreignKeyToAdd */
         foreach ($foreignKeysToAdd as $foreignKeyToAdd) {
             $migrationTable->addForeignKey($foreignKeyToAdd->getColumns(), $foreignKeyToAdd->getReferencedTable(), $foreignKeyToAdd->getReferencedColumns(), $foreignKeyToAdd->getOnDelete(), $foreignKeyToAdd->getOnUpdate());
+            $changeMade = true;
         }
-
-        return $migrationTable;
+        return $changeMade;
     }
 }

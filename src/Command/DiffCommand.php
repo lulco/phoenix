@@ -22,26 +22,12 @@ class DiffCommand extends AbstractDumpCommand
 
     protected function sourceStructure(): Structure
     {
-        $source = $this->input->getArgument('source');
-        $sourceConfig = $this->config->getEnvironmentConfig($source);
-        if (!$sourceConfig) {
-            throw new InvalidArgumentValueException('Source "' . $source . '" doesn\'t exist in config');
-        }
-
-        $sourceAdapter = AdapterFactory::instance($sourceConfig);
-        return $sourceAdapter->getStructure();
+        return $this->getStructure('source');
     }
 
     protected function targetStructure(): Structure
     {
-        $target = $this->input->getArgument('target');
-        $targetConfig = $this->config->getEnvironmentConfig($target);
-        if (!$targetConfig) {
-            throw new InvalidArgumentValueException('Target "' . $target . '" doesn\'t exist in config');
-        }
-
-        $targetAdapter = AdapterFactory::instance($targetConfig);
-        return $targetAdapter->getStructure();
+        return $this->getStructure('target');
     }
 
     protected function shouldLoadData(): bool
@@ -49,8 +35,15 @@ class DiffCommand extends AbstractDumpCommand
         return false;
     }
 
-    protected function loadData(array $tables): array
+    private function getStructure(string $type): Structure
     {
-        return [];
+        $env = $this->input->getArgument($type);
+        $config = $this->config->getEnvironmentConfig($env);
+        if (!$config) {
+            throw new InvalidArgumentValueException(ucfirst($type) . ' environment "' . $env . '" doesn\'t exist in config');
+        }
+
+        $adapter = AdapterFactory::instance($config);
+        return $adapter->getStructure();
     }
 }
