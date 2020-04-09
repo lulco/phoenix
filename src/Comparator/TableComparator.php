@@ -48,10 +48,10 @@ class TableComparator
         $returnMigrationTable = false;
 
         $migrationTable = new MigrationTable($sourceTable->getName());
-        $returnMigrationTable = $returnMigrationTable || $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable);
-        $returnMigrationTable = $returnMigrationTable || $this->handleColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $columnsToDrop, $columnsToAdd, $columnsToChange);
-        $returnMigrationTable = $returnMigrationTable || $this->handleIndexes($migrationTable, $indexesToDrop, $indexesToAdd);
-        $returnMigrationTable = $returnMigrationTable || $this->handleForeignKeys($migrationTable, $foreignKeysToDrop, $foreignKeysToAdd);
+        $returnMigrationTable = $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable) || $returnMigrationTable;
+        $returnMigrationTable = $this->handleColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $columnsToDrop, $columnsToAdd, $columnsToChange) || $returnMigrationTable;
+        $returnMigrationTable = $this->handleIndexes($migrationTable, $indexesToDrop, $indexesToAdd) || $returnMigrationTable;
+        $returnMigrationTable = $this->handleForeignKeys($migrationTable, $foreignKeysToDrop, $foreignKeysToAdd) || $returnMigrationTable;
 
         return $returnMigrationTable ? $migrationTable : null;
     }
@@ -121,7 +121,7 @@ class TableComparator
 
     private function handleForeignKeys(MigrationTable $migrationTable, array $foreignKeysToDrop, array $foreignKeysToAdd): bool
     {
-            $changeMade = false;
+        $changeMade = false;
         foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
             $migrationTable->dropForeignKey($foreignKeyToDrop);
             $changeMade = true;
