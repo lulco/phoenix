@@ -14,7 +14,7 @@ trait IndexBehavior
     private $indexesToDrop = [];
 
     /**
-     * @param string|array|IndexColumn|IndexColumn[] $columns name(s) of column(s) or IndexColumn instance(s)
+     * @param string|string[]|IndexColumn|IndexColumn[] $columns name(s) of column(s) or IndexColumn instance(s)
      * @param string $type type of index (unique, fulltext) default ''
      * @param string $method method of index (btree, hash) default ''
      * @param string $name name of index
