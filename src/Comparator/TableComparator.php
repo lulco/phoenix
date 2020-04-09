@@ -45,10 +45,8 @@ class TableComparator
         $foreignKeysToDrop = array_diff(array_keys($sourceForeignKeys), array_keys($targetForeignKeys));
         $foreignKeysToAdd = array_diff_key($targetForeignKeys, $sourceForeignKeys);
 
-        $returnMigrationTable = false;
-
         $migrationTable = new MigrationTable($sourceTable->getName());
-        $returnMigrationTable = $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable) || $returnMigrationTable;
+        $returnMigrationTable = $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable);
         $returnMigrationTable = $this->handleColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $columnsToDrop, $columnsToAdd, $columnsToChange) || $returnMigrationTable;
         $returnMigrationTable = $this->handleIndexes($migrationTable, $indexesToDrop, $indexesToAdd) || $returnMigrationTable;
         $returnMigrationTable = $this->handleForeignKeys($migrationTable, $foreignKeysToDrop, $foreignKeysToAdd) || $returnMigrationTable;
