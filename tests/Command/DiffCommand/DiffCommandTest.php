@@ -1,8 +1,8 @@
 <?php
 
-namespace Phoenix\Tests\Command\DumpCommand;
+namespace Phoenix\Tests\Command\DiffCommand;
 
-use Phoenix\Command\DumpCommand;
+use Phoenix\Command\DiffCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
@@ -15,23 +15,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Finder\Finder;
 
-abstract class DumpCommandTest extends BaseCommandTest
+abstract class DiffCommandTest extends BaseCommandTest
 {
     public function testDefaultName()
     {
-        $command = new DumpCommand();
-        $this->assertEquals('dump', $command->getName());
+        $command = new DiffCommand();
+        $this->assertEquals('diff', $command->getName());
     }
 
     public function testCustomName()
     {
-        $command = new DumpCommand('my_dump');
-        $this->assertEquals('my_dump', $command->getName());
+        $command = new DiffCommand('my_diff');
+        $this->assertEquals('my_diff', $command->getName());
     }
 
     public function testMissingDefaultConfig()
     {
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('No configuration file exists. Create phoenix.php or phoenix.yml or phoenix.neon or phoenix.json in your project root or specify path to your existing config file with --config option');
         $command->run($this->input, $this->output);
@@ -39,7 +39,7 @@ abstract class DumpCommandTest extends BaseCommandTest
 
     public function testUserConfigFileNotFound()
     {
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $this->input->setOption('config', 'xyz.neon');
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Configuration file "xyz.neon" doesn\'t exist.');
@@ -53,7 +53,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $initCommand->setConfig($this->configuration);
         $initCommand->run($input, new Output());
 
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $command->setConfig($this->configuration);
         $this->input->setOption('template', 'non-existing-file.phoenix');
         $this->input->setOption('indent', '4spaces');
@@ -63,74 +63,122 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    public function testSourceNotFound()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
-        $this->assertFalse(is_dir($dumpMigrationDir));
-        mkdir($dumpMigrationDir);
-        $this->assertTrue(is_dir($dumpMigrationDir));
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
 
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
 
         $initCommand = new InitCommand();
         $input = $this->createInput();
         $initCommand->setConfig($configuration);
         $initCommand->run($input, new Output());
 
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $command->setConfig($configuration);
         $this->input->setOption('indent', '4spaces');
 
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs(['dump']);
-        $commandTester->execute([]);
+        $commandTester->setInputs(['diff']);
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(1, $dumpFiles);
-        foreach ($dumpFiles as $dumpFile) {
-            $filePath = (string)$dumpFile;
-
-            $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
-            $this->assertStringNotContainsString("\t", $migrationContent);
-            $this->assertStringContainsString("    ", $migrationContent);
-
-            $classNameCreator = new ClassNameCreator($filePath);
-            $this->assertEquals('\Initialization', $classNameCreator->getClassName());
-            unlink($filePath);
-        }
-        rmdir($dumpMigrationDir);
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Source environment "source" doesn\'t exist in config');
+        $commandTester->execute(['source' => 'source', 'target' => $this->getEnvironment()]);
     }
 
-    public function testDumpCommandAfterInit()
+    public function testTargetNotFound()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
-        $this->assertFalse(is_dir($dumpMigrationDir));
-        mkdir($dumpMigrationDir);
-        $this->assertTrue(is_dir($dumpMigrationDir));
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
 
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
-
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(0, $dumpFiles);
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
 
         $initCommand = new InitCommand();
         $input = $this->createInput();
         $initCommand->setConfig($configuration);
         $initCommand->run($input, new Output());
 
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $command->setConfig($configuration);
         $this->input->setOption('indent', '4spaces');
-        $this->input->setOption('dir', 'dump');
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['diff']);
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Target environment "lalala" doesn\'t exist in config');
+        $commandTester->execute(['source' => $this->getEnvironment(), 'target' => 'lalala']);
+    }
+
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    {
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
+
+        $configuration = $this->configuration;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
+
+        $initCommand = new InitCommand();
+        $input = $this->createInput();
+        $initCommand->setConfig($configuration);
+        $initCommand->run($input, new Output());
+
+        $command = new DiffCommand();
+        $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['diff']);
+        $commandTester->execute(['source' => $this->getEnvironment(), 'target' => $this->getEnvironment()]);
+
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(1, $diffFiles);
+        foreach ($diffFiles as $diffFile) {
+            $filePath = (string)$diffFile;
+
+            $migrationContent = file_get_contents($filePath);
+            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringNotContainsString("\t", $migrationContent);
+            $this->assertStringContainsString("    ", $migrationContent);
+
+            $classNameCreator = new ClassNameCreator($filePath);
+            $this->assertEquals('\Initialization', $classNameCreator->getClassName());
+            unlink($filePath);
+        }
+        rmdir($diffMigrationDir);
+    }
+
+    public function testDiffCommandAfterInit()
+    {
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
+
+        $configuration = $this->configuration;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
+
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(0, $diffFiles);
+
+        $initCommand = new InitCommand();
+        $input = $this->createInput();
+        $initCommand->setConfig($configuration);
+        $initCommand->run($input, new Output());
+
+        $command = new DiffCommand();
+        $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
+        $this->input->setOption('dir', 'diff');
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(1, $dumpFiles);
-        foreach ($dumpFiles as $dumpFile) {
-            $filePath = (string)$dumpFile;
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(1, $diffFiles);
+        foreach ($diffFiles as $diffFile) {
+            $filePath = (string)$diffFile;
 
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
@@ -147,45 +195,43 @@ abstract class DumpCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertCount(5, $messages[0]);
-        $this->assertStringStartsWith('<info>Migration "Initialization" created in "' . realpath($dumpMigrationDir), $messages[0][1]);
+        $this->assertStringStartsWith('<info>Migration "Initialization" created in "' . realpath($diffMigrationDir), $messages[0][1]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
 
-        rmdir($dumpMigrationDir);
+        rmdir($diffMigrationDir);
     }
 
-    public function testDumpCommandAfterMigration()
+    public function testDiffCommandAfterMigration()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
-        $this->assertFalse(is_dir($dumpMigrationDir));
-        mkdir($dumpMigrationDir);
-        $this->assertTrue(is_dir($dumpMigrationDir));
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
 
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(0, $dumpFiles);
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(0, $diffFiles);
 
         $migrateCommand = new MigrateCommand();
         $input = $this->createInput();
         $migrateCommand->setConfig($configuration);
         $migrateCommand->run($input, new Output());
 
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $command->setConfig($configuration);
-        $this->input->setOption('data', true);
         $this->input->setOption('ignore-tables', 'all_types');
-        $this->input->setOption('ignore-data-tables', 'table_3');
         $this->input->setOption('indent', 'tab');
         $this->input->setOption('migration', '\MyNamespace\MyMigration');
-        $this->input->setOption('dir', 'dump');
+        $this->input->setOption('dir', 'diff');
 
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(1, $dumpFiles);
-        foreach ($dumpFiles as $dumpFile) {
-            $filePath = (string)$dumpFile;
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(1, $diffFiles);
+        foreach ($diffFiles as $diffFile) {
+            $filePath = (string)$diffFile;
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
@@ -194,51 +240,49 @@ abstract class DumpCommandTest extends BaseCommandTest
             $this->assertEquals('\MyNamespace\MyMigration', $classNameCreator->getClassName());
             unlink($filePath);
         }
-        rmdir($dumpMigrationDir);
+        rmdir($diffMigrationDir);
 
         $messages = $this->output->getMessages();
 
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertCount(5, $messages[0]);
-        $this->assertStringStartsWith('<info>Migration "\MyNamespace\MyMigration" created in "' . realpath($dumpMigrationDir), $messages[0][1]);
+        $this->assertStringStartsWith('<info>Migration "\MyNamespace\MyMigration" created in "' . realpath($diffMigrationDir), $messages[0][1]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testDumpCommandJsonOutputAfterMigration()
+    public function testDiffCommandJsonOutputAfterMigration()
     {
-        $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
-        $this->assertFalse(is_dir($dumpMigrationDir));
-        mkdir($dumpMigrationDir);
-        $this->assertTrue(is_dir($dumpMigrationDir));
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
 
         $configuration = $this->configuration;
-        $configuration['migration_dirs']['dump'] = $dumpMigrationDir;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(0, $dumpFiles);
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(0, $diffFiles);
 
         $migrateCommand = new MigrateCommand();
         $input = $this->createInput();
         $migrateCommand->setConfig($configuration);
         $migrateCommand->run($input, new Output());
 
-        $command = new DumpCommand();
+        $command = new DiffCommand();
         $command->setConfig($configuration);
-        $this->input->setOption('data', true);
         $this->input->setOption('ignore-tables', 'all_types');
-        $this->input->setOption('ignore-data-tables', 'table_3');
         $this->input->setOption('indent', 'tab');
         $this->input->setOption('migration', '\MyNamespace\MyMigration');
-        $this->input->setOption('dir', 'dump');
+        $this->input->setOption('dir', 'diff');
         $this->input->setOption('output-format', 'json');
 
         $command->run($this->input, $this->output);
 
-        $dumpFiles = Finder::create()->files()->in($dumpMigrationDir);
-        $this->assertCount(1, $dumpFiles);
-        foreach ($dumpFiles as $dumpFile) {
-            $filePath = (string)$dumpFile;
+        $diffFiles = Finder::create()->files()->in($diffMigrationDir);
+        $this->assertCount(1, $diffFiles);
+        foreach ($diffFiles as $diffFile) {
+            $filePath = (string)$diffFile;
             $migrationContent = file_get_contents($filePath);
             $this->assertStringStartsWith('<?php', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
@@ -247,7 +291,7 @@ abstract class DumpCommandTest extends BaseCommandTest
             $this->assertEquals('\MyNamespace\MyMigration', $classNameCreator->getClassName());
             unlink($filePath);
         }
-        rmdir($dumpMigrationDir);
+        rmdir($diffMigrationDir);
 
         $messages = $this->output->getMessages(0);
 
@@ -262,5 +306,13 @@ abstract class DumpCommandTest extends BaseCommandTest
         $this->assertEquals('\MyNamespace\MyMigration', $message['migration_name']);
         $this->assertArrayHasKey('migration_filepath', $message);
         $this->assertArrayHasKey('execution_time', $message);
+    }
+
+    protected function createInput()
+    {
+        $input = parent::createInput();
+        $input->setArgument('source', $this->getEnvironment());
+        $input->setArgument('target', $this->getEnvironment());
+        return $input;
     }
 }

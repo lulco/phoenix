@@ -90,6 +90,18 @@ namespace PHPSTORM_META
     );
 
     expectedArguments(
+        \Phoenix\Database\Element\Column::__construct(),
+        1,
+        argumentsSet('phoenix_column_types')
+    );
+
+    expectedArguments(
+        \Phoenix\Database\Element\Column::__construct(),
+        2,
+        argumentsSet('phoenix_column_settings')
+    );
+
+    expectedArguments(
         \Phoenix\Database\Element\MigrationTable::addColumn(),
         1,
         argumentsSet('phoenix_column_types')
@@ -113,6 +125,12 @@ namespace PHPSTORM_META
     expectedArguments(
         \Phoenix\Database\Element\MigrationTable::addColumn(),
         2,
+        argumentsSet('phoenix_column_settings')
+    );
+
+    expectedArguments(
+        \Phoenix\Database\Element\ColumnSettings::__construct(),
+        0,
         argumentsSet('phoenix_column_settings')
     );
 

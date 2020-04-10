@@ -161,4 +161,25 @@ class Table
         unset($this->foreignKeys[$foreignKeyName]);
         return $this;
     }
+
+    public function toMigrationTable(): MigrationTable
+    {
+        $table = clone $this;
+
+        $migrationTable = new MigrationTable($table->getName(), $table->getPrimary());
+        $migrationTable->setCharset($table->getCharset());
+        $migrationTable->setCollation($table->getCollation());
+        $migrationTable->setComment($table->getComment());
+
+        foreach ($table->getColumns() as $column) {
+            $migrationTable->addColumn($column->getName(), $column->getType(), $column->getSettings()->getSettings());
+        }
+        foreach ($table->getIndexes() as $index) {
+            $migrationTable->addIndex($index->getColumns(), $index->getType(), $index->getMethod(), $index->getName());
+        }
+        foreach ($table->getForeignKeys() as $foreignKey) {
+            $migrationTable->addForeignKey($foreignKey->getColumns(), $foreignKey->getReferencedTable(), $foreignKey->getReferencedColumns(), $foreignKey->getOnDelete(), $foreignKey->getOnUpdate());
+        }
+        return $migrationTable;
+    }
 }

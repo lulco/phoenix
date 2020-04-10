@@ -5,8 +5,8 @@ namespace Dumper;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
+use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\IndexColumn;
-use Phoenix\Database\Element\Table;
 
 class Dumper
 {
@@ -34,15 +34,17 @@ class Dumper
     }
 
     /**
-     * @param Table[] $tables
+     * @param MigrationTable[] $tables
+     * @return string
      */
-    public function dumpTablesUp(array $tables = []): string
+    public function dumpTables(array $tables): string
     {
         $tableMigrations = [];
         foreach ($tables as $table) {
             $tableMigration = $this->indent() . "\$this->table('{$table->getName()}'";
-            if ($table->getPrimary()) {
-                $tableMigration .= ", " . $this->columnsToString($table->getPrimary());
+            $primaryColumns = $table->getPrimaryColumnNames();
+            if ($primaryColumns) {
+                $tableMigration .= ", " . $this->columnsToString($primaryColumns);
             }
             $tableMigration .= ")\n";
             if ($table->getCharset()) {
@@ -51,31 +53,58 @@ class Dumper
             if ($table->getCollation()) {
                 $tableMigration .= $this->indent(1) . "->setCollation('{$table->getCollation()}')\n";
             }
+            if ($table->hasPrimaryKeyToDrop()) {
+                $tableMigration .= $this->indent(1) . "->dropPrimaryKey()\n";
+            }
+            foreach ($table->getColumnsToDrop() as $column) {
+                $tableMigration .= $this->indent(1) . "->dropColumn('$column')\n";
+            }
+            foreach ($table->getColumnsToChange() as $oldColumnName => $column) {
+                $tableMigration .= $this->indent(1) . "->changeColumn('$oldColumnName', '{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
+            }
+            if ($table->getPrimaryColumns()) {
+                $primaryColumnList = [];
+                foreach ($table->getPrimaryColumns() as $primaryColumn) {
+                    $primaryColumnList[] = "new \Phoenix\Database\Element\Column('{$primaryColumn->getName()}', '{$primaryColumn->getType()}'" . $this->settingsToString($primaryColumn, $table) . ")";
+                }
+                $addedPrimaryColumns = implode(', ', $primaryColumnList);
+                $tableMigration .= $this->indent(1) . "->addPrimaryColumns([$addedPrimaryColumns])\n";
+            }
             foreach ($table->getColumns() as $column) {
                 $tableMigration .= $this->indent(1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
+            }
+            foreach ($table->getIndexesToDrop() as $indexName) {
+                $tableMigration .= $this->indent(1) . "->dropIndexByName('$indexName')\n";
             }
             foreach ($table->getIndexes() as $index) {
                 $tableMigration .= $this->indent(1) . "->addIndex(";
                 $tableMigration .= $this->indexColumnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }
-            $tableMigration .= $this->indent(1) . "->create();";
+            $action = $table->getAction() === MigrationTable::ACTION_ALTER ? 'save' : $table->getAction();
+            $tableMigration .= $this->indent(1) . "->$action();";
             $tableMigrations[] = $tableMigration;
         }
         return implode("\n\n", $tableMigrations);
     }
 
     /**
-     * @param Table[] $tables
+     * @param MigrationTable[] $tables
+     * @return string
      */
-    public function dumpForeignKeysUp(array $tables = []): string
+    public function dumpForeignKeys(array $tables): string
     {
         $foreignKeysMigrations = [];
         foreach ($tables as $table) {
+            $foreignKeysToDrop = $table->getForeignKeysToDrop();
             $foreignKeys = $table->getForeignKeys();
-            if (count($foreignKeys) === 0) {
+            if (count($foreignKeysToDrop) === 0 && count($foreignKeys) === 0) {
                 continue;
             }
+
             $foreignKeysMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
+            foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
+                $foreignKeysMigration .= $this->indent(1) . "->dropForeignKey('{$foreignKeyToDrop}')\n";
+            }
             foreach ($foreignKeys as $foreignKey) {
                 $foreignKeysMigration .= $this->indent(1) . "->addForeignKey(";
                 $foreignKeysMigration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}'";
@@ -90,6 +119,7 @@ class Dumper
 
     /**
      * @param array $data data for migration in format table => rows
+     * @return string
      */
     public function dumpDataUp(array $data = []): string
     {
@@ -110,41 +140,6 @@ class Dumper
             $dataMigrations[] = $dataMigration;
         }
         return implode("\n\n", $dataMigrations);
-    }
-
-    /**
-     * @param Table[] $tables
-     */
-    public function dumpTablesDown(array $tables = []): string
-    {
-        $downMigrations = [];
-        foreach ($tables as $table) {
-            $downMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
-            $downMigration .= $this->indent(1) . "->drop();";
-            $downMigrations[] = $downMigration;
-        }
-        return implode("\n\n", $downMigrations);
-    }
-
-    /**
-     * @param Table[] $tables
-     */
-    public function dumpForeignKeysDown(array $tables = []): string
-    {
-        $downForeignKeysMigrations = [];
-        foreach ($tables as $table) {
-            $foreignKeys = $table->getForeignKeys();
-            if (count($foreignKeys) === 0) {
-                continue;
-            }
-            $foreignKeysMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
-            foreach ($foreignKeys as $foreignKey) {
-                $foreignKeysMigration .= $this->indent(1) . "->dropForeignKey({$this->columnsToString($foreignKey->getColumns())})\n";
-            }
-            $foreignKeysMigration .= $this->indent(1) . "->save();";
-            $downForeignKeysMigrations[] = $foreignKeysMigration;
-        }
-        return implode("\n\n", $downForeignKeysMigrations);
     }
 
     private function indent(int $multiplier = 0): string
@@ -169,7 +164,7 @@ class Dumper
         return '[' . implode(', ', $values) . ']';
     }
 
-    private function settingsToString(Column $column, Table $table): string
+    private function settingsToString(Column $column, MigrationTable $table): string
     {
         $settings = $column->getSettings();
         $defaultSettings = $this->defaultSettings($column, $table);
@@ -223,7 +218,7 @@ class Dumper
         return count($columnsList) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
     }
 
-    private function defaultSettings(Column $column, Table $table): array
+    private function defaultSettings(Column $column, MigrationTable $table): array
     {
         $defaultSettings = $this->defaultSettings;
         $defaultSettings[ColumnSettings::SETTING_CHARSET][] = $table->getCharset();

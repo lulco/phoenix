@@ -65,8 +65,8 @@ class Config
         return current(array_keys($this->configuration['environments']));
     }
 
-    public function getEnvironmentConfig(string $environment): EnvironmentConfig
+    public function getEnvironmentConfig(string $environment): ?EnvironmentConfig
     {
-        return new EnvironmentConfig($this->configuration['environments'][$environment]);
+        return isset($this->configuration['environments'][$environment]) ? new EnvironmentConfig($this->configuration['environments'][$environment]) : null;
     }
 }

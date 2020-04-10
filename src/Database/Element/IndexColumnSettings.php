@@ -26,11 +26,6 @@ class IndexColumnSettings
         $this->settings = $settings;
     }
 
-    public function getSettings(): array
-    {
-        return $this->settings;
-    }
-
     public function getNonDefaultSettings(): array
     {
         $settings = $this->settings;

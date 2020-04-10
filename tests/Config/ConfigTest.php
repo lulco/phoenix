@@ -28,6 +28,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('first', $config->getDefaultEnvironment());
         $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('first'));
         $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('second'));
+        $this->assertNull($config->getEnvironmentConfig('not_existing_config'));
         $this->assertTrue(is_array($config->getConfiguration()));
         $this->assertArrayHasKey('migration_dirs', $config->getConfiguration());
         $this->assertCount(2, $config->getConfiguration()['migration_dirs']);
@@ -53,6 +54,7 @@ class ConfigTest extends TestCase
         $this->assertEquals('second', $config->getDefaultEnvironment());
         $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('first'));
         $this->assertInstanceOf(EnvironmentConfig::class, $config->getEnvironmentConfig('second'));
+        $this->assertNull($config->getEnvironmentConfig('not_existing_config'));
     }
 
     public function testEmptyMigrationDirs()

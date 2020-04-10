@@ -3,38 +3,39 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- Added method renameColumn() to migrations
-- Added PHPStorm meta for better suggestions
-- Added migration datetime to json output of migrate / rollback commands for future purpose
-- Added smallserial as primary in pqsql
-- Added method truncate() to migrations
-- Added settings order and length to index columns
+- method renameColumn() to migrations
+- PHPStorm meta for better suggestions
+- migration datetime to json output of migrate / rollback commands for future purpose
+- smallserial as primary in pqsql
+- method truncate() to migrations
+- settings order and length to index columns
+- DiffCommand for creating migration from diff of two databases
 
 #### Changed
-- Unfreezed symfony/console and added versions 3.4.31 and 4.3.4 to conflict
+- unfreezed symfony/console and added versions 3.4.31 and 4.3.4 to conflict
 
 ### [1.2.0] - 2020-03-16
 #### Changed
-- Added support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))
-- Changed comparation `==` to `===` and added strict parameter to in_array
+- changed comparation `==` to `===` and added strict parameter to in_array
 
 #### Added
-- Added support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
+- support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
+- support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))
 
 #### Fixed
-- Tests on travis
+- tests on travis
 
 ### [1.1.1] - 2019-09-12
 #### Changed
-- Freezed symfony/console to >=3.1 <3.4.31|>=4.0 <4.3.4
+- freezed symfony/console to >=3.1 <3.4.31|>=4.0 <4.3.4
 
 #### Added
-- Added support for nette/neon ^3.0
+- support for nette/neon ^3.0
 
 ### [1.1.0] - 2019-02-11
 #### Added
-- Added time column type
-- Added timestamp column type
+- time column type
+- timestamp column type
 
 ### [1.0.0] - 2018-06-20
 #### Changed
@@ -47,7 +48,7 @@
 - removed nette/utils
 
 #### Fixed
-- Typehint for fetch method
+- typehint for fetch method
 
 ### [0.13.0] - 2018-03-14
 #### Changed
@@ -92,7 +93,7 @@
 
 ### [0.9.1] - 2017-06-07
 #### Fixed
-- Reverted calling execute instead of run for InitCommand in AbstractCommand
+- reverted calling execute instead of run for InitCommand in AbstractCommand
 
 ### [0.9.0] - 2017-06-07
 #### Changed
