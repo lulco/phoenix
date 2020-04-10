@@ -29,17 +29,16 @@ class DumpCommand extends AbstractDumpCommand
         return $this->adapter->getStructure();
     }
 
-    protected function shouldLoadData(): bool
-    {
-        return (bool)$this->input->getOption('data');
-    }
-
     /**
      * @param MigrationTable[] $tables
      * @return array
      */
     protected function loadData(array $tables = []): array
     {
+        if (!(bool)$this->input->getOption('data')) {
+            return [];
+        }
+
         $ignoredDataTables = $this->input->getOption('ignore-data-tables')
             ? array_map('trim', explode(',', $this->input->getOption('ignore-data-tables')))
             : [];

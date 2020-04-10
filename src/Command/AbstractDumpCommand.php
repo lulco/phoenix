@@ -39,7 +39,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $sourceStructure = $this->sourceStructure();
         $targetStructure = $this->targetStructure();
 
-        $up = $this->createUpDown($sourceStructure, $targetStructure, $dumper, 'up', $this->shouldLoadData());
+        $up = $this->createUpDown($sourceStructure, $targetStructure, $dumper, 'up');
         $down = $this->createUpDown($targetStructure, $sourceStructure, $dumper, 'down');
 
         $dir = $this->input->getOption('dir');
@@ -56,12 +56,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
 
     abstract protected function targetStructure(): Structure;
 
-    abstract protected function shouldLoadData(): bool;
-
-    protected function loadData(array $tables): array
-    {
-        return [];
-    }
+    abstract protected function loadData(array $tables): array;
 
     /**
      * @param Structure $sourceStructure
@@ -83,7 +78,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         return $tables;
     }
 
-    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $type, bool $loadData = false): string
+    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $type): string
     {
         $tables = $this->getFilteredTables($sourceStructure, $targetStructure);
         $parts = [];
@@ -91,11 +86,8 @@ abstract class AbstractDumpCommand extends AbstractCommand
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
         $parts[] = $dumper->dumpTables($tables);
-        if ($loadData) {
-            $data = $this->loadData($tables);
-            $parts[] = $dumper->dumpDataUp($data);
-        }
         if ($type === 'up') {
+            $parts[] = $dumper->dumpDataUp($this->loadData($tables));
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
         return implode("\n\n", array_filter($parts));

@@ -30,9 +30,9 @@ class DiffCommand extends AbstractDumpCommand
         return $this->getStructure('target');
     }
 
-    protected function shouldLoadData(): bool
+    protected function loadData(array $tables): array
     {
-        return false;
+        return [];
     }
 
     private function getStructure(string $type): Structure

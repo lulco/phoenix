@@ -6,6 +6,7 @@ use Phoenix\Command\DiffCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;
@@ -60,6 +61,54 @@ abstract class DiffCommandTest extends BaseCommandTest
         $this->expectException(PhoenixException::class);
         $this->expectExceptionMessage('Template "non-existing-file.phoenix" not found');
         $command->run($this->input, $this->output);
+    }
+
+    public function testSourceNotFound()
+    {
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+
+        $configuration = $this->configuration;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
+
+        $initCommand = new InitCommand();
+        $input = $this->createInput();
+        $initCommand->setConfig($configuration);
+        $initCommand->run($input, new Output());
+
+        $command = new DiffCommand();
+        $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['diff']);
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Source environment "source" doesn\'t exist in config');
+        $commandTester->execute(['source' => 'source', 'target' => $this->getEnvironment()]);
+    }
+
+    public function testTargetNotFound()
+    {
+        $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+
+        $configuration = $this->configuration;
+        $configuration['migration_dirs']['diff'] = $diffMigrationDir;
+
+        $initCommand = new InitCommand();
+        $input = $this->createInput();
+        $initCommand->setConfig($configuration);
+        $initCommand->run($input, new Output());
+
+        $command = new DiffCommand();
+        $command->setConfig($configuration);
+        $this->input->setOption('indent', '4spaces');
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs(['diff']);
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Target environment "lalala" doesn\'t exist in config');
+        $commandTester->execute(['source' => $this->getEnvironment(), 'target' => 'lalala']);
     }
 
     public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()

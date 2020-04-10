@@ -12,50 +12,22 @@ class TableComparator
 {
     public function diff(Table $sourceTable, Table $targetTable): ?MigrationTable
     {
-        $sourceColumns = $sourceTable->getColumns();
-        $targetColumns = $targetTable->getColumns();
+        $migrationTable = new MigrationTable($sourceTable->getName());
+        $returnMigrationTable = $this->handlePrimaryColumns($migrationTable, $sourceTable, $targetTable);
+        $returnMigrationTable = $this->handleColumns($migrationTable, $sourceTable, $targetTable) || $returnMigrationTable;
+        $returnMigrationTable = $this->handleIndexes($migrationTable, $sourceTable, $targetTable) || $returnMigrationTable;
+        $returnMigrationTable = $this->handleForeignKeys($migrationTable, $sourceTable, $targetTable) || $returnMigrationTable;
 
+        return $returnMigrationTable ? $migrationTable : null;
+    }
+
+    private function handlePrimaryColumns(MigrationTable $migrationTable, Table $sourceTable, Table $targetTable): bool
+    {
         $sourcePrimaryColumns = $sourceTable->getPrimary();
         $targetPrimaryColumns = $targetTable->getPrimary();
         $primaryColumnsToDrop = array_diff($sourcePrimaryColumns, $targetPrimaryColumns);
         $primaryColumnsToAdd = array_diff($targetPrimaryColumns, $sourcePrimaryColumns);
 
-        $columnsToDrop = array_diff(array_keys($sourceColumns), array_keys($targetColumns));
-        $columnsToAdd = array_diff_key($targetColumns, $sourceColumns);
-        $columnsIntersect = array_intersect(array_keys($sourceColumns), array_keys($targetColumns));
-
-        $columnsComparator = new ColumnComparator();
-        $columnsToChange = [];
-        foreach ($columnsIntersect as $columnName) {
-            $diffColumn = $columnsComparator->diff($sourceTable->getColumn($columnName), $targetTable->getColumn($columnName));
-            if ($diffColumn !== null) {
-                $columnsToChange[$columnName] = $diffColumn;
-            }
-        }
-
-        $sourceIndexes = $sourceTable->getIndexes();
-        $targetIndexes = $targetTable->getIndexes();
-
-        $indexesToDrop = array_diff(array_keys($sourceIndexes), array_keys($targetIndexes));
-        $indexesToAdd = array_diff_key($targetIndexes, $sourceIndexes);
-
-        $sourceForeignKeys = $sourceTable->getForeignKeys();
-        $targetForeignKeys = $targetTable->getForeignKeys();
-
-        $foreignKeysToDrop = array_diff(array_keys($sourceForeignKeys), array_keys($targetForeignKeys));
-        $foreignKeysToAdd = array_diff_key($targetForeignKeys, $sourceForeignKeys);
-
-        $migrationTable = new MigrationTable($sourceTable->getName());
-        $returnMigrationTable = $this->handlePrimaryColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $targetTable);
-        $returnMigrationTable = $this->handleColumns($migrationTable, $primaryColumnsToDrop, $primaryColumnsToAdd, $columnsToDrop, $columnsToAdd, $columnsToChange) || $returnMigrationTable;
-        $returnMigrationTable = $this->handleIndexes($migrationTable, $indexesToDrop, $indexesToAdd) || $returnMigrationTable;
-        $returnMigrationTable = $this->handleForeignKeys($migrationTable, $foreignKeysToDrop, $foreignKeysToAdd) || $returnMigrationTable;
-
-        return $returnMigrationTable ? $migrationTable : null;
-    }
-
-    private function handlePrimaryColumns(MigrationTable $migrationTable, array $primaryColumnsToDrop, array $primaryColumnsToAdd, Table $targetTable): bool
-    {
         $changeMade = false;
         if (!empty($primaryColumnsToDrop)) {
             $migrationTable->dropPrimaryKey();
@@ -73,8 +45,19 @@ class TableComparator
         return $changeMade;
     }
 
-    private function handleColumns(MigrationTable $migrationTable, array $primaryColumnsToDrop, array $primaryColumnsToAdd, array $columnsToDrop, array $columnsToAdd, array $columnsToChange): bool
+    private function handleColumns(MigrationTable $migrationTable, Table $sourceTable, Table $targetTable): bool
     {
+        $sourceColumns = $sourceTable->getColumns();
+        $targetColumns = $targetTable->getColumns();
+        $columnsToDrop = array_diff(array_keys($sourceColumns), array_keys($targetColumns));
+        $columnsToAdd = array_diff_key($targetColumns, $sourceColumns);
+        $columnsToChange = $this->findColumnsToChange($sourceTable, $targetTable);
+
+        $sourcePrimaryColumns = $sourceTable->getPrimary();
+        $targetPrimaryColumns = $targetTable->getPrimary();
+        $primaryColumnsToDrop = array_diff($sourcePrimaryColumns, $targetPrimaryColumns);
+        $primaryColumnsToAdd = array_diff($targetPrimaryColumns, $sourcePrimaryColumns);
+
         $changeMade = false;
         foreach ($columnsToDrop as $columnToDrop) {
             if (in_array($columnToDrop, $primaryColumnsToDrop, true)) {
@@ -101,8 +84,28 @@ class TableComparator
         return $changeMade;
     }
 
-    private function handleIndexes(MigrationTable $migrationTable, array $indexesToDrop, array $indexesToAdd): bool
+    private function findColumnsToChange(Table $sourceTable, Table $targetTable): array
     {
+        $columnsIntersect = array_intersect(array_keys($sourceTable->getColumns()), array_keys($targetTable->getColumns()));
+        $columnsComparator = new ColumnComparator();
+        $columnsToChange = [];
+        foreach ($columnsIntersect as $columnName) {
+            $diffColumn = $columnsComparator->diff($sourceTable->getColumn($columnName), $targetTable->getColumn($columnName));
+            if ($diffColumn !== null) {
+                $columnsToChange[$columnName] = $diffColumn;
+            }
+        }
+        return $columnsToChange;
+    }
+
+    private function handleIndexes(MigrationTable $migrationTable, Table $sourceTable, Table $targetTable): bool
+    {
+        $sourceIndexes = $sourceTable->getIndexes();
+        $targetIndexes = $targetTable->getIndexes();
+
+        $indexesToDrop = array_diff(array_keys($sourceIndexes), array_keys($targetIndexes));
+        $indexesToAdd = array_diff_key($targetIndexes, $sourceIndexes);
+
         $changeMade = false;
         foreach ($indexesToDrop as $indexToDrop) {
             $migrationTable->dropIndexByName($indexToDrop);
@@ -117,8 +120,14 @@ class TableComparator
         return $changeMade;
     }
 
-    private function handleForeignKeys(MigrationTable $migrationTable, array $foreignKeysToDrop, array $foreignKeysToAdd): bool
+    private function handleForeignKeys(MigrationTable $migrationTable, Table $sourceTable, Table $targetTable): bool
     {
+        $sourceForeignKeys = $sourceTable->getForeignKeys();
+        $targetForeignKeys = $targetTable->getForeignKeys();
+
+        $foreignKeysToDrop = array_diff(array_keys($sourceForeignKeys), array_keys($targetForeignKeys));
+        $foreignKeysToAdd = array_diff_key($targetForeignKeys, $sourceForeignKeys);
+
         $changeMade = false;
         foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
             $migrationTable->dropForeignKey($foreignKeyToDrop);

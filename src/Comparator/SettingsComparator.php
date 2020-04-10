@@ -33,7 +33,9 @@ class SettingsComparator
                 if (count($recursiveDiff)) {
                     $return[$key] = $recursiveDiff;
                 }
-            } elseif ($value != $array2[$key]) {
+                continue;
+            }
+            if ($value !== $array2[$key]) {
                 $return[$key] = $value;
             }
         }
