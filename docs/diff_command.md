@@ -8,7 +8,7 @@ Creates new migration file with migration which is diff between source and targe
 - `target` Target environment from config
 
 ### Options:
-- `--ignore-tables[=IGNORE-TABLES]` Comma separated list of tables to ignore (Structure and data). Default: phoenix_log
+- `--ignore-tables=IGNORE-TABLES` Comma separated list of tables to ignore (Structure and data). Default: phoenix_log
 - `-i`, `--indent=INDENT` Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab [default: 4spaces]
 - `--migration=MIGRATION` The name of migration. Default: Initialization
 - `--dir=DIR` Directory to create migration in
