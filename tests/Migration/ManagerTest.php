@@ -3,7 +3,6 @@
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Config\Config;
-use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
@@ -106,13 +105,6 @@ class ManagerTest extends TestCase
         $this->manager->findMigrationsToExecute('type');
     }
 
-    public function testWrongTarget()
-    {
-        $this->expectException(InvalidArgumentValueException::class);
-        $this->expectExceptionMessage('Target "target" is not allowed.');
-        $this->manager->findMigrationsToExecute('up', 'target');
-    }
-
     public function testSkippingNonExistingMigration()
     {
         $executedMigrations = $this->manager->executedMigrations();
@@ -160,6 +152,61 @@ class ManagerTest extends TestCase
         $downMigrations = $this->manager->findMigrationsToExecute('down');
         $this->checkMigrations($downMigrations, 2, [0 => '20150428140909', 1 => '20150518091732']);
         $this->initMigration->rollback();
+    }
+
+    public function testMigrationsWithTarget()
+    {
+        $executedMigrations = $this->manager->executedMigrations();
+        $this->assertTrue(is_array($executedMigrations));
+        $this->assertCount(0, $executedMigrations);
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_UP, '20150500000000');
+        $this->checkMigrations($migrations, 1, [0 => '20150428140909']);
+        $this->assertTrue(is_array($migrations));
+
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
+
+        $migrations = $this->manager->findMigrationsToExecute();
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, '20150600000000');
+        $this->checkMigrations($migrations, 0, []);
+        $this->assertTrue(is_array($migrations));
+
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, '20150518091732');
+        $this->checkMigrations($migrations, 1, [0 => '20150518091732']);
+        $this->assertTrue(is_array($migrations));
+
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
+
+        $migrations = $this->manager->findMigrationsToExecute();
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
+
+        $migrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, '20150400000000');
+        $this->checkMigrations($migrations, 2, [0 => '20150518091732', 1 => '20150428140909']);
+        $this->assertTrue(is_array($migrations));
+
+        foreach ($migrations as $migration) {
+            $migration->migrate();
+            $this->manager->logExecution($migration);
+        }
     }
 
     private function checkMigrations($migrations, $count, array $migrationDatetimes = [])

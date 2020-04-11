@@ -35,8 +35,8 @@ class Manager
     public function findMigrationsToExecute(string $type = self::TYPE_UP, string $target = self::TARGET_ALL, array $dirs = [], array $classes = []): array
     {
         $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
-        $this->inArray($target, [self::TARGET_ALL, self::TARGET_FIRST], 'Target "' . $target . '" is not allowed.');
 
+        /** @var AbstractMigration[] $migrations */
         $migrations = $this->findMigrations($type, $dirs, $classes);
         if (empty($migrations)) {
             return [];
@@ -44,7 +44,22 @@ class Manager
         if ($type === self::TYPE_DOWN) {
             $migrations = array_reverse($migrations);
         }
-        return $target === self::TARGET_ALL ? $migrations : [current($migrations)];
+
+        if ($target === self::TARGET_ALL) {
+            return $migrations;
+        }
+
+        if ($target === self::TARGET_FIRST) {
+            return [current($migrations)];
+        }
+
+        $migrationsToExecute = [];
+        foreach ($migrations as $migration) {
+            if (($type === self::TYPE_UP && $migration->getDatetime() <= $target) || ($type === self::TYPE_DOWN && $migration->getDatetime() >= $target)) {
+                $migrationsToExecute[] = $migration;
+            }
+        }
+        return $migrationsToExecute;
     }
 
     private function findMigrations(string $type, array $dirs, array $classes): array

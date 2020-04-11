@@ -17,6 +17,7 @@ class MigrateCommand extends AbstractRunCommand
         parent::configure();
         $this->setName('migrate')
             ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
+            ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Datetime of last migration which should be executed')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to migrate')
             ->addOption('class', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Class to migrate')
             ->setDescription('Run migrations');
@@ -24,7 +25,7 @@ class MigrateCommand extends AbstractRunCommand
 
     protected function findMigrations(): array
     {
-        $target = $this->input->getOption('first') ? Manager::TARGET_FIRST : Manager::TARGET_ALL;
+        $target = $this->input->getOption('target') ? str_pad($this->input->getOption('target'), 14, '0', STR_PAD_RIGHT) : ($this->input->getOption('first') ? Manager::TARGET_FIRST : Manager::TARGET_ALL);
         $dirs = $this->input->getOption('dir') ?: [];
         $this->checkDirs($dirs);
         $classes = $this->input->getOption('class') ?: [];

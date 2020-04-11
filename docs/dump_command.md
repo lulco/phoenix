@@ -3,7 +3,7 @@
 
 Creates new migration file from actual database structure. If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
 If you want to start using Phoenix when database already exists, it is recommended to add additional check for each table:
-```
+```php
 if ($this->tableExists('table_name')) {
     $this->table('table_name')
         -> ...
