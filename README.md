@@ -18,6 +18,7 @@ Framework agnostic database migrations for PHP.
 - Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
 - Add an autoincrement primary column to an existing table
 - Dump command for creating migration from existing database
+- Diff command for creating diff migration from two existing databases
 - Test command for testing new migration executing migrate, rollback, migrate
 - Status command that shows list of executed migrations and list of migrations to execute
 - json output format for all commands
@@ -249,6 +250,10 @@ All done. Took 0.0401s
 ### [Dump command](docs/dump_command.md)
 Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
 If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
+
+### [Diff command](docs/diff_command.md)
+Command `php vendor/bin/phoenix diff` creates migration as diff of two existing database structures.
+This command can be used when upgrading some system to newer version and you know the structure of both old and new version. 
 
 ### [Status command](docs/status_command.md)
 Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:

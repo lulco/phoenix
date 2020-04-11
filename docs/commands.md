@@ -15,5 +15,6 @@ There are several commands in phoenix and they have few common options:
 - [rollback](rollback_command.md)
 - [status](status_command.md)
 - [dump](dump_command.md)
+- [diff](diff_command.md)
 - [test](test_command.md)
 - [cleanup](cleanup_command.md)
