@@ -47,7 +47,7 @@ return [
 As you know and as you can see, in php configuration file you can use `__DIR__` as token for identifying actual directory (directory where configuration file is stored). In other types of configuration files you can use special token `%%ACTUAL_DIR%%` which is replaced with path to configuration file directory.
 
 #### phoenix.yml or phoenix.yaml
-```
+```yaml
 log_table_name: my_phoenix_log
 migration_dirs:
   first: '%%ACTUAL_DIR%%/first'
@@ -62,7 +62,7 @@ environments:
     password: pass
     db_name: my_db
     charset: utf8 # optional
-  production
+  production:
     adapter: mysql
     host: production_host
     username: user
@@ -73,7 +73,7 @@ default_environment: local
 ```
 
 #### phoenix.neon
-```
+```neon
 log_table_name: my_phoenix_log
 migration_dirs:
     first: '%%ACTUAL_DIR%%/first'
@@ -88,7 +88,7 @@ environments:
         password: pass
         db_name: my_db
         charset: utf8 # optional
-    production
+    production:
         adapter: mysql
         host: production_host
         username: user
@@ -101,7 +101,7 @@ default_environment: local
 Configuration files of types yml and neon are pretty similar. The only difference is that in yml type you have to use 2 or 4 spaces for indentation, but no tabs, while in neon type the tabs are allowed.
 
 #### phoenix.json
-```
+```json
 {
     "log_table_name": "my_phoenix_log",
     "migration_dirs": {

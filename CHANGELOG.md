@@ -10,6 +10,7 @@
 - method truncate() to migrations
 - settings order and length to index columns
 - DiffCommand for creating migration from diff of two databases
+- target option for migrate and rollback commands
 
 #### Changed
 - unfreezed symfony/console and added versions 3.4.31 and 4.3.4 to conflict

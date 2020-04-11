@@ -4,7 +4,7 @@ You can setup connection to database in environments block of config file. There
 
 #### MySQL
 You can use full config array:
-```
+```php
 'environments' => [
     'env1' => [
         'adapter' => 'mysql',
@@ -17,7 +17,7 @@ You can use full config array:
 ],
 ```
 or dsn:
-```
+```php
 'environments' => [
     'env2' => [
         'adapter' => 'mysql',
@@ -30,7 +30,7 @@ or dsn:
 
 #### PostgreSQL
 This is similar to MySQL. You can use full config array:
-```
+```php
 'environments' => [
     'env3' => [
         'adapter' => 'pgsql',
@@ -43,7 +43,7 @@ This is similar to MySQL. You can use full config array:
 ],
 ```
 or dsn:
-```
+```php
 'environments' => [
     'env4' => [
         'adapter' => 'pgsql',

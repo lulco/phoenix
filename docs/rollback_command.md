@@ -6,6 +6,7 @@ Rollbacks migrations.
 ### Options:
 First four options are [common](commands.md), other are described here:
 - `--dry` Just print queries, no query defined in migration is executed
-- `--all` Rollbacks all migrations, if not set only last executed migration is rollbacked
+- `--all` Rollbacks all migrations, if not set only last executed migration is rollbacked. Cannot be combined with `--target`
+- `--target=TARGET` Executes only migrations with timestamp greater then or equal to TARGET. Cannot be combined with `--all`
 - `--dir=DIR` Executes only migrations in dir(s) (multiple values allowed)
 - `--class=CLASS` Executes only migrations specified by this option (multiple values allowed)
