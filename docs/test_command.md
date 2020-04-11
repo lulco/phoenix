@@ -4,5 +4,5 @@
 Tests next migration by executing migrate, rollback, migrate for it.
 
 ### Options:
-First four options are [common](commands.md), other are described here:
+First four options are [common](commands.md), last one is described here:
 - `--cleanup` Cleanup after test (rollback migration at the end)

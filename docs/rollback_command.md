@@ -7,5 +7,5 @@ Rollbacks migrations.
 First four options are [common](commands.md), other are described here:
 - `--dry` Just print queries, no query defined in migration is executed
 - `--all` Rollbacks all migrations, if not set only last executed migration is rollbacked
-- `--dir` Executes only migrations in dir(s)
-- `--class` Executes only migrations specified by this option
+- `--dir=DIR` Executes only migrations in dir(s) (multiple values allowed)
+- `--class=CLASS` Executes only migrations specified by this option (multiple values allowed)
