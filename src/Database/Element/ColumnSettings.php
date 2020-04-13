@@ -35,6 +35,19 @@ class ColumnSettings
         self::SETTING_COMMENT => ['is_null', 'is_string'],
     ];
 
+    private $defaultSettings = [
+        self::SETTING_AUTOINCREMENT => false,
+        self::SETTING_NULL => false,
+        self::SETTING_DEFAULT => null,
+        self::SETTING_SIGNED => true,
+        self::SETTING_LENGTH => [null, ''],
+        self::SETTING_DECIMALS => [null, ''],
+        self::SETTING_CHARSET => [null, ''],
+        self::SETTING_COLLATION => [null, ''],
+        self::SETTING_VALUES => null,
+        self::SETTING_COMMENT => [null, ''],
+    ];
+
     const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 
     private $settings = [];
@@ -52,6 +65,11 @@ class ColumnSettings
     public function getSettings(): array
     {
         return $this->settings;
+    }
+
+    public function getDefaultSettings(): array
+    {
+        return $this->defaultSettings;
     }
 
     public function allowNull(): bool

@@ -5,6 +5,7 @@ namespace Phoenix\Migration;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
@@ -68,6 +69,16 @@ abstract class AbstractMigration
         $this->down();
         $queries = $this->prepare();
         return $this->runQueries($queries, $dry);
+    }
+
+    final public function updateStructure(Structure $structure): void
+    {
+        $this->up();
+        foreach ($this->queriesToExecute as $queryToExecute) {
+            if ($queryToExecute instanceof MigrationTable) {
+                $structure->update($queryToExecute);
+            }
+        }
     }
 
     /**
@@ -196,8 +207,8 @@ abstract class AbstractMigration
 
     private function reset(): void
     {
-        $this->executedQueries = [];
         $this->queriesToExecute = [];
+        $this->executedQueries = [];
     }
 
     private function prepare(): array

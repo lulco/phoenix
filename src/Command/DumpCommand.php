@@ -19,6 +19,11 @@ class DumpCommand extends AbstractDumpCommand
         parent::configure();
     }
 
+    protected function migrationDefaultName()
+    {
+        return 'Initialization';
+    }
+
     protected function sourceStructure(): Structure
     {
         return new Structure();

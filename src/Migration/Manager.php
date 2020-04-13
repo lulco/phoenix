@@ -70,7 +70,6 @@ class Manager
             foreach (array_keys($executedMigrations) as $migrationIdentifier) {
                 unset($migrations[$migrationIdentifier]);
             }
-            ksort($migrations);
             return array_values($migrations);
         }
 
@@ -84,7 +83,12 @@ class Manager
         return $migrationsToExecute;
     }
 
-    private function findMigrationClasses(array $dirs = [], array $classes = []): array
+    /**
+     * @param array $dirs
+     * @param array $classes
+     * @return AbstractMigration[]
+     */
+    public function findMigrationClasses(array $dirs = [], array $classes = []): array
     {
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
@@ -103,6 +107,7 @@ class Manager
                 $migrations[$migrationIdentifier] = new $className($this->adapter);
             }
         }
+        ksort($migrations);
         return $migrations;
     }
 
