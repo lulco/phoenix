@@ -33,7 +33,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $indent = $indenter->indent($this->input->getOption('indent'));
         $dumper = new Dumper($indent, 2);
 
-        $migration = $this->input->getOption('migration') ?: 'Initialization';
+        $migration = $this->input->getOption('migration') ?: $this->migrationDefaultName();
         $migrationCreator = new MigrationCreator($migration, $indent, $this->input->getOption('template'));
 
         $sourceStructure = $this->sourceStructure();

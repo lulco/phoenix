@@ -2,7 +2,7 @@
 
 return [
     'migration_dirs' => [
-        'phoenix' => __DIR__ . '/../testing_migrations/diff',
+        'phoenix' => __DIR__ . '/../testing_migrations/phoenix',
     ],
     'environments' => [
         'mysql' => [
