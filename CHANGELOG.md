@@ -9,7 +9,7 @@
 - smallserial as primary in pqsql
 - method truncate() to migrations
 - settings order and length to index columns
-- DiffCommand for creating migration from diff of two databases
+- DiffCommand for creating migration from diff of two databases or migration and database
 - target option for migrate and rollback commands
 
 #### Changed

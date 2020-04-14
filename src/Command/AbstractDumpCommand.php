@@ -19,7 +19,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $this
             ->addOption('ignore-tables', null, InputOption::VALUE_REQUIRED, 'Comma separated list of tables to ignore (Structure and data).', 'phoenix_log')
             ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces')
-            ->addOption('migration', null, InputOption::VALUE_REQUIRED, 'Name of migration', 'Initialization')
+            ->addOption('migration', null, InputOption::VALUE_REQUIRED, 'Name of migration', $this->migrationDefaultName())
             ->addOption('dir', null, InputOption::VALUE_REQUIRED, 'Directory to create migration in')
             ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')
         ;
@@ -33,7 +33,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $indent = $indenter->indent($this->input->getOption('indent'));
         $dumper = new Dumper($indent, 2);
 
-        $migration = $this->input->getOption('migration') ?: 'Initialization';
+        $migration = $this->input->getOption('migration') ?: $this->migrationDefaultName();
         $migrationCreator = new MigrationCreator($migration, $indent, $this->input->getOption('template'));
 
         $sourceStructure = $this->sourceStructure();
@@ -51,6 +51,8 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;
     }
+
+    abstract protected function migrationDefaultName();
 
     abstract protected function sourceStructure(): Structure;
 

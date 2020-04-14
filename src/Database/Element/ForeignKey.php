@@ -51,6 +51,12 @@ class ForeignKey
         return $this->columns;
     }
 
+    public function setReferencedTable(string $referencedTable): ForeignKey
+    {
+        $this->referencedTable = $referencedTable;
+        return $this;
+    }
+
     public function getReferencedTable(): string
     {
         return $this->referencedTable;

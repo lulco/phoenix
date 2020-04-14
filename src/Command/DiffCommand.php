@@ -5,19 +5,25 @@ namespace Phoenix\Command;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Exception\InvalidArgumentValueException;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 
 class DiffCommand extends AbstractDumpCommand
 {
     protected function configure(): void
     {
         $this->setName('diff')
-            ->setDescription('Makes diff of source and target database')
-            ->addArgument('source', InputArgument::REQUIRED, 'Source environment from config')
-            ->addArgument('target', InputArgument::REQUIRED, 'Target environment from config')
+            ->setDescription('Makes diff of source and target database or diff of migrations and database')
+            ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source environment from config. If not set, migrations are used as source.')
+            ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Target environment from config. If not set, migrations are used as target.')
         ;
 
         parent::configure();
+    }
+
+    protected function migrationDefaultName()
+    {
+        return 'Diff';
     }
 
     protected function sourceStructure(): Structure
@@ -37,7 +43,11 @@ class DiffCommand extends AbstractDumpCommand
 
     private function getStructure(string $type): Structure
     {
-        $env = $this->input->getArgument($type);
+        $env = $this->input->getOption($type);
+        if (!$env) {
+            return $this->createStructureFromMigrations();
+        }
+
         $config = $this->config->getEnvironmentConfig($env);
         if (!$config) {
             throw new InvalidArgumentValueException(ucfirst($type) . ' environment "' . $env . '" doesn\'t exist in config');
@@ -45,5 +55,19 @@ class DiffCommand extends AbstractDumpCommand
 
         $adapter = AdapterFactory::instance($config);
         return $adapter->getStructure();
+    }
+
+    private function createStructureFromMigrations(): Structure
+    {
+        $structure = new Structure();
+        $migrationClasses = $this->manager->findMigrationClasses();
+        foreach ($migrationClasses as $migration) {
+            try {
+                $migration->updateStructure($structure);
+            } catch (Throwable $e) {
+                $this->output->writeln('<error>Warning: Migration "' . $migration->getFullClassName() . '" throws exception / error: "' . $e->getMessage() . '"</error>');
+            }
+        }
+        return $structure;
     }
 }

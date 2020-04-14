@@ -66,6 +66,9 @@ abstract class DiffCommandTest extends BaseCommandTest
     public function testSourceNotFound()
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
 
         $configuration = $this->configuration;
         $configuration['migration_dirs']['diff'] = $diffMigrationDir;
@@ -77,19 +80,23 @@ abstract class DiffCommandTest extends BaseCommandTest
 
         $command = new DiffCommand();
         $command->setConfig($configuration);
-        $this->input->setOption('indent', '4spaces');
 
-        $commandTester = new CommandTester($command);
-        $commandTester->setInputs(['diff']);
+        $this->input->setOption('indent', '4spaces');
+        $this->input->setOption('source', 'source');
+        $this->input->setOption('target', $this->getEnvironment());
+        $this->input->setOption('dir', 'diff');
 
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Source environment "source" doesn\'t exist in config');
-        $commandTester->execute(['source' => 'source', 'target' => $this->getEnvironment()]);
+        $command->run($this->input, $this->output);
     }
 
     public function testTargetNotFound()
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
+        $this->assertFalse(is_dir($diffMigrationDir));
+        mkdir($diffMigrationDir);
+        $this->assertTrue(is_dir($diffMigrationDir));
 
         $configuration = $this->configuration;
         $configuration['migration_dirs']['diff'] = $diffMigrationDir;
@@ -102,13 +109,13 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command = new DiffCommand();
         $command->setConfig($configuration);
         $this->input->setOption('indent', '4spaces');
-
-        $commandTester = new CommandTester($command);
-        $commandTester->setInputs(['diff']);
+        $this->input->setOption('source', $this->getEnvironment());
+        $this->input->setOption('target', 'lalala');
+        $this->input->setOption('dir', 'diff');
 
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Target environment "lalala" doesn\'t exist in config');
-        $commandTester->execute(['source' => $this->getEnvironment(), 'target' => 'lalala']);
+        $command->run($this->input, $this->output);
     }
 
     public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
@@ -132,7 +139,7 @@ abstract class DiffCommandTest extends BaseCommandTest
 
         $commandTester = new CommandTester($command);
         $commandTester->setInputs(['diff']);
-        $commandTester->execute(['source' => $this->getEnvironment(), 'target' => $this->getEnvironment()]);
+        $commandTester->execute([]);
 
         $diffFiles = Finder::create()->files()->in($diffMigrationDir);
         $this->assertCount(1, $diffFiles);
@@ -145,7 +152,7 @@ abstract class DiffCommandTest extends BaseCommandTest
             $this->assertStringContainsString("    ", $migrationContent);
 
             $classNameCreator = new ClassNameCreator($filePath);
-            $this->assertEquals('\Initialization', $classNameCreator->getClassName());
+            $this->assertEquals('\Diff', $classNameCreator->getClassName());
             unlink($filePath);
         }
         rmdir($diffMigrationDir);
@@ -186,7 +193,7 @@ abstract class DiffCommandTest extends BaseCommandTest
             $this->assertStringContainsString("    ", $migrationContent);
 
             $classNameCreator = new ClassNameCreator($filePath);
-            $this->assertEquals('\Initialization', $classNameCreator->getClassName());
+            $this->assertEquals('\Diff', $classNameCreator->getClassName());
             unlink($filePath);
         }
 
@@ -195,7 +202,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertCount(5, $messages[0]);
-        $this->assertStringStartsWith('<info>Migration "Initialization" created in "' . realpath($diffMigrationDir), $messages[0][1]);
+        $this->assertStringStartsWith('<info>Migration "Diff" created in "' . realpath($diffMigrationDir), $messages[0][1]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
 
         rmdir($diffMigrationDir);
@@ -311,8 +318,8 @@ abstract class DiffCommandTest extends BaseCommandTest
     protected function createInput()
     {
         $input = parent::createInput();
-        $input->setArgument('source', $this->getEnvironment());
-        $input->setArgument('target', $this->getEnvironment());
+        $input->setOption('source', $this->getEnvironment());
+        $input->setOption('target', $this->getEnvironment());
         return $input;
     }
 }
