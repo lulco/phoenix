@@ -66,18 +66,15 @@ class PgsqlAdapterTest extends TestCase
 
     public function testUniqueIndexWithLengthSpecified()
     {
-        $this->markTestSkipped();
-
         $queryBuilder = $this->adapter->getQueryBuilder();
 
         $migrationTable = new MigrationTable('unique_index_length_10');
-        $migrationTable->setCollation('utf8_general_ci');
         $migrationTable->addColumn('title', 'string');
         $migrationTable->addColumn('alias', 'string');
         $migrationTable->addColumn('blabla', 'text');
         $migrationTable->addIndex(new IndexColumn('title', ['length' => 10]), Index::TYPE_UNIQUE);
-        $migrationTable->addIndex([new IndexColumn('title', ['length' => 15]), new IndexColumn('alias', ['length' => 10])]);
-        $migrationTable->addIndex([new IndexColumn('title', ['length' => 10]), new IndexColumn('alias'), new IndexColumn('blabla', ['length' => 20])]);
+        $migrationTable->addIndex([new IndexColumn('title', ['length' => 15, 'order' => 'DESC']), new IndexColumn('alias', ['length' => 10])]);
+        $migrationTable->addIndex([new IndexColumn('title', ['length' => 10]), new IndexColumn('alias', ['length' => 15, 'order' => 'DESC']), new IndexColumn('blabla', ['length' => 20])]);
         $migrationTable->create();
 
         $queries = $queryBuilder->createTable($migrationTable);
@@ -113,17 +110,21 @@ class PgsqlAdapterTest extends TestCase
             'length' => 255,
         ]));
 
-        $this->checkIndex($table, 'idx_unique_index_length_10_title_l15_alias_l10', [new IndexColumn('title',['length' => 15]), new IndexColumn('alias',['length' => 10])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
-        $this->checkIndex($table, 'idx_unique_index_length_10_title_l10_alias_blabla_20', [new IndexColumn('title', ['length' => 10]), new IndexColumn('alias'), new IndexColumn('blabla', ['length' => 20])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
         $this->checkIndex($table, 'idx_unique_index_length_10_title_l10', [new IndexColumn('title',['length' => 10])], Index::TYPE_UNIQUE, Index::METHOD_DEFAULT);
+        $this->checkIndex($table, 'idx_unique_index_length_10_title_l15_odesc_alias_l10', [new IndexColumn('title',['length' => 15, 'order' => 'DESC']), new IndexColumn('alias',['length' => 10])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
+        $this->checkIndex($table, 'idx_unique_index_length_10_title_l10_alias_l15_odesc_blabla_l20', [new IndexColumn('title', ['length' => 10]), new IndexColumn('alias', ['length' => 15, 'order' => 'DESC']), new IndexColumn('blabla', ['length' => 20])], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
 
         $this->adapter->insert('unique_index_length_10', [
             'title' => 'This is my item number 1',
+            'alias' => 'this-is-my-item-number-1',
+            'blabla' => 'Foo',
         ]);
 
         $this->expectException(DatabaseQueryExecuteException::class);
         $this->adapter->insert('unique_index_length_10', [
             'title' => 'This is my item number 2',
+            'alias' => 'this-is-my-item-number-2',
+            'blabla' => 'Bar',
         ]);
     }
 
