@@ -146,7 +146,6 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadIndexes(string $database): array
     {
-
         // there are too many indexes which are not required - try to select only those from actual database
         $indexRows = $this->query("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary, a.indoption FROM (
             SELECT a.indrelid, a.indisunique, a.indoption, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
@@ -178,6 +177,49 @@ class PgsqlAdapter extends PdoAdapter
             $indexes[$indexRow['relname']][$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
             $indexes[$indexRow['relname']][$indexRow['index_name']]['method'] = Index::METHOD_DEFAULT;
         }
+
+        $substringIndexRows = $this->query("SELECT pg_index.indisunique, pg_index.indoption, index_info.relname AS index_name, table_info.relname AS table_name, pg_index.indexprs
+FROM pg_index
+INNER JOIN pg_class AS index_info ON index_info.relfilenode = pg_index.indexrelid
+INNER JOIN pg_class AS table_info ON table_info.relfilenode = pg_index.indrelid
+INNER JOIN pg_attribute ON pg_index.indexrelid = pg_attribute.attrelid
+WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
+
+        $columns = $this->query(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public'", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tableColumns = [];
+        foreach ($columns as $column) {
+            $tableColumns[$column['table_name']][$column['ordinal_position']] = $column;
+        }
+        foreach ($substringIndexRows as $substringIndexRow) {
+            $tableName = $substringIndexRow['table_name'];
+            preg_match_all('/varattno ([0-9]+) (.*?):constvalue 4 \[ ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) \]}\) :location/', $substringIndexRow['indexprs'], $matches);
+
+            $indoptions = explode(' ', $substringIndexRow['indoption']);
+
+            $indexColumns = [];
+            for ($i = 0; $i < count($matches[0]); $i++) {
+                $ordinalPosition = $matches[1][$i];
+                $length = $matches[3][$i];
+                $indexColumnSettings = [
+                    IndexColumnSettings::SETTING_LENGTH => (int)$length,
+                ];
+                $indoption = $indoptions[$i] ?? 0;
+                if ($indoption & 1) {
+                    $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
+                }
+                if ($indoption & 2) {
+                    // ready for NULLS FIRST
+                }
+                $indexColumns[] = new IndexColumn($tableColumns[$tableName][$ordinalPosition]['column_name'], $indexColumnSettings);
+            }
+
+            $indexes[$tableName][$substringIndexRow['index_name']] = [
+                'columns' => $indexColumns,
+                'type' => $substringIndexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL,
+                'method' => Index::METHOD_DEFAULT,
+            ];
+        }
+
         return $indexes;
     }
 
