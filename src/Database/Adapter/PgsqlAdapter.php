@@ -197,7 +197,8 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
             $indoptions = explode(' ', $substringIndexRow['indoption']);
 
             $indexColumns = [];
-            for ($i = 0; $i < count($matches[0]); $i++) {
+            $count = count($matches[0]);
+            for ($i = 0; $i < $count; $i++) {
                 $ordinalPosition = $matches[1][$i];
                 $length = $matches[3][$i];
                 $indexColumnSettings = [
