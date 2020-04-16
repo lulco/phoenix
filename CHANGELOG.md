@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.3.0] - 2020-04-16
 #### Added
 - method renameColumn() to migrations
 - PHPStorm meta for better suggestions
@@ -214,7 +215,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.2.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/lulco/phoenix/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/lulco/phoenix/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/lulco/phoenix/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/lulco/phoenix/compare/1.0.0...1.1.0
