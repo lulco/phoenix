@@ -12,4 +12,4 @@ Creates new migration file with migration which is diff between source and targe
 - `--dir=DIR` Directory to create migration in
 - `--template=TEMPLATE` Path to template
 
-All other options are common and they are described [here](commands.md).
+All other options are common and they are described [here](index.md).

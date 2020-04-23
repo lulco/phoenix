@@ -3,4 +3,4 @@
 
 This command shows list of executed migrations and list of migrations to execute.
 
-All options are common and they are described [here](commands.md).
+All options are common and they are described [here](index.md).

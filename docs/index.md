@@ -1,0 +1,20 @@
+# Phoenix
+Framework agnostic database migrations for PHP.
+
+- [Configuration](configuration/index.md)
+  - [adapters](configuration/adapters.md)
+- [Commands](commands/index.md)
+  - [init](commands/init_command.md)
+  - [create](commands/create_command.md)
+  - [migrate](commands/migrate_command.md)
+  - [rollback](commands/rollback_command.md)
+  - [status](commands/status_command.md)
+  - [test](commands/test_command.md)
+  - [dump](commands/dump_command.md)
+  - [diff](commands/diff_command.md)
+  - [cleanup](commands/cleanup_command.md)
+- [Migrations](migrations/index.md)
+  - [columns](migrations/columns.md)
+  - [indexes](migrations/indexes.md)
+  - [namespaces](migrations/namespaces.md)
+  - [custom template](migrations/custom_template.md)

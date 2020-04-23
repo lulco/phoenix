@@ -20,4 +20,4 @@ if ($this->tableExists('table_name')) {
 - `--dir=DIR` Directory to create migration in
 - `--template=TEMPLATE` Path to template
 
-All other options are common and they are described [here](commands.md).
+All other options are common and they are described [here](index.md).

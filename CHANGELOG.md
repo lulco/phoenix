@@ -22,7 +22,7 @@
 
 #### Added
 - support for `CURRENT_TIMESTAMP` for columns with type `timestamp`
-- support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration.md))
+- support for json column type for newer versions of mysql (>= 5.7.8) (To keep using text instead of json, force version in [config](docs/configuration/index.md))
 
 #### Fixed
 - tests on travis

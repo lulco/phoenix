@@ -1,7 +1,7 @@
 ## Migrations
 
 ### Create migration
-To create new migration, use command [create](create_command.md). In all migrations you can setup several operations: create new tables, change existing tables and also rename, drop or truncate existing tables.
+To create new migration, use command [create](../commands/create_command.md). In all migrations you can setup several operations: create new tables, change existing tables and also rename, drop or truncate existing tables.
 
 #### Create table
 ```php
