@@ -3,7 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- default value of boolean columns in pgsql is set to false if it is not null (this prevent from errors when user forgot set default to false and also it is compatible with mysql)
+- default value of boolean columns is set to false if it is not null (this prevent from errors when user forgot set default to false)
 
 ### [1.3.0] - 2020-04-16
 #### Added

@@ -189,7 +189,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             return ' DEFAULT NULL';
         }
 
-        if ($column->getSettings()->getDefault() !== null) {
+        if ($column->getSettings()->getDefault() !== null || $column->getType() === Column::TYPE_BOOLEAN) {
             $default = ' DEFAULT ';
             if ($column->getType() === Column::TYPE_INTEGER) {
                 return $default . $column->getSettings()->getDefault();

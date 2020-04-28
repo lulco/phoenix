@@ -188,7 +188,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
         if ($column->getSettings()->allowNull() && $column->getSettings()->getDefault() === null) {
             $col .= ' DEFAULT NULL';
-        } elseif ($column->getType() === Column::TYPE_BOOLEAN || $column->getSettings()->getDefault() !== null) {
+        } elseif ($column->getSettings()->getDefault() !== null || $column->getType() === Column::TYPE_BOOLEAN) {
             $col .= ' DEFAULT ' . $this->escapeDefault($column);
         }
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
