@@ -138,7 +138,6 @@ class AddData extends AbstractMigration
             'col_double' => 3.1415,
             'col_decimal' => 3.1415,
             'col_numeric' => 3.1415,
-            'col_boolean' => false,
             'col_datetime' => new DateTime(),
             'col_date' => (new DateTime())->format('Y-m-d'),
             'col_time' => '20:30:40',
