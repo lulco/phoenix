@@ -2,6 +2,8 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use InvalidArgumentException;
+use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
@@ -64,9 +66,14 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $queries = [];
         $enumSetColumns = [];
+        /** @var Column|null $autoIncrementColumn */
+        $autoIncrementColumn = null;
         foreach ($table->getColumns() as $column) {
             if (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                 $enumSetColumns[] = $column;
+            }
+            if ($column->getSettings()->isAutoincrement()) {
+                $autoIncrementColumn = $column;
             }
         }
 
@@ -83,6 +90,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $this->createIndex($index, $table);
         }
         $queries = array_merge($queries, $this->createComments($table));
+        if ($table->getAutoIncrement() !== null && $autoIncrementColumn !== null) {
+            $sequenceName = $table->getName() . '_' . $autoIncrementColumn->getName() . '_seq';
+            $queries[] = $this->createAutoIncrementQuery($sequenceName, $table->getAutoIncrement());
+        }
         return $queries;
     }
 
@@ -156,6 +167,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = array_merge($queries, $this->addForeignKeys($table));
         if ($table->getComment() !== null) {
             $queries[] = $this->createTableComment($table);
+        }
+        if ($table->getAutoIncrement() !== null) {
+            $queries[] = $this->createAutoIncrement($table);
         }
         return $queries;
     }
@@ -259,6 +273,22 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function escapeString(?string $string): string
     {
         return '"' . $string . '"';
+    }
+
+    private function createAutoIncrement(MigrationTable $table): string
+    {
+        /** @var PgsqlAdapter $adapter */
+        $adapter = $this->adapter;
+        $sequenceName = $adapter->getSequenceName($table);
+        if ($sequenceName === null) {
+            throw new InvalidArgumentException('Table ' . $table->getName() . ' has no sequence, so you cannot set auto increment');
+        }
+        return $this->createAutoIncrementQuery($sequenceName, $table->getAutoIncrement());
+    }
+
+    private function createAutoIncrementQuery(string $sequenceName, int $autoIncrement)
+    {
+        return sprintf('ALTER SEQUENCE %s RESTART WITH %d;', $this->escapeString($sequenceName), $autoIncrement);
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table): string

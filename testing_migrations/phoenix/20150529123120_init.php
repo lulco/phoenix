@@ -19,6 +19,7 @@ class Init extends AbstractMigration
             ->addColumn('self_fk', 'integer', ['null' => true])
             ->addIndex(new IndexColumn('alias', ['length' => 10]), 'unique')
             ->addForeignKey('self_fk', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE)
+            ->setAutoIncrement(10)
             ->create();
 
         $this->table('table_2')

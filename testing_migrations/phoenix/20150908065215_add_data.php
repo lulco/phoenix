@@ -10,7 +10,6 @@ class AddData extends AbstractMigration
     public function up(): void
     {
         $this->insert('table_1', [
-            'id' => 1,
             'title' => 'First item',
             'alias' => 'first-item',
             'is_active' => false,
@@ -19,16 +18,14 @@ class AddData extends AbstractMigration
 
         $this->insert('table_1', [
             [
-                'id' => 2,
                 'title' => 'Second item',
                 'alias' => 'second-item',
-                'self_fk' => 1,
+                'self_fk' => 10,
             ],
             [
-                'id' => 3,
                 'title' => 'Third item',
                 'alias' => 'third-item',
-                'self_fk' => 2,
+                'self_fk' => 11,
             ]
         ]);
 
@@ -36,7 +33,7 @@ class AddData extends AbstractMigration
             'id' => 1,
             'title' => 'T2 First item',
             'sorting' => 1,
-            't1_fk' => 1,
+            't1_fk' => 10,
             'created_at' => new DateTime(),
         ]);
 
@@ -44,18 +41,18 @@ class AddData extends AbstractMigration
             'id' => 2,
             'title' => 'T2 Second item',
             'sorting' => 2,
-            't1_fk' => 3,
+            't1_fk' => 12,
             'created_at' => new DateTime(),
         ]);
 
         $this->insert('table_3', [
             'identifier' => '6fedffa4-897e-41b1-ba00-185b7c1726d2',
-            't1_fk' => 3,
+            't1_fk' => 12,
         ]);
 
         $this->insert('table_3', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465b',
-            't1_fk' => 1,
+            't1_fk' => 10,
             't2_fk' => 1,
         ]);
 
@@ -97,7 +94,7 @@ class AddData extends AbstractMigration
         $this->update('table_1', [
             'title' => 'Renamed second item',
             'is_active' => true,
-        ], ['id' => 2]);
+        ], ['id' => 11]);
 
         $this->insert('all_types', [
             'identifier' => '914dbcc3-3b19-4b17-863b-2ce37a63465c',
@@ -156,8 +153,9 @@ class AddData extends AbstractMigration
         $this->delete('table_3', ['identifier' => '6fedffa4-897e-41b1-ba00-185b7c1726d2']);
         $this->delete('table_2', ['id' => 2]);
         $this->delete('table_2', ['id' => 1]);
-        $this->delete('table_1', ['id' => 1]);
-        $this->delete('table_1', ['id' => 2]);
-        $this->delete('table_1', ['id' => 3]);
+        $this->delete('table_1', ['id' => 10]);
+        $this->delete('table_1', ['id' => 11]);
+        $this->delete('table_1', ['id' => 12]);
+        $this->table('table_1')->setAutoIncrement(10);
     }
 }

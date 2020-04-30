@@ -17,7 +17,7 @@ class Check extends AbstractMigration
         }
 
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) !== 12) {
+        if (count($logs) !== 13) {
             throw new Exception('Wrong count');
         }
 
@@ -87,19 +87,27 @@ class Check extends AbstractMigration
             throw new Exception('Items count in table_4 is not 1000, but ' . $table4Count['cnt']);
         }
 
-        $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 1]);
+        $item1 = $this->fetch('renamed_table_1', ['*'], ['id' => 10]);
         if ((bool)$item1['is_active'] !== false) {
-            throw new Exception('is_active for item with id 1 should be false');
+            throw new Exception('is_active for item with id 10 should be false');
         }
 
-        $item2 = $this->fetch('renamed_table_1', ['*'], ['id' => 2]);
+        $item2 = $this->fetch('renamed_table_1', ['*'], ['id' => 11]);
         if ((bool)$item2['is_active'] !== true) {
-            throw new Exception('is_active for item with id 2 should be true');
+            throw new Exception('is_active for item with id 11 should be true');
         }
 
-        $item3 = $this->fetch('renamed_table_1', ['*'], ['id' => 3]);
+        $item3 = $this->fetch('renamed_table_1', ['*'], ['id' => 12]);
         if ((bool)$item3['is_active'] !== true) {
-            throw new Exception('is_active for item with id 3 should be false');
+            throw new Exception('is_active for item with id 12 should be false');
+        }
+
+        $item100 = $this->fetch('renamed_table_1', ['*'], ['id' => 100]);
+        if (!$item100) {
+            throw new Exception('There is no item with id 100');
+        }
+        if ((bool)$item100['is_active'] !== true) {
+            throw new Exception('is_active for item with id 100 should be false');
         }
 
         if ($this->tableExists('non_existing_table')) {
