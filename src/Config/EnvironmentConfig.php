@@ -2,6 +2,8 @@
 
 namespace Phoenix\Config;
 
+use PDO;
+
 class EnvironmentConfig
 {
     private $configuration;

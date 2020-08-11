@@ -99,7 +99,8 @@ abstract class AbstractMigration
      *
      * @return PDO
      */
-    final protected function getConnection(): PDO {
+    final protected function getConnection(): PDO
+    {
         return $this->adapter->getConnection();
     }
 

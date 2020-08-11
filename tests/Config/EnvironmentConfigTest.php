@@ -119,13 +119,11 @@ class EnvironmentConfigTest extends TestCase
 
     public function testCustomConnectionNull()
     {
-        $connection = null;
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'any_adapter',
-            'connection' => $connection,
+            'connection' => null,
         ]);
         $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
-        $this->assertNotEquals($connection, $environmentConfig->getConnection());
         $this->assertNull($environmentConfig->getConnection());
     }
 }

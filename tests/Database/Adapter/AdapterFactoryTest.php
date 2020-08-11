@@ -2,6 +2,7 @@
 
 namespace Phoenix\Tests\Database\Adapter;
 
+use PDO;
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\MysqlAdapter;
@@ -98,7 +99,7 @@ class AdapterFactoryTest extends TestCase
 
     public function testCustomConnectionMySQL()
     {
-        $connection = new \PDO('sqlite::memory:');
+        $connection = new PDO('sqlite::memory:');
 
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -112,7 +113,7 @@ class AdapterFactoryTest extends TestCase
 
     public function testCustomConnectionPgsql()
     {
-        $connection = new \PDO('sqlite::memory:');
+        $connection = new PDO('sqlite::memory:');
 
         $config = new EnvironmentConfig([
             'adapter' => 'pgsql',
