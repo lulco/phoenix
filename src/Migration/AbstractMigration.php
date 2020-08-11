@@ -2,6 +2,7 @@
 
 namespace Phoenix\Migration;
 
+use PDO;
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\MigrationTable;
@@ -87,6 +88,19 @@ abstract class AbstractMigration
     final protected function execute($sql): void
     {
         $this->queriesToExecute[] = $sql;
+    }
+
+    /**
+     * If for some reasons user needs to access to connection (for example he uses custom compatible database connection
+     * and he wants to access some functionality), this method can help.
+     *
+     * Warning: using this method directly can have some unknown consequences, so don't use it if there is another way
+     * to get required functionality.
+     *
+     * @return PDO
+     */
+    final protected function getConnection(): PDO {
+        return $this->adapter->getConnection();
     }
 
     /**

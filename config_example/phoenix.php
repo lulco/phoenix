@@ -13,6 +13,7 @@ return [
             'password' => '123',
             'db_name' => 'phoenix',
             'charset' => 'utf8', // optional
+            'connection' => null, // existing PDO instance that you need to be reused; use this or other parameters
         ],
         'pgsql' => [
             'adapter' => 'pgsql',
@@ -21,6 +22,7 @@ return [
             'password' => '123',
             'db_name' => 'phoenix',
             'charset' => 'utf8',
+            'connection' => null, // existing PDO instance that you need to be reused; use this or other parameters
         ],
     ],
 ];

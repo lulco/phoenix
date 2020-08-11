@@ -95,4 +95,45 @@ class AdapterFactoryTest extends TestCase
         $this->expectExceptionMessage('Unknown adapter "unknown". Use one of value: "mysql", "pgsql".');
         AdapterFactory::instance($config);
     }
+
+    public function testCustomConnectionMySQL()
+    {
+        $connection = new \PDO('sqlite::memory:');
+
+        $config = new EnvironmentConfig([
+            'adapter' => 'mysql',
+            'connection' => $connection,
+        ]);
+
+        $adapter = AdapterFactory::instance($config);
+        $this->assertInstanceOf(MysqlAdapter::class, $adapter);
+        $this->assertEquals($connection, $adapter->getConnection());
+    }
+
+    public function testCustomConnectionPgsql()
+    {
+        $connection = new \PDO('sqlite::memory:');
+
+        $config = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'connection' => $connection,
+        ]);
+
+        $adapter = AdapterFactory::instance($config);
+        $this->assertInstanceOf(PgsqlAdapter::class, $adapter);
+        $this->assertEquals($connection, $adapter->getConnection());
+    }
+
+    public function testBadCustomConnectionWithGoodDSNString()
+    {
+        $config = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'connection' => 'random string',
+            'dsn' => 'sqlite::memory:'
+        ]);
+
+        $adapter = AdapterFactory::instance($config);
+        $this->assertInstanceOf(PgsqlAdapter::class, $adapter);
+        $this->assertNotEquals('random string', $adapter->getConnection());
+    }
 }

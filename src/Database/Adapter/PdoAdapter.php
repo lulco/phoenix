@@ -268,6 +268,14 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->charset;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getConnection(): PDO
+    {
+        return $this->pdo;
+    }
+
     protected function getLengthAndDecimals(?string $lengthAndDecimals = null)
     {
         if ($lengthAndDecimals === null) {

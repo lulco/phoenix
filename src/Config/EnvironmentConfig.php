@@ -60,6 +60,19 @@ class EnvironmentConfig
         return $this->configuration['version'] ?? null;
     }
 
+    /**
+     * If user wish to reuse existing connection, connection can be passed as config parameter 'connection'
+     * and will be accessed from here.
+     *
+     * At current moment only PDO based connections are supported. In future that can change.
+     *
+     * @return PDO|null
+     */
+    public function getConnection(): ?PDO
+    {
+        return $this->checkConfigValue('connection') && ($this->configuration['connection'] instanceof \PDO) ? $this->configuration['connection'] : null;
+    }
+
     private function checkConfigValue(string $key): bool
     {
         return isset($this->configuration[$key]) && $this->configuration[$key];

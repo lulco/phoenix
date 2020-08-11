@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Adapter;
 
+use PDO;
 use PDOStatement;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
@@ -61,4 +62,11 @@ interface AdapterInterface
     public function getCharset(): ?string;
 
     public function getStructure(): Structure;
+
+    /**
+     * Gets current database connection
+     *
+     * @return PDO
+     */
+    public function getConnection(): PDO;
 }

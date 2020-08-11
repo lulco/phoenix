@@ -93,4 +93,39 @@ class EnvironmentConfigTest extends TestCase
         $this->assertEquals('test_username', $environmentConfig->getUsername());
         $this->assertEquals('test_password', $environmentConfig->getPassword());
     }
+
+    public function testCustomConnectionPDO()
+    {
+        $pdo = new \PDO('sqlite::memory:');
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'any_adapter',
+            'connection' => $pdo,
+        ]);
+        $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
+        $this->assertEquals($pdo, $environmentConfig->getConnection());
+    }
+
+    public function testCustomConnectionNotPDO()
+    {
+        $connection = new \stdClass();
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'any_adapter',
+            'connection' => $connection,
+        ]);
+        $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
+        $this->assertNotEquals($connection, $environmentConfig->getConnection());
+        $this->assertNull($environmentConfig->getConnection());
+    }
+
+    public function testCustomConnectionNull()
+    {
+        $connection = null;
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'any_adapter',
+            'connection' => $connection,
+        ]);
+        $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
+        $this->assertNotEquals($connection, $environmentConfig->getConnection());
+        $this->assertNull($environmentConfig->getConnection());
+    }
 }
