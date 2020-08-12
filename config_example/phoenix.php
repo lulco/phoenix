@@ -13,7 +13,6 @@ return [
             'password' => '123',
             'db_name' => 'phoenix',
             'charset' => 'utf8', // optional
-            'connection' => null, // existing PDO instance that you need to be reused; use this or other parameters
         ],
         'pgsql' => [
             'adapter' => 'pgsql',
@@ -22,7 +21,10 @@ return [
             'password' => '123',
             'db_name' => 'phoenix',
             'charset' => 'utf8',
-            'connection' => null, // existing PDO instance that you need to be reused; use this or other parameters
         ],
+        'custom_connection' => [
+            'adapter' => 'mysql', // or pgsql
+            'connection' => new PDO('mysql://'), // or any instance that extends PDO and compatible with selected adapter
+        ]
     ],
 ];

@@ -2,8 +2,11 @@
 
 namespace Phoenix\Tests\Config;
 
+use PDO;
 use Phoenix\Config\EnvironmentConfig;
+use Phoenix\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class EnvironmentConfigTest extends TestCase
 {
@@ -96,7 +99,7 @@ class EnvironmentConfigTest extends TestCase
 
     public function testCustomConnectionPDO()
     {
-        $pdo = new \PDO('sqlite::memory:');
+        $pdo = new PDO('sqlite::memory:');
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'any_adapter',
             'connection' => $pdo,
@@ -107,14 +110,15 @@ class EnvironmentConfigTest extends TestCase
 
     public function testCustomConnectionNotPDO()
     {
-        $connection = new \stdClass();
+        $connection = new stdClass();
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'any_adapter',
             'connection' => $connection,
         ]);
         $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
-        $this->assertNotEquals($connection, $environmentConfig->getConnection());
-        $this->assertNull($environmentConfig->getConnection());
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Connection instance must extend PDO class');
+        $environmentConfig->getConnection();
     }
 
     public function testCustomConnectionNull()
@@ -124,6 +128,6 @@ class EnvironmentConfigTest extends TestCase
             'connection' => null,
         ]);
         $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
-        $this->assertNull($environmentConfig->getConnection());
+        $this->assertInstanceOf(PDO::class, $environmentConfig->getConnection());
     }
 }

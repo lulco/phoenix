@@ -3,6 +3,7 @@
 namespace Phoenix\Config;
 
 use PDO;
+use Phoenix\Exception\ConfigException;
 
 class EnvironmentConfig
 {
@@ -64,15 +65,21 @@ class EnvironmentConfig
 
     /**
      * If user wish to reuse existing connection, connection can be passed as config parameter 'connection'
-     * and will be accessed from here.
+     * and will be accessed from here. Otherwise new PDO connection will be created.
      *
-     * At current moment only PDO based connections are supported. In future that can change.
-     *
-     * @return PDO|null
+     * @return PDO
+     * 
+     * @throws ConfigException
      */
-    public function getConnection(): ?PDO
+    public function getConnection(): PDO
     {
-        return $this->checkConfigValue('connection') && ($this->configuration['connection'] instanceof \PDO) ? $this->configuration['connection'] : null;
+        if ($this->checkConfigValue('connection')) {
+            if ($this->configuration['connection'] instanceof PDO) {
+                return $this->configuration['connection'];
+            }
+            throw new ConfigException('Connection instance must extend PDO class');
+        }
+        return new PDO($this->getDsn(), $this->getUsername(), $this->getPassword());
     }
 
     private function checkConfigValue(string $key): bool

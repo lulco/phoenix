@@ -9,6 +9,7 @@ use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Adapter\PgsqlAdapter;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
 use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
+use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
@@ -133,8 +134,32 @@ class AdapterFactoryTest extends TestCase
             'dsn' => 'sqlite::memory:'
         ]);
 
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Connection instance must extend PDO class');
+        AdapterFactory::instance($config);
+    }
+
+    public function testBadCustomConnectionWithoutGoodDSNString()
+    {
+        $config = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'connection' => 'random string'
+        ]);
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Connection instance must extend PDO class');
+        AdapterFactory::instance($config);
+    }
+
+    public function testNullCustomConnectionWithGoodDSNString()
+    {
+        $config = new EnvironmentConfig([
+            'adapter' => 'pgsql',
+            'connection' => null,
+            'dsn' => 'sqlite::memory:'
+        ]);
+
         $adapter = AdapterFactory::instance($config);
         $this->assertInstanceOf(PgsqlAdapter::class, $adapter);
-        $this->assertNotEquals('random string', $adapter->getConnection());
     }
 }
