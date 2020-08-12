@@ -24,7 +24,9 @@ return [
         ],
         'custom_connection' => [
             'adapter' => 'mysql', // or pgsql
-            'connection' => new PDO('mysql://'), // or any instance that extends PDO and compatible with selected adapter
+            'connection' => new PDO('mysql:host=127.0.0.1;port=3306;dbname=mysql;charset=utf8', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT // we not recommend to use silent error mode but for testing purpose that is ok
+            ])
         ]
     ],
 ];
