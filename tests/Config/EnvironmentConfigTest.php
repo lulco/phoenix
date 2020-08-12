@@ -128,6 +128,8 @@ class EnvironmentConfigTest extends TestCase
             'connection' => null,
         ]);
         $this->assertEquals('any_adapter', $environmentConfig->getAdapter());
-        $this->assertInstanceOf(PDO::class, $environmentConfig->getConnection());
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('db_name is not set for environment');
+        $environmentConfig->getConnection();
     }
 }

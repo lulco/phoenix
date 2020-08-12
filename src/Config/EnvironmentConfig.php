@@ -29,6 +29,12 @@ class EnvironmentConfig
         if ($this->checkConfigValue('dsn')) {
             return $this->configuration['dsn'];
         }
+        if (!$this->checkConfigValue('db_name')) {
+            throw new ConfigException('db_name is not set for environment');
+        }
+        if (!$this->checkConfigValue('host')) {
+            throw new ConfigException('host is not set for environment');
+        }
         $dsn = $this->configuration['adapter'] . ':dbname=' . $this->configuration['db_name'] . ';host=' . $this->configuration['host'];
         if ($this->checkConfigValue('port')) {
             $dsn .= ';port=' . $this->configuration['port'];
@@ -68,7 +74,7 @@ class EnvironmentConfig
      * and will be accessed from here. Otherwise new PDO connection will be created.
      *
      * @return PDO
-     * 
+     *
      * @throws ConfigException
      */
     public function getConnection(): PDO
