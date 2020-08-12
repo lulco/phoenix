@@ -24,9 +24,14 @@ return [
         ],
         'custom_connection' => [
             'adapter' => 'mysql', // or pgsql
-            'connection' => new PDO('mysql:host=127.0.0.1;port=3306;dbname=mysql;charset=utf8', null, null, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT // we not recommend to use silent error mode but for testing purpose that is ok
-            ])
+            'connection' => new class("example:") extends PDO {
+
+                public function __construct($dsn, $username = null, $passwd = null, $options = null)
+                {
+                    // this method here is just to disable PDO connection on class instance creation
+                }
+
+            }, // any object instance that is based on PDO can be used here
         ]
     ],
 ];
