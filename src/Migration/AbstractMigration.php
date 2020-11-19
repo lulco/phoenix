@@ -84,7 +84,7 @@ abstract class AbstractMigration
     /**
      * @param string|PDOStatement $sql
      */
-    final protected function execute($sql): void
+    protected function execute($sql): void
     {
         $this->queriesToExecute[] = $sql;
     }
@@ -100,7 +100,7 @@ abstract class AbstractMigration
      * other (false, null) - if your table doesn't have primary key
      * @return MigrationTable
      */
-    final protected function table(string $name, $primaryKey = true, ?string $charset = null, ?string $collation = null): MigrationTable
+    protected function table(string $name, $primaryKey = true, ?string $charset = null, ?string $collation = null): MigrationTable
     {
         $table = new MigrationTable($name, $primaryKey);
         $table->setCharset($charset ?: $this->adapter->getCharset());
@@ -110,12 +110,12 @@ abstract class AbstractMigration
         return $table;
     }
 
-    final protected function tableExists(string $name): bool
+    protected function tableExists(string $name): bool
     {
         return $this->adapter->getStructure()->getTable($name) !== null;
     }
 
-    final protected function tableColumnExists(string $tableName, string $columnName): bool
+    protected function tableColumnExists(string $tableName, string $columnName): bool
     {
         $table = $this->getTable($tableName);
         if ($table === null) {
@@ -124,22 +124,22 @@ abstract class AbstractMigration
         return $table->getColumn($columnName) !== null;
     }
 
-    final protected function getTable(string $name): ?Table
+    protected function getTable(string $name): ?Table
     {
         return $this->adapter->getStructure()->getTable($name);
     }
 
-    final protected function select(string $sql): array
+    protected function select(string $sql): array
     {
         return $this->adapter->select($sql);
     }
 
-    final protected function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array
+    protected function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array
     {
         return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
     }
 
-    final protected function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
+    protected function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
     }
@@ -147,7 +147,7 @@ abstract class AbstractMigration
     /**
      * adds insert query to list of queries to execute
      */
-    final protected function insert(string $table, array $data): AbstractMigration
+    protected function insert(string $table, array $data): AbstractMigration
     {
         $this->execute($this->adapter->buildInsertQuery($table, $data));
         return $this;
@@ -161,7 +161,7 @@ abstract class AbstractMigration
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
-    final protected function update(string $table, array $data, array $conditions = [], string $where = ''): AbstractMigration
+    protected function update(string $table, array $data, array $conditions = [], string $where = ''): AbstractMigration
     {
         $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
         return $this;
@@ -174,7 +174,7 @@ abstract class AbstractMigration
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
-    final protected function delete(string $table, array $conditions = [], string $where = ''): AbstractMigration
+    protected function delete(string $table, array $conditions = [], string $where = ''): AbstractMigration
     {
         $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
         return $this;
