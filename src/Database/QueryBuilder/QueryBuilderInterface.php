@@ -43,8 +43,8 @@ interface QueryBuilderInterface
     public function truncateTable(MigrationTable $table): array;
 
     /**
-     * @param string $string
+     * @param string|null $string
      * @return string escaped string
      */
-    public function escapeString(string $string): string;
+    public function escapeString(?string $string): string;
 }
