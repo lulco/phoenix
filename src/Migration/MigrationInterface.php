@@ -2,6 +2,7 @@
 
 namespace Phoenix\Migration;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Structure;
 
 /**
@@ -11,6 +12,13 @@ use Phoenix\Database\Element\Structure;
  */
 interface MigrationInterface
 {
+    /**
+     * MigrationInterface constructor.
+     *
+     * @param AdapterInterface $adapter
+     */
+    public function __construct(AdapterInterface $adapter);
+
     /**
      * Gets date-time for migration
      *
