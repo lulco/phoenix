@@ -69,12 +69,10 @@ class QueriesList implements IteratorAggregate
      *
      * @param string $table
      * @param array $data
-     * @return AbstractMigration
      */
-    final public function insert(string $table, array $data): AbstractMigration
+    final public function insert(string $table, array $data)
     {
         $this->execute($this->adapter->buildInsertQuery($table, $data));
-        return $this;
     }
 
     /**
@@ -83,12 +81,10 @@ class QueriesList implements IteratorAggregate
      * @param array $data
      * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
      * @param string $where additional where added to generated WHERE as is
-     * @return AbstractMigration
      */
-    final public function update(string $table, array $data, array $conditions = [], string $where = ''): AbstractMigration
+    final public function update(string $table, array $data, array $conditions = [], string $where = '')
     {
         $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
-        return $this;
     }
 
     /**
@@ -96,12 +92,10 @@ class QueriesList implements IteratorAggregate
      * @param string $table
      * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
      * @param string $where additional where added to generated WHERE as is
-     * @return AbstractMigration
      */
-    final public function delete(string $table, array $conditions = [], string $where = ''): AbstractMigration
+    final public function delete(string $table, array $conditions = [], string $where = '')
     {
         $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
-        return $this;
     }
 
     public function prepare(): array
