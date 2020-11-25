@@ -7,11 +7,10 @@ use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
-use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use ReflectionClass;
 
-abstract class AbstractMigration
+abstract class AbstractMigration implements MigrationInterface
 {
     /** @var AdapterInterface */
     private $adapter;
@@ -25,11 +24,12 @@ abstract class AbstractMigration
     /** @var string */
     private $fullClassName;
 
-    /** @var array */
-    private $queriesToExecute = [];
-
     /** @var array list of executed queries */
     private $executedQueries = [];
+    /**
+     * @var QueriesList
+     */
+    private $queriesList;
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -38,6 +38,7 @@ abstract class AbstractMigration
         $this->datetime = $classNameCreator->getDatetime();
         $this->className = $classNameCreator->getClassName();
         $this->fullClassName = $classNameCreator->getClassName();
+        $this->queriesList = new QueriesList($this->adapter);
     }
 
     final public function getDatetime(): string
@@ -59,7 +60,7 @@ abstract class AbstractMigration
     {
         $this->reset();
         $this->up();
-        $queries = $this->prepare();
+        $queries = $this->queriesList->prepare();
         return $this->runQueries($queries, $dry);
     }
 
@@ -67,14 +68,14 @@ abstract class AbstractMigration
     {
         $this->reset();
         $this->down();
-        $queries = $this->prepare();
+        $queries = $this->queriesList->prepare();
         return $this->runQueries($queries, $dry);
     }
 
     final public function updateStructure(Structure $structure): void
     {
         $this->up();
-        foreach ($this->queriesToExecute as $queryToExecute) {
+        foreach ($this->queriesList as $queryToExecute) {
             if ($queryToExecute instanceof MigrationTable) {
                 $structure->update($queryToExecute);
             }
@@ -86,7 +87,7 @@ abstract class AbstractMigration
      */
     final protected function execute($sql): void
     {
-        $this->queriesToExecute[] = $sql;
+        $this->queriesList->execute($sql);
     }
 
     /**
@@ -98,16 +99,13 @@ abstract class AbstractMigration
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
+     * @param string|null $charset
+     * @param string|null $collation
      * @return MigrationTable
      */
     final protected function table(string $name, $primaryKey = true, ?string $charset = null, ?string $collation = null): MigrationTable
     {
-        $table = new MigrationTable($name, $primaryKey);
-        $table->setCharset($charset ?: $this->adapter->getCharset());
-        $table->setCollation($collation);
-
-        $this->queriesToExecute[] = $table;
-        return $table;
+        return $this->queriesList->table($name, $primaryKey, $charset, $collation);
     }
 
     final protected function tableExists(string $name): bool
@@ -146,10 +144,15 @@ abstract class AbstractMigration
 
     /**
      * adds insert query to list of queries to execute
+     *
+     * @param string $table
+     * @param array $data
+     *
+     * @return AbstractMigration
      */
     final protected function insert(string $table, array $data): AbstractMigration
     {
-        $this->execute($this->adapter->buildInsertQuery($table, $data));
+        $this->queriesList->insert($table, $data);
         return $this;
     }
 
@@ -163,7 +166,7 @@ abstract class AbstractMigration
      */
     final protected function update(string $table, array $data, array $conditions = [], string $where = ''): AbstractMigration
     {
-        $this->execute($this->adapter->buildUpdateQuery($table, $data, $conditions, $where));
+        $this->queriesList->update($table, $data, $conditions, $where);
         return $this;
     }
 
@@ -176,7 +179,7 @@ abstract class AbstractMigration
      */
     final protected function delete(string $table, array $conditions = [], string $where = ''): AbstractMigration
     {
-        $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
+        $this->queriesList->delete($table, $conditions, $where);
         return $this;
     }
 
@@ -207,41 +210,7 @@ abstract class AbstractMigration
 
     private function reset(): void
     {
-        $this->queriesToExecute = [];
+        $this->queriesList->reset();
         $this->executedQueries = [];
-    }
-
-    private function prepare(): array
-    {
-        $queryBuilder = $this->adapter->getQueryBuilder();
-        $queries = [];
-        foreach ($this->queriesToExecute as $queryToExecute) {
-            if (!$queryToExecute instanceof MigrationTable) {
-                $queries[] = $queryToExecute;
-                continue;
-            }
-            $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
-            $queries = array_merge($queries, $tableQueries);
-        }
-        return $queries;
-    }
-
-    private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder): array
-    {
-        $tableQueries = [];
-        if ($table->getAction() === MigrationTable::ACTION_CREATE) {
-            $tableQueries = $queryBuilder->createTable($table);
-        } elseif ($table->getAction() === MigrationTable::ACTION_ALTER) {
-            $tableQueries = $queryBuilder->alterTable($table);
-        } elseif ($table->getAction() === MigrationTable::ACTION_RENAME) {
-            $tableQueries = $queryBuilder->renameTable($table);
-        } elseif ($table->getAction() === MigrationTable::ACTION_DROP) {
-            $tableQueries = $queryBuilder->dropTable($table);
-        } elseif ($table->getAction() === MigrationTable::ACTION_COPY) {
-            $tableQueries = $queryBuilder->copyTable($table);
-        } elseif ($table->getAction() === MigrationTable::ACTION_TRUNCATE) {
-            $tableQueries = $queryBuilder->truncateTable($table);
-        }
-        return $tableQueries;
     }
 }

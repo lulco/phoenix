@@ -3,10 +3,10 @@
 namespace Phoenix\Migration;
 
 use DateTime;
+use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
-use Phoenix\Behavior\ParamsCheckerBehavior;
 
 class Manager
 {
@@ -121,19 +121,19 @@ class Manager
         return $executedMigrations;
     }
 
-    public function logExecution(AbstractMigration $migration): void
+    public function logExecution(MigrationInterface $migration): void
     {
         $data = $this->createData($migration);
         $data['executed_at'] = new DateTime();
         $this->adapter->insert($this->config->getLogTableName(), $data);
     }
 
-    public function removeExecution(AbstractMigration $migration): void
+    public function removeExecution(MigrationInterface $migration): void
     {
         $this->adapter->delete($this->config->getLogTableName(), $this->createData($migration));
     }
 
-    private function createData(AbstractMigration $migration): array
+    private function createData(MigrationInterface $migration): array
     {
         return [
             'classname' => $migration->getFullClassName(),

@@ -4,9 +4,9 @@ namespace Phoenix\Tests\Migration;
 
 use Phoenix\Config\Config;
 use Phoenix\Exception\InvalidArgumentValueException;
-use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
+use Phoenix\Migration\MigrationInterface;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use Phoenix\Tests\Mock\Migration\FakeMigration;
@@ -215,7 +215,7 @@ class ManagerTest extends TestCase
         $this->assertCount($count, $migrations);
         $numberOfMigrations = count($migrations);
         for ($i = 0; $i < $numberOfMigrations; ++$i) {
-            $this->assertInstanceOf(AbstractMigration::class, $migrations[$i]);
+            $this->assertInstanceOf(MigrationInterface::class, $migrations[$i]);
             $this->assertEquals($migrationDatetimes[$i], $migrations[$i]->getDatetime());
         }
     }

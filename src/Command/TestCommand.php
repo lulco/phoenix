@@ -2,8 +2,8 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
+use Phoenix\Migration\MigrationInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -73,7 +73,7 @@ class TestCommand extends AbstractCommand
         }
     }
 
-    private function logMigration(AbstractMigration $migration, string $type, float $executionTime): void
+    private function logMigration(MigrationInterface $migration, string $type, float $executionTime): void
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);

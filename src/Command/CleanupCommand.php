@@ -2,9 +2,9 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
+use Phoenix\Migration\MigrationInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanupCommand extends AbstractCommand
@@ -45,7 +45,7 @@ class CleanupCommand extends AbstractCommand
         }
     }
 
-    private function addMigrationToList(AbstractMigration $migration): array
+    private function addMigrationToList(MigrationInterface $migration): array
     {
         $executedQueries = $migration->getExecutedQueries();
         $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);

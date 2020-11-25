@@ -2,8 +2,8 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
+use Phoenix\Migration\MigrationInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends AbstractRunCommand
@@ -32,7 +32,7 @@ class MigrateCommand extends AbstractRunCommand
         return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target, $dirs, $classes);
     }
 
-    protected function runMigration(AbstractMigration $migration, bool $dry = false): void
+    protected function runMigration(MigrationInterface $migration, bool $dry = false): void
     {
         $migration->migrate($dry);
         if (!$dry) {
