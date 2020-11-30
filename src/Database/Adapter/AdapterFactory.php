@@ -12,6 +12,7 @@ class AdapterFactory
     {
         $pdo = new PDO($config->getDsn(), $config->getUsername(), $config->getPassword());
 
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         sscanf($config->getVersion() ?? $pdo->getAttribute(PDO::ATTR_SERVER_VERSION), '%d.%d.%d', $v1, $v2, $v3);
         $version = implode('.', array_filter([$v1, $v2, $v3], function ($v) {
             return $v !== null;

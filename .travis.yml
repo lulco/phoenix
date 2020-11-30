@@ -26,16 +26,19 @@ before_script:
 script:
     - mkdir -p build/logs
     - composer outdated -D --strict
+
     - composer require squizlabs/php_codesniffer --dev
     - vendor/bin/phpcs src --standard=PSR2 -n
     - composer remove squizlabs/php_codesniffer --dev
+
     - composer require phpstan/phpstan --dev
     - vendor/bin/phpstan analyze src --level=5 --no-progress
     - composer remove phpstan/phpstan --dev
-#    Add back when will support symfony/console 5.0
-#    - composer require efabrica/php-extensions-finder --dev
-#    - vendor/bin/php-extensions-finder check src tests
-#    - composer remove efabrica/php-extensions-finder --dev
+
+    - composer require efabrica/php-extensions-finder --dev
+    - vendor/bin/php-extensions-finder check src tests
+    - composer remove efabrica/php-extensions-finder --dev
+
     - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:
