@@ -21,6 +21,8 @@ class PgsqlPdo extends PDO
         if (getenv('PHOENIX_PGSQL_CHARSET')) {
             $dsn .= ';options=\'--client_encoding=' . getenv('PHOENIX_PGSQL_CHARSET') . '\'';
         }
-        parent::__construct($dsn, getenv('PHOENIX_PGSQL_USERNAME'), getenv('PHOENIX_PGSQL_PASSWORD'));
+        parent::__construct($dsn, getenv('PHOENIX_PGSQL_USERNAME'), getenv('PHOENIX_PGSQL_PASSWORD'), [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
+        ]);
     }
 }

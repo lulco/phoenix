@@ -27,11 +27,11 @@ class PdoAdapterTest extends TestCase
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
 
-        $this->adapter->startTransaction();
+        $this->assertTrue($this->adapter->startTransaction());
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->adapter->query('INSERT INTO `phoenix_test_table` VALUES (1, "first");');
         $this->adapter->query('INSERT INTO `phoenix_test_table` VALUES (2, "second");');
-        $this->adapter->commit();
+        $this->assertTrue($this->adapter->commit());
     }
 
     public function testInsert()

@@ -246,6 +246,9 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function commit(): bool
     {
+        if (!$this->pdo->inTransaction()) {
+            return true;    // back compatibility for PHP 8.0 - autocommited transaction throws error here
+        }
         return $this->pdo->commit();
     }
 
@@ -254,6 +257,9 @@ abstract class PdoAdapter implements AdapterInterface
      */
     public function rollback(): bool
     {
+        if (!$this->pdo->inTransaction()) {
+            return true;    // back compatibility for PHP 8.0 - autocommited transaction throws error here
+        }
         return $this->pdo->rollBack();
     }
 
