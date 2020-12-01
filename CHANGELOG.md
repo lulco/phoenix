@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.4.0] - 2020-12-01
 #### Changed
 - default value of boolean columns is set to false if it is not null (this prevent from errors when user forgot set default to false)
 - better organized docs
@@ -227,7 +228,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.3.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/lulco/phoenix/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/lulco/phoenix/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/lulco/phoenix/compare/1.1.1...1.2.0
 [1.1.1]: https://github.com/lulco/phoenix/compare/1.1.0...1.1.1
