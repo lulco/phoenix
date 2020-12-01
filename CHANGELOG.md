@@ -4,10 +4,15 @@
 
 #### Changed
 - default value of boolean columns is set to false if it is not null (this prevent from errors when user forgot set default to false)
+- better organized docs
 
 #### Added
-- support for PHP 8.0 - `$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);`
+- support for PHP 8.0
+  - `$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);`
 - set autoincrement for new table and also for existing table
+
+#### Fixed
+- escape string in QueryBuilderInterface
 
 ### [1.3.0] - 2020-04-16
 #### Added
