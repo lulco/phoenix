@@ -98,6 +98,8 @@ abstract class AbstractMigration
      * array of strings - names of columns in list of columns
      * array of Column - list of own columns (all columns are added to list of columns)
      * other (false, null) - if your table doesn't have primary key
+     * @param string|null $charset
+     * @param string|null $collation
      * @return MigrationTable
      */
     final protected function table(string $name, $primaryKey = true, ?string $charset = null, ?string $collation = null): MigrationTable
@@ -146,6 +148,11 @@ abstract class AbstractMigration
 
     /**
      * adds insert query to list of queries to execute
+     *
+     * @param string $table
+     * @param array $data
+     *
+     * @return AbstractMigration
      */
     final protected function insert(string $table, array $data): AbstractMigration
     {
@@ -181,6 +188,9 @@ abstract class AbstractMigration
     }
 
     /**
+     * @param array $queries
+     * @param bool $dry
+     *
      * @throws DatabaseQueryExecuteException
      */
     private function runQueries(array $queries, bool $dry = false): array

@@ -28,6 +28,11 @@ abstract class PdoAdapter implements AdapterInterface
         $this->version = $version;
     }
 
+    /**
+     * @param PDOStatement $sql
+     * @return bool
+     * @throws DatabaseQueryExecuteException on error
+     */
     public function execute(PDOStatement $sql): bool
     {
         $res = $sql->execute();
@@ -37,6 +42,11 @@ abstract class PdoAdapter implements AdapterInterface
         return $res;
     }
 
+    /**
+     * @param string $sql
+     * @return PDOStatement
+     * @throws DatabaseQueryExecuteException on error
+     */
     public function query(string $sql): PDOStatement
     {
         $res = $this->pdo->query($sql);

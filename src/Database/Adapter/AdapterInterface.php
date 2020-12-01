@@ -5,13 +5,24 @@ namespace Phoenix\Database\Adapter;
 use PDOStatement;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 
 interface AdapterInterface
 {
+    /**
+     * @param PDOStatement $sql
+     * @return bool
+     * @throws DatabaseQueryExecuteException on error
+     */
     public function execute(PDOStatement $sql): bool;
 
+    /**
+     * @param string $sql
+     * @return PDOStatement
+     * @throws DatabaseQueryExecuteException on error
+     */
     public function query(string $sql): PDOStatement;
-    
+
     /**
      * @return mixed last inserted id
      */
