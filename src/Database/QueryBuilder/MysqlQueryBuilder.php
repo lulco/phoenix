@@ -80,7 +80,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $query .= $this->createTableCharset($table);
         $query .= $this->createTableComment($table);
         $query .= ';';
-        return [$query];
+
+        $queries = [$query];
+        if ($table->getAutoIncrement() !== null) {
+            $queries[] = $this->createAutoIncrement($table);
+        }
+        return $queries;
     }
 
     public function dropTable(MigrationTable $table): array
@@ -95,7 +100,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     public function renameTable(MigrationTable $table): array
     {
-        return ['RENAME TABLE ' . $this->escapeString($table->getName())  . ' TO ' . $this->escapeString($table->getNewName()) . ';'];
+        return ['RENAME TABLE ' . $this->escapeString($table->getName()) . ' TO ' . $this->escapeString($table->getNewName()) . ';'];
     }
 
     public function alterTable(MigrationTable $table): array
@@ -140,6 +145,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = array_merge($queries, $this->addForeignKeys($table));
         if ($table->getComment() !== null) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . $this->createTableComment($table) . ';';
+        }
+        if ($table->getAutoIncrement() !== null) {
+            $queries[] = $this->createAutoIncrement($table);
         }
         return $queries;
     }
@@ -212,7 +220,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             return ' AFTER ' . $this->escapeString($column->getSettings()->getAfter());
         }
         if ($column->getSettings()->isFirst()) {
-            return  ' FIRST';
+            return ' FIRST';
         }
         return '';
     }
@@ -262,6 +270,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function escapeString(?string $string): string
     {
         return '`' . $string . '`';
+    }
+
+    private function createAutoIncrement(MigrationTable $table): string
+    {
+        return sprintf('ALTER TABLE %s AUTO_INCREMENT=%d;', $this->escapeString($table->getName()), $table->getAutoIncrement());
     }
 
     private function createColumnCharset(Column $column): string

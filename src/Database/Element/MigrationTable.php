@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Database\Element\Behavior\AutoIncrementBehavior;
 use Phoenix\Database\Element\Behavior\CharsetAndCollationBehavior;
 use Phoenix\Database\Element\Behavior\ColumnsToChangeBehavior;
 use Phoenix\Database\Element\Behavior\ColumnsToDropBehavior;
@@ -15,6 +16,7 @@ use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 
 class MigrationTable
 {
+    use AutoIncrementBehavior;
     use CharsetAndCollationBehavior;
     use ColumnsToChangeBehavior;
     use ColumnsToDropBehavior;

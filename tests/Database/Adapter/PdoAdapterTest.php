@@ -166,15 +166,15 @@ class PdoAdapterTest extends TestCase
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
 
-        $this->adapter->startTransaction();
+        $this->assertTrue($this->adapter->startTransaction());
         try {
             $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
             $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
-            $this->adapter->commit();
+            $this->assertTrue($this->adapter->commit());
         } catch (DatabaseQueryExecuteException $e) {
             $this->assertEquals(1050, $e->getCode());
             $this->assertEquals('SQLSTATE[42S01]: Table \'phoenix_test_table\' already exists. Query CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`)); fails', $e->getMessage());
-            $this->adapter->rollback();
+            $this->assertTrue($this->adapter->rollback());
         }
     }
 }

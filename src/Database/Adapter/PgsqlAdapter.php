@@ -83,6 +83,17 @@ class PgsqlAdapter extends PdoAdapter
         $migrationTable->addColumn($column['column_name'], $type, $settings);
     }
 
+    public function getSequenceName(MigrationTable $migrationTable): ?string
+    {
+        $query = sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public' AND table_name = '%s' AND column_default LIKE 'nextval%%'", $this->loadDatabase(), $migrationTable->getName());
+        $autoIncrementColumn = $this->query($query)->fetch(PDO::FETCH_ASSOC);
+        if (!$autoIncrementColumn) {
+            return null;
+        }
+        preg_match('/nextval\(\'(.*?)\'/', $autoIncrementColumn['column_default'], $matches);
+        return $matches[1] ?? null;
+    }
+
     private function remapType(string $type): string
     {
         $types = [
