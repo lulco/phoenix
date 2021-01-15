@@ -108,11 +108,10 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $queries = $this->dropIndexes($table);
 
         $tableStructure = $this->adapter->getStructure()->getTable($table->getName());
-        if (($table->getCharset() && $table->getCharset() !== $tableStructure->getCharset()) || ($table->getCollation() && $table->getCollation() !== $tableStructure->getCollation())) {
+        if ($tableStructure && (($table->getCharset() && $table->getCharset() !== $tableStructure->getCharset()) || ($table->getCollation() && $table->getCollation() !== $tableStructure->getCollation()))) {
             $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . $this->createCharset($table->getCharset(), $table->getCollation()) . ';';
         }
         if ($table->getColumnsToRename()) {
-
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
             foreach ($table->getColumnsToRename() as $oldName => $newName) {
