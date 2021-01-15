@@ -38,6 +38,10 @@ interface AdapterInterface
 
     public function buildDeleteQuery(string $table, array $conditions = [], string $where = ''): PDOStatement;
 
+    public function buildDoNotCheckForeignKeysQuery(): string;
+
+    public function buildCheckForeignKeysQuery(): string;
+
     public function select(string $sql): array;
 
     public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array;

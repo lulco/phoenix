@@ -187,6 +187,30 @@ abstract class AbstractMigration
         return $this;
     }
 
+    final protected function changeCollation(string $targetCollation): void
+    {
+        $this->execute($this->adapter->buildDoNotCheckForeignKeysQuery());
+        [$targetCharset,] = explode('_', $targetCollation, 2);
+
+        foreach ($this->adapter->getStructure()->getTables() as $table) {
+            $migrationTable = $this->table($table->getName(), $table->getPrimary(), $targetCharset, $targetCollation);
+            foreach ($table->getColumns() as $column) {
+                $settings = $actualSettings = $column->getSettings()->getSettings();
+                if ($actualSettings['charset'] && $actualSettings['charset'] !== $targetCharset) {
+                    $settings['charset'] = $targetCharset;
+                }
+                if ($actualSettings['collation'] && $actualSettings['collation'] !== $targetCollation) {
+                    $settings['collation'] = $targetCollation;
+                }
+                if ($settings !== $actualSettings) {
+                    $migrationTable->changeColumn($column->getName(), $column->getName(), $column->getType(), $settings);
+                }
+            }
+            $migrationTable->save();
+        }
+        $this->execute($this->adapter->buildCheckForeignKeysQuery());
+    }
+
     /**
      * @param array $queries
      * @param bool $dry

@@ -26,6 +26,16 @@ class MysqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
+    public function buildDoNotCheckForeignKeysQuery(): string
+    {
+        return 'SET FOREIGN_KEY_CHECKS = 0;';
+    }
+
+    public function buildCheckForeignKeysQuery(): string
+    {
+        return 'SET FOREIGN_KEY_CHECKS = 1;';
+    }
+
     protected function loadDatabase(): string
     {
         return $this->query('SELECT database()')->fetchColumn();
