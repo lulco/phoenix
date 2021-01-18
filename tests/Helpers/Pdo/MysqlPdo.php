@@ -10,10 +10,10 @@ class MysqlPdo extends PDO
     {
         $dsn = 'mysql:';
         if ($db) {
-            $dsn .= 'dbname=' . $db;
+            $dsn .= 'dbname=' . $db . ';';
         }
         if (getenv('PHOENIX_MYSQL_HOST')) {
-            $dsn .= ';host=' . getenv('PHOENIX_MYSQL_HOST');
+            $dsn .= 'host=' . getenv('PHOENIX_MYSQL_HOST');
         }
         if (getenv('PHOENIX_MYSQL_PORT')) {
             $dsn .= ';port=' . getenv('PHOENIX_MYSQL_PORT');
