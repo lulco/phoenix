@@ -42,21 +42,14 @@ jobs:
       - name: Composer update
         run: composer update --no-progress --no-suggest
 
-      - name: Show DBs
-        run: mysql -uroot -h127.0.0.1 -P${{ job.services.mysql.ports[3306] }} -p123 -e 'SHOW DATABASES;'
-
-      - name: Check DB
-        run: mysql -uroot -h127.0.0.1 -P${{ job.services.mysql.ports[3306] }} -p123 phoenix -e 'CREATE TABLE `test` (`id` int NOT NULL AUTO_INCREMENT PRIMARY KEY);' -e 'SHOW TABLES;'
-
-#      - name: Create mysql database
-#        run: mysql -uroot -h127.0.0.1 -P${{ job.services.mysql.ports[3306] }} -p123 -e 'CREATE DATABASE IF NOT EXISTS phoenix;'
+      - name: Debug php mysql
+        run: php -i | grep mysql
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
         env:
-          PHOENIX_MYSQL_HOST: 127.0.0.1
+#          PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           PHOENIX_MYSQL_PASSWORD: 123
-          PHOENIX_MYSQL_DATABASE: phoenix
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
           PHOENIX_PGSQL_PASSWORD: 123
