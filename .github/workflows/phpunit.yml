@@ -41,10 +41,11 @@ jobs:
       - name: Composer update
         run: composer update
 
+      - name: Drop mysql database
+        run: mysql -e 'DROP DATABASE IF EXISTS phoenix;'
+
       - name: Create mysql database
-        run:
-          - mysql -e 'DROP DATABASE IF EXISTS phoenix;'
-          - mysql -e 'CREATE DATABASE phoenix;'
+        run: mysql -e 'CREATE DATABASE phoenix;'
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
