@@ -11,9 +11,16 @@ jobs:
         php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
 
     name: PHPStan PHP ${{ matrix.php }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none # disable xdebug, pcov
 
       - name: Composer update
         run: composer update
