@@ -1,6 +1,10 @@
 name: PHP syntax checker
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    branches:
+      - '**:**'
 
 jobs:
   syntax_checker:
