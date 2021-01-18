@@ -8,19 +8,21 @@ class MysqlPdo extends PDO
 {
     public function __construct($db = null)
     {
-        $dsn = 'mysql:';
+        $dsnParts = [];
         if ($db) {
-            $dsn .= 'dbname=' . $db . ';';
+            $dsnParts[] = 'dbname=' . $db;
         }
         if (getenv('PHOENIX_MYSQL_HOST')) {
-            $dsn .= 'host=' . getenv('PHOENIX_MYSQL_HOST');
+            $dsnParts[] = 'host=' . getenv('PHOENIX_MYSQL_HOST');
         }
         if (getenv('PHOENIX_MYSQL_PORT')) {
-            $dsn .= ';port=' . getenv('PHOENIX_MYSQL_PORT');
+            $dsnParts[] = 'port=' . getenv('PHOENIX_MYSQL_PORT');
         }
         if (getenv('PHOENIX_MYSQL_CHARSET')) {
-            $dsn .= ';charset=' . getenv('PHOENIX_MYSQL_CHARSET');
+            $dsnParts[] = 'charset=' . getenv('PHOENIX_MYSQL_CHARSET');
         }
+
+        $dsn = 'mysql:' . implode(';', $dsnParts);
         var_dump($dsn);
         var_dump(getenv('PHOENIX_MYSQL_USERNAME'));
         var_dump(getenv('PHOENIX_MYSQL_PASSWORD'));
