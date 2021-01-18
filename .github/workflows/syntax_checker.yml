@@ -4,8 +4,14 @@ on: [push]
 
 jobs:
   lint:
-    name: Linter
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
+
+    name: PHP syntax checker PHP ${{ matrix.php }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

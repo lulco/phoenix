@@ -2,10 +2,25 @@ name: PHPunit
 
 on: [push]
 
+services:
+  mysql:
+    image: mysql:5.7
+    env:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: phoenix
+    ports:
+      - 3306
+    options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
 jobs:
   phpunit:
-    name: PHPunit
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
+
+    name: PHPunit PHP ${{ matrix.php }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
