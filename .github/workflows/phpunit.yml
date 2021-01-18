@@ -2,7 +2,6 @@ name: PHPunit
 
 on: [push]
 
-
 jobs:
   phpunit:
     runs-on: ubuntu-latest
@@ -36,10 +35,8 @@ jobs:
       - name: Composer update
         run: composer update
 
-      - name: Debug
-        run: echo ${{ job.services.mysql.ports[3306] }}
-
       - name: PHPunit
-        run: PHOENIX_MYSQL_HOST=mysql vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-#        env:
-#          PHOENIX_MYSQL_HOST: mysql:${{ job.services.mysql.ports[3306] }}
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+        env:
+          PHOENIX_MYSQL_HOST: mysql
+          PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
