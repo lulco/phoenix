@@ -17,7 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractCommand extends Command
 {
-    protected ?Config $config = null;
+    /** @var Config|null  */
+    protected $config = null;
 
     /** @var AdapterInterface */
     protected $adapter;
