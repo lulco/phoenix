@@ -37,21 +37,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: pdo, pdo_sqlite, pdo_mysql
 
       - name: Composer update
         run: composer update --no-progress --no-interaction
 
-      - name: Debug php mysql
-        run: php -i | grep mysql
-
-      - name: Socket exists
-        run: ls -la /var/run/mysqld/mysqld.sock
-
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
         env:
-#          PHOENIX_MYSQL_HOST: 127.0.0.1
+          PHOENIX_MYSQL_HOST: mysql
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           PHOENIX_MYSQL_PASSWORD: 123
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
