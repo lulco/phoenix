@@ -38,3 +38,5 @@ jobs:
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+        env:
+          PHOENIX_MYSQL_HOST: 127.0.0.1:${{ job.services.mysql.ports[3306] }}
