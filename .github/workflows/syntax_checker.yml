@@ -23,4 +23,4 @@ jobs:
           coverage: none # disable xdebug, pcov
 
       - name: Check syntax
-        run: php -l src tests
+        run: find src bin tests -name "*.php" -print0 | xargs -0 -n1 -P8 php -l
