@@ -1,0 +1,26 @@
+name: PHP syntax checker
+
+on: [push, pull_request]
+
+jobs:
+  syntax_checker:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
+
+    name: PHP syntax checker PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none # disable xdebug, pcov
+
+      - name: Check syntax
+        run: find src bin tests -name "*.php" -print0 | xargs -0 -n1 -P8 php -l

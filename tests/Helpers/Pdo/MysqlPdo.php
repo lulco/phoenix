@@ -8,20 +8,22 @@ class MysqlPdo extends PDO
 {
     public function __construct($db = null)
     {
-        $dsn = 'mysql:';
+        $dsnParts = [];
         if ($db) {
-            $dsn .= 'dbname=' . $db;
+            $dsnParts[] = 'dbname=' . $db;
         }
         if (getenv('PHOENIX_MYSQL_HOST')) {
-            $dsn .= ';host=' . getenv('PHOENIX_MYSQL_HOST');
+            $dsnParts[] = 'host=' . getenv('PHOENIX_MYSQL_HOST');
         }
         if (getenv('PHOENIX_MYSQL_PORT')) {
-            $dsn .= ';port=' . getenv('PHOENIX_MYSQL_PORT');
+            $dsnParts[] = 'port=' . getenv('PHOENIX_MYSQL_PORT');
         }
         if (getenv('PHOENIX_MYSQL_CHARSET')) {
-            $dsn .= ';charset=' . getenv('PHOENIX_MYSQL_CHARSET');
+            $dsnParts[] = 'charset=' . getenv('PHOENIX_MYSQL_CHARSET');
         }
-        parent::__construct($dsn, getenv('PHOENIX_MYSQL_USERNAME'), getenv('PHOENIX_MYSQL_PASSWORD'), [
+
+        $dsn = 'mysql:' . implode(';', $dsnParts);
+        parent::__construct($dsn, getenv('PHOENIX_MYSQL_USERNAME'), getenv('PHOENIX_MYSQL_PASSWORD') ?: null, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
         ]);
     }
