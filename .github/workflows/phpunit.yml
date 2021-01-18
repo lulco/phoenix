@@ -50,5 +50,6 @@ jobs:
           PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           PHOENIX_MYSQL_PASSWORD: 123
+          PHOENIX_MYSQL_DATABASE: phoenix
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
           PHOENIX_PGSQL_PASSWORD: 123
