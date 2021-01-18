@@ -1,9 +1,9 @@
 name: PHP syntax checker
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  lint:
+  syntax_checker:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -16,5 +16,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none # disable xdebug, pcov
+
       - name: Check syntax
-        run: php -l src tests
+        run: find src bin tests -name "*.php" -print0 | xargs -0 -n1 -P8 php -l

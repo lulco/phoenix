@@ -1,16 +1,6 @@
 name: PHPunit
 
-on: [push]
-
-services:
-  mysql:
-    image: mysql:5.7
-    env:
-      MYSQL_ALLOW_EMPTY_PASSWORD: yes
-      MYSQL_DATABASE: phoenix
-    ports:
-      - 3306
-    options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+on: [push, pull_request]
 
 jobs:
   phpunit:
@@ -21,12 +11,51 @@ jobs:
         php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
 
     name: PHPunit PHP ${{ matrix.php }}
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: phoenix
+          MYSQL_ROOT_PASSWORD: 123
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: 123
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+        ports:
+          - 5432
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
       - name: Composer update
-        run: composer update
+        run: composer update --no-progress --no-interaction
+
+      - name: Start mysql database
+        run: sudo /etc/init.d/mysql start
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+        env:
+          PHOENIX_MYSQL_HOST: 127.0.0.1
+          PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          PHOENIX_MYSQL_PASSWORD: 123
+          PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
+          PHOENIX_PGSQL_PASSWORD: 123
+
+      - name: Send code coverage
+        run: |
+          if [ ${{ matrix.php }} == 7.4 ]; then
+            wget https://scrutinizer-ci.com/ocular.phar
+            php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+          fi
