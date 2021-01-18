@@ -52,6 +52,12 @@ class MysqlAdapterTest extends TestCase
         $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
+    public function testForeignKeyQueries()
+    {
+        $this->assertEquals('SET FOREIGN_KEY_CHECKS = 1;', $this->adapter->buildCheckForeignKeysQuery());
+        $this->assertEquals('SET FOREIGN_KEY_CHECKS = 0;', $this->adapter->buildDoNotCheckForeignKeysQuery());
+    }
+
     public function testGetEmptyStructureAndUpdate()
     {
         $structure = $this->adapter->getStructure();

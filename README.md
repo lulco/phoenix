@@ -26,6 +26,8 @@ Framework agnostic database migrations for PHP.
 - Own migration templates
 - Easy integration to any PHP application
 - PHPStorm suggestions (works even better with deep-assoc-completion plugin)
+- Change collation for all existing tables and columns
+- Turn foreign keys check on / off in migration
 
 ## Supported adapters
 - MySql

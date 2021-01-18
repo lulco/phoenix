@@ -6,7 +6,7 @@
         <env name="PHOENIX_MYSQL_USERNAME" value="root"/>
         <env name="PHOENIX_MYSQL_PASSWORD" value=""/>
         <env name="PHOENIX_MYSQL_DATABASE" value="phoenix"/>
-        <env name="PHOENIX_MYSQL_CHARSET" value="utf8"/>
+        <env name="PHOENIX_MYSQL_CHARSET" value="utf8mb4"/>
 
         <env name="PHOENIX_PGSQL_HOST" value="localhost"/>
         <env name="PHOENIX_PGSQL_USERNAME" value="postgres"/>

@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support to change collation on all existing tables and columns
+- support for turn on / off checking foreign keys in migration
+
 ### [1.4.0] - 2020-12-01
 #### Changed
 - default value of boolean columns is set to false if it is not null (this prevent from errors when user forgot set default to false)
