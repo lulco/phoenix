@@ -1,0 +1,14 @@
+name: PHP syntax checker
+
+on: [push]
+
+jobs:
+  phpcs:
+      name: Linter
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: lint
+          run: php -l src tests
