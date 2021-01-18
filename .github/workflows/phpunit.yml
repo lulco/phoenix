@@ -44,6 +44,9 @@ jobs:
       - name: Start mysql database
         run: sudo /etc/init.d/mysql start
 
+      - name: Connect to mysql
+        run: mysql -uroot -h127.0.0.1 -P${{ job.services.mysql.ports[3306] }} -e 'SHOW DATABASES;'
+
       - name: PHPunit
         run: vendor/bin/phpunit tests/Database/ --coverage-text --coverage-clover=coverage.clover
         env:
