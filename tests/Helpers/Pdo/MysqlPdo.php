@@ -21,8 +21,10 @@ class MysqlPdo extends PDO
         if (getenv('PHOENIX_MYSQL_CHARSET')) {
             $dsn .= ';charset=' . getenv('PHOENIX_MYSQL_CHARSET');
         }
-
-        parent::__construct($dsn, getenv('PHOENIX_MYSQL_USERNAME'), getenv('PHOENIX_MYSQL_PASSWORD'), [
+        var_dump($dsn);
+        var_dump(getenv('PHOENIX_MYSQL_USERNAME'));
+        var_dump(getenv('PHOENIX_MYSQL_PASSWORD'));
+        parent::__construct($dsn, getenv('PHOENIX_MYSQL_USERNAME'), getenv('PHOENIX_MYSQL_PASSWORD') ?: null, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
         ]);
     }
