@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '7.1', '7.2' ] #, '7.3', '7.4', '8.0' ]
+        php: [ '7.1', '7.2', '7.3', '7.4', '8.0' ]
 
     name: PHPunit PHP ${{ matrix.php }}
 
@@ -45,7 +45,7 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: PHPunit
-        run: vendor/bin/phpunit tests/Database/ --coverage-text --coverage-clover=coverage.clover
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
         env:
           PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
@@ -55,7 +55,7 @@ jobs:
 
       - name: Send code coverage
         run: |
-          if [ ${{ matrix.php }} == 7.1 ]; then
+          if [ ${{ matrix.php }} == 7.4 ]; then
             wget https://scrutinizer-ci.com/ocular.phar
             php ocular.phar code-coverage:upload --format=php-clover coverage.clover
           fi
