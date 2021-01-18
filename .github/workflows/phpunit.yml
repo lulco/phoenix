@@ -21,7 +21,9 @@ jobs:
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+      postgres:
+        image: postgres
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout code
@@ -38,5 +40,4 @@ jobs:
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
         env:
-          PHOENIX_MYSQL_HOST: mysql
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
