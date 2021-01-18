@@ -2,7 +2,7 @@
 
 <phpunit bootstrap="vendor/autoload.php">
     <php>
-        <env name="PHOENIX_MYSQL_HOST" value="localhost"/>
+        <env name="PHOENIX_MYSQL_HOST" value="mysql"/>
         <env name="PHOENIX_MYSQL_USERNAME" value="root"/>
         <env name="PHOENIX_MYSQL_PASSWORD" value=""/>
         <env name="PHOENIX_MYSQL_DATABASE" value="phoenix"/>
