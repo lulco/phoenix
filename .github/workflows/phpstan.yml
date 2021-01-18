@@ -1,6 +1,6 @@
 name: PHP static analysis
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   phpstan:
