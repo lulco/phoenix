@@ -18,6 +18,7 @@ jobs:
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: phoenix
+          MYSQL_ROOT_PASSWORD: 123
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -41,15 +42,10 @@ jobs:
       - name: Composer update
         run: composer update
 
-      - name: Drop mysql database
-        run: mysql -e 'DROP DATABASE IF EXISTS phoenix;'
-
-      - name: Create mysql database
-        run: mysql -e 'CREATE DATABASE phoenix;'
-
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
         env:
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          PHOENIX_MYSQL_PASSWORD: 123
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
           PHOENIX_PGSQL_PASSWORD: 123
