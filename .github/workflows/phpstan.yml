@@ -1,0 +1,20 @@
+name: PHP static analysis
+
+on: [push]
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Composer update
+        run: composer update
+
+      - name: Install PHPStan as dev dependency
+        run: composer require phpstan/phpstan --dev
+
+      - name: PHPStan analyse
+        run: vendor/bin/phpstan analyze src --level=5 --no-progress

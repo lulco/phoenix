@@ -1,0 +1,17 @@
+name: PHPunit
+
+on: [push]
+
+jobs:
+  phpunit:
+    name: PHPunit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Composer update
+        run: composer update
+
+      - name: PHPunit
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
