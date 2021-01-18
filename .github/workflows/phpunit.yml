@@ -42,12 +42,12 @@ jobs:
         run: composer update --no-progress --no-interaction
 
       - name: Start mysql database
-        run: sudo systemctl start mysql
+        run: sudo /etc/init.d/mysql start
 
       - name: PHPunit
-        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+        run: vendor/bin/phpunit tests/Database/ --coverage-text --coverage-clover=coverage.clover
         env:
-          PHOENIX_MYSQL_HOST: mysql
+          PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           PHOENIX_MYSQL_PASSWORD: 123
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
