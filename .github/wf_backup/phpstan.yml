@@ -23,7 +23,7 @@ jobs:
           coverage: none # disable xdebug, pcov
 
       - name: Composer update
-        run: composer update --no-progress --no-suggest
+        run: composer update --no-progress --no-interaction
 
       - name: Install PHPStan as dev dependency
         run: composer require phpstan/phpstan --dev

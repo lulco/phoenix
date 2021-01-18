@@ -40,10 +40,13 @@ jobs:
           extensions: pdo, pdo_sqlite, pdo_mysql
 
       - name: Composer update
-        run: composer update --no-progress --no-suggest
+        run: composer update --no-progress --no-interaction
 
       - name: Debug php mysql
         run: php -i | grep mysql
+
+      - name: Socket exists
+        run: ls -la /var/run/mysqld/mysqld.sock
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
