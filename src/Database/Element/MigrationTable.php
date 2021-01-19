@@ -13,6 +13,7 @@ use Phoenix\Database\Element\Behavior\DropPrimaryKeyBehavior;
 use Phoenix\Database\Element\Behavior\ForeignKeyBehavior;
 use Phoenix\Database\Element\Behavior\IndexBehavior;
 use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 class MigrationTable
 {
@@ -73,6 +74,13 @@ class MigrationTable
         $this->tmpPrimaryKey = $primaryKey;
     }
 
+    /**
+     * @param string $name
+     * @param string $type
+     * @param array<string, mixed> $settings
+     * @return MigrationTable
+     * @throws InvalidArgumentValueException
+     */
     public function addColumn(string $name, string $type, array $settings = []): MigrationTable
     {
         $column = new Column($name, $type, $settings);
@@ -145,6 +153,9 @@ class MigrationTable
         return isset($this->columns[$name]) ? $this->columns[$name] : null;
     }
 
+    /**
+     * @return string[]
+     */
     public function getPrimaryColumnNames(): array
     {
         return $this->primaryColumnNames;

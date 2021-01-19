@@ -87,6 +87,9 @@ class Table
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getPrimary(): array
     {
         return $this->primaryColumns;

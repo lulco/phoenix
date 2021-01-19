@@ -275,7 +275,7 @@ abstract class AbstractMigration
     /**
      * @param MigrationTable $table
      * @param QueryBuilderInterface $queryBuilder
-     * @return string[]
+     * @return array<string|PDOStatement>
      */
     private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder): array
     {

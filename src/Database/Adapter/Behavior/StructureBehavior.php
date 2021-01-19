@@ -53,13 +53,13 @@ trait StructureBehavior
 
     /**
      * @param string $database
-     * @return array<array<string, string>>
+     * @return array<string[]>
      */
     abstract protected function loadTables(string $database): array;
 
     /**
      * @param string $database
-     * @return array<string, array<array<string, mixed>>>
+     * @return array<string, array<int, mixed>>
      */
     abstract protected function loadColumns(string $database): array;
 
@@ -71,7 +71,7 @@ trait StructureBehavior
 
     /**
      * @param string $database
-     * @return array<string, array<string, array<string, string>>>
+     * @return array<string, array<string, array<string, mixed>>>
      */
     abstract protected function loadForeignKeys(string $database): array;
 

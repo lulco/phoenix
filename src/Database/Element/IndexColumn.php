@@ -12,7 +12,7 @@ class IndexColumn
 
     /**
      * @param string $name
-     * @param array<string, string> $columnSettings
+     * @param array<string, int|string> $columnSettings
      */
     public function __construct(string $name, array $columnSettings = [])
     {

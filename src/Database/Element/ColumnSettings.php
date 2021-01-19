@@ -20,6 +20,7 @@ class ColumnSettings
     const SETTING_VALUES = 'values';
     const SETTING_COMMENT = 'comment';
 
+    /** @var array<string, array<callable>> */
     private $allowedSettingsValues = [
         self::SETTING_NULL => ['is_bool'],
         self::SETTING_DEFAULT => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
@@ -111,6 +112,9 @@ class ColumnSettings
         return isset($this->settings[self::SETTING_COLLATION]) ? $this->settings[self::SETTING_COLLATION] : null;
     }
 
+    /**
+     * @return mixed[]|null
+     */
     public function getValues(): ?array
     {
         return isset($this->settings[self::SETTING_VALUES]) ? $this->settings[self::SETTING_VALUES] : null;
@@ -121,7 +125,11 @@ class ColumnSettings
         return isset($this->settings[self::SETTING_COMMENT]) ? $this->settings[self::SETTING_COMMENT] : null;
     }
 
-    private function checkSettings(array $settings)
+    /**
+     * @param array<string, mixed> $settings
+     * @throws InvalidArgumentValueException
+     */
+    private function checkSettings(array $settings): void
     {
         $errors = [];
         $reflectionClass = new ReflectionClass($this);
@@ -130,8 +138,8 @@ class ColumnSettings
             if (!in_array($setting, $settingsConstants, true)) {
                 $errors[] = 'Setting "' . $setting . '" is not allowed.';
             }
-            $checkedValue = $this->checkValue($setting, $value);
-            if ($checkedValue !== true) {
+            $checkedValue = $this->getValueError($setting, $value);
+            if ($checkedValue !== null) {
                 $errors[] = $checkedValue;
             }
         }
@@ -141,15 +149,20 @@ class ColumnSettings
         }
     }
 
-    private function checkValue(string $setting, $value)
+    /**
+     * @param string $setting
+     * @param mixed $value
+     * @return string|null
+     */
+    private function getValueError(string $setting, $value): ?string
     {
         if (!isset($this->allowedSettingsValues[$setting])) {
-            return true;
+            return null;
         }
 
         foreach ($this->allowedSettingsValues[$setting] as $checkFunction) {
             if (call_user_func($checkFunction, $value) === true) {
-                return true;
+                return null;
             }
         }
         return 'Value "' . $value . '" is not allowed for setting "' . $setting . '".';

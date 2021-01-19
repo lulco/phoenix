@@ -2,6 +2,7 @@
 
 namespace Phoenix\Database\QueryBuilder;
 
+use PDOStatement;
 use Phoenix\Database\Element\MigrationTable;
 
 interface QueryBuilderInterface
@@ -26,13 +27,13 @@ interface QueryBuilderInterface
 
     /**
      * @param MigrationTable $table
-     * @return string[] list of queries
+     * @return array<string|PDOStatement> list of queries
      */
     public function alterTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return string[] list of queries
+     * @return array<string|PDOStatement> list of queries
      */
     public function copyTable(MigrationTable $table): array;
 

@@ -14,9 +14,9 @@ trait ForeignKeyBehavior
     private $foreignKeysToDrop = [];
 
     /**
-     * @param string|array $columns
+     * @param string|string[] $columns
      * @param string $referencedTable
-     * @param string|array $referencedColumns
+     * @param string|string[] $referencedColumns
      * @param string $onDelete
      * @param string $onUpdate
      * @return MigrationTable
@@ -42,7 +42,7 @@ trait ForeignKeyBehavior
     }
 
     /**
-     * @param string|array $columns
+     * @param string|string[] $columns
      */
     public function dropForeignKey($columns): MigrationTable
     {
