@@ -30,11 +30,16 @@ abstract class AbstractDumpCommand extends AbstractCommand
     protected function runCommand(): void
     {
         $indenter = new Indenter();
-        $indent = $indenter->indent($this->input->getOption('indent'));
+        /** @var string $indentOption */
+        $indentOption = $this->input->getOption('indent');
+        $indent = $indenter->indent($indentOption);
         $dumper = new Dumper($indent, 2);
 
+        /** @var string $migration */
         $migration = $this->input->getOption('migration') ?: $this->migrationDefaultName();
-        $migrationCreator = new MigrationCreator($migration, $indent, $this->input->getOption('template'));
+        /** @var string $template */
+        $template = $this->input->getOption('template');
+        $migrationCreator = new MigrationCreator($migration, $indent, $template);
 
         $sourceStructure = $this->sourceStructure();
         $targetStructure = $this->targetStructure();
@@ -42,6 +47,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $up = $this->createUpDown($sourceStructure, $targetStructure, $dumper, 'up');
         $down = $this->createUpDown($targetStructure, $sourceStructure, $dumper, 'down');
 
+        /** @var string|null $dir */
         $dir = $this->input->getOption('dir');
         $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create($up, $down, $migrationDir);
@@ -52,12 +58,17 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $this->outputData['migration_filepath'] = $migrationPath;
     }
 
-    abstract protected function migrationDefaultName();
+    abstract protected function migrationDefaultName(): string;
 
     abstract protected function sourceStructure(): Structure;
 
     abstract protected function targetStructure(): Structure;
 
+
+    /**
+     * @param MigrationTable[] $tables
+     * @return array<string, array<string, mixed>>
+     */
     abstract protected function loadData(array $tables): array;
 
     /**
@@ -67,7 +78,9 @@ abstract class AbstractDumpCommand extends AbstractCommand
      */
     private function getFilteredTables(Structure $sourceStructure, Structure $targetStructure): array
     {
-        $ignoredTables = array_filter(array_map('trim', explode(',', $this->input->getOption('ignore-tables'))));
+        /** @var string $ignoredTablesOption */
+        $ignoredTablesOption = $this->input->getOption('ignore-tables');
+        $ignoredTables = array_filter(array_map('trim', explode(',', $ignoredTablesOption)));
         $structureComparator = new StructureComparator();
         $tables = [];
         $diffTables = $structureComparator->diff($sourceStructure, $targetStructure);
@@ -98,10 +111,10 @@ abstract class AbstractDumpCommand extends AbstractCommand
     private function chooseMigrationDir(?string $dir): string
     {
         try {
-            return $this->config->getMigrationDir($dir);
+            return $this->getConfig()->getMigrationDir($dir);
         } catch (InvalidArgumentValueException $e) {
             $symfonyStyle = new SymfonyStyle($this->input, $this->output);
-            $dir = $symfonyStyle->choice($e->getMessage(), $this->config->getMigrationDirs());
+            $dir = $symfonyStyle->choice($e->getMessage(), $this->getConfig()->getMigrationDirs());
             return $this->chooseMigrationDir($dir);
         }
     }

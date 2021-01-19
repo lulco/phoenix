@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TestCommand extends AbstractCommand
 {
+    /** @var array<int, array<string, mixed>> */
     private $executedMigrations = [];
 
     protected function configure(): void

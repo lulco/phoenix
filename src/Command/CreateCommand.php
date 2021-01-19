@@ -25,11 +25,17 @@ class CreateCommand extends AbstractCommand
     protected function runCommand(): void
     {
         $indenter = new Indenter();
-        $indent = $indenter->indent($this->input->getOption('indent'));
+        /** @var string $indentOption */
+        $indentOption = $this->input->getOption('indent');
+        $indent = $indenter->indent($indentOption);
 
+        /** @var string $migration */
         $migration = $this->input->getArgument('migration');
-        $migrationCreator = new MigrationCreator($migration, $indent, $this->input->getOption('template'));
+        /** @var string|null $template */
+        $template = $this->input->getOption('template');
+        $migrationCreator = new MigrationCreator($migration, $indent, $template);
 
+        /** @var string|null $dir */
         $dir = $this->input->getArgument('dir');
         $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create(str_repeat($indent, 2), str_repeat($indent, 2), $migrationDir);
@@ -44,10 +50,10 @@ class CreateCommand extends AbstractCommand
     private function chooseMigrationDir(?string $dir): string
     {
         try {
-            return $this->config->getMigrationDir($dir);
+            return $this->getConfig()->getMigrationDir($dir);
         } catch (InvalidArgumentValueException $e) {
             $symfonyStyle = new SymfonyStyle($this->input, $this->output);
-            $dir = $symfonyStyle->choice($e->getMessage(), $this->config->getMigrationDirs());
+            $dir = $symfonyStyle->choice($e->getMessage(), $this->getConfig()->getMigrationDirs());
             return $this->chooseMigrationDir($dir);
         }
     }

@@ -31,7 +31,7 @@ class CleanupCommand extends AbstractCommand
 
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
         require_once $filename;
-        $migration = new Init($this->adapter, $this->config->getLogTableName());
+        $migration = new Init($this->adapter, $this->getConfig()->getLogTableName());
         $migration->rollback();
 
         $this->writeln('');
@@ -45,6 +45,10 @@ class CleanupCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @param AbstractMigration $migration
+     * @return array<string, mixed>
+     */
     private function addMigrationToList(AbstractMigration $migration): array
     {
         $executedQueries = $migration->getExecutedQueries();
