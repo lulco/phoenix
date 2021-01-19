@@ -49,17 +49,10 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: PHPunit
-        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+        run: vendor/bin/phpunit --coverage-text
         env:
           PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           PHOENIX_MYSQL_PASSWORD: 123
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
           PHOENIX_PGSQL_PASSWORD: 123
-
-      - name: Send code coverage
-        run: |
-          if [ ${{ matrix.php }} == 7.4 ]; then
-            wget https://scrutinizer-ci.com/ocular.phar
-            php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-          fi

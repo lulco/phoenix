@@ -15,7 +15,7 @@ class YamlConfigParser implements ConfigParserInterface
         if (!class_exists('Symfony\Component\Yaml\Yaml')) {
             throw new ConfigException('Class Symfony\Component\Yaml\Yaml doesn\'t exist. Run composer require symfony/yaml');
         }
-        $configString = str_replace('%%ACTUAL_DIR%%', pathinfo($filename, PATHINFO_DIRNAME), file_get_contents($filename));
+        $configString = str_replace('%%ACTUAL_DIR%%', pathinfo($filename, PATHINFO_DIRNAME), (string)file_get_contents($filename));
         return Yaml::parse($configString);
     }
 }

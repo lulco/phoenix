@@ -15,17 +15,25 @@ class IndexColumnSettings
         self::SETTING_LENGTH => null,
     ];
 
-    /** @var array */
+    /** @var array<string, int|string> */
     private $settings;
 
+    /**
+     * @param array<string, int|string> $settings
+     */
     public function __construct(array $settings)
     {
         if (isset($settings[self::SETTING_ORDER])) {
-            $settings[self::SETTING_ORDER] = strtoupper($settings[self::SETTING_ORDER]);
+            /** @var string $settingOrder */
+            $settingOrder = $settings[self::SETTING_ORDER];
+            $settings[self::SETTING_ORDER] = strtoupper($settingOrder);
         }
         $this->settings = $settings;
     }
 
+    /**
+     * @return array<string, int|string>
+     */
     public function getNonDefaultSettings(): array
     {
         $settings = $this->settings;

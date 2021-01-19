@@ -2,7 +2,6 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -19,7 +18,7 @@ class DumpCommand extends AbstractDumpCommand
         parent::configure();
     }
 
-    protected function migrationDefaultName()
+    protected function migrationDefaultName(): string
     {
         return 'Initialization';
     }
@@ -34,18 +33,16 @@ class DumpCommand extends AbstractDumpCommand
         return $this->adapter->getStructure();
     }
 
-    /**
-     * @param MigrationTable[] $tables
-     * @return array
-     */
     protected function loadData(array $tables = []): array
     {
         if (!(bool)$this->input->getOption('data')) {
             return [];
         }
 
-        $ignoredDataTables = $this->input->getOption('ignore-data-tables')
-            ? array_map('trim', explode(',', $this->input->getOption('ignore-data-tables')))
+        /** @var string|null $ignoredDataTablesOption */
+        $ignoredDataTablesOption = $this->input->getOption('ignore-data-tables');
+        $ignoredDataTables = $ignoredDataTablesOption
+            ? array_map('trim', explode(',', $ignoredDataTablesOption))
             : [];
 
         $data = [];

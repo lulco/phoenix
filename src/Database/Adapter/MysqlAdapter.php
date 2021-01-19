@@ -14,6 +14,9 @@ use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
 {
+    /** @var MysqlQueryBuilder|null */
+    private $queryBuilder;
+
     public function getQueryBuilder(): MysqlQueryBuilder
     {
         if (!$this->queryBuilder) {
@@ -28,12 +31,16 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadDatabase(): string
     {
-        return $this->query('SELECT database()')->fetchColumn();
+        /** @var string $currentDatabase */
+        $currentDatabase = $this->query('SELECT database()')->fetchColumn();
+        return $currentDatabase;
     }
 
     protected function loadTables(string $database): array
     {
-        return $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        /** @var array<string[]> $tables */
+        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        return $tables;
     }
 
     protected function createMigrationTable(array $table): MigrationTable
@@ -66,10 +73,13 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadColumns(string $database): array
     {
+        /** @var array<mixed[]> $columns */
         $columns = $this->query(sprintf("SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME, ORDINAL_POSITION", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesColumns = [];
         foreach ($columns as $column) {
-            $tablesColumns[$column['TABLE_NAME']][] = $column;
+            /** @var string $tableName */
+            $tableName = $column['TABLE_NAME'];
+            $tablesColumns[$tableName][] = $column;
         }
         return $tablesColumns;
     }
@@ -89,6 +99,10 @@ class MysqlAdapter extends PdoAdapter
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }
 
+    /**
+     * @param array<string, mixed> $column
+     * @return array<string, mixed>
+     */
     private function prepareSettings(array $column): array
     {
         preg_match('/(.*?)\((.*?)\)(.*)/', $column['COLUMN_TYPE'], $matches);
@@ -113,11 +127,16 @@ class MysqlAdapter extends PdoAdapter
 
     protected function loadIndexes(string $database): array
     {
+        /** @var array<mixed[]> $indexes */
         $indexes = $this->query(sprintf("SELECT * FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = '%s'", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tablesIndexes = [];
         foreach ($indexes as $index) {
-            if (!isset($tablesIndexes[$index['TABLE_NAME']])) {
-                $tablesIndexes[$index['TABLE_NAME']] = [];
+            /** @var string $tableName */
+            $tableName = $index['TABLE_NAME'];
+            /** @var string $indexName */
+            $indexName = $index['INDEX_NAME'];
+            if (!isset($tablesIndexes[$tableName])) {
+                $tablesIndexes[$tableName] = [];
             }
 
             $indexColumnSettings = [];
@@ -128,9 +147,9 @@ class MysqlAdapter extends PdoAdapter
                 $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
             }
 
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['columns'][$index['SEQ_IN_INDEX']] = new IndexColumn($index['COLUMN_NAME'], $indexColumnSettings);
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
-            $tablesIndexes[$index['TABLE_NAME']][$index['INDEX_NAME']]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
+            $tablesIndexes[$tableName][$indexName]['columns'][$index['SEQ_IN_INDEX']] = new IndexColumn($index['COLUMN_NAME'], $indexColumnSettings);
+            $tablesIndexes[$tableName][$indexName]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$tableName][$indexName]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
         return $tablesIndexes;
     }
@@ -141,14 +160,19 @@ class MysqlAdapter extends PdoAdapter
 INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS ON information_schema.KEY_COLUMN_USAGE.CONSTRAINT_NAME = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME
 AND information_schema.KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA = information_schema.REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
 WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
+        /** @var array<mixed[]> $foreignKeyColumns */
         $foreignKeyColumns = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
-            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];
-            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_table'] = $foreignKeyColumn['REFERENCED_TABLE_NAME'];
-            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['referenced_columns'][] = $foreignKeyColumn['REFERENCED_COLUMN_NAME'];
-            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
-            $foreignKeys[$foreignKeyColumn['TABLE_NAME']][$foreignKeyColumn['CONSTRAINT_NAME']]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
+            /** @var string $tableName */
+            $tableName = $foreignKeyColumn['TABLE_NAME'];
+            /** @var string $constraintName */
+            $constraintName = $foreignKeyColumn['CONSTRAINT_NAME'];
+            $foreignKeys[$tableName][$constraintName]['columns'][] = $foreignKeyColumn['COLUMN_NAME'];
+            $foreignKeys[$tableName][$constraintName]['referenced_table'] = $foreignKeyColumn['REFERENCED_TABLE_NAME'];
+            $foreignKeys[$tableName][$constraintName]['referenced_columns'][] = $foreignKeyColumn['REFERENCED_COLUMN_NAME'];
+            $foreignKeys[$tableName][$constraintName]['on_update'] = $foreignKeyColumn['UPDATE_RULE'];
+            $foreignKeys[$tableName][$constraintName]['on_delete'] = $foreignKeyColumn['DELETE_RULE'];
         }
         return $foreignKeys;
     }

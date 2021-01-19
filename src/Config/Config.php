@@ -7,6 +7,9 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 class Config
 {
+    /**
+     * @var array<string, mixed>
+     */
     private $configuration = [
         'log_table_name' => 'phoenix_log',
         'migration_dirs' => [],
@@ -14,6 +17,10 @@ class Config
         'default_environment' => '',
     ];
 
+    /**
+     * @param array<string, mixed> $configuration
+     * @throws ConfigException
+     */
     public function __construct(array $configuration)
     {
         $this->configuration = array_merge($this->configuration, $configuration);
@@ -26,11 +33,17 @@ class Config
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getConfiguration(): array
     {
         return $this->configuration;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getMigrationDirs(): array
     {
         return $this->configuration['migration_dirs'];
@@ -62,7 +75,7 @@ class Config
         if ($this->configuration['default_environment']) {
             return $this->configuration['default_environment'];
         }
-        return current(array_keys($this->configuration['environments']));
+        return (string)current(array_keys($this->configuration['environments']));
     }
 
     public function getEnvironmentConfig(string $environment): ?EnvironmentConfig

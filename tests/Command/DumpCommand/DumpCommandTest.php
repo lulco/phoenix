@@ -6,7 +6,6 @@ use Phoenix\Command\DumpCommand;
 use Phoenix\Command\InitCommand;
 use Phoenix\Command\MigrateCommand;
 use Phoenix\Exception\ConfigException;
-use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;

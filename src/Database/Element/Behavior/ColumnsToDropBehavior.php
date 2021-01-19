@@ -6,6 +6,7 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait ColumnsToDropBehavior
 {
+    /** @var string[] */
     private $columnsToDrop = [];
 
     public function dropColumn(string $name): MigrationTable
@@ -14,6 +15,9 @@ trait ColumnsToDropBehavior
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getColumnsToDrop(): array
     {
         return $this->columnsToDrop;

@@ -11,8 +11,10 @@ use Phoenix\Database\Element\MigrationTable;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
+    /** @var array<string, mixed> */
     protected $defaultLength = [];
 
+    /** @var AdapterInterface */
     protected $adapter;
 
     public function __construct(AdapterInterface $adapter)
@@ -55,6 +57,10 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return $query;
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return string[]
+     */
     protected function addColumns(MigrationTable $table): array
     {
         $columns = $table->getColumns();
@@ -64,7 +70,12 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return [$this->addColumnsQuery($table, $columns) . ';'];
     }
 
-    protected function addColumnsQuery(MigrationTable $table, array $columns)
+    /**
+     * @param MigrationTable $table
+     * @param Column[] $columns
+     * @return string
+     */
+    protected function addColumnsQuery(MigrationTable $table, array $columns): string
     {
         $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
         $columnList = [];
@@ -83,6 +94,10 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return $this->primaryKeyString($table);
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return array<PDOStatement|string>
+     */
     protected function addPrimaryKey(MigrationTable $table): array
     {
         $primaryColumns = $table->getPrimaryColumns();
@@ -124,6 +139,10 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return $queries;
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return string[]
+     */
     protected function dropIndexes(MigrationTable $table): array
     {
         if (empty($table->getIndexesToDrop())) {
@@ -162,6 +181,10 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return ',' . implode(',', $foreignKeys);
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return string[]
+     */
     protected function addForeignKeys(MigrationTable $table): array
     {
         $queries = [];
@@ -193,6 +216,12 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return $constraint;
     }
 
+    /**
+     * @param MigrationTable $table
+     * @param string $primaryKeyName
+     * @param string $foreignKeyPrefix
+     * @return string[]
+     */
     protected function dropKeys(MigrationTable $table, string $primaryKeyName, string $foreignKeyPrefix): array
     {
         $queries = [];
@@ -210,11 +239,16 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' DROP ' . $key . ';';
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return PDOStatement[]
+     */
     protected function copyAndAddData(MigrationTable $table): array
     {
         $chunkSize = $table->getDataChunkSize();
         if ($chunkSize !== null) {
             $queries = [];
+            /** @var array<int> $res */
             $res = $this->adapter->fetch($table->getName(), ['count(*) AS cnt']);
             $totalCount = $res['cnt'];
             $pages = ceil($totalCount / $chunkSize);
@@ -230,6 +264,11 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return empty($data) ? [] : [$this->createCopyAndAddDataQuery($table, $data)];
     }
 
+    /**
+     * @param MigrationTable $table
+     * @param array<array<string, mixed>> $oldData
+     * @return PDOStatement
+     */
     private function createCopyAndAddDataQuery(MigrationTable $table, array $oldData): PDOStatement
     {
         $newData = [];
@@ -238,11 +277,17 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
                 $newData[] = call_user_func($table->getPrimaryColumnsValuesFunction(), $row);
             }
         }
-        return $this->adapter->buildInsertQuery($table->getNewName(), $newData);
+        /** @var string $newTableName */
+        $newTableName = $table->getNewName();
+        return $this->adapter->buildInsertQuery($newTableName, $newData);
     }
 
     abstract public function escapeString(?string $string): string;
 
+    /**
+     * @param string[] $array
+     * @return string[]
+     */
     protected function escapeArray(array $array): array
     {
         return array_map(function ($string) {
@@ -256,5 +301,8 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
 
     abstract protected function createEnumSetColumn(Column $column, MigrationTable $table): string;
 
+    /**
+     * @return array<string, string>
+     */
     abstract protected function typeMap(): array;
 }

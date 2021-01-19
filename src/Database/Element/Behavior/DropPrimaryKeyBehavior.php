@@ -6,6 +6,7 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait DropPrimaryKeyBehavior
 {
+    /** @var bool */
     private $dropPrimaryKey = false;
 
     public function dropPrimaryKey(): MigrationTable

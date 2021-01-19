@@ -11,9 +11,13 @@ use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
+use Phoenix\Exception\DatabaseQueryExecuteException;
 
 class PgsqlAdapter extends PdoAdapter
 {
+    /** @var PgsqlQueryBuilder|null */
+    private $queryBuilder;
+
     public function getQueryBuilder(): PgsqlQueryBuilder
     {
         if (!$this->queryBuilder) {
@@ -24,21 +28,26 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadDatabase(): string
     {
-        return $this->query('SELECT current_database()')->fetchColumn();
+        /** @var string $currentDatabase */
+        $currentDatabase = $this->query('SELECT current_database()')->fetchColumn();
+        return $currentDatabase;
     }
 
     protected function loadTables(string $database): array
     {
-        return $this->query(sprintf("
+        /** @var array<mixed[]> $tables */
+        $tables = $this->query(sprintf("
             SELECT *
             FROM INFORMATION_SCHEMA.TABLES
             WHERE table_catalog = '%s' AND table_schema='public'
             ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        return $tables;
     }
 
     protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
+        /** @var string $comment */
         $comment = $this->query(sprintf("
             SELECT description
             FROM pg_description
@@ -51,11 +60,13 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function loadColumns(string $database): array
     {
+        /** @var array<mixed[]> $columns */
         $columns = $this->query(sprintf("
             SELECT * FROM INFORMATION_SCHEMA.COLUMNS
             WHERE table_catalog = '%s' AND table_schema = 'public'
             ORDER BY table_name, ordinal_position", $database))->fetchAll(PDO::FETCH_ASSOC);
 
+        /** @var array<string[]> $comments */
         $comments = $this->query(sprintf("
             SELECT c.table_name,c.column_name,pgd.description
             FROM pg_catalog.pg_statio_all_tables AS st
@@ -70,8 +81,10 @@ class PgsqlAdapter extends PdoAdapter
 
         $tablesColumns = [];
         foreach ($columns as $column) {
-            $column['comment'] = isset($tableColumnComments[$column['table_name']][$column['column_name']]) ? $tableColumnComments[$column['table_name']][$column['column_name']] : null;
-            $tablesColumns[$column['table_name']][] = $column;
+            /** @var string $tableName */
+            $tableName = $column['table_name'];
+            $column['comment'] = $tableColumnComments[$tableName][$column['column_name']] ?? null;
+            $tablesColumns[$tableName][] = $column;
         }
         return $tablesColumns;
     }
@@ -115,6 +128,13 @@ class PgsqlAdapter extends PdoAdapter
         return $types[$type] ?? $type;
     }
 
+    /**
+     * @param string $type
+     * @param array<string, mixed> $column
+     * @param string $table
+     * @return array<string, mixed>
+     * @throws DatabaseQueryExecuteException
+     */
     private function prepareSettings(string $type, array $column, string $table): array
     {
         $length = null;
@@ -141,6 +161,11 @@ class PgsqlAdapter extends PdoAdapter
         return $settings;
     }
 
+    /**
+     * @param array<string, mixed> $column
+     * @param string $type
+     * @return mixed
+     */
     private function prepareDefault(array $column, string $type)
     {
         if (!$column['column_default']) {
@@ -158,23 +183,29 @@ class PgsqlAdapter extends PdoAdapter
     protected function loadIndexes(string $database): array
     {
         // there are too many indexes which are not required - try to select only those from actual database
-        $indexRows = $this->query("SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary, a.indoption FROM (
+        $query = 'SELECT a.index_name, b.attname, a.relname, a.indisunique, a.indisprimary, a.indoption FROM (
             SELECT a.indrelid, a.indisunique, a.indoption, b.relname, a.indisprimary, c.relname index_name, unnest(a.indkey) index_num
             FROM pg_index a, pg_class b, pg_class c
             WHERE b.oid=a.indrelid AND a.indexrelid=c.oid
-            ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num")->fetchAll(PDO::FETCH_ASSOC);
+            ) a, pg_attribute b WHERE a.indrelid = b.attrelid AND a.index_num = b.attnum ORDER BY a.index_name, a.index_num';
+        /** @var array<mixed[]> $indexRows */
+        $indexRows = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $indexes = [];
         foreach ($indexRows as $indexRow) {
+            /** @var string $relname */
+            $relname = $indexRow['relname'];
+            /** @var string $indexName */
+            $indexName = $indexRow['index_name'];
             if ($indexRow['indisprimary']) {
-                $indexes[$indexRow['relname']]['PRIMARY']['columns'][] = new IndexColumn($indexRow['attname']);
+                $indexes[$relname]['PRIMARY']['columns'][] = new IndexColumn($indexRow['attname']);
                 continue;
             }
 
             $settings = [];
 
-            $position = count($indexes[$indexRow['relname']][$indexRow['index_name']]['columns'] ?? []);
+            $position = count($indexes[$relname][$indexName]['columns'] ?? []);
             $indoptions = explode(' ', $indexRow['indoption']);
-            $indoption = $indoptions[$position] ?? 0;
+            $indoption = (int)($indoptions[$position] ?? 0);
 
             if ($indoption & 1) {
                 $settings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
@@ -184,11 +215,12 @@ class PgsqlAdapter extends PdoAdapter
                 // ready for NULLS FIRST
             }
 
-            $indexes[$indexRow['relname']][$indexRow['index_name']]['columns'][] = new IndexColumn($indexRow['attname'], $settings);
-            $indexes[$indexRow['relname']][$indexRow['index_name']]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
-            $indexes[$indexRow['relname']][$indexRow['index_name']]['method'] = Index::METHOD_DEFAULT;
+            $indexes[$relname][$indexName]['columns'][] = new IndexColumn($indexRow['attname'], $settings);
+            $indexes[$relname][$indexName]['type'] = $indexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL;
+            $indexes[$relname][$indexName]['method'] = Index::METHOD_DEFAULT;
         }
 
+        /** @var array<mixed[]> $substringIndexRows */
         $substringIndexRows = $this->query("SELECT pg_index.indisunique, pg_index.indoption, index_info.relname AS index_name, table_info.relname AS table_name, pg_index.indexprs
 FROM pg_index
 INNER JOIN pg_class AS index_info ON index_info.relfilenode = pg_index.indexrelid
@@ -196,12 +228,14 @@ INNER JOIN pg_class AS table_info ON table_info.relfilenode = pg_index.indrelid
 INNER JOIN pg_attribute ON pg_index.indexrelid = pg_attribute.attrelid
 WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
 
+        /** @var array<mixed[]> $columns */
         $columns = $this->query(sprintf("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_catalog = '%s' AND table_schema = 'public'", $database))->fetchAll(PDO::FETCH_ASSOC);
         $tableColumns = [];
         foreach ($columns as $column) {
             $tableColumns[$column['table_name']][$column['ordinal_position']] = $column;
         }
         foreach ($substringIndexRows as $substringIndexRow) {
+            /** @var string $tableName */
             $tableName = $substringIndexRow['table_name'];
             preg_match_all('/varattno ([0-9]+) (.*?):constvalue 4 \[ ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+) \]}\) :location/', $substringIndexRow['indexprs'], $matches);
 
@@ -215,7 +249,7 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
                 $indexColumnSettings = [
                     IndexColumnSettings::SETTING_LENGTH => (int)$length,
                 ];
-                $indoption = $indoptions[$i] ?? 0;
+                $indoption = (int)($indoptions[$i] ?? 0);
                 if ($indoption & 1) {
                     $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
                 }
@@ -244,14 +278,19 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
             JOIN pg_constraint AS pgc ON pgc.conname = tc.constraint_name
             WHERE constraint_type = 'FOREIGN KEY'";
 
+        /** @var array<mixed[]> $foreignKeyColumns */
         $foreignKeyColumns = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
         $foreignKeys = [];
         foreach ($foreignKeyColumns as $foreignKeyColumn) {
-            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];
-            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['referenced_table'] = $foreignKeyColumn['foreign_table_name'];
-            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['referenced_columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['foreign_column_name'];
-            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
-            $foreignKeys[$foreignKeyColumn['table_name']][$foreignKeyColumn['constraint_name']]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
+            /** @var string $tableName */
+            $tableName = $foreignKeyColumn['table_name'];
+            /** @var string $constraintName */
+            $constraintName = $foreignKeyColumn['constraint_name'];
+            $foreignKeys[$tableName][$constraintName]['columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['column_name'];
+            $foreignKeys[$tableName][$constraintName]['referenced_table'] = $foreignKeyColumn['foreign_table_name'];
+            $foreignKeys[$tableName][$constraintName]['referenced_columns'][$foreignKeyColumn['ordinal_position']] = $foreignKeyColumn['foreign_column_name'];
+            $foreignKeys[$tableName][$constraintName]['on_delete'] = $this->remapForeignKeyAction($foreignKeyColumn['confdeltype']);
+            $foreignKeys[$tableName][$constraintName]['on_update'] = $this->remapForeignKeyAction($foreignKeyColumn['confupdtype']);
         }
         return $foreignKeys;
     }
