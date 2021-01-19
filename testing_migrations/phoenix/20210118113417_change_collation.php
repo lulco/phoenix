@@ -19,7 +19,7 @@ class ChangeCollation extends AbstractMigration
 
     protected function down(): void
     {
-        $this->changeCollation('utf8_general_ci');
         $this->delete('renamed_table_1', ['id' => 1000]);
+        $this->changeCollation('utf8_general_ci');
     }
 }
