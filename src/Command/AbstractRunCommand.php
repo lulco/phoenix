@@ -2,7 +2,6 @@
 
 namespace Phoenix\Command;
 
-use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Symfony\Component\Console\Input\InputOption;

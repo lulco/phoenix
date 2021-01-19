@@ -3,10 +3,10 @@
 namespace Phoenix\Migration;
 
 use DateTime;
+use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
-use Phoenix\Behavior\ParamsCheckerBehavior;
 
 class Manager
 {

@@ -5,8 +5,8 @@ namespace Dumper;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
-use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\IndexColumn;
+use Phoenix\Database\Element\MigrationTable;
 
 class Dumper
 {
