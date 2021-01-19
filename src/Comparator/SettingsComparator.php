@@ -6,6 +6,11 @@ use Phoenix\Database\Element\ColumnSettings;
 
 class SettingsComparator
 {
+    /**
+     * @param ColumnSettings $sourceColumnSettings
+     * @param ColumnSettings $targetColumnSettings
+     * @return array<string, mixed>
+     */
     public function diff(ColumnSettings $sourceColumnSettings, ColumnSettings $targetColumnSettings): array
     {
         $sourceSettings = $sourceColumnSettings->getSettings();
@@ -20,7 +25,12 @@ class SettingsComparator
         return $targetColumnSettings->getSettings();
     }
 
-    private function arrayRecursiveDiff($array1, $array2)
+    /**
+     * @param array<string, mixed> $array1
+     * @param array<string, mixed> $array2
+     * @return array<string, mixed>
+     */
+    private function arrayRecursiveDiff(array $array1, array $array2): array
     {
         $return = [];
         foreach ($array1 as $key => $value) {

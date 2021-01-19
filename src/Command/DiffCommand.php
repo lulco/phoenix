@@ -21,7 +21,7 @@ class DiffCommand extends AbstractDumpCommand
         parent::configure();
     }
 
-    protected function migrationDefaultName()
+    protected function migrationDefaultName(): string
     {
         return 'Diff';
     }
@@ -43,12 +43,13 @@ class DiffCommand extends AbstractDumpCommand
 
     private function getStructure(string $type): Structure
     {
+        /** @var string|null $env */
         $env = $this->input->getOption($type);
         if (!$env) {
             return $this->createStructureFromMigrations();
         }
 
-        $config = $this->config->getEnvironmentConfig($env);
+        $config = $this->getConfig()->getEnvironmentConfig($env);
         if (!$config) {
             throw new InvalidArgumentValueException(ucfirst($type) . ' environment "' . $env . '" doesn\'t exist in config');
         }

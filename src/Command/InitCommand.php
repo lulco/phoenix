@@ -18,7 +18,7 @@ class InitCommand extends AbstractCommand
     {
         $filename = __DIR__ . '/../Migration/Init/0_init.php';
         require_once $filename;
-        $migration = new Init($this->adapter, $this->config->getLogTableName());
+        $migration = new Init($this->adapter, $this->getConfig()->getLogTableName());
         $migration->migrate();
 
         $this->writeln('');

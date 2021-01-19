@@ -10,6 +10,7 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Table;
 
 class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -58,6 +59,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         Column::TYPE_DECIMAL => [10, 0],
     ];
 
+    /** @var array<string, string> */
     private $typeCastMap = [
         Column::TYPE_STRING => 'varchar',
     ];
@@ -81,7 +83,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             foreach ($enumSetColumns as $column) {
                 $queries[] = 'CREATE TYPE ' . $this->escapeString($table->getName() . '__' . $column->getName()) . ' AS ENUM (' . implode(',', array_map(function ($value) {
                     return "'$value'";
-                }, $column->getSettings()->getValues())) . ');';
+                }, $column->getSettings()->getValues() ?: [])) . ');';
             }
         }
 
@@ -90,9 +92,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $queries[] = $this->createIndex($index, $table);
         }
         $queries = array_merge($queries, $this->createComments($table));
-        if ($table->getAutoIncrement() !== null && $autoIncrementColumn !== null) {
+        $autoIncrement = $table->getAutoIncrement();
+        if ($autoIncrement !== null && $autoIncrementColumn !== null) {
             $sequenceName = $table->getName() . '_' . $autoIncrementColumn->getName() . '_seq';
-            $queries[] = $this->createAutoIncrementQuery($sequenceName, $table->getAutoIncrement());
+            $queries[] = $this->createAutoIncrementQuery($sequenceName, $autoIncrement);
         }
         return $queries;
     }
@@ -139,11 +142,18 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             }
             if (in_array($newColumn->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
                 $cast = sprintf($this->remapType($newColumn), $table->getName(), $newColumn->getName());
+                /** @var Table $tableInfo */
                 $tableInfo = $this->adapter->getStructure()->getTable($table->getName());
-                foreach (array_diff($tableInfo->getColumn($oldColumnName)->getSettings()->getValues(), $newColumn->getSettings()->getValues()) as $newValue) {
-                    $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $newValue, $table->getName() . '__' . $newColumn->getName());
+                /** @var Column $column */
+                $column = $tableInfo->getColumn($oldColumnName);
+                /** @var mixed[] $columnValues */
+                $columnValues = $column->getSettings()->getValues();
+                /** @var mixed[] $newColumnValues */
+                $newColumnValues = $newColumn->getSettings()->getValues();
+                foreach (array_diff($columnValues, $newColumnValues) as $valueToDelete) {
+                    $queries[] = sprintf("DELETE FROM pg_enum WHERE enumlabel = '%s' AND enumtypid IN (SELECT oid FROM pg_type WHERE typname = '%s')", $valueToDelete, $table->getName() . '__' . $newColumn->getName());
                 }
-                foreach (array_diff($newColumn->getSettings()->getValues(), $tableInfo->getColumn($oldColumnName)->getSettings()->getValues()) as $newValue) {
+                foreach (array_diff($newColumnValues, $columnValues) as $newValue) {
                     $queries[] = 'ALTER TYPE ' . $table->getName() . '__' . $newColumn->getName() . ' ADD VALUE \'' . $newValue . '\'';
                 }
             } else {
@@ -283,10 +293,12 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($sequenceName === null) {
             throw new InvalidArgumentException('Table ' . $table->getName() . ' has no sequence, so you cannot set auto increment');
         }
-        return $this->createAutoIncrementQuery($sequenceName, $table->getAutoIncrement());
+        /** @var int $autoincrement */
+        $autoincrement = $table->getAutoIncrement();
+        return $this->createAutoIncrementQuery($sequenceName, $autoincrement);
     }
 
-    private function createAutoIncrementQuery(string $sequenceName, int $autoIncrement)
+    private function createAutoIncrementQuery(string $sequenceName, int $autoIncrement): string
     {
         return sprintf('ALTER SEQUENCE %s RESTART WITH %d;', $this->escapeString($sequenceName), $autoIncrement);
     }
@@ -296,6 +308,10 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         return sprintf($this->remapType($column), $table->getName(), $column->getName());
     }
 
+    /**
+     * @param MigrationTable $table
+     * @return string[]
+     */
     private function createComments(MigrationTable $table): array
     {
         $queries = [];

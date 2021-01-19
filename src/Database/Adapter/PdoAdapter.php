@@ -16,11 +16,11 @@ abstract class PdoAdapter implements AdapterInterface
     /** @var PDO */
     private $pdo;
 
+    /** @var string|null */
     private $charset;
 
+    /** @var string|null */
     protected $version;
-
-    protected $queryBuilder;
 
     public function __construct(PDO $pdo, ?string $version = null)
     {
@@ -116,7 +116,9 @@ abstract class PdoAdapter implements AdapterInterface
     public function select(string $sql): array
     {
         if (strpos(strtoupper($sql), 'SELECT ') === 0) {
-            return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            /** @var array<mixed[]> $result */
+            $result = $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            return $result;
         }
         throw new InvalidArgumentException('Only select query can be executed in select method');
     }
@@ -133,9 +135,20 @@ abstract class PdoAdapter implements AdapterInterface
     {
         $statement = $this->buildFetchQuery($table, $fields, $conditions, $limit, $orders, $groups);
         $this->execute($statement);
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        /** @var array<mixed[]> $result */
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 
+    /**
+     * @param string $table
+     * @param string[] $fields
+     * @param array<string, mixed> $conditions
+     * @param string|null $limit
+     * @param string[]|array<string, string> $orders
+     * @param string[] $groups
+     * @return PDOStatement
+     */
     private function buildFetchQuery(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): PDOStatement
     {
         $query = sprintf('SELECT %s FROM %s%s%s%s%s;', implode(', ', $fields), $this->escapeString(addslashes($table)), $this->createWhere($conditions), $this->createGroup($groups), $this->createOrder($orders), $this->createLimit($limit));
@@ -144,18 +157,27 @@ abstract class PdoAdapter implements AdapterInterface
         return $statement;
     }
 
+    /**
+     * @param mixed[]|array<mixed[]> $data
+     * @return string
+     */
     private function createKeys(array $data): string
     {
         $keys = [];
         if ($this->isMulti($data)) {
             $data = current($data);
         }
+        /** @var string $key */
         foreach (array_keys($data) as $key) {
             $keys[] = $this->escapeString($key);
         }
         return '(' . implode(', ', $keys) . ')';
     }
 
+    /**
+     * @param mixed[]|array<mixed[]> $data
+     * @return string
+     */
     private function createValues(array $data): string
     {
         if (!$this->isMulti($data)) {
@@ -173,6 +195,11 @@ abstract class PdoAdapter implements AdapterInterface
         return ':' . $prefix . $key;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @param string $prefix
+     * @return string
+     */
     private function createValueString(array $data, string $prefix = ''): string
     {
         $values = [];
@@ -182,6 +209,11 @@ abstract class PdoAdapter implements AdapterInterface
         return '(' . implode(', ', $values) . ')';
     }
 
+    /**
+     * @param array<string, mixed> $conditions
+     * @param string $where
+     * @return string
+     */
     private function createWhere(array $conditions = [], string $where = ''): string
     {
         if (empty($conditions) && $where === '') {
@@ -198,6 +230,11 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' WHERE %s', implode(' AND ', $cond) . ($where ? ' AND ' . $where : ''));
     }
 
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return string
+     */
     private function addCondition(string $key, $value): string
     {
         if (!is_array($value)) {
@@ -218,6 +255,10 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' LIMIT %s', $limit);
     }
 
+    /**
+     * @param string[]|array<string, string> $orders
+     * @return string
+     */
     private function createOrder(array $orders = []): string
     {
         if (empty($orders)) {
@@ -235,6 +276,10 @@ abstract class PdoAdapter implements AdapterInterface
         return sprintf(' ORDER BY %s', implode(', ', $listOfOrders));
     }
 
+    /**
+     * @param string[] $groups
+     * @return string
+     */
     private function createGroup(array $groups = []): string
     {
         if (empty($groups)) {
@@ -284,7 +329,11 @@ abstract class PdoAdapter implements AdapterInterface
         return $this->charset;
     }
 
-    protected function getLengthAndDecimals(?string $lengthAndDecimals = null)
+    /**
+     * @param string|null $lengthAndDecimals
+     * @return array<int|null>
+     */
+    protected function getLengthAndDecimals(?string $lengthAndDecimals = null): array
     {
         if ($lengthAndDecimals === null) {
             return [null, null];
@@ -298,7 +347,12 @@ abstract class PdoAdapter implements AdapterInterface
         return [$length, $decimals];
     }
 
-    private function bindDataValues(PDOStatement $statement, array $data, string $prefix = '')
+    /**
+     * @param PDOStatement $statement
+     * @param array<string, mixed> $data
+     * @param string $prefix
+     */
+    private function bindDataValues(PDOStatement $statement, array $data, string $prefix = ''): void
     {
         foreach ($data as $key => $value) {
             if ($value instanceof DateTime) {
@@ -308,14 +362,23 @@ abstract class PdoAdapter implements AdapterInterface
         }
     }
 
-    private function bindConditions(PDOStatement $statement, array $conditions = [])
+    /**
+     * @param PDOStatement $statement
+     * @param array<string, mixed> $conditions
+     */
+    private function bindConditions(PDOStatement $statement, array $conditions = []): void
     {
         foreach ($conditions as $key => $condition) {
             $this->bindCondition($statement, $key, $condition);
         }
     }
 
-    private function bindCondition(PDOStatement $statement, string $key, $condition)
+    /**
+     * @param PDOStatement $statement
+     * @param string $key
+     * @param mixed $condition
+     */
+    private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
         if (!is_array($condition)) {
             $statement->bindValue('where_' . $key, $condition);
@@ -326,6 +389,10 @@ abstract class PdoAdapter implements AdapterInterface
         }
     }
 
+    /**
+     * @param array<mixed> $data
+     * @return bool
+     */
     private function isMulti(array $data): bool
     {
         foreach ($data as $item) {
@@ -336,7 +403,11 @@ abstract class PdoAdapter implements AdapterInterface
         return true;
     }
 
-    private function throwError($query)
+    /**
+     * @param string|PDOStatement $query
+     * @throws DatabaseQueryExecuteException
+     */
+    private function throwError($query): void
     {
         $errorInfo = $this->pdo->errorInfo();
         throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_r($query, true) . ' fails' : ''), $errorInfo[1]);

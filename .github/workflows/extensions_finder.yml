@@ -1,6 +1,10 @@
 name: PHP extensions finder
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    branches:
+      - '**:**'
 
 jobs:
   extensions_finder:

@@ -6,7 +6,10 @@ use Phoenix\Templates\TemplateManager;
 
 class MigrationCreator
 {
+    /** @var MigrationNameCreator */
     private $migrationNameCreator;
+
+    /** @var TemplateManager */
     private $templateManager;
 
     public function __construct(string $migration, string $indent, ?string $templatePath = null)
@@ -20,6 +23,6 @@ class MigrationCreator
         $template = $this->templateManager->createMigrationFromTemplate($up, $down);
         $migrationPath = $migrationDir . '/' . $this->migrationNameCreator->getFileName();
         file_put_contents($migrationPath, $template);
-        return realpath($migrationPath);
+        return (string)realpath($migrationPath);
     }
 }

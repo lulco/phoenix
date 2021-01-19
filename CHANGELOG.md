@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- moved tests from travis to github actions and removed scrutinizer
+- improved code applying phpstan
+
 #### Added
 - support to change collation on all existing tables and columns
 - support for turn on / off checking foreign keys in migration

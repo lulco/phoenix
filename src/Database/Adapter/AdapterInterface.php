@@ -24,28 +24,82 @@ interface AdapterInterface
     public function query(string $sql): PDOStatement;
 
     /**
+     * @param string $table
+     * @param mixed[] $data
      * @return mixed last inserted id
      */
     public function insert(string $table, array $data);
 
+    /**
+     * @param string $table
+     * @param mixed[] $data
+     * @return PDOStatement
+     */
     public function buildInsertQuery(string $table, array $data): PDOStatement;
 
+    /**
+     * @param string $table
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $conditions
+     * @param string $where
+     * @return bool
+     */
     public function update(string $table, array $data, array $conditions = [], string $where = ''): bool;
 
+    /**
+     * @param string $table
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $conditions
+     * @param string $where
+     * @return PDOStatement
+     */
     public function buildUpdateQuery(string $table, array $data, array $conditions = [], string $where = ''): PDOStatement;
 
+    /**
+     * @param string $table
+     * @param array<string, mixed> $conditions
+     * @param string $where
+     * @return bool
+     */
     public function delete(string $table, array $conditions = [], string $where = ''): bool;
 
+    /**
+     * @param string $table
+     * @param array<string, mixed> $conditions
+     * @param string $where
+     * @return PDOStatement
+     */
     public function buildDeleteQuery(string $table, array $conditions = [], string $where = ''): PDOStatement;
 
     public function buildDoNotCheckForeignKeysQuery(): string;
 
     public function buildCheckForeignKeysQuery(): string;
 
+    /**
+     * @param string $sql
+     * @return array<array<string, mixed>>
+     */
     public function select(string $sql): array;
 
+    /**
+     * @param string $table
+     * @param string[] $fields
+     * @param array<string, mixed> $conditions
+     * @param string[]|array<string, string> $orders
+     * @param string[] $groups
+     * @return array<string, mixed>|null
+     */
     public function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array;
 
+    /**
+     * @param string $table
+     * @param string[] $fields
+     * @param array<string, mixed> $conditions
+     * @param string|null $limit
+     * @param string[]|array<string, string> $orders
+     * @param string[] $groups
+     * @return array<array<string, mixed>>
+     */
     public function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array;
 
     /**

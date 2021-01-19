@@ -6,8 +6,10 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait CharsetAndCollationBehavior
 {
+    /** @var string|null */
     private $charset;
 
+    /** @var string|null */
     private $collation;
 
     public function setCharset(?string $charset): MigrationTable

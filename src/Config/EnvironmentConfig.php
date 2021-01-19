@@ -4,13 +4,22 @@ namespace Phoenix\Config;
 
 class EnvironmentConfig
 {
+    /**
+     * @var array<string, mixed>
+     */
     private $configuration;
 
+    /**
+     * @param array<string, mixed> $configuration
+     */
     public function __construct(array $configuration)
     {
         $this->configuration = $configuration;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getConfiguration(): array
     {
         return $this->configuration;

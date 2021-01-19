@@ -7,6 +7,7 @@ use Symfony\Component\Finder\Finder;
 
 class FilesFinder
 {
+    /** @var string[] */
     private $directories = [];
 
     public function addDirectory(string $path): FilesFinder
@@ -43,11 +44,17 @@ class FilesFinder
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getDirectories(): array
     {
         return $this->directories;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFiles(): array
     {
         $files = [];

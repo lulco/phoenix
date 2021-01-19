@@ -4,10 +4,13 @@ namespace Phoenix\Migration;
 
 class MigrationNameCreator
 {
+    /** @var string */
     private $namespace;
 
+    /** @var string */
     private $className;
 
+    /** @var string */
     private $fileName;
 
     public function __construct(string $fullClassName)

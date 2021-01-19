@@ -2,6 +2,7 @@
 
 namespace Phoenix\Command;
 
+use InvalidArgumentException;
 use Phoenix\Config\Config;
 use Phoenix\Config\Parser\ConfigParserFactory;
 use Phoenix\Database\Adapter\AdapterFactory;
@@ -37,7 +38,7 @@ abstract class AbstractCommand extends Command
 
     /**
      * output data used for json output format
-     * @var array
+     * @var array<string, mixed>
      */
     protected $outputData = [];
 
@@ -61,6 +62,11 @@ abstract class AbstractCommand extends Command
         $this->addOption('output-format', 'f', InputOption::VALUE_REQUIRED, 'Format of the output. Available values: default, json', 'default');
     }
 
+    /**
+     * @param array<string, mixed> $configuration
+     * @return self
+     * @throws ConfigException
+     */
     public function setConfig(array $configuration): AbstractCommand
     {
         $this->config = new Config($configuration);
@@ -73,10 +79,15 @@ abstract class AbstractCommand extends Command
         $this->output = $output;
         $this->config = $this->loadConfig();
 
-        $environment = $this->input->getOption('environment') ?: $this->config->getDefaultEnvironment();
-        $this->adapter = AdapterFactory::instance($this->config->getEnvironmentConfig($environment));
+        /** @var string $environment */
+        $environment = $this->input->getOption('environment') ?: $this->getConfig()->getDefaultEnvironment();
+        $environmentConfig = $this->getConfig()->getEnvironmentConfig($environment);
+        if (!$environmentConfig) {
+            throw new InvalidArgumentException('Environment ' . $environment . ' doesn\'t exist');
+        }
+        $this->adapter = AdapterFactory::instance($environmentConfig);
 
-        $this->manager = new Manager($this->config, $this->adapter);
+        $this->manager = new Manager($this->getConfig(), $this->adapter);
         $this->check();
 
         $this->start = microtime(true);
@@ -86,7 +97,7 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param string|array $messages
+     * @param string|string[] $messages
      */
     protected function writeln($messages, int $options = 0): void
     {
@@ -101,12 +112,20 @@ abstract class AbstractCommand extends Command
         return $this->input->getOption('output-format') === null || $this->input->getOption('output-format') === 'default';
     }
 
+    protected function getConfig(): Config
+    {
+        if ($this->config === null) {
+            throw new ConfigException('Config is not set');
+        }
+        return $this->config;
+    }
+
     private function finishCommand(): void
     {
         $executionTime = microtime(true) - $this->start;
         if ($this->input->getOption('output-format') === 'json') {
             $this->outputData['execution_time'] = $executionTime;
-            $this->output->write(json_encode($this->outputData));
+            $this->output->write((string)json_encode($this->outputData));
             return;
         }
         $this->output->writeln('');
@@ -120,6 +139,7 @@ abstract class AbstractCommand extends Command
             return $this->config;
         }
 
+        /** @var string|null $configFile */
         $configFile = $this->input->getOption('config');
         if (!$configFile) {
             $configFile = $this->getDefaultConfig();
@@ -153,6 +173,7 @@ abstract class AbstractCommand extends Command
             throw new ConfigException('Configuration file "' . $configFile . '" doesn\'t exist.');
         }
 
+        /** @var string $type */
         $type = $this->input->getOption('config_type') ?: pathinfo($configFile, PATHINFO_EXTENSION);
         $configParser = ConfigParserFactory::instance($type);
         $configuration = $configParser->parse($configFile);
@@ -167,7 +188,7 @@ abstract class AbstractCommand extends Command
             $executedMigrations = false;
             if (!$this instanceof InitCommand) {
                 $init = new InitCommand();
-                $init->setConfig($this->config->getConfiguration());
+                $init->setConfig($this->getConfig()->getConfiguration());
                 $verbosity = $this->output->getVerbosity();
                 $this->output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
                 $init->execute($this->input, $this->output);

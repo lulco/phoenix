@@ -9,8 +9,10 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 trait IndexBehavior
 {
+    /** @var Index[] */
     private $indexes = [];
 
+    /** @var string[]  */
     private $indexesToDrop = [];
 
     /**
@@ -38,7 +40,7 @@ trait IndexBehavior
     }
 
     /**
-     * @param string|array $columns
+     * @param string|string[]|IndexColumn|IndexColumn[] $columns
      * @return MigrationTable
      */
     public function dropIndex($columns): MigrationTable
@@ -54,6 +56,9 @@ trait IndexBehavior
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getIndexesToDrop(): array
     {
         return $this->indexesToDrop;
@@ -86,7 +91,7 @@ trait IndexBehavior
     }
 
     /**
-     * @param array|string $columns
+     * @param string|string[]|IndexColumn|IndexColumn[] $columns
      * @return IndexColumn[]
      */
     private function createIndexColumns($columns): array
@@ -103,5 +108,5 @@ trait IndexBehavior
         return $columnList;
     }
 
-    abstract public function getName();
+    abstract public function getName(): string;
 }

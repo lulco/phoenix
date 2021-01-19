@@ -7,10 +7,13 @@ use Phoenix\Migration\MigrationNameCreator;
 
 class TemplateManager
 {
+    /** @var MigrationNameCreator */
     private $migrationNameCreator;
 
+    /** @var string */
     private $indent;
 
+    /** @var string */
     private $templatePath;
 
     public function __construct(MigrationNameCreator $migrationNameCreator, string $indent, ?string $templatePath = null)
@@ -26,7 +29,7 @@ class TemplateManager
 
     public function createMigrationFromTemplate(string $up, string $down): string
     {
-        $template = file_get_contents($this->templatePath);
+        $template = (string)file_get_contents($this->templatePath);
         $namespace = '';
         if ($this->migrationNameCreator->getNamespace()) {
             $namespace .= "namespace {$this->migrationNameCreator->getNamespace()};\n\n";

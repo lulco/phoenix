@@ -40,6 +40,12 @@ class StatusCommand extends AbstractCommand
         }
     }
 
+    /**
+     * @param string[] $headers
+     * @param array<int, array<string, string|mixed>> $rows
+     * @param string $header
+     * @param string $noItemsText
+     */
     private function printTable(array $headers, array $rows, string $header, string $noItemsText): void
     {
         $this->writeln('');

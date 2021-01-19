@@ -38,8 +38,11 @@ class StructureComparator
         $tableComparator = new TableComparator();
         $intersect = array_intersect(array_keys($sourceTables), array_keys($targetTables));
         foreach ($intersect as $tableName) {
+            /** @var Table $sourceTable */
             $sourceTable = $sourceStructure->getTable($tableName);
+            /** @var Table $targetTable */
             $targetTable = $targetStructure->getTable($tableName);
+
             $migrationTable = $tableComparator->diff($sourceTable, $targetTable);
             if ($migrationTable) {
                 $diff[] = $migrationTable;

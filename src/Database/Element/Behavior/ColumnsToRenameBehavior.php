@@ -6,6 +6,7 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait ColumnsToRenameBehavior
 {
+    /** @var array<string, string> */
     private $columnsToRename = [];
 
     public function renameColumn(string $oldName, string $newName): MigrationTable
@@ -14,6 +15,9 @@ trait ColumnsToRenameBehavior
         return $this;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getColumnsToRename(): array
     {
         return $this->columnsToRename;

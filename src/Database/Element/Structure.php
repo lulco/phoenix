@@ -15,13 +15,15 @@ class Structure
             unset($this->tables[$migrationTable->getName()]);
         } elseif ($migrationTable->getAction() === MigrationTable::ACTION_RENAME) {
             $table = $this->tables[$migrationTable->getName()];
-            $table->setName($migrationTable->getNewName());
-            $this->tables[$migrationTable->getNewName()] = $table;
+            /** @var string $newName */
+            $newName = $migrationTable->getNewName();
+            $table->setName($newName);
+            $this->tables[$newName] = $table;
             unset($this->tables[$migrationTable->getName()]);
             foreach ($this->getTables() as $table) {
                 foreach ($table->getForeignKeys() as $foreginKey) {
                     if ($foreginKey->getReferencedTable() == $migrationTable->getName()) {
-                        $foreginKey->setReferencedTable($migrationTable->getNewName());
+                        $foreginKey->setReferencedTable($newName);
                     }
                 }
             }
