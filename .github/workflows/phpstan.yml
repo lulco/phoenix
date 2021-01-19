@@ -33,4 +33,4 @@ jobs:
         run: composer require phpstan/phpstan --dev
 
       - name: PHPStan analyse
-        run: vendor/bin/phpstan analyze src --level=5 --no-progress
+        run: vendor/bin/phpstan analyze src --level=max --no-progress
