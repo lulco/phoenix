@@ -25,16 +25,16 @@ abstract class AbstractMigration
     /** @var string */
     private $fullClassName;
 
-    /** @var array */
+    /** @var array<int, string|PDOStatement|MigrationTable> */
     private $queriesToExecute = [];
 
-    /** @var array list of executed queries */
+    /** @var string[] list of executed queries */
     private $executedQueries = [];
 
     public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
-        $classNameCreator = new ClassNameCreator((new ReflectionClass($this))->getFileName());
+        $classNameCreator = new ClassNameCreator((string)(new ReflectionClass($this))->getFileName());
         $this->datetime = $classNameCreator->getDatetime();
         $this->className = $classNameCreator->getClassName();
         $this->fullClassName = $classNameCreator->getClassName();
@@ -55,6 +55,11 @@ abstract class AbstractMigration
         return $this->fullClassName;
     }
 
+    /**
+     * @param bool $dry
+     * @return mixed[]
+     * @throws DatabaseQueryExecuteException
+     */
     final public function migrate(bool $dry = false): array
     {
         $this->reset();
@@ -63,6 +68,11 @@ abstract class AbstractMigration
         return $this->runQueries($queries, $dry);
     }
 
+    /**
+     * @param bool $dry
+     * @return mixed[]
+     * @throws DatabaseQueryExecuteException
+     */
     final public function rollback(bool $dry = false): array
     {
         $this->reset();
@@ -131,16 +141,37 @@ abstract class AbstractMigration
         return $this->adapter->getStructure()->getTable($name);
     }
 
+    /**
+     * @param string $sql
+     * @return array<array<string, mixed>>
+     */
     final protected function select(string $sql): array
     {
         return $this->adapter->select($sql);
     }
 
+    /**
+     * @param string $table
+     * @param string[] $fields
+     * @param array<string, mixed> $conditions
+     * @param array<string, string> $orders column name => sort direction
+     * @param string[] $groups
+     * @return array<string, mixed>|null
+     */
     final protected function fetch(string $table, array $fields = ['*'], array $conditions = [], array $orders = [], array $groups = []): ?array
     {
         return $this->adapter->fetch($table, $fields, $conditions, $orders, $groups);
     }
 
+    /**
+     * @param string $table
+     * @param string[] $fields
+     * @param array<string, mixed> $conditions
+     * @param string|null $limit
+     * @param array<string, string> $orders column name => sort direction
+     * @param string[] $groups
+     * @return array<array<string, mixed>>
+     */
     final protected function fetchAll(string $table, array $fields = ['*'], array $conditions = [], ?string $limit = null, array $orders = [], array $groups = []): array
     {
         return $this->adapter->fetchAll($table, $fields, $conditions, $limit, $orders, $groups);
@@ -150,8 +181,7 @@ abstract class AbstractMigration
      * adds insert query to list of queries to execute
      *
      * @param string $table
-     * @param array $data
-     *
+     * @param array<string, mixed> $data
      * @return AbstractMigration
      */
     final protected function insert(string $table, array $data): AbstractMigration
@@ -163,8 +193,8 @@ abstract class AbstractMigration
     /**
      * adds update query to list of queries to execute
      * @param string $table
-     * @param array $data
-     * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
+     * @param array<string, mixed> $data
+     * @param array<string, mixed> $conditions key => value conditions to generate WHERE part of query, imploded with AND
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
@@ -177,7 +207,7 @@ abstract class AbstractMigration
     /**
      * adds delete query to list of queries to exectue
      * @param string $table
-     * @param array $conditions key => value conditions to generate WHERE part of query, imploded with AND
+     * @param array<string, mixed> $conditions key => value conditions to generate WHERE part of query, imploded with AND
      * @param string $where additional where added to generated WHERE as is
      * @return AbstractMigration
      */
@@ -188,9 +218,9 @@ abstract class AbstractMigration
     }
 
     /**
-     * @param array $queries
+     * @param array<int, string|PDOStatement> $queries
      * @param bool $dry
-     *
+     * @return mixed[]
      * @throws DatabaseQueryExecuteException
      */
     private function runQueries(array $queries, bool $dry = false): array
@@ -206,6 +236,9 @@ abstract class AbstractMigration
         return $results;
     }
 
+    /**
+     * @return string[]
+     */
     public function getExecutedQueries(): array
     {
         return $this->executedQueries;
@@ -221,6 +254,9 @@ abstract class AbstractMigration
         $this->executedQueries = [];
     }
 
+    /**
+     * @return array<int, string|PDOStatement>
+     */
     private function prepare(): array
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
@@ -236,6 +272,11 @@ abstract class AbstractMigration
         return $queries;
     }
 
+    /**
+     * @param MigrationTable $table
+     * @param QueryBuilderInterface $queryBuilder
+     * @return string[]
+     */
     private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder): array
     {
         $tableQueries = [];

@@ -8,6 +8,7 @@ use Phoenix\Migration\AbstractMigration;
 
 class Init extends AbstractMigration
 {
+    /** @var string */
     private $logTableName;
 
     public function __construct(AdapterInterface $adapter, string $logTableName)

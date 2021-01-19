@@ -18,8 +18,10 @@ class Manager
     const TARGET_FIRST = 'first';
     const TARGET_ALL = 'all';
 
+    /** @var Config */
     private $config;
 
+    /** @var AdapterInterface */
     private $adapter;
 
     public function __construct(Config $config, AdapterInterface $adapter)
@@ -29,6 +31,10 @@ class Manager
     }
 
     /**
+     * @param string $type
+     * @param string $target
+     * @param string[] $dirs
+     * @param string[] $classes
      * @return AbstractMigration[]
      * @throws InvalidArgumentValueException
      */
@@ -36,7 +42,6 @@ class Manager
     {
         $this->inArray($type, [self::TYPE_UP, self::TYPE_DOWN], 'Type "' . $type . '" is not allowed.');
 
-        /** @var AbstractMigration[] $migrations */
         $migrations = $this->findMigrations($type, $dirs, $classes);
         if (empty($migrations)) {
             return [];
@@ -50,7 +55,8 @@ class Manager
         }
 
         if ($target === self::TARGET_FIRST) {
-            return [current($migrations)];
+            $currentMigration = current($migrations);
+            return $currentMigration ? [$currentMigration] : [];
         }
 
         $migrationsToExecute = [];
@@ -62,6 +68,12 @@ class Manager
         return $migrationsToExecute;
     }
 
+    /**
+     * @param string $type
+     * @param string[] $dirs
+     * @param string[] $classes
+     * @return AbstractMigration[]
+     */
     private function findMigrations(string $type, array $dirs, array $classes): array
     {
         $migrations = $this->findMigrationClasses($dirs, $classes);
@@ -84,8 +96,8 @@ class Manager
     }
 
     /**
-     * @param array $dirs
-     * @param array $classes
+     * @param string[] $dirs
+     * @param string[] $classes
      * @return AbstractMigration[]
      */
     public function findMigrationClasses(array $dirs = [], array $classes = []): array
@@ -111,6 +123,9 @@ class Manager
         return $migrations;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function executedMigrations(): array
     {
         $migrations = $this->adapter->fetchAll($this->config->getLogTableName(), ['*'], [], null, ['executed_at', 'migration_datetime']);
@@ -133,6 +148,10 @@ class Manager
         $this->adapter->delete($this->config->getLogTableName(), $this->createData($migration));
     }
 
+    /**
+     * @param AbstractMigration $migration
+     * @return array<string, string>
+     */
     private function createData(AbstractMigration $migration): array
     {
         return [

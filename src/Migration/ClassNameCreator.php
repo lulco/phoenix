@@ -4,8 +4,10 @@ namespace Phoenix\Migration;
 
 class ClassNameCreator
 {
+    /** @var string */
     private $datetime = '';
 
+    /** @var string */
     private $className = '';
 
     public function __construct(string $filepath)
@@ -30,12 +32,12 @@ class ClassNameCreator
 
     private function findClassName(string $filepath): string
     {
-        $fileContent = file_get_contents($filepath);
+        $fileContent = (string)file_get_contents($filepath);
 
         // remove comments
         $patterns = ['/\/\*(.*?)\*\//s', "/\/\/(.*?)\n/s"];
         foreach ($patterns as $pattern) {
-            $fileContent = preg_replace($pattern, '', $fileContent);
+            $fileContent = (string)preg_replace($pattern, '', $fileContent);
         }
 
         $pattern = '/namespace (.*?);/s';
