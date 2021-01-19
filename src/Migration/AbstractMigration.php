@@ -4,11 +4,13 @@ namespace Phoenix\Migration;
 
 use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 
 abstract class AbstractMigration
@@ -215,6 +217,55 @@ abstract class AbstractMigration
     {
         $this->execute($this->adapter->buildDeleteQuery($table, $conditions, $where));
         return $this;
+    }
+
+    /**
+     * adds turn off checking foreign keys query to list of queries to execute
+     * @return void
+     */
+    final protected function checkForeignKeysOff(): void
+    {
+        $this->execute($this->adapter->buildDoNotCheckForeignKeysQuery());
+    }
+
+    /**
+     * adds turn on checking foreign keys query to list of queries to execute
+     * @return void
+     */
+    final protected function checkForeignKeysOn(): void
+    {
+        $this->execute($this->adapter->buildCheckForeignKeysQuery());
+    }
+
+    /**
+     * changes collation on all existing tables and columns
+     *
+     * @param string $targetCollation
+     * @return void
+     * @throws InvalidArgumentValueException
+     */
+    final protected function changeCollation(string $targetCollation): void
+    {
+        $this->checkForeignKeysOff();
+        [$targetCharset,] = explode('_', $targetCollation, 2);
+
+        foreach ($this->adapter->getStructure()->getTables() as $table) {
+            $migrationTable = $this->table($table->getName(), $table->getPrimary(), $targetCharset, $targetCollation);
+            foreach ($table->getColumns() as $column) {
+                $settings = $actualSettings = $column->getSettings()->getSettings();
+                if (isset($actualSettings[ColumnSettings::SETTING_CHARSET]) && $actualSettings[ColumnSettings::SETTING_CHARSET] !== $targetCharset) {
+                    $settings[ColumnSettings::SETTING_CHARSET] = $targetCharset;
+                }
+                if (isset($actualSettings[ColumnSettings::SETTING_COLLATION]) && $actualSettings[ColumnSettings::SETTING_COLLATION] !== $targetCollation) {
+                    $settings[ColumnSettings::SETTING_COLLATION] = $targetCollation;
+                }
+                if ($settings !== $actualSettings) {
+                    $migrationTable->changeColumn($column->getName(), $column->getName(), $column->getType(), $settings);
+                }
+            }
+            $migrationTable->save();
+        }
+        $this->checkForeignKeysOn();
     }
 
     /**

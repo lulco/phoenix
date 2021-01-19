@@ -107,9 +107,12 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     public function alterTable(MigrationTable $table): array
     {
         $queries = $this->dropIndexes($table);
-        if ($table->getColumnsToRename()) {
-            /** @var Table $tableStructure */
-            $tableStructure = $this->adapter->getStructure()->getTable($table->getName());
+
+        $tableStructure = $this->adapter->getStructure()->getTable($table->getName());
+        if ($tableStructure && (($table->getCharset() && $table->getCharset() !== $tableStructure->getCharset()) || ($table->getCollation() && $table->getCollation() !== $tableStructure->getCollation()))) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . $this->createCharset($table->getCharset(), $table->getCollation()) . ';';
+        }
+        if ($tableStructure && $table->getColumnsToRename()) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
             foreach ($table->getColumnsToRename() as $oldName => $newName) {

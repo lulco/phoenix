@@ -71,6 +71,10 @@ interface AdapterInterface
      */
     public function buildDeleteQuery(string $table, array $conditions = [], string $where = ''): PDOStatement;
 
+    public function buildDoNotCheckForeignKeysQuery(): string;
+
+    public function buildCheckForeignKeysQuery(): string;
+
     /**
      * @param string $sql
      * @return array<array<string, mixed>>

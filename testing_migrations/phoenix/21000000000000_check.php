@@ -17,7 +17,7 @@ class Check extends AbstractMigration
         }
 
         $logs = $this->fetchAll('phoenix_log');
-        if (count($logs) !== 13) {
+        if (count($logs) !== 14) {
             throw new Exception('Wrong count');
         }
 
@@ -108,6 +108,14 @@ class Check extends AbstractMigration
         }
         if ((bool)$item100['is_active'] !== true) {
             throw new Exception('is_active for item with id 100 should be false');
+        }
+
+        $item1000 = $this->fetch('renamed_table_1', ['title'], ['id' => 1000]);
+        if (!$item1000) {
+            throw new Exception('There is no item with id 1000');
+        }
+        if ($item1000['title'] !== 'Panda 🐼') {
+            throw new Exception('title for item with id 1000 should be "Panda 🐼"');
         }
 
         if ($this->tableExists('non_existing_table')) {

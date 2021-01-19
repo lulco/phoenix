@@ -26,6 +26,16 @@ class PgsqlAdapter extends PdoAdapter
         return $this->queryBuilder;
     }
 
+    public function buildDoNotCheckForeignKeysQuery(): string
+    {
+        return 'SET session_replication_role = replica;';
+    }
+
+    public function buildCheckForeignKeysQuery(): string
+    {
+        return 'SET session_replication_role = DEFAULT;';
+    }
+
     protected function loadDatabase(): string
     {
         /** @var string $currentDatabase */

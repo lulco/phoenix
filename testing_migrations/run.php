@@ -18,7 +18,7 @@ $configuration = [
             'host' => 'localhost',
             'username' => 'root',
             'password' => '123',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
         'pgsql' => [
             'adapter' => 'pgsql',

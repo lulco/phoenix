@@ -1,12 +1,13 @@
 # Phoenix
 Framework agnostic database migrations for PHP.
 
-[![Build Status](https://travis-ci.org/lulco/phoenix.svg?branch=master)](https://travis-ci.org/lulco/phoenix)
-[![PHPStan](https://img.shields.io/badge/PHPStan-level:%205-brightgreen.svg)](https://travis-ci.org/lulco/phoenix)
+[![PHP unit](https://github.com/lulco/phoenix/workflows/PHPunit/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3APHPunit)
+[![PHPStan level](https://img.shields.io/badge/PHPStan-level:%20max-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
+[![PHP static analysis](https://github.com/lulco/phoenix/workflows/PHP%20static%20analysis/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
-[![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://travis-ci.org/lulco/phoenix)
+[![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://github.com/lulco/phoenix/actions)
 
 ## Features
 - Validation all settings in migration before executing first query
@@ -24,6 +25,8 @@ Framework agnostic database migrations for PHP.
 - Own migration templates
 - Easy integration to any PHP application
 - PHPStorm suggestions (works even better with deep-assoc-completion plugin)
+- Change collation for all existing tables and columns
+- Turn foreign keys check on / off in migration
 
 ## Supported adapters
 - MySql

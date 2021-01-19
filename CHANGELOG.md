@@ -3,8 +3,12 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Moved tests from travis to github actions and removed scrutinizer
-- Improved code applying phpstan
+- moved tests from travis to github actions and removed scrutinizer
+- improved code applying phpstan
+
+#### Added
+- support to change collation on all existing tables and columns
+- support for turn on / off checking foreign keys in migration
 
 ### [1.4.0] - 2020-12-01
 #### Changed

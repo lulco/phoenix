@@ -37,6 +37,12 @@ class PgsqlAdapterTest extends TestCase
         $this->assertInstanceOf(PgsqlQueryBuilder::class, $this->adapter->getQueryBuilder());
     }
 
+    public function testForeignKeyQueries()
+    {
+        $this->assertEquals('SET session_replication_role = DEFAULT;', $this->adapter->buildCheckForeignKeysQuery());
+        $this->assertEquals('SET session_replication_role = replica;', $this->adapter->buildDoNotCheckForeignKeysQuery());
+    }
+
     public function testGetEmptyStructureAndUpdate()
     {
         $structure = $this->adapter->getStructure();
