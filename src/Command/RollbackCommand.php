@@ -31,10 +31,10 @@ class RollbackCommand extends AbstractRunCommand
         $targetOption = $this->input->getOption('target');
         $target = $targetOption ? str_pad($targetOption, 14, '0', STR_PAD_RIGHT) : ($this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST);
         /** @var string[] $dirs */
-        $dirs = $this->input->getOption('dir');
+        $dirs = $this->input->getOption('dir') ?: [];
         $this->checkDirs($dirs);
         /** @var string[] $classes */
-        $classes = $this->input->getOption('class');
+        $classes = $this->input->getOption('class') ?: [];
         return $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, $target, $dirs, $classes);
     }
 

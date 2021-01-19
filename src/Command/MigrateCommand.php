@@ -33,10 +33,10 @@ class MigrateCommand extends AbstractRunCommand
         $first = $this->input->getOption('first');
         $target = $targetOption ? str_pad($targetOption, 14, '0', STR_PAD_RIGHT) : ($first ? Manager::TARGET_FIRST : Manager::TARGET_ALL);
         /** @var string[] $dirs */
-        $dirs = $this->input->getOption('dir');
+        $dirs = $this->input->getOption('dir') ?: [];
         $this->checkDirs($dirs);
         /** @var string[] $classes */
-        $classes = $this->input->getOption('class');
+        $classes = $this->input->getOption('class') ?: [];
         return $this->manager->findMigrationsToExecute(Manager::TYPE_UP, $target, $dirs, $classes);
     }
 
