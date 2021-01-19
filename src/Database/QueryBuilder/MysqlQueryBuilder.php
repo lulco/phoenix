@@ -8,6 +8,7 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\Table;
 
 class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -107,11 +108,15 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     {
         $queries = $this->dropIndexes($table);
         if ($table->getColumnsToRename()) {
+            /** @var Table $tableStructure */
             $tableStructure = $this->adapter->getStructure()->getTable($table->getName());
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $columnList = [];
             foreach ($table->getColumnsToRename() as $oldName => $newName) {
                 $column = $tableStructure->getColumn($oldName);
+                if (!$column) {
+                    continue;
+                }
                 $newColumn = new Column($newName, $column->getType(), $column->getSettings()->getSettings());
                 $columnList[] = 'CHANGE COLUMN ' . $this->escapeString($oldName) . ' ' . $this->createColumn($newColumn, $table);
             }
@@ -164,6 +169,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 return $queries;
             }
 
+            /** @var Table $oldTable */
             $oldTable = $this->adapter->getStructure()->getTable($table->getName());
             $columns = [];
             foreach ($oldTable->getColumns() as $column) {
@@ -322,7 +328,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             $this->remapType($column),
             implode(',', array_map(function ($value) {
                 return "'$value'";
-            }, $column->getSettings()->getValues()))
+            }, $column->getSettings()->getValues() ?: []))
         );
     }
 }

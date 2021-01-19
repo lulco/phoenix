@@ -53,7 +53,7 @@ class Column
     /**
      * @param string $name name of column
      * @param string $type type of column
-     * @param array $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
+     * @param array<string, mixed> $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
      * @throws InvalidArgumentValueException if setting is not allowed
      */
     public function __construct(string $name, string $type, array $settings = [])

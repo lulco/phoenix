@@ -7,8 +7,10 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait ForeignKeyBehavior
 {
+    /** @var ForeignKey[] */
     private $foreignKeys = [];
 
+    /** @var string[] */
     private $foreignKeysToDrop = [];
 
     /**
@@ -51,6 +53,9 @@ trait ForeignKeyBehavior
         return $this;
     }
 
+    /**
+     * @return string[]
+     */
     public function getForeignKeysToDrop(): array
     {
         return $this->foreignKeysToDrop;

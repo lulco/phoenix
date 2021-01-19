@@ -15,17 +15,28 @@ class ForeignKey
     const CASCADE = 'CASCADE';
     const SET_NULL = 'SET NULL';
 
+    /** @var string[] */
     private $columns = [];
 
+    /** @var string */
     private $referencedTable;
 
+    /** @var string[] */
     private $referencedColumns;
 
+    /** @var string */
     private $onDelete;
 
+    /** @var string */
     private $onUpdate;
 
     /**
+     * ForeignKey constructor.
+     * @param string[] $columns
+     * @param string $referencedTable
+     * @param string[] $referencedColumns
+     * @param string $onDelete
+     * @param string $onUpdate
      * @throws InvalidArgumentValueException if onDelete action or onUpdate action is not allowed
      */
     public function __construct(array $columns, string $referencedTable, array $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)
@@ -46,6 +57,9 @@ class ForeignKey
         return implode('_', $this->columns);
     }
 
+    /**
+     * @return string[]
+     */
     public function getColumns(): array
     {
         return $this->columns;
@@ -62,6 +76,9 @@ class ForeignKey
         return $this->referencedTable;
     }
 
+    /**
+     * @return string[]
+     */
     public function getReferencedColumns(): array
     {
         return $this->referencedColumns;

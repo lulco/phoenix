@@ -10,6 +10,10 @@ class IndexColumn
     /** @var IndexColumnSettings */
     private $columnSettings;
 
+    /**
+     * @param string $name
+     * @param array<string, string> $columnSettings
+     */
     public function __construct(string $name, array $columnSettings = [])
     {
         $this->name = $name;

@@ -11,8 +11,10 @@ use Phoenix\Database\Element\MigrationTable;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
+    /** @var array<string, mixed> */
     protected $defaultLength = [];
 
+    /** @var AdapterInterface */
     protected $adapter;
 
     public function __construct(AdapterInterface $adapter)
@@ -256,5 +258,8 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
 
     abstract protected function createEnumSetColumn(Column $column, MigrationTable $table): string;
 
+    /**
+     * @return array<string, string>
+     */
     abstract protected function typeMap(): array;
 }

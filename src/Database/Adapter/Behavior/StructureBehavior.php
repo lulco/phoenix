@@ -5,6 +5,7 @@ namespace Phoenix\Database\Adapter\Behavior;
 use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 trait StructureBehavior
 {
@@ -28,11 +29,19 @@ trait StructureBehavior
         return $structure;
     }
 
+    /**
+     * @param array<string, string> $table
+     * @return MigrationTable
+     */
     protected function createMigrationTable(array $table): MigrationTable
     {
         return new MigrationTable($table['table_name'], false);
     }
 
+    /**
+     * @param MigrationTable $migrationTable
+     * @param array<array<string, mixed>> $columns
+     */
     protected function addColumns(MigrationTable $migrationTable, array $columns): void
     {
         foreach ($columns as $column) {
@@ -42,16 +51,41 @@ trait StructureBehavior
 
     abstract protected function loadDatabase(): string;
 
+    /**
+     * @param string $database
+     * @return array<array<string, string>>
+     */
     abstract protected function loadTables(string $database): array;
 
+    /**
+     * @param string $database
+     * @return array<string, array<array<string, mixed>>>
+     */
     abstract protected function loadColumns(string $database): array;
 
+    /**
+     * @param string $database
+     * @return array<string, array<string, array<string, mixed>>>
+     */
     abstract protected function loadIndexes(string $database): array;
 
+    /**
+     * @param string $database
+     * @return array<string, array<string, array<string, string>>>
+     */
     abstract protected function loadForeignKeys(string $database): array;
 
+    /**
+     * @param MigrationTable $migrationTable
+     * @param array<string, mixed> $column
+     */
     abstract protected function addColumn(MigrationTable $migrationTable, array $column): void;
 
+    /**
+     * @param MigrationTable $migrationTable
+     * @param array<string, array<string, mixed>> $indexes
+     * @throws InvalidArgumentValueException
+     */
     private function addIndexes(MigrationTable $migrationTable, array $indexes): void
     {
         foreach ($indexes as $name => $index) {
@@ -68,6 +102,10 @@ trait StructureBehavior
         }
     }
 
+    /**
+     * @param MigrationTable $migrationTable
+     * @param array<string, array<string, mixed>> $foreignKeys
+     */
     private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys): void
     {
         foreach ($foreignKeys as $foreignKey) {

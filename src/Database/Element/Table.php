@@ -4,20 +4,28 @@ namespace Phoenix\Database\Element;
 
 class Table
 {
+    /** @var string */
     private $name;
 
+    /** @var string|null */
     private $charset;
 
+    /** @var string|null */
     private $collation;
 
+    /** @var string|null */
     private $comment;
 
+    /** @var Column[] */
     private $columns = [];
 
+    /** @var string[] */
     private $primaryColumns = [];
 
+    /** @var ForeignKey[] */
     private $foreignKeys = [];
 
+    /** @var array<string, Index> */
     private $indexes = [];
 
     public function __construct(string $name)
@@ -69,6 +77,10 @@ class Table
         return $this->comment;
     }
 
+    /**
+     * @param string[] $primaryColumns
+     * @return Table
+     */
     public function setPrimary(array $primaryColumns): Table
     {
         $this->primaryColumns = $primaryColumns;

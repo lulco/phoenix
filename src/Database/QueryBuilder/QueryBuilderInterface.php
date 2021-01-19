@@ -8,37 +8,37 @@ interface QueryBuilderInterface
 {
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function createTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function dropTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function renameTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function alterTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function copyTable(MigrationTable $table): array;
 
     /**
      * @param MigrationTable $table
-     * @return array list of queries
+     * @return string[] list of queries
      */
     public function truncateTable(MigrationTable $table): array;
 

@@ -15,9 +15,12 @@ class IndexColumnSettings
         self::SETTING_LENGTH => null,
     ];
 
-    /** @var array */
+    /** @var array<string, string> */
     private $settings;
 
+    /**
+     * @param array<string, string> $settings
+     */
     public function __construct(array $settings)
     {
         if (isset($settings[self::SETTING_ORDER])) {
@@ -26,6 +29,9 @@ class IndexColumnSettings
         $this->settings = $settings;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getNonDefaultSettings(): array
     {
         $settings = $this->settings;

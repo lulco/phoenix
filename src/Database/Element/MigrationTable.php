@@ -46,16 +46,22 @@ class MigrationTable
 
     const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
+    /** @var string */
     private $action;
 
+    /** @var mixed */
     private $tmpPrimaryKey;
 
+    /** @var string */
     private $name;
 
+    /** @var string|null */
     private $newName;
 
+    /** @var Column[] */
     private $columns = [];
 
+    /** @var string[] */
     private $primaryColumnNames = [];
 
     /**

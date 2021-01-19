@@ -20,10 +20,13 @@ class Index
     /** @var IndexColumn[] */
     private $columns = [];
 
+    /** @var string */
     private $name;
 
+    /** @var string */
     private $type;
 
+    /** @var string */
     private $method;
 
     /**

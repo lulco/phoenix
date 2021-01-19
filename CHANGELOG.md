@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Moved tests from travis to github actions and removed scrutinizer
+- Improved code applying phpstan
+
 ### [1.4.0] - 2020-12-01
 #### Changed
 - default value of boolean columns is set to false if it is not null (this prevent from errors when user forgot set default to false)

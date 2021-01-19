@@ -9,8 +9,10 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 trait IndexBehavior
 {
+    /** @var Index[] */
     private $indexes = [];
 
+    /** @var string[]  */
     private $indexesToDrop = [];
 
     /**
@@ -103,5 +105,5 @@ trait IndexBehavior
         return $columnList;
     }
 
-    abstract public function getName();
+    abstract public function getName(): string;
 }

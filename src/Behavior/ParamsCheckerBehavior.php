@@ -6,6 +6,12 @@ use Phoenix\Exception\InvalidArgumentValueException;
 
 trait ParamsCheckerBehavior
 {
+    /**
+     * @param string $valueToCheck
+     * @param string[] $availableValues
+     * @param string $message
+     * @throws InvalidArgumentValueException
+     */
     protected function inArray(string $valueToCheck, array $availableValues, string $message): void
     {
         if (!in_array($valueToCheck, $availableValues, true)) {

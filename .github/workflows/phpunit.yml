@@ -56,10 +56,3 @@ jobs:
           PHOENIX_MYSQL_PASSWORD: 123
           PHOENIX_PGSQL_PORT: ${{ job.services.postgres.ports[5432] }}
           PHOENIX_PGSQL_PASSWORD: 123
-
-      - name: Send code coverage
-        run: |
-          if [ ${{ matrix.php }} == 7.4 ]; then
-            wget https://scrutinizer-ci.com/ocular.phar
-            php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-          fi

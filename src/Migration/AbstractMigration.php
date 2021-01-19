@@ -154,7 +154,7 @@ abstract class AbstractMigration
      * @param string $table
      * @param string[] $fields
      * @param array<string, mixed> $conditions
-     * @param array<string, string> $orders column name => sort direction
+     * @param string[]|array<string, string> $orders column name => sort direction or list of columns (all will use ASC sorting)
      * @param string[] $groups
      * @return array<string, mixed>|null
      */
@@ -168,7 +168,7 @@ abstract class AbstractMigration
      * @param string[] $fields
      * @param array<string, mixed> $conditions
      * @param string|null $limit
-     * @param array<string, string> $orders column name => sort direction
+     * @param string[]|array<string, string> $orders column name => sort direction or list of columns (all will use ASC sorting)
      * @param string[] $groups
      * @return array<array<string, mixed>>
      */

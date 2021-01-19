@@ -174,7 +174,7 @@ class PgsqlAdapter extends PdoAdapter
 
             $position = count($indexes[$indexRow['relname']][$indexRow['index_name']]['columns'] ?? []);
             $indoptions = explode(' ', $indexRow['indoption']);
-            $indoption = $indoptions[$position] ?? 0;
+            $indoption = (int)($indoptions[$position] ?? 0);
 
             if ($indoption & 1) {
                 $settings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
@@ -215,7 +215,7 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
                 $indexColumnSettings = [
                     IndexColumnSettings::SETTING_LENGTH => (int)$length,
                 ];
-                $indoption = $indoptions[$i] ?? 0;
+                $indoption = (int)($indoptions[$i] ?? 0);
                 if ($indoption & 1) {
                     $indexColumnSettings[IndexColumnSettings::SETTING_ORDER] = IndexColumnSettings::SETTING_ORDER_DESC;
                 }
