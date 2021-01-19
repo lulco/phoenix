@@ -10,10 +10,13 @@ use Phoenix\Database\Element\IndexColumn;
 
 class Dumper
 {
+    /** @var string */
     private $indent;
 
+    /** @var int  */
     private $baseIndent;
 
+    /** @var array<string, mixed> */
     private $defaultSettings = [
         ColumnSettings::SETTING_AUTOINCREMENT => false,
         ColumnSettings::SETTING_NULL => false,
@@ -118,7 +121,7 @@ class Dumper
     }
 
     /**
-     * @param array $data data for migration in format table => rows
+     * @param array<string, array<string, mixed>> $data data for migration in format table => rows
      * @return string
      */
     public function dumpDataUp(array $data = []): string
@@ -147,6 +150,10 @@ class Dumper
         return str_repeat($this->indent, $multiplier + $this->baseIndent);
     }
 
+    /**
+     * @param string[] $columns
+     * @return string
+     */
     private function columnsToString(array $columns): string
     {
         $columns = array_map(function ($column) {
@@ -156,6 +163,10 @@ class Dumper
         return count($columns) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
     }
 
+    /**
+     * @param string[] $values
+     * @return string
+     */
     private function valuesToString(array $values): string
     {
         $values = array_map(function ($value) {
@@ -218,6 +229,11 @@ class Dumper
         return count($columnsList) > 1 ? '[' . $implodedColumns . ']' : $implodedColumns;
     }
 
+    /**
+     * @param Column $column
+     * @param MigrationTable $table
+     * @return array<string, mixed>
+     */
     private function defaultSettings(Column $column, MigrationTable $table): array
     {
         $defaultSettings = $this->defaultSettings;

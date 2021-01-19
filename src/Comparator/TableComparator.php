@@ -35,7 +35,9 @@ class TableComparator
         }
         $primaryColumns = [];
         foreach ($primaryColumnsToAdd as $primaryColumnToAdd) {
-            $primaryColumns[] = $targetTable->getColumn($primaryColumnToAdd);
+            /** @var Column $primaryColumn */
+            $primaryColumn = $targetTable->getColumn($primaryColumnToAdd);
+            $primaryColumns[] = $primaryColumn;
             $changeMade = true;
         }
         if (!empty($primaryColumns)) {
@@ -76,7 +78,6 @@ class TableComparator
             $changeMade = true;
         }
 
-        /** @var Column $columnToChange */
         foreach ($columnsToChange as $columnToChangeName => $columnToChange) {
             $migrationTable->changeColumn($columnToChangeName, $columnToChange->getName(), $columnToChange->getType(), $columnToChange->getSettings()->getSettings());
             $changeMade = true;
@@ -84,13 +85,23 @@ class TableComparator
         return $changeMade;
     }
 
+    /**
+     * @param Table $sourceTable
+     * @param Table $targetTable
+     * @return array<string, Column>
+     */
     private function findColumnsToChange(Table $sourceTable, Table $targetTable): array
     {
         $columnsIntersect = array_intersect(array_keys($sourceTable->getColumns()), array_keys($targetTable->getColumns()));
         $columnsComparator = new ColumnComparator();
         $columnsToChange = [];
         foreach ($columnsIntersect as $columnName) {
-            $diffColumn = $columnsComparator->diff($sourceTable->getColumn($columnName), $targetTable->getColumn($columnName));
+            /** @var Column $sourceColumn */
+            $sourceColumn = $sourceTable->getColumn($columnName);
+            /** @var Column $targetColumn */
+            $targetColumn = $targetTable->getColumn($columnName);
+
+            $diffColumn = $columnsComparator->diff($sourceColumn, $targetColumn);
             if ($diffColumn !== null) {
                 $columnsToChange[$columnName] = $diffColumn;
             }

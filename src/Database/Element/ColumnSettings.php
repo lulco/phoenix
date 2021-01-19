@@ -49,6 +49,9 @@ class ColumnSettings
         $this->settings = $settings;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSettings(): array
     {
         return $this->settings;
