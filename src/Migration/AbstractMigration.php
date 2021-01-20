@@ -183,7 +183,7 @@ abstract class AbstractMigration
      * adds insert query to list of queries to execute
      *
      * @param string $table
-     * @param array<string, mixed> $data
+     * @param array<string, mixed>|array<array<string, mixed> $data
      * @return AbstractMigration
      */
     final protected function insert(string $table, array $data): AbstractMigration
