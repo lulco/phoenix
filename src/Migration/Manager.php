@@ -55,8 +55,7 @@ class Manager
         }
 
         if ($target === self::TARGET_FIRST) {
-            $currentMigration = current($migrations);
-            return $currentMigration ? [$currentMigration] : [];
+            return [current($migrations)];
         }
 
         $migrationsToExecute = [];
