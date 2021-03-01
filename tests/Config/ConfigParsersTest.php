@@ -29,6 +29,7 @@ class ConfigParsersTest extends TestCase
         ];
 
         foreach ($configs as $type => $configuration) {
+            $config = [];
             $configParser = ConfigParserFactory::instance($type);
             $filename = __DIR__ . '/../../config_example/' . $configuration['file'];
             $classname = isset($configuration['class']) ? $configuration['class'] : null;
