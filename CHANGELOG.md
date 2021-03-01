@@ -2,6 +2,15 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- changed autoload to PSR-4
+- moved namespace Dumper to Phoenix\Dumper
+- moved namespace Comparator to Phoenix\Comparator
+
+#### Fixed
+- fixed deprecated test class name
+- fixed tests (phpstan issues)
+
 ### [1.5.0] - 2021-01-25
 #### Changed
 - moved tests from travis to github actions and removed scrutinizer
