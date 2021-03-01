@@ -2,9 +2,9 @@ name: PHPunit
 
 on:
   push:
-  pull_request:
     branches:
-      - '**:**'
+      - master
+  pull_request: null
 
 jobs:
   phpunit:
