@@ -2,7 +2,7 @@
 
 namespace Phoenix\Tests\Comparator;
 
-use Comparator\StructureComparator;
+use Phoenix\Comparator\StructureComparator;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
