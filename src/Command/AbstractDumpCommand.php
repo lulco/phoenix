@@ -2,7 +2,7 @@
 
 namespace Phoenix\Command;
 
-use Comparator\StructureComparator;
+use Phoenix\Comparator\StructureComparator;
 use Phoenix\Dumper\Dumper;
 use Phoenix\Dumper\Indenter;
 use Phoenix\Database\Element\MigrationTable;
