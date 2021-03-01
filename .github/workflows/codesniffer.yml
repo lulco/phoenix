@@ -2,9 +2,9 @@ name: PHP code sniffer
 
 on:
   push:
-  pull_request:
     branches:
-      - '**:**'
+      - master
+  pull_request: null
 
 jobs:
   codesniffer:
