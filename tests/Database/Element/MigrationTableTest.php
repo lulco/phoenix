@@ -211,7 +211,7 @@ class MigrationTableTest extends TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
         $this->assertCount(0, $table->getPrimaryColumnNames());
 
-        $this->assertNull($table->create());
+        $table->create();
 
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getCharset());
@@ -240,7 +240,7 @@ class MigrationTableTest extends TestCase
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
-        $this->assertNull($table->create());
+        $table->create();
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
     }
@@ -249,8 +249,8 @@ class MigrationTableTest extends TestCase
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
-        $this->assertNull($table->getNewName());
-        $this->assertNull($table->rename('new_test'));
+        $table->getNewName();
+        $table->rename('new_test');
         $this->assertEquals(MigrationTable::ACTION_RENAME, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
@@ -261,7 +261,7 @@ class MigrationTableTest extends TestCase
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
-        $this->assertNull($table->drop());
+        $table->drop();
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_DROP, $table->getAction());
     }
@@ -271,25 +271,25 @@ class MigrationTableTest extends TestCase
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getNewName());
-        $this->assertNull($table->copy('new_test'));
+        $table->copy('new_test');
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_STRUCTURE));
+        $table->copy('new_test', MigrationTable::COPY_ONLY_STRUCTURE);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_DATA));
+        $table->copy('new_test', MigrationTable::COPY_ONLY_DATA);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_DATA, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_STRUCTURE_AND_DATA));
+        $table->copy('new_test', MigrationTable::COPY_STRUCTURE_AND_DATA);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());

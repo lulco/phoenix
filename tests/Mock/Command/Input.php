@@ -16,7 +16,7 @@ class Input implements InputInterface
         
     }
 
-    public function getArgument($name)
+    public function getArgument(string $name)
     {
         return isset($this->arguments[$name]) ? $this->arguments[$name] : null;
     }
@@ -28,10 +28,10 @@ class Input implements InputInterface
 
     public function getFirstArgument()
     {
-        
+        return null;
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
         return isset($this->options[$name]) ? $this->options[$name] : null;
     }
@@ -41,9 +41,9 @@ class Input implements InputInterface
         return $this->options;
     }
 
-    public function getParameterOption($values, $default = false, $onlyParams = false)
+    public function getParameterOption($values, $default = false, bool $onlyParams = false)
     {
-        
+        return null;
     }
 
     public function hasArgument($name)
@@ -51,33 +51,33 @@ class Input implements InputInterface
         return isset($this->arguments[$name]);
     }
 
-    public function hasOption($name)
+    public function hasOption(string $name)
     {
         return isset($this->options[$name]);
     }
 
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, bool $onlyParams = false)
     {
-        
+        return false;
     }
 
     public function isInteractive()
     {
-
+        return false;
     }
 
-    public function setArgument($name, $value)
+    public function setArgument(string $name, $value)
     {
         $this->arguments[$name] = $value;
         return $this;
     }
 
-    public function setInteractive($interactive)
+    public function setInteractive(bool $interactive)
     {
         
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, $value)
     {
         $this->options[$name] = $value;
         return $this;
