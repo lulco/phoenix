@@ -2,9 +2,9 @@ name: PHP static analysis
 
 on:
   push:
-  pull_request:
     branches:
-      - '**:**'
+      - master
+  pull_request: null
 
 jobs:
   phpstan:
