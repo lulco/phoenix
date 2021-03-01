@@ -1,6 +1,6 @@
 <?php
 
-namespace Dumper;
+namespace Phoenix\Dumper;
 
 class Indenter
 {

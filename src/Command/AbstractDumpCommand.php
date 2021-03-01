@@ -3,8 +3,8 @@
 namespace Phoenix\Command;
 
 use Comparator\StructureComparator;
-use Dumper\Dumper;
-use Dumper\Indenter;
+use Phoenix\Dumper\Dumper;
+use Phoenix\Dumper\Indenter;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Exception\InvalidArgumentValueException;
