@@ -1,6 +1,6 @@
 <?php
 
-namespace Comparator;
+namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
