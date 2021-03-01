@@ -1,6 +1,6 @@
 <?php
 
-namespace Dumper;
+namespace Phoenix\Dumper;
 
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
