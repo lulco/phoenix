@@ -13,7 +13,7 @@ use Symfony\Component\Finder\Finder;
 
 abstract class BaseCommandTest extends TestCase
 {
-    /** @var Input */
+    /** @var Input|InputInterface. */
     protected $input;
 
     /** @var Output */
