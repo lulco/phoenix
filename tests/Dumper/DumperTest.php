@@ -2,7 +2,7 @@
 
 namespace Phoenix\Tests\Dumper;
 
-use Dumper\Dumper;
+use Phoenix\Dumper\Dumper;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
