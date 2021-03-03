@@ -416,7 +416,8 @@ abstract class PdoAdapter implements AdapterInterface
                 $errorInfo[0] ?? '',
                 $errorInfo[2] ?? '',
                 ($query ? ' Query ' . print_r($query, true) . ' fails' : '')
-            ), $errorInfo[1] ?? 0
+            ),
+            $errorInfo[1] ?? 0
         );
     }
 
