@@ -410,7 +410,15 @@ abstract class PdoAdapter implements AdapterInterface
     private function throwError($query): void
     {
         $errorInfo = $this->pdo->errorInfo();
-        throw new DatabaseQueryExecuteException('SQLSTATE[' . $errorInfo[0] . ']: ' . $errorInfo[2] . '.' . ($query ? ' Query ' . print_r($query, true) . ' fails' : ''), $errorInfo[1]);
+        throw new DatabaseQueryExecuteException(
+            sprintf(
+                'SQLSTATE[%s]: %s.%s',
+                $errorInfo[0] ?? '',
+                $errorInfo[2] ?? '',
+                ($query ? ' Query ' . print_r($query, true) . ' fails' : '')
+            ),
+            $errorInfo[1] ?? 0
+        );
     }
 
     abstract protected function escapeString(string $string): string;

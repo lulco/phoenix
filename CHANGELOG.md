@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- PHP 8.1 deprecation notice
+
 ### [1.5.0] - 2021-01-25
 #### Changed
 - moved tests from travis to github actions and removed scrutinizer
