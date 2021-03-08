@@ -2,6 +2,11 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- use utf8mb4 as default charset for mysql (fix but BC break)
+
+
+
 #### Fixed
 - PHP 8.1 deprecation notice
 
