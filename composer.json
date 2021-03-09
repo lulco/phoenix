@@ -5,7 +5,7 @@
     "keywords": ["PHP", "Database", "Migrations", "Multiple folders", "Query builder", "Create", "Migrate", "Rollback", "Dump", "Status"],
     "license": "MIT",
     "require": {
-        "php": ">= 7.1",
+        "php": ">= 7.4",
         "ext-json": "*",
         "ext-pdo": "*",
         "symfony/console": "^3.1|^4.0|^5.0",

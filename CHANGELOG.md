@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Dropped support for unsupported PHP versions and added native typehints (BC break)
+
+
 #### Fixed
 - PHP 8.1 deprecation notice
 
