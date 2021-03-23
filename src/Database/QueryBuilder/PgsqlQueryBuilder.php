@@ -54,6 +54,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     }
 
     protected $defaultLength = [
+        Column::TYPE_BIT => 32,
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
         Column::TYPE_NUMERIC => [10, 0],
