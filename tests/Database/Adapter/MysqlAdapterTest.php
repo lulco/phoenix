@@ -501,7 +501,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->setCollation('utf8_slovak_ci');
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
-        $migrationTable1->addColumn('col_bit', 'bit', ['null' => true, 'default' => "b'0'"]);
+        $migrationTable1->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'0'"]);
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
         $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
