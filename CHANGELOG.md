@@ -4,9 +4,6 @@
 
 #### Fixed
 - PHP 8.1 deprecation notice
-
-### [1.5.1] - 2021-03-23
-#### Fixed
 - escaping column value in Dumper
 
 ### [1.5.0] - 2021-01-25
