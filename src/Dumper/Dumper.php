@@ -170,7 +170,7 @@ class Dumper
     private function valuesToString(array $values): string
     {
         $values = array_map(function ($value) {
-            return "'$value'";
+            return "'" . str_replace("'", "\'", $value) . "'";
         }, $values);
         return '[' . implode(', ', $values) . ']';
     }
@@ -265,7 +265,7 @@ class Dumper
         } elseif (is_array($value)) {
             $value = $this->valuesToString($value);
         } elseif (!is_numeric($value)) {
-            $value = "'$value'";
+            $value = "'" . str_replace("'", "\'", $value) . "'";
         }
         return $value;
     }
