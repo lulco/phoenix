@@ -15,6 +15,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function typeMap(): array
     {
         return [
+            Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'tinyint(%d)',
             Column::TYPE_SMALL_INTEGER => 'smallint(%d)',
             Column::TYPE_MEDIUM_INTEGER => 'mediumint(%d)',
@@ -51,6 +52,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
+        Column::TYPE_BIT => 32,
         Column::TYPE_TINY_INTEGER => 4,
         Column::TYPE_SMALL_INTEGER => 6,
         Column::TYPE_MEDIUM_INTEGER => 9,

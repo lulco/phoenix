@@ -8,6 +8,7 @@ use ReflectionClass;
 class Column
 {
     const TYPE_STRING = 'string';
+    const TYPE_BIT = 'bit';
     const TYPE_TINY_INTEGER = 'tinyinteger';
     const TYPE_SMALL_INTEGER = 'smallinteger';
     const TYPE_MEDIUM_INTEGER = 'mediuminteger';

@@ -17,6 +17,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function typeMap() : array
     {
         return [
+            Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'int2',
             Column::TYPE_SMALL_INTEGER => 'int2',
             Column::TYPE_MEDIUM_INTEGER => 'int4',

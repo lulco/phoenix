@@ -71,6 +71,7 @@ class MysqlAdapter extends PdoAdapter
     {
         $types = [
             'int' => Column::TYPE_INTEGER,
+            'bit' => Column::TYPE_BIT,
             'tinyint' => Column::TYPE_TINY_INTEGER,
             'smallint' => Column::TYPE_SMALL_INTEGER,
             'mediumint' => Column::TYPE_MEDIUM_INTEGER,
