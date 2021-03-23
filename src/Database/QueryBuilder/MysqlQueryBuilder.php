@@ -219,7 +219,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             if ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
                 return $default . 'CURRENT_TIMESTAMP';
             }
-            return $default . "'" . $column->getSettings()->getDefault() . "'";
+            return $default . "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";
         }
 
         return '';

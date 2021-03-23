@@ -230,7 +230,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
-            $default = "'" . $column->getSettings()->getDefault() . "'";
+            $default = "'" . str_replace("'". "\'", $column->getSettings()->getDefault()) . "'";
         }
 
         return $default;
