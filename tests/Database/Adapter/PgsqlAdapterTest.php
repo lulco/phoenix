@@ -232,6 +232,9 @@ class PgsqlAdapterTest extends TestCase
         $this->checkColumn($table1, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, [
             'null' => true,
         ]));
+        $this->checkColumn($table1, 'col_bit', Column::TYPE_BIT, array_merge($defaultSettings, [
+            'null' => true,
+        ]));
         $this->checkColumn($table1, 'col_tinyint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'null' => true,
         ]));
@@ -316,6 +319,7 @@ class PgsqlAdapterTest extends TestCase
             'autoincrement' => true,
         ]));
         $this->checkColumn($table2, 'col_uuid', Column::TYPE_UUID, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_bit', Column::TYPE_BIT, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, []));
         $this->checkColumn($table2, 'col_mediumint', Column::TYPE_INTEGER, array_merge($defaultSettings, []));
@@ -410,6 +414,7 @@ class PgsqlAdapterTest extends TestCase
         $migrationTable1 = new MigrationTable('table_1', true);
         $migrationTable1->setCollation('utf8_general_ci');
         $migrationTable1->addColumn('col_uuid', 'uuid', ['null' => true]);
+        $migrationTable1->addColumn('col_bit', 'bit', ['null' => true]);
         $migrationTable1->addColumn('col_tinyint', 'tinyinteger', ['null' => true]);
         $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true, 'signed' => false]);
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
@@ -454,6 +459,7 @@ class PgsqlAdapterTest extends TestCase
         $migrationTable2->setCollation('utf8_slovak_ci');
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
+        $migrationTable2->addColumn('col_bit', 'bit');
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
         $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
