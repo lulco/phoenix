@@ -17,6 +17,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function typeMap() : array
     {
         return [
+            Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'int2',
             Column::TYPE_SMALL_INTEGER => 'int2',
             Column::TYPE_MEDIUM_INTEGER => 'int4',
@@ -53,6 +54,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     }
 
     protected $defaultLength = [
+        Column::TYPE_BIT => 32,
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
         Column::TYPE_NUMERIC => [10, 0],
@@ -228,7 +230,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
-            $default = "'" . $column->getSettings()->getDefault() . "'";
+            $default = "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";
         }
 
         return $default;
