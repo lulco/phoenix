@@ -149,7 +149,7 @@ class PgsqlAdapter extends PdoAdapter
     {
         $length = null;
         $decimals = null;
-        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR], true)) {
+        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR, Column::TYPE_BIT], true)) {
             $length = $column['character_maximum_length'];
         } elseif (in_array($type, [Column::TYPE_NUMERIC], true)) {
             $length = $column['numeric_precision'];
