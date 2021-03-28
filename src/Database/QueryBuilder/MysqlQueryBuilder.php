@@ -210,13 +210,16 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
         if ($column->getSettings()->getDefault() !== null || $column->getType() === Column::TYPE_BOOLEAN) {
             $default = ' DEFAULT ';
-            if ($column->getType() === Column::TYPE_INTEGER) {
+            if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
                 return $default . $column->getSettings()->getDefault();
             }
-            if ($column->getType() === Column::TYPE_BOOLEAN) {
+            if (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
                 return $default . intval($column->getSettings()->getDefault());
             }
             if ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+                if ($column->getSettings()->allowNull()) {
+                    $default = ' NULL' . $default;
+                }
                 return $default . 'CURRENT_TIMESTAMP';
             }
             return $default . "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";

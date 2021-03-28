@@ -2,9 +2,13 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- bit column type (Thanks to [Slava Ershov](https://github.com/fishus))
+
 #### Fixed
-- PHP 8.1 deprecation notice
-- escaping column value in Dumper
+- PHP 8.1 deprecation notice (Thanks to [Daniel Opitz](https://github.com/odan))
+- escaping column value in Dumper (Thanks to [Slava Ershov](https://github.com/fishus))
+- nullable timestamp field with default value
 
 ### [1.5.0] - 2021-01-25
 #### Changed
@@ -62,7 +66,7 @@
 
 ### [1.1.0] - 2019-02-11
 #### Added
-- time column type
+- time column type (Thanks to [Tibor Mikóczy](https://github.com/mikoczy))
 - timestamp column type
 
 ### [1.0.0] - 2018-06-20
@@ -159,7 +163,7 @@
 
 ### [0.6.1] - 2016-12-13
 #### Fixed
-- support for changing column settings (allowNull, default) in pgsql
+- support for changing column settings (allowNull, default) in pgsql (Thanks to [Tibor Mikóczy](https://github.com/mikoczy))
 
 ### [0.6.0] - 2016-09-26
 #### Removed
