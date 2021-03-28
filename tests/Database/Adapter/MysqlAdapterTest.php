@@ -324,7 +324,7 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table2, 'col_bit', Column::TYPE_BIT, array_merge($defaultSettings, [
             'null' => true,
             'length' => 32,
-            'default' => "b'0'",
+            'default' => "b'10101'",
         ]));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'length' => 4,
@@ -512,7 +512,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->setCollation('utf8_slovak_ci');
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
-        $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'0'"]);
+        $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'10101'"]);
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
         $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
