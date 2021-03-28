@@ -101,8 +101,13 @@ class PgsqlAdapter extends PdoAdapter
 
     protected function addColumn(MigrationTable $migrationTable, array $column): void
     {
+        print_r($column);
+
         $type = $this->remapType($column['data_type']);
         $settings = $this->prepareSettings($type, $column, $migrationTable->getName());
+
+        print_r($settings);
+
         $migrationTable->addColumn($column['column_name'], $type, $settings);
     }
 
@@ -187,6 +192,9 @@ class PgsqlAdapter extends PdoAdapter
         } elseif (substr($default, 0, 6) === 'NULL::' || substr($default, 0, 7) === 'nextval') {
             $default = null;
         }
+
+        var_dump($default);
+
         return $default;
     }
 

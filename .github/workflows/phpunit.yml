@@ -49,7 +49,7 @@ jobs:
         run: sudo /etc/init.d/mysql start
 
       - name: PHPunit
-        run: vendor/bin/phpunit --coverage-text
+        run: vendor/bin/phpunit tests/Database/Adapter/PgsqlAdapterTest.php
         env:
           PHOENIX_MYSQL_HOST: 127.0.0.1
           PHOENIX_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
