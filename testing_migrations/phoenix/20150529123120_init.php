@@ -77,7 +77,7 @@ class Init extends AbstractMigration
             ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')
-            ->addColumn('col_bit', 'bit', ['length' => 32, 'default' => "b'10101'"])
+            ->addColumn('col_bit', 'bit', ['length' => 5, 'default' => "b'10101'"])
             ->addColumn('col_datetime', 'datetime')
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
