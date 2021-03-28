@@ -419,7 +419,7 @@ class PgsqlAdapterTest extends TestCase
         $migrationTable1 = new MigrationTable('table_1', true);
         $migrationTable1->setCollation('utf8_general_ci');
         $migrationTable1->addColumn('col_uuid', 'uuid', ['null' => true]);
-        $migrationTable1->addColumn('col_bit', 'bit', ['length' => 5, 'default' => "b'00000'"]);
+        $migrationTable1->addColumn('col_bit', 'bit', ['length' => 5, 'default' => "B'00000'"]);
         $migrationTable1->addColumn('col_tinyint', 'tinyinteger', ['null' => true]);
         $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true, 'signed' => false]);
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
@@ -464,7 +464,7 @@ class PgsqlAdapterTest extends TestCase
         $migrationTable2->setCollation('utf8_slovak_ci');
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
-        $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 5, 'default' => "b'10101'"]);
+        $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 5, 'default' => "B'10101'"]);
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
         $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
