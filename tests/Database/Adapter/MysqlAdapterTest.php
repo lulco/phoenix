@@ -4,6 +4,7 @@ namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Database\Element\Column;
+use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\IndexColumn;
@@ -214,6 +215,7 @@ class MysqlAdapterTest extends TestCase
             'charset' => 'utf8',
             'collation' => 'utf8_general_ci',
             'length' => 255,
+            'default' => "I'll meet you at midnight",
         ]));
         $this->checkColumn($table1, 'col_char', Column::TYPE_CHAR, array_merge($defaultSettings, [
             'charset' => 'utf16',
@@ -273,6 +275,10 @@ class MysqlAdapterTest extends TestCase
             'default' => true,
         ]));
         $this->checkColumn($table1, 'col_datetime', Column::TYPE_DATETIME, $defaultSettings);
+        $this->checkColumn($table1, 'col_timestamp', Column::TYPE_TIMESTAMP, array_merge($defaultSettings, [
+            'null' => true,
+            'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP,
+        ]));
         $this->checkColumn($table1, 'col_date', Column::TYPE_DATE, $defaultSettings);
         $this->checkColumn($table1, 'col_enum', Column::TYPE_ENUM, array_merge($defaultSettings, [
             'charset' => 'utf8',
@@ -315,10 +321,10 @@ class MysqlAdapterTest extends TestCase
             'charset' => 'utf8',
             'collation' => 'utf8_slovak_ci',
         ]));
-        $this->checkColumn($table1, 'col_bit', Column::TYPE_BIT, array_merge($defaultSettings, [
+        $this->checkColumn($table2, 'col_bit', Column::TYPE_BIT, array_merge($defaultSettings, [
             'null' => true,
             'length' => 32,
-            'default' => "b'0'",
+            'default' => "b'10101'",
         ]));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'length' => 4,
@@ -346,6 +352,7 @@ class MysqlAdapterTest extends TestCase
             'collation' => 'utf16_slovak_ci',
             'null' => true,
             'length' => 50,
+            'default' => 'He said: "Hello world"',
         ]));
         $this->checkColumn($table2, 'col_char', Column::TYPE_CHAR, array_merge($defaultSettings, [
             'charset' => 'utf8',
@@ -408,6 +415,9 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table2, 'col_datetime', Column::TYPE_DATETIME, array_merge($defaultSettings, [
             'null' => true
         ]));
+        $this->checkColumn($table2, 'col_timestamp', Column::TYPE_TIMESTAMP, array_merge($defaultSettings, [
+            'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP,
+        ]));
         $this->checkColumn($table2, 'col_date', Column::TYPE_DATE, array_merge($defaultSettings, [
             'null' => true
         ]));
@@ -462,7 +472,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
         $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50, 'signed' => false]);
         $migrationTable1->addColumn('col_bigint', 'biginteger');
-        $migrationTable1->addColumn('col_string', 'string');
+        $migrationTable1->addColumn('col_string', 'string', ['default' => "I'll meet you at midnight"]);
         $migrationTable1->addColumn('col_char', 'char', ['length' => 50, 'charset' => 'utf16']);
         $migrationTable1->addColumn('col_binary', 'binary');
         $migrationTable1->addColumn('col_varbinary', 'varbinary');
@@ -481,6 +491,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_double', 'double', ['null' => true, 'length' => 13, 'decimals' => 1, 'signed' => false]);
         $migrationTable1->addColumn('col_boolean', 'boolean', ['default' => true]);
         $migrationTable1->addColumn('col_datetime', 'datetime');
+        $migrationTable1->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP]);
         $migrationTable1->addColumn('col_date', 'date');
         $migrationTable1->addColumn('col_enum', 'enum', ['values' => ['t1_enum_xxx', 't1_enum_yyy', 't1_enum_zzz']]);
         $migrationTable1->addColumn('col_set', 'set', ['values' => ['t1_set_xxx', 't1_set_yyy', 't1_set_zzz']]);
@@ -501,13 +512,13 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->setCollation('utf8_slovak_ci');
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
-        $migrationTable1->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'0'"]);
+        $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'10101'"]);
         $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
         $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
         $migrationTable2->addColumn('col_int', 'integer', ['null' => true]);
         $migrationTable2->addColumn('col_bigint', 'biginteger', ['null' => true, 'signed' => false]);
-        $migrationTable2->addColumn('col_string', 'string', ['null' => true, 'length' => 50, 'collation' => 'utf16_slovak_ci']);
+        $migrationTable2->addColumn('col_string', 'string', ['null' => true, 'length' => 50, 'default' => 'He said: "Hello world"', 'collation' => 'utf16_slovak_ci']);
         $migrationTable2->addColumn('col_char', 'char');
         $migrationTable2->addColumn('col_binary', 'binary', ['null' => true, 'length' => 50]);
         $migrationTable2->addColumn('col_varbinary', 'varbinary', ['null' => true, 'length' => 50]);
@@ -526,6 +537,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->addColumn('col_double', 'double');
         $migrationTable2->addColumn('col_boolean', 'boolean');
         $migrationTable2->addColumn('col_datetime', 'datetime', ['null' => true]);
+        $migrationTable2->addColumn('col_timestamp', 'timestamp');
         $migrationTable2->addColumn('col_date', 'date', ['null' => true]);
         $migrationTable2->addColumn('col_enum', 'enum', ['null' => true, 'values' => ['t2_enum_xxx', 't2_enum_yyy', 't2_enum_zzz']]);
         $migrationTable2->addColumn('col_set', 'set', ['null' => true, 'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz']]);

@@ -19,6 +19,7 @@ There are several types in Phoenix, but not all adapters allows all types. This 
 | char          | char       | char          |
 | string        | varchar    | varchar       |
 | boolean       | tinyint(1) | bool          |
+| bit           | bit        | bit           |
 | date          | date       | date          |
 | time          | time       | time          |
 | datetime      | datetime   | timestamp(6)  |

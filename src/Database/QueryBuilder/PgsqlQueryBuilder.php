@@ -223,9 +223,9 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function escapeDefault(Column $column): string
     {
-        if ($column->getType() === Column::TYPE_INTEGER) {
+        if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
             $default = $column->getSettings()->getDefault();
-        } elseif ($column->getType() === Column::TYPE_BOOLEAN) {
+        } elseif (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
