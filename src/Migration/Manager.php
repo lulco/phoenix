@@ -101,7 +101,7 @@ class Manager
      */
     public function findMigrationClasses(array $dirs = [], array $classes = []): array
     {
-        $classes = array_map(function($class) {
+        $classes = array_map(function ($class) {
             return strpos($class, '\\') !== 0 ? '\\' . $class : $class;
         }, $classes);
 
