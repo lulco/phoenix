@@ -9,6 +9,7 @@
 - PHP 8.1 deprecation notice (Thanks to [Daniel Opitz](https://github.com/odan))
 - escaping column value in Dumper (Thanks to [Slava Ershov](https://github.com/fishus))
 - nullable timestamp field with default value
+- migrate / rollback commands option --class will work without starting backslash
 
 ### [1.5.0] - 2021-01-25
 #### Changed
