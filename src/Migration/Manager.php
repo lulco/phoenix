@@ -3,10 +3,13 @@
 namespace Phoenix\Migration;
 
 use DateTime;
+use InvalidArgumentException;
 use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
+use ReflectionClass;
+use ReflectionParameter;
 
 class Manager
 {
@@ -116,10 +119,36 @@ class Manager
         foreach ($filesFinder->getFiles() as $file) {
             require_once $file;
             $classNameCreator = new ClassNameCreator($file);
+
+            /** @var class-string $className */
             $className = $classNameCreator->getClassName();
+
             if (empty($classes) || (!empty($classes) && in_array($className, $classes, true))) {
                 $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
-                $migrations[$migrationIdentifier] = new $className($this->adapter);
+
+                $reflection = new ReflectionClass($className);
+                $constructorReflection = $reflection->getConstructor();
+                /** @var AbstractMigration $migration */
+                $migration = $reflection->newInstanceArgs(
+                    array_map(
+                        function (ReflectionParameter $parameter) {
+                            $type = $parameter->getType();
+                            if (!$type) {
+                                throw new InvalidArgumentException('Parameter ' . $parameter->getName() . ' has wrong type');
+                            }
+                            if (!method_exists($type, 'getName')) {
+                                throw new InvalidArgumentException('Type ' . get_class($type) . ' has no name');
+                            }
+                            $typeName = $type->getName();
+                            if ($typeName === AdapterInterface::class) {
+                                return $this->adapter;
+                            }
+                            return $this->config->getDependency($typeName);
+                        },
+                        $constructorReflection ? $constructorReflection->getParameters() : []
+                    )
+                );
+                $migrations[$migrationIdentifier]= $migration;
             }
         }
         ksort($migrations);

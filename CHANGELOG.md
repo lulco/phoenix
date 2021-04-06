@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- simple dependency injection in migrations
+
 ### [1.6.0] - 2021-04-03
 #### Added
 - bit column type (Thanks to [Slava Ershov](https://github.com/fishus))

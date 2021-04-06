@@ -1,5 +1,8 @@
 <?php
 
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidFactoryInterface;
+
 return [
     'migration_dirs' => [
         'phoenix' => __DIR__ . '/../phoenix',
@@ -23,5 +26,8 @@ return [
             'db_name' => getenv('PHOENIX_PGSQL_DATABASE'),
             'charset' => getenv('PHOENIX_PGSQL_CHARSET'),
         ],
+    ],
+    'dependencies' => [
+        UuidFactoryInterface::class => new UuidFactory(),
     ],
 ];
