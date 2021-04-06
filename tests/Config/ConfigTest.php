@@ -7,6 +7,8 @@ use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\UuidFactory;
+use Ramsey\Uuid\UuidFactoryInterface;
 
 class ConfigTest extends TestCase
 {
@@ -162,5 +164,29 @@ class ConfigTest extends TestCase
                 'first_dir'
             ],
         ]);
+    }
+
+    public function testDependencies()
+    {
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+                'second_dir'
+            ],
+            'environments' => [
+                'first' => [],
+                'second' => [],
+                'third' => [],
+            ],
+            'dependencies' => [
+                UuidFactoryInterface::class => new UuidFactory(),
+            ],
+        ]);
+
+        $this->assertInstanceOf(UuidFactory::class, $config->getDependency(UuidFactoryInterface::class));
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Dependency for type "Ramsey\Uuid\UuidFactory" not found. Register it via $configuration[\'dependencies\'][\'Ramsey\Uuid\UuidFactory\']');
+        $config->getDependency(UuidFactory::class);
     }
 }

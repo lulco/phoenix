@@ -84,6 +84,11 @@ class Config
         return isset($this->configuration['environments'][$environment]) ? new EnvironmentConfig($this->configuration['environments'][$environment]) : null;
     }
 
+    /**
+     * @param string $type
+     * @return mixed
+     * @throws InvalidArgumentValueException
+     */
     public function getDependency(string $type)
     {
         if (isset($this->configuration['dependencies'][$type])) {
