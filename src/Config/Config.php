@@ -15,6 +15,7 @@ class Config
         'migration_dirs' => [],
         'environments' => [],
         'default_environment' => '',
+        'dependencies' => [],
     ];
 
     /**
@@ -81,5 +82,13 @@ class Config
     public function getEnvironmentConfig(string $environment): ?EnvironmentConfig
     {
         return isset($this->configuration['environments'][$environment]) ? new EnvironmentConfig($this->configuration['environments'][$environment]) : null;
+    }
+
+    public function getDependency(string $type)
+    {
+        if (isset($this->configuration['dependencies'][$type])) {
+            return $this->configuration['dependencies'][$type];
+        }
+        throw new InvalidArgumentValueException('Dependency for type "' . $type . '" not found. Register it via $configuration[\'dependencies\'][\'' . $type . '\']');
     }
 }

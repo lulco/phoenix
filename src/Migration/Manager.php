@@ -7,6 +7,8 @@ use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Config\Config;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\InvalidArgumentValueException;
+use ReflectionClass;
+use ReflectionParameter;
 
 class Manager
 {
@@ -117,9 +119,23 @@ class Manager
             require_once $file;
             $classNameCreator = new ClassNameCreator($file);
             $className = $classNameCreator->getClassName();
+
             if (empty($classes) || (!empty($classes) && in_array($className, $classes, true))) {
                 $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
-                $migrations[$migrationIdentifier] = new $className($this->adapter);
+
+                $reflection = new ReflectionClass($className);
+                $migrations[$migrationIdentifier]= $reflection->newInstanceArgs(
+                    array_map(
+                        function (ReflectionParameter $parameter) {
+                            $type = $parameter->getType()->getName();
+                            if ($type === AdapterInterface::class) {
+                                return $this->adapter;
+                            }
+                            return $this->config->getDependency($type);
+                        },
+                        $reflection->getConstructor()->getParameters()
+                    )
+                );
             }
         }
         ksort($migrations);

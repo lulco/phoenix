@@ -27,6 +27,7 @@ Framework agnostic database migrations for PHP.
 - PHPStorm suggestions (works even better with deep-assoc-completion plugin)
 - Change collation for all existing tables and columns
 - Turn foreign keys check on / off in migration
+- Simple dependency injection in migrations
 
 ## Supported adapters
 - MySql
