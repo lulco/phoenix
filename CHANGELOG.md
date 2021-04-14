@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.7.0] - 2021-04-14
 #### Added
 - simple autowiring in migrations
 
@@ -250,7 +251,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.6.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.7.0...HEAD
+[1.7.0]: https://github.com/lulco/phoenix/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/lulco/phoenix/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/lulco/phoenix/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/lulco/phoenix/compare/1.3.0...1.4.0
