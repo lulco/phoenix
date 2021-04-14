@@ -3,7 +3,7 @@
 ### [Unreleased][unreleased]
 
 #### Added
-- simple dependency injection in migrations
+- simple autowiring in migrations
 
 ### [1.6.0] - 2021-04-03
 #### Added
