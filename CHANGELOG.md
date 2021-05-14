@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- year column type (year for mysql, numeric(4) for pgsql)
+
 ### [1.7.0] - 2021-04-14
 #### Added
 - simple autowiring in migrations

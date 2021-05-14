@@ -82,6 +82,7 @@ class Init extends AbstractMigration
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addColumn('col_year', 'year')
             ->addColumn('col_point', 'point', ['null' => true])
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])
