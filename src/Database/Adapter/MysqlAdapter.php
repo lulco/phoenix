@@ -106,6 +106,8 @@ class MysqlAdapter extends PdoAdapter
             $type = Column::TYPE_BOOLEAN;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
+        } elseif ($type === Column::TYPE_YEAR) {
+            $settings[ColumnSettings::SETTING_LENGTH] = null;
         }
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }
