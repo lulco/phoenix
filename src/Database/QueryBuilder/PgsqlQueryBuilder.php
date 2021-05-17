@@ -331,13 +331,13 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createTableComment(MigrationTable $table): string
     {
-        $comment = str_replace("'", "''", $table->getComment());
+        $comment = str_replace("'", "''", (string)$table->getComment());
         return "COMMENT ON TABLE {$table->getName()} IS '$comment';";
     }
 
     private function createColumnComment(MigrationTable $table, Column $column): string
     {
-        $comment = str_replace("'", "''", $column->getSettings()->getComment());
+        $comment = str_replace("'", "''", (string)$column->getSettings()->getComment());
         return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '$comment';";
     }
 }
