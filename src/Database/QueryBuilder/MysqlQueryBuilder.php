@@ -327,6 +327,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($comment === null) {
             return '';
         }
+        $comment = str_replace("'", "\'", $comment);
         return " COMMENT$glue'$comment'";
     }
 

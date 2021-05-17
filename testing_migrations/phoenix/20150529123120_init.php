@@ -32,7 +32,7 @@ class Init extends AbstractMigration
             ->create();
 
         $this->table('table_3', false)
-            ->addColumn('identifier', 'uuid')
+            ->addColumn('identifier', 'uuid', ['comment' => 'Row\'s identifier'])
             ->addColumn('t1_fk', 'integer')
             ->addColumn('t2_fk', 'integer', ['null' => true])
             ->addForeignKey('t1_fk', 'table_1', 'id', ForeignKey::RESTRICT, ForeignKey::RESTRICT)

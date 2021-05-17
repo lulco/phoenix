@@ -231,7 +231,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
-            $default = "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";
+            $default = "'" . str_replace("'", "''", $column->getSettings()->getDefault()) . "'";
         }
 
         return $default;
@@ -331,11 +331,13 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createTableComment(MigrationTable $table): string
     {
-        return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
+        $comment = str_replace("'", "''", $table->getComment());
+        return "COMMENT ON TABLE {$table->getName()} IS '$comment';";
     }
 
     private function createColumnComment(MigrationTable $table, Column $column): string
     {
-        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '{$column->getSettings()->getComment()}';";
+        $comment = str_replace("'", "''", $column->getSettings()->getComment());
+        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '$comment';";
     }
 }
