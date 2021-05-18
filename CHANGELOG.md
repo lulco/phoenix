@@ -8,6 +8,7 @@
 #### Fixed
 - single quotes in comments
 - table comment in dump
+- transfer tinyint(1) to boolean in mysql only if it has default values 1 or 0 
 
 ### [1.7.0] - 2021-04-14
 #### Added

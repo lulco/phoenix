@@ -102,7 +102,7 @@ class MysqlAdapter extends PdoAdapter
         if ($type === Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] === 36) {
             $type = Column::TYPE_UUID;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
-        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1) {
+        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1 && in_array($settings[ColumnSettings::SETTING_DEFAULT], ['0', '1'], true)) {
             $type = Column::TYPE_BOOLEAN;
             $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
