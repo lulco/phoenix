@@ -56,8 +56,9 @@ class Dumper
             if ($table->getCollation()) {
                 $tableMigration .= $this->indent(1) . "->setCollation('{$table->getCollation()}')\n";
             }
-            if ($table->getComment()) {
-                $tableMigration .= $this->indent(1) . "->setComment('{$this->sanitizeSingleQuote($table->getComment())}')\n";
+            $comment = $table->getComment();
+            if ($comment) {
+                $tableMigration .= $this->indent(1) . "->setComment('{$this->sanitizeSingleQuote($comment)}')\n";
             }
             if ($table->hasPrimaryKeyToDrop()) {
                 $tableMigration .= $this->indent(1) . "->dropPrimaryKey()\n";
