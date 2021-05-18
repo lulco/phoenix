@@ -101,13 +101,14 @@ class MysqlAdapter extends PdoAdapter
         $settings = $this->prepareSettings($column);
         if ($type === Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] === 36) {
             $type = Column::TYPE_UUID;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
         } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1 && in_array($settings[ColumnSettings::SETTING_DEFAULT], ['0', '1'], true)) {
             $type = Column::TYPE_BOOLEAN;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
+            unset($settings[ColumnSettings::SETTING_SIGNED]);
         } elseif ($type === Column::TYPE_YEAR) {
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
         }
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }
