@@ -56,6 +56,10 @@ class Dumper
             if ($table->getCollation()) {
                 $tableMigration .= $this->indent(1) . "->setCollation('{$table->getCollation()}')\n";
             }
+            $comment = $table->getComment();
+            if ($comment) {
+                $tableMigration .= $this->indent(1) . "->setComment('{$this->sanitizeSingleQuote($comment)}')\n";
+            }
             if ($table->hasPrimaryKeyToDrop()) {
                 $tableMigration .= $this->indent(1) . "->dropPrimaryKey()\n";
             }
@@ -170,7 +174,7 @@ class Dumper
     private function valuesToString(array $values): string
     {
         $values = array_map(function ($value) {
-            return "'" . str_replace("'", "\'", $value) . "'";
+            return "'" . $this->sanitizeSingleQuote($value) . "'";
         }, $values);
         return '[' . implode(', ', $values) . ']';
     }
@@ -265,7 +269,7 @@ class Dumper
         } elseif (is_array($value)) {
             $value = $this->valuesToString($value);
         } elseif (!is_numeric($value)) {
-            $value = "'" . str_replace("'", "\'", $value) . "'";
+            $value = "'" . $this->sanitizeSingleQuote($value) . "'";
         }
         return $value;
     }
@@ -287,5 +291,10 @@ class Dumper
             $foreignKeyActions .= ", '$onUpdate'";
         }
         return $foreignKeyActions;
+    }
+
+    private function sanitizeSingleQuote(string $input): string
+    {
+        return str_replace("'", "\'", $input);
     }
 }

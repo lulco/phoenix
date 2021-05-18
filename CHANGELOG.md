@@ -7,6 +7,7 @@
 
 #### Fixed
 - single quotes in comments
+- table comment in dump
 
 ### [1.7.0] - 2021-04-14
 #### Added
