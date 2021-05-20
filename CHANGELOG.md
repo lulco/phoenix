@@ -9,6 +9,7 @@
 - single quotes in comments
 - table comment in dump
 - transfer tinyint(1) to boolean in mysql only if it has default values 1 or 0 
+- dump command skip everything which is not of type "BASE TABLE" (VIEW, SYSTEM VIEW etc.) 
 
 ### [1.7.0] - 2021-04-14
 #### Added

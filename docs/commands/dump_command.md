@@ -11,6 +11,8 @@ if ($this->tableExists('table_name')) {
 }
 ``` 
 
+**Note**: Views and system views are skipped. Only tables with table type "BASE TABLE" are dumped.
+
 ### Options:
 - `-d`, `--data` Dump structure and also data
 - `--ignore-tables=IGNORE-TABLES` Comma separated list of tables to ignore (Structure and data). Default: phoenix_log
