@@ -21,15 +21,15 @@ class DumperTest extends TestCase
 
         $dumper = new Dumper('    ');
         $output = "\$this->table('table_1')\n    ->addColumn('id', 'integer')\n    ->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
         $output = "\$this->table('table_1')\n\t->addColumn('id', 'integer')\n\t->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper('custom_indent');
         $output = "\$this->table('table_1')\ncustom_indent->addColumn('id', 'integer')\ncustom_indent->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
     public function testBaseIndent()
@@ -40,22 +40,22 @@ class DumperTest extends TestCase
 
         $dumper = new Dumper('    ', 2);
         $output = "        \$this->table('table_1')\n            ->addColumn('id', 'integer')\n            ->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t", 2);
         $output = "\t\t\$this->table('table_1')\n\t\t\t->addColumn('id', 'integer')\n\t\t\t->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper('custom_indent', 2);
         $output = "custom_indentcustom_indent\$this->table('table_1')\ncustom_indentcustom_indentcustom_indent->addColumn('id', 'integer')\ncustom_indentcustom_indentcustom_indent->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
     public function testDumpEmptyStructureUp()
     {
         $dumper = new Dumper('    ');
-        $this->assertEquals('', $dumper->dumpTables([]));
-        $this->assertEquals('', $dumper->dumpTables([]));
+        $this->assertEquals('', $dumper->dumpTables([], 'up'));
+        $this->assertEquals('', $dumper->dumpTables([], 'up'));
     }
 
     public function testDumpEmptyDataUp()
@@ -81,11 +81,11 @@ class DumperTest extends TestCase
 
         $dumper = new Dumper('    ');
         $output = "\$this->table('table_1', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
         $output = "\$this->table('table_1', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
     public function testDumpSimpleDataUp()
@@ -124,7 +124,7 @@ class DumperTest extends TestCase
 
         $output .= "\$this->table('table_3', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n    ->addColumn('fk_table_1_id', 'integer', ['null' => true])\n    ->create();\n\n";
         $output .= "\$this->table('table_4', 'identifier')\n    ->addColumn('identifier', 'uuid')\n    ->addColumn('col_integer', 'integer')\n    ->addColumn('col_string', 'string')\n    ->addColumn('col_char', 'char')\n    ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n    ->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n    ->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
         $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal')\n\t->addColumn('sorting', 'biginteger')\n\t->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n\t->create();\n\n";
@@ -132,7 +132,7 @@ class DumperTest extends TestCase
 
         $output .= "\$this->table('table_3', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n\t->addColumn('fk_table_1_id', 'integer', ['null' => true])\n\t->create();\n\n";
         $output .= "\$this->table('table_4', 'identifier')\n\t->addColumn('identifier', 'uuid')\n\t->addColumn('col_integer', 'integer')\n\t->addColumn('col_string', 'string')\n\t->addColumn('col_char', 'char')\n\t->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n\t->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n\t->create();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
     public function testDumpComplexDataUp()
@@ -194,8 +194,8 @@ class DumperTest extends TestCase
     public function testDumpEmptyStructureDown()
     {
         $dumper = new Dumper('    ');
-        $this->assertEquals('', $dumper->dumpTables([]));
-        $this->assertEquals('', $dumper->dumpTables([]));
+        $this->assertEquals('', $dumper->dumpTables([], 'down'));
+        $this->assertEquals('', $dumper->dumpTables([], 'down'));
     }
 
     public function testDumpEmptyForeignKeysDown()
@@ -213,11 +213,11 @@ class DumperTest extends TestCase
 
         $dumper = new Dumper('    ');
         $output = "\$this->table('table_1')\n    ->drop();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'down'));
 
         $dumper = new Dumper("\t");
         $output = "\$this->table('table_1')\n\t->drop();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'down'));
     }
 
     public function testComplexChanges()
@@ -241,7 +241,7 @@ class DumperTest extends TestCase
         $dumper = new Dumper('    ');
         $output = "\$this->table('table_1')\n    ->dropColumn('created_at')\n    ->changeColumn('sorting', 'sorting', 'integer', ['default' => 100])\n    ->addPrimaryColumns([new \\Phoenix\\Database\\Element\\Column('id', 'integer', ['autoincrement' => true])])\n    ->addColumn('description', 'text')\n    ->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n    ->save();\n\n";
         $output .= "\$this->table('table_2')\n    ->dropPrimaryKey()\n    ->changeColumn('description', 'description', 'text')\n    ->addColumn('table_1_fk', 'integer', ['null' => true])\n    ->dropIndexByName('idx_table_2_alias')\n    ->save();";
-        $this->assertEquals($output, $dumper->dumpTables($tables));
+        $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $output = "\$this->table('table_2')\n    ->dropForeignKey('table_3_fk')\n    ->addForeignKey('table_1_fk', 'table_1', 'id', 'set null', 'cascade')\n    ->save();";
         $this->assertEquals($output, $dumper->dumpForeignKeys($tables));

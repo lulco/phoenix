@@ -94,15 +94,15 @@ abstract class AbstractDumpCommand extends AbstractCommand
         return $tables;
     }
 
-    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $type): string
+    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $dumpType): string
     {
         $tables = $this->getFilteredTables($sourceStructure, $targetStructure);
         $parts = [];
-        if ($type === 'down') {
+        if ($dumpType === 'down') {
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
-        $parts[] = $dumper->dumpTables($tables, $type);
-        if ($type === 'up') {
+        $parts[] = $dumper->dumpTables($tables, $dumpType);
+        if ($dumpType === 'up') {
             $parts[] = $dumper->dumpDataUp($this->loadData($tables));
             $parts[] = $dumper->dumpForeignKeys($tables);
         }

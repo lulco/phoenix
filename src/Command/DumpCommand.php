@@ -29,7 +29,9 @@ class DumpCommand extends AbstractDumpCommand
 
     protected function createDumper(string $indent): Dumper
     {
-        return new Dumper($indent, 2, $this->input->getOption('add-table-exists-check'), $this->input->getOption('auto-increment'));
+        $autoIncrement = (bool)$this->input->getOption('auto-increment');
+        $tableExistsCondition = (bool)$this->input->getOption('add-table-exists-check');
+        return new Dumper($indent, 2, $tableExistsCondition, $autoIncrement);
     }
 
     protected function sourceStructure(): Structure
