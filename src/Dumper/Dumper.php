@@ -16,6 +16,12 @@ class Dumper
     /** @var int  */
     private $baseIndent;
 
+    /** @var bool */
+    private $tableExistCondition;
+
+    /** @var bool */
+    private $autoIncrement;
+
     /** @var array<string, mixed> */
     private $defaultSettings = [
         ColumnSettings::SETTING_AUTOINCREMENT => false,
@@ -30,44 +36,56 @@ class Dumper
         ColumnSettings::SETTING_COMMENT => [null, ''],
     ];
 
-    public function __construct(string $indent, int $baseIndent = 0)
+    public function __construct(string $indent, int $baseIndent = 0, bool $tableExistCondition = false, bool $autoIncrement = false)
     {
         $this->indent = $indent;
         $this->baseIndent = $baseIndent;
+        $this->tableExistCondition = $tableExistCondition;
+        $this->autoIncrement = $autoIncrement;
     }
 
     /**
      * @param MigrationTable[] $tables
+     * @param string $dumpType up/down
      * @return string
      */
-    public function dumpTables(array $tables): string
+    public function dumpTables(array $tables, string $dumpType): string
     {
         $tableMigrations = [];
         foreach ($tables as $table) {
-            $tableMigration = $this->indent() . "\$this->table('{$table->getName()}'";
+            $indentMultiplier = $defaultIndentMultiplier = 0;
+            $tableMigration = '';
+            if ($dumpType === 'up' && $this->tableExistCondition === true) {
+                $tableMigration .= $this->indent($defaultIndentMultiplier) . "if (!\$this->tableExists('{$table->getName()}')) {\n";
+                $indentMultiplier = 1;
+            }
+            $tableMigration .= $this->indent($indentMultiplier) . "\$this->table('{$table->getName()}'";
             $primaryColumns = $table->getPrimaryColumnNames();
             if ($primaryColumns) {
                 $tableMigration .= ", " . $this->columnsToString($primaryColumns);
             }
             $tableMigration .= ")\n";
+            if ($table->getAutoIncrement() && $table->getAutoIncrement() !== 1 && $this->autoIncrement) {
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->setAutoincrement({$table->getAutoIncrement()})\n";
+            }
             if ($table->getCharset()) {
-                $tableMigration .= $this->indent(1) . "->setCharset('{$table->getCharset()}')\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->setCharset('{$table->getCharset()}')\n";
             }
             if ($table->getCollation()) {
-                $tableMigration .= $this->indent(1) . "->setCollation('{$table->getCollation()}')\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->setCollation('{$table->getCollation()}')\n";
             }
             $comment = $table->getComment();
             if ($comment) {
-                $tableMigration .= $this->indent(1) . "->setComment('{$this->sanitizeSingleQuote($comment)}')\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->setComment('{$this->sanitizeSingleQuote($comment)}')\n";
             }
             if ($table->hasPrimaryKeyToDrop()) {
-                $tableMigration .= $this->indent(1) . "->dropPrimaryKey()\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->dropPrimaryKey()\n";
             }
             foreach ($table->getColumnsToDrop() as $column) {
-                $tableMigration .= $this->indent(1) . "->dropColumn('$column')\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->dropColumn('$column')\n";
             }
             foreach ($table->getColumnsToChange() as $oldColumnName => $column) {
-                $tableMigration .= $this->indent(1) . "->changeColumn('$oldColumnName', '{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->changeColumn('$oldColumnName', '{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
             }
             if ($table->getPrimaryColumns()) {
                 $primaryColumnList = [];
@@ -75,20 +93,23 @@ class Dumper
                     $primaryColumnList[] = "new \Phoenix\Database\Element\Column('{$primaryColumn->getName()}', '{$primaryColumn->getType()}'" . $this->settingsToString($primaryColumn, $table) . ")";
                 }
                 $addedPrimaryColumns = implode(', ', $primaryColumnList);
-                $tableMigration .= $this->indent(1) . "->addPrimaryColumns([$addedPrimaryColumns])\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->addPrimaryColumns([$addedPrimaryColumns])\n";
             }
             foreach ($table->getColumns() as $column) {
-                $tableMigration .= $this->indent(1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
             }
             foreach ($table->getIndexesToDrop() as $indexName) {
-                $tableMigration .= $this->indent(1) . "->dropIndexByName('$indexName')\n";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->dropIndexByName('$indexName')\n";
             }
             foreach ($table->getIndexes() as $index) {
-                $tableMigration .= $this->indent(1) . "->addIndex(";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->addIndex(";
                 $tableMigration .= $this->indexColumnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }
             $action = $table->getAction() === MigrationTable::ACTION_ALTER ? 'save' : $table->getAction();
-            $tableMigration .= $this->indent(1) . "->$action();";
+            $tableMigration .= $this->indent($indentMultiplier + 1) . "->$action();";
+            if ($dumpType === 'up' && $this->tableExistCondition === true) {
+                $tableMigration .= "\n" . $this->indent($defaultIndentMultiplier) . "}";
+            }
             $tableMigrations[] = $tableMigration;
         }
         return implode("\n\n", $tableMigrations);
@@ -108,17 +129,26 @@ class Dumper
                 continue;
             }
 
-            $foreignKeysMigration = $this->indent() . "\$this->table('{$table->getName()}')\n";
+            $indentMultiplier = $defaultIndentMultiplier = 0;
+            $foreignKeysMigration = '';
+            if ($this->tableExistCondition === true) {
+                $foreignKeysMigration .= $this->indent($defaultIndentMultiplier) . "if (!\$this->tableExists('{$table->getName()}')) {\n";
+                $indentMultiplier = 1;
+            }
+            $foreignKeysMigration .= $this->indent($indentMultiplier) . "\$this->table('{$table->getName()}')\n";
             foreach ($foreignKeysToDrop as $foreignKeyToDrop) {
-                $foreignKeysMigration .= $this->indent(1) . "->dropForeignKey('{$foreignKeyToDrop}')\n";
+                $foreignKeysMigration .= $this->indent($indentMultiplier + 1) . "->dropForeignKey('{$foreignKeyToDrop}')\n";
             }
             foreach ($foreignKeys as $foreignKey) {
-                $foreignKeysMigration .= $this->indent(1) . "->addForeignKey(";
+                $foreignKeysMigration .= $this->indent($indentMultiplier + 1) . "->addForeignKey(";
                 $foreignKeysMigration .= $this->columnsToString($foreignKey->getColumns()) . ", '{$foreignKey->getReferencedTable()}'";
                 $foreignKeysMigration .= $this->foreignKeyActions($foreignKey);
                 $foreignKeysMigration .= ")\n";
             }
-            $foreignKeysMigration .= $this->indent(1) . "->save();";
+            $foreignKeysMigration .= $this->indent($indentMultiplier + 1) . "->save();";
+            if ($this->tableExistCondition === true) {
+                $foreignKeysMigration .= "\n" . $this->indent($defaultIndentMultiplier) . "}";
+            }
             $foreignKeysMigrations[] = $foreignKeysMigration;
         }
         return implode("\n\n", $foreignKeysMigrations);
@@ -139,7 +169,15 @@ class Dumper
             foreach ($rows as $row) {
                 $dataMigration .= $this->indent(1) . "[\n";
                 foreach ($row as $column => $value) {
-                    $dataMigration .= "{$this->indent(2)}'$column' => '" . addslashes($value) . "',\n";
+                    if ($value === null) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => null,\n";
+                    } elseif ($value === false) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => false,\n";
+                    } elseif ($value === true) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => true,\n";
+                    } else {
+                        $dataMigration .= "{$this->indent(2)}'$column' => '" . str_replace(["'"], ["\'"], $value) . "',\n";
+                    }
                 }
                 $dataMigration .= "{$this->indent(1)}],\n";
             }

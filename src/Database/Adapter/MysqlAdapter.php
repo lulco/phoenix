@@ -49,7 +49,7 @@ class MysqlAdapter extends PdoAdapter
     protected function loadTables(string $database): array
     {
         /** @var array<string[]> $tables */
-        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment, AUTO_INCREMENT as auto_increment FROM information_schema.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
         return $tables;
     }
 
@@ -63,6 +63,9 @@ class MysqlAdapter extends PdoAdapter
         }
         if ($table['table_comment']) {
             $migrationTable->setComment($table['table_comment']);
+        }
+        if ($table['auto_increment']) {
+            $migrationTable->setAutoIncrement((int)$table['auto_increment']);
         }
         return $migrationTable;
     }
