@@ -33,7 +33,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         /** @var string $indentOption */
         $indentOption = $this->input->getOption('indent');
         $indent = $indenter->indent($indentOption);
-        $dumper = new Dumper($indent, 2);
+        $dumper = $this->createDumper($indent);
 
         /** @var string $migration */
         $migration = $this->input->getOption('migration') ?: $this->migrationDefaultName();
@@ -60,10 +60,11 @@ abstract class AbstractDumpCommand extends AbstractCommand
 
     abstract protected function migrationDefaultName(): string;
 
+    abstract protected function createDumper(string $indent): Dumper;
+
     abstract protected function sourceStructure(): Structure;
 
     abstract protected function targetStructure(): Structure;
-
 
     /**
      * @param MigrationTable[] $tables
@@ -100,7 +101,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         if ($type === 'down') {
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
-        $parts[] = $dumper->dumpTables($tables);
+        $parts[] = $dumper->dumpTables($tables, $type);
         if ($type === 'up') {
             $parts[] = $dumper->dumpDataUp($this->loadData($tables));
             $parts[] = $dumper->dumpForeignKeys($tables);

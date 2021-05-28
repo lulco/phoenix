@@ -196,6 +196,7 @@ class MigrationTable
     public function toTable(): Table
     {
         $table = new Table($this->getName());
+        $table->setAutoIncrement($this->getAutoIncrement());
         $table->setCharset($this->getCharset());
         $table->setCollation($this->getCollation());
         $table->setComment($this->getComment());
