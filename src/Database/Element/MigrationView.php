@@ -10,12 +10,16 @@ class MigrationView
 
     const ACTION_DROP = 'drop';
 
+    /** @var string */
     private $name;
 
+    /** @var string[] */
     private $columns = [];
 
+    /** @var string */
     private $sql;
 
+    /** @var string */
     private $action;
 
     public function __construct(string $name)
@@ -23,6 +27,10 @@ class MigrationView
         $this->name = $name;
     }
 
+    /**
+     * @param string[] $columns
+     * @return $this
+     */
     public function columns(array $columns): MigrationView
     {
         $this->columns = $columns;
@@ -40,9 +48,9 @@ class MigrationView
         $this->action = self::ACTION_CREATE;
     }
 
-    public function save(): void
+    public function replace(): void
     {
-        $this->action = self::ACTION_ALTER;
+        $this->action = self::ACTION_REPLACE;
     }
 
     public function drop(): void
@@ -55,6 +63,9 @@ class MigrationView
         return $this->name;
     }
 
+    /**
+     * @return string[]
+     */
     public function getColumns(): array
     {
         return $this->columns;
@@ -67,6 +78,6 @@ class MigrationView
 
     public function getAction(): string
     {
-        return $this->action;
+        return $this->action ?: self::ACTION_REPLACE;
     }
 }

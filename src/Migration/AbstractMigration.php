@@ -28,7 +28,7 @@ abstract class AbstractMigration
     /** @var string */
     private $fullClassName;
 
-    /** @var array<int, string|PDOStatement|MigrationTable> */
+    /** @var array<int, string|PDOStatement|MigrationTable|MigrationView> */
     private $queriesToExecute = [];
 
     /** @var string[] list of executed queries */
@@ -144,7 +144,7 @@ abstract class AbstractMigration
         return $this->adapter->getStructure()->getTable($name);
     }
 
-    final protected function view(string $name)
+    final protected function view(string $name): MigrationView
     {
         $migrationView = new MigrationView($name);
         $this->queriesToExecute[] = $migrationView;
