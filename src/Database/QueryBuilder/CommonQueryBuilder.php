@@ -8,6 +8,7 @@ use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\MigrationView;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -281,6 +282,32 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $newTableName = $table->getNewName();
         return $this->adapter->buildInsertQuery($newTableName, $newData);
     }
+
+    public function createView(MigrationView $view): array
+    {
+        $columns = array_map(function (string $column) {
+            return $this->escapeString($column);
+        }, $view->getColumns());
+        return [
+            'CREATE VIEW ' . $this->escapeString($view->getName()) . ($columns ? ' (' . implode(',', $columns) . ')' : '') . ' AS ' . $view->getSql(),
+        ];
+    }
+
+    public function replaceView(MigrationView $view): array
+    {
+        $columns = array_map(function (string $column) {
+            return $this->escapeString($column);
+        }, $view->getColumns());
+        return [
+            'CREATE OR REPLACE VIEW ' . $this->escapeString($view->getName()) . ($columns ? ' (' . implode(',', $columns) . ')' : '') . ' AS ' . $view->getSql(),
+        ];
+    }
+
+    public function dropView(MigrationView $view): array
+    {
+        return ['DROP VIEW ' . $this->escapeString($view->getName())];
+    }
+
 
     abstract public function escapeString(?string $string): string;
 

@@ -3,6 +3,10 @@
 ### [Unreleased][unreleased]
 
 #### Added
+- support for views
+
+
+#### Added
 - year column type (year for mysql, numeric(4) for pgsql)
 - new options add-table-exists-check and auto-increment to Dumper command
 

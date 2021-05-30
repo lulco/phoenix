@@ -12,6 +12,7 @@ Framework agnostic database migrations for PHP.
 ## Features
 - Validation all settings in migration before executing first query
 - Multiple migration directories
+- Support for views
 - Migrate up and down
 - Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
