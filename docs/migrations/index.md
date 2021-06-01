@@ -15,6 +15,8 @@ $this->table('users')
     ->create();
 ```
 
+Read more about [primary keys](primary_keys.md).
+
 #### Change table
 Add column, drop column, rename column, change column, add index, drop index, add foreign key, drop foreign key
 ```php
@@ -48,12 +50,7 @@ $this->table('users')
     ->rename('frontend_users');
 ```
 
-#### Add an autoincrement primary column to an existing table
-```php
-$this->table('table_without_primary_key')
-    ->addPrimaryColumns([new Column('id', 'integer', ['autoincrement' => true])])
-    ->save();
-```
+
 
 #### Check if table exists
 ```php
