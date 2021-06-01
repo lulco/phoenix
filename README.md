@@ -91,6 +91,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `migrate` - run migrations
 - `rollback` - rollback migrations
 - `dump` - create migration from existing database
+- `diff` - create migration as diff of two existing database structures
 - `status` - list of migrations already executed and list of migrations to execute
 - `test` - test next migration by executing migrate, rollback, migrate for it
 - `cleanup` - rollback all migrations and delete log table
@@ -252,6 +253,7 @@ All done. Took 0.0401s
 ### [Dump command](docs/commands/dump_command.md)
 Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
 If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
+It also helps you when you want to [change mysql to postgres or vice versa](docs/examples/how_to_change_mysql_to_pgsql.md)
 
 ### [Diff command](docs/commands/diff_command.md)
 Command `php vendor/bin/phoenix diff` creates migration as diff of two existing database structures.

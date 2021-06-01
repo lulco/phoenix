@@ -6,6 +6,7 @@
 - year column type (year for mysql, numeric(4) for pgsql)
 - new options add-table-exists-check and auto-increment to Dumper command
 - documentation for primary keys
+- step by step tutorial for using dump command to change mysql to pgsql or vice versa
 
 #### Fixed
 - single quotes in comments
