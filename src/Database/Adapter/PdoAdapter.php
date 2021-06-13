@@ -238,7 +238,12 @@ abstract class PdoAdapter implements AdapterInterface
     private function addCondition(string $key, $value): string
     {
         if (!is_array($value)) {
-            return $this->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+            $equalityOperator = ' = ';
+            // checks if $value is 'NULL' or 'NOT NULL', then use 'IS' instead of '=' operator
+            if ($this->isNull($value, $notNull)) {
+                $equalityOperator = ' IS ' . ($notNull ? 'NOT ' : '');
+            }
+            return $this->escapeString($key) . $equalityOperator . $this->createValue($key, 'where_');
         }
         $inConditions = [];
         foreach (array_keys($value) as $index) {
@@ -381,6 +386,9 @@ abstract class PdoAdapter implements AdapterInterface
     private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
         if (!is_array($condition)) {
+            if ($this->isNull($condition)) {
+                $condition = null;
+            }
             $statement->bindValue('where_' . $key, $condition);
             return;
         }
@@ -400,6 +408,21 @@ abstract class PdoAdapter implements AdapterInterface
                 return false;
             }
         }
+        return true;
+    }
+
+    private function isNull($value, &$notNull = false): bool {
+        if (is_null($value)) {
+            $notNull = false;
+            return true;
+        }
+        if (!is_string($value)) {
+            return false;
+        }
+        if (preg_match('/^\s*(NOT\s+)?NULL\s*$/', $value, $matches) !== 1) {
+            return false;
+        }
+        $notNull = array_key_exists(1, $matches);
         return true;
     }
 

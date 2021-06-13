@@ -121,6 +121,40 @@ class PdoAdapterTest extends TestCase
         }
     }
 
+    public function testFetchAllWhereNull()
+    {
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NULL,PRIMARY KEY (`id`));');
+        $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
+        $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => NULL]));
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title' => 'NOT NULL']);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertNotNull($item['title']);
+        }
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title' => 'NULL']);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertNull($item['title']);
+        }
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title' => NULL]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertNull($item['title']);
+        }
+    }
+
     public function testDelete()
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
