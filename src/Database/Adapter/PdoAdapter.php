@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use DateTime;
 use InvalidArgumentException;
+use UnexpectedValueException;
 use PDO;
 use PDOStatement;
 use Phoenix\Database\Adapter\Behavior\StructureBehavior;
@@ -237,19 +238,18 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function addCondition(string $key, $value): string
     {
-        if (!is_array($value)) {
-            $equalityOperator = ' = ';
-            // checks if $value is 'NULL' or 'NOT NULL', then use 'IS' instead of '=' operator
-            if ($this->isNull($value, $notNull)) {
-                $equalityOperator = ' IS ' . ($notNull ? 'NOT ' : '');
+        $rightOperand = null;
+        $this->splitColumnNameAndOperator($key, $value, $columnName, $operator);
+        if (is_array($value)) {
+            $inConditions = [];
+            foreach (array_keys($value) as $index) {
+                $inConditions[] = $this->createValue($columnName, 'where_' . $index . '_');
             }
-            return $this->escapeString($key) . $equalityOperator . $this->createValue($key, 'where_');
+            $rightOperand = '(' . implode(', ', $inConditions) . ')';
+        } else {
+            $rightOperand = $this->createValue($columnName, 'where_');
         }
-        $inConditions = [];
-        foreach (array_keys($value) as $index) {
-            $inConditions[] = $this->createValue($key, 'where_' . $index . '_');
-        }
-        return $this->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
+        return $this->escapeString($columnName) . ' ' . $operator . ' ' . $rightOperand;
     }
 
     private function createLimit(?string $limit = null): string
@@ -385,15 +385,13 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
+        $this->splitColumnNameAndOperator($key, $condition, $columnName, $operator);
         if (!is_array($condition)) {
-            if ($this->isNull($condition)) {
-                $condition = null;
-            }
-            $statement->bindValue('where_' . $key, $condition);
+            $statement->bindValue('where_' . $columnName, $condition);
             return;
         }
         foreach ($condition as $index => $cond) {
-            $statement->bindValue('where_' . $index . '_' . $key, $cond);
+            $statement->bindValue('where_' . $index . '_' . $columnName, $cond);
         }
     }
 
@@ -411,19 +409,48 @@ abstract class PdoAdapter implements AdapterInterface
         return true;
     }
 
-    private function isNull($value, &$notNull = false): bool {
+    private function splitColumnNameAndOperator($key, $value, &$columnName, &$operator): void
+    {
+        // initialize both column name and operator
+        $columnName = $key;
+        $operator = '=';
+
+        // check presence of operator in $key
+        if (preg_match('/^(.*)\s(=|!=|<>|<|<=|>|>=)$/', $key, $matches) === 1) {
+            $columnName = $matches[1];
+            $operator = $matches[2];
+        }
+
+        $columnName = trim($columnName);
+
         if (is_null($value)) {
-            $notNull = false;
-            return true;
+            if ($operator === '=') {
+                $operator = 'IS';
+                return;
+            }
+            if (in_array($operator, [ '!=', '<>' ])) {
+                $operator = 'IS NOT';
+                return;
+            }
+            throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for NULL value');
         }
-        if (!is_string($value)) {
-            return false;
+
+        if (is_array($value)) {
+            if ($operator === '=') {
+                $operator = 'IN';
+                return;
+            }
+            if (in_array($operator, [ '!=', '<>' ])) {
+                $operator = 'NOT IN';
+                return;
+            }
+            throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for list value');
         }
-        if (preg_match('/^\s*(NOT\s+)?NULL\s*$/', $value, $matches) !== 1) {
-            return false;
+        
+        // always prefer '<>' to '!='
+        if ($operator === '!=') {
+            $operator = '<>';
         }
-        $notNull = array_key_exists(1, $matches);
-        return true;
     }
 
     /**
