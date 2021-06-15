@@ -238,7 +238,6 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function addCondition(string $key, $value): string
     {
-        $rightOperand = null;
         $this->splitColumnNameAndOperator($key, $value, $columnName, $operator);
         if (is_array($value)) {
             $inConditions = [];
@@ -409,14 +408,14 @@ abstract class PdoAdapter implements AdapterInterface
         return true;
     }
 
-    private function splitColumnNameAndOperator($key, $value, &$columnName, &$operator): void
+    private function splitColumnNameAndOperator(string $key, $value, string &$columnName, string &$operator): void
     {
         // initialize both column name and operator
         $columnName = $key;
         $operator = '=';
 
         // check presence of operator in $key
-        if (preg_match('/^(.*)\s(=|!=|<>|<|<=|>|>=)$/', $key, $matches) === 1) {
+        if (preg_match('/^(.*) (=|!=|<>|<|<=|>|>=)$/', $key, $matches) === 1) {
             $columnName = $matches[1];
             $operator = $matches[2];
         }

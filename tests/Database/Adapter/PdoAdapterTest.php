@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Adapter;
 
 use InvalidArgumentException;
+use UnexpectedValueException;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
@@ -144,6 +145,10 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('title', $item);
             $this->assertNull($item['title']);
         }
+        
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Cannot accept "<" operator for NULL value');
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title <' => NULL]);
     }
 
     public function testDelete()
