@@ -122,7 +122,7 @@ class PdoAdapterTest extends TestCase
         }
     }
 
-    public function testFetchAllWhereNull()
+    public function testFetchAllWithConditions()
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -144,6 +144,42 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
             $this->assertNull($item['title']);
+        }
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >' => 1]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertGreaterThan($item['id'], 1);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >=' => 1]);
+        $this->assertCount(2, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertGreaterThanOrEqual($item['id'], 1);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <' => 2]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertLessThan($item['id'], 2);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <=' => 2]);
+        $this->assertCount(2, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertLessThanOrEqual($item['id'], 2);
         }
         
         $this->expectException(UnexpectedValueException::class);

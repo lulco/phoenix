@@ -408,7 +408,7 @@ abstract class PdoAdapter implements AdapterInterface
         return true;
     }
 
-    private function splitColumnNameAndOperator(string $key, $value, string &$columnName, string &$operator): void
+    private function splitColumnNameAndOperator(string $key, mixed $value, ?string &$columnName, ?string &$operator): void
     {
         // initialize both column name and operator
         $columnName = $key;

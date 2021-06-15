@@ -85,3 +85,39 @@ $this->execute('CREATE TABLE `first_table` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 );
 ```
+
+### Fetch data
+`$this->fetch` and `$this->fetchAll` accept the following arguments:
+name|description|type|optional|default
+-|-|-|-|-
+table|The name of the table from which fetch the data|string|no|-
+fields|A list of column names to return|array|yes|`['*']`
+conditions|A list of condition, where the key of the associative array will be the column name and the value will be the compared value.<br><br>By default the operator of the comparison is '=' but you can specify the operator in the array key just after the column name preceded by a space (e.g. `column !=` or `column >`)|array|yes|`[]`
+groups|A list of column names to group by|array|yes|`[]`
+
+#### Fetch with conditions
+```php
+$trackableOrders = $this->fetchAll(
+    'orders',
+    [
+        'id'
+    ],
+    [
+        'user_id' => 12,
+        'tracking_id !=' => null
+    ]
+);
+```
+
+```php
+$orders = $this->fetchAll(
+    'orders',
+    [
+        'id'
+    ],
+    [
+        'user_id =' => 12,
+        'price >=' => 23.50
+    ]
+);
+```

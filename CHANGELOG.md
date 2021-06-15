@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+### [1.8.1] - 2021-06-01
+#### Changed
+- add support for different operators in `$conditions` array
+
 ### [1.8.0] - 2021-06-01
 #### Added
 - year column type (year for mysql, numeric(4) for pgsql)
