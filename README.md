@@ -317,4 +317,4 @@ Test finished successfully
 
 All done. Took 0.2840s
 ```
-Read more about commands [here](docs/commands/commands.md)
+Read more about commands [here](docs/commands/index.md)
