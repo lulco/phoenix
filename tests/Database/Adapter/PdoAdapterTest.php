@@ -152,7 +152,7 @@ class PdoAdapterTest extends TestCase
             $this->assertCount(2, $item);
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
-            $this->assertGreaterThan($item['id'], 1);
+            $this->assertGreaterThan(1, $item['id']);
         }
         
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >=' => 1]);
@@ -161,7 +161,7 @@ class PdoAdapterTest extends TestCase
             $this->assertCount(2, $item);
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
-            $this->assertGreaterThanOrEqual($item['id'], 1);
+            $this->assertGreaterThanOrEqual(1, $item['id']);
         }
         
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <' => 2]);
@@ -170,7 +170,7 @@ class PdoAdapterTest extends TestCase
             $this->assertCount(2, $item);
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
-            $this->assertLessThan($item['id'], 2);
+            $this->assertLessThan(2, $item['id']);
         }
         
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <=' => 2]);
@@ -179,7 +179,7 @@ class PdoAdapterTest extends TestCase
             $this->assertCount(2, $item);
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
-            $this->assertLessThanOrEqual($item['id'], 2);
+            $this->assertLessThanOrEqual(2, $item['id']);
         }
         
         $this->expectException(UnexpectedValueException::class);

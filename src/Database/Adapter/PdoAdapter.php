@@ -238,7 +238,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function addCondition(string $key, $value): string
     {
-        $this->splitColumnNameAndOperator($key, $value, $columnName, $operator);
+        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $value);
         if (is_array($value)) {
             $inConditions = [];
             foreach (array_keys($value) as $index) {
@@ -384,7 +384,7 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
-        $this->splitColumnNameAndOperator($key, $condition, $columnName, $operator);
+        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $condition);
         if (!is_array($condition)) {
             $statement->bindValue('where_' . $columnName, $condition);
             return;
@@ -408,7 +408,12 @@ abstract class PdoAdapter implements AdapterInterface
         return true;
     }
 
-    private function splitColumnNameAndOperator(string $key, mixed $value, ?string &$columnName, ?string &$operator): void
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return array [ columnName, operator ]
+     */
+    private function splitColumnNameAndOperator(string $key, $value): array
     {
         // initialize both column name and operator
         $columnName = $key;
@@ -424,24 +429,20 @@ abstract class PdoAdapter implements AdapterInterface
 
         if (is_null($value)) {
             if ($operator === '=') {
-                $operator = 'IS';
-                return;
+                return [ $columnName, 'IS' ];
             }
             if (in_array($operator, [ '!=', '<>' ])) {
-                $operator = 'IS NOT';
-                return;
+                return [ $columnName, 'IS NOT' ];
             }
             throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for NULL value');
         }
-
+        
         if (is_array($value)) {
             if ($operator === '=') {
-                $operator = 'IN';
-                return;
+                return [ $columnName, 'IN' ];
             }
             if (in_array($operator, [ '!=', '<>' ])) {
-                $operator = 'NOT IN';
-                return;
+                return [ $columnName, 'NOT IN' ];
             }
             throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for list value');
         }
@@ -450,6 +451,7 @@ abstract class PdoAdapter implements AdapterInterface
         if ($operator === '!=') {
             $operator = '<>';
         }
+        return [ $columnName, $operator ];
     }
 
     /**
