@@ -3,6 +3,7 @@
 namespace Phoenix\Tests\Database\Adapter;
 
 use InvalidArgumentException;
+use UnexpectedValueException;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
@@ -119,6 +120,71 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('id', $item);
             $this->assertArrayHasKey('title', $item);
         }
+    }
+
+    public function testFetchAllWithConditions()
+    {
+        $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NULL,PRIMARY KEY (`id`));');
+        $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
+        $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', ['id' => 2, 'title' => NULL]));
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title !=' => NULL]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertNotNull($item['title']);
+        }
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title' => NULL]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertNull($item['title']);
+        }
+
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >' => 1]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertGreaterThan(1, $item['id']);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >=' => 1]);
+        $this->assertCount(2, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertGreaterThanOrEqual(1, $item['id']);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <' => 2]);
+        $this->assertCount(1, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertLessThan(2, $item['id']);
+        }
+        
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <=' => 2]);
+        $this->assertCount(2, $items);
+        foreach ($items as $item) {
+            $this->assertCount(2, $item);
+            $this->assertArrayHasKey('id', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertLessThanOrEqual(2, $item['id']);
+        }
+        
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Cannot accept "<" operator for NULL value');
+        $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title <' => NULL]);
     }
 
     public function testDelete()

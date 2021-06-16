@@ -4,6 +4,7 @@ namespace Phoenix\Database\Adapter;
 
 use DateTime;
 use InvalidArgumentException;
+use UnexpectedValueException;
 use PDO;
 use PDOStatement;
 use Phoenix\Database\Adapter\Behavior\StructureBehavior;
@@ -237,14 +238,17 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function addCondition(string $key, $value): string
     {
-        if (!is_array($value)) {
-            return $this->escapeString($key) . ' = ' . $this->createValue($key, 'where_');
+        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $value);
+        if (is_array($value)) {
+            $inConditions = [];
+            foreach (array_keys($value) as $index) {
+                $inConditions[] = $this->createValue($columnName, 'where_' . $index . '_');
+            }
+            $rightOperand = '(' . implode(', ', $inConditions) . ')';
+        } else {
+            $rightOperand = $this->createValue($columnName, 'where_');
         }
-        $inConditions = [];
-        foreach (array_keys($value) as $index) {
-            $inConditions[] = $this->createValue($key, 'where_' . $index . '_');
-        }
-        return $this->escapeString($key) . ' IN (' . implode(', ', $inConditions) . ')';
+        return $this->escapeString($columnName) . ' ' . $operator . ' ' . $rightOperand;
     }
 
     private function createLimit(?string $limit = null): string
@@ -380,12 +384,13 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
+        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $condition);
         if (!is_array($condition)) {
-            $statement->bindValue('where_' . $key, $condition);
+            $statement->bindValue('where_' . $columnName, $condition);
             return;
         }
         foreach ($condition as $index => $cond) {
-            $statement->bindValue('where_' . $index . '_' . $key, $cond);
+            $statement->bindValue('where_' . $index . '_' . $columnName, $cond);
         }
     }
 
@@ -401,6 +406,52 @@ abstract class PdoAdapter implements AdapterInterface
             }
         }
         return true;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return array<string, string> [ columnName, operator ]
+     */
+    private function splitColumnNameAndOperator(string $key, $value): array
+    {
+        // initialize both column name and operator
+        $columnName = $key;
+        $operator = '=';
+
+        // check presence of operator in $key
+        if (preg_match('/^(.*) (=|!=|<>|<|<=|>|>=)$/', $key, $matches) === 1) {
+            $columnName = $matches[1];
+            $operator = $matches[2];
+        }
+
+        $columnName = trim($columnName);
+
+        if (is_null($value)) {
+            if ($operator === '=') {
+                return [ $columnName, 'IS' ];
+            }
+            if (in_array($operator, [ '!=', '<>' ])) {
+                return [ $columnName, 'IS NOT' ];
+            }
+            throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for NULL value');
+        }
+        
+        if (is_array($value)) {
+            if ($operator === '=') {
+                return [ $columnName, 'IN' ];
+            }
+            if (in_array($operator, [ '!=', '<>' ])) {
+                return [ $columnName, 'NOT IN' ];
+            }
+            throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for list value');
+        }
+        
+        // always prefer '<>' to '!='
+        if ($operator === '!=') {
+            $operator = '<>';
+        }
+        return [ $columnName, $operator ];
     }
 
     /**
