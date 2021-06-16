@@ -411,7 +411,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @return array [ columnName, operator ]
+     * @return array<string, string> [ columnName, operator ]
      */
     private function splitColumnNameAndOperator(string $key, $value): array
     {
