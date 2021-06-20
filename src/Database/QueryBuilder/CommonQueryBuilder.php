@@ -308,7 +308,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return ['DROP VIEW ' . $this->escapeString($view->getName())];
     }
 
-
     abstract public function escapeString(?string $string): string;
 
     /**

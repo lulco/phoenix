@@ -29,7 +29,6 @@ class MigrationView
 
     /**
      * @param string[] $columns
-     * @return $this
      */
     public function columns(array $columns): MigrationView
     {
