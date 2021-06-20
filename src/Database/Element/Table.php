@@ -2,8 +2,12 @@
 
 namespace Phoenix\Database\Element;
 
+use Phoenix\Database\Element\Behavior\AutoIncrementBehavior;
+
 class Table
 {
+    use AutoIncrementBehavior;
+
     /** @var string */
     private $name;
 
@@ -182,6 +186,7 @@ class Table
         $table = clone $this;
 
         $migrationTable = new MigrationTable($table->getName(), $table->getPrimary());
+        $migrationTable->setAutoIncrement($table->getAutoIncrement());
         $migrationTable->setCharset($table->getCharset());
         $migrationTable->setCollation($table->getCollation());
         $migrationTable->setComment($table->getComment());

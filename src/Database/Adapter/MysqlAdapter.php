@@ -49,7 +49,7 @@ class MysqlAdapter extends PdoAdapter
     protected function loadTables(string $database): array
     {
         /** @var array<string[]> $tables */
-        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment, AUTO_INCREMENT as auto_increment FROM information_schema.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
         return $tables;
     }
 
@@ -63,6 +63,9 @@ class MysqlAdapter extends PdoAdapter
         }
         if ($table['table_comment']) {
             $migrationTable->setComment($table['table_comment']);
+        }
+        if ($table['auto_increment']) {
+            $migrationTable->setAutoIncrement((int)$table['auto_increment']);
         }
         return $migrationTable;
     }
@@ -101,11 +104,14 @@ class MysqlAdapter extends PdoAdapter
         $settings = $this->prepareSettings($column);
         if ($type === Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] === 36) {
             $type = Column::TYPE_UUID;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
-        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1) {
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
+        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1 && in_array($settings[ColumnSettings::SETTING_DEFAULT], ['0', '1'], true)) {
             $type = Column::TYPE_BOOLEAN;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
+            unset($settings[ColumnSettings::SETTING_SIGNED]);
+        } elseif ($type === Column::TYPE_YEAR) {
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
         }
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }

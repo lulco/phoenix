@@ -49,7 +49,7 @@ class PgsqlAdapter extends PdoAdapter
         $tables = $this->query(sprintf("
             SELECT *
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE table_catalog = '%s' AND table_schema='public'
+            WHERE table_type = 'BASE TABLE' AND table_catalog = '%s' AND table_schema='public'
             ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
         return $tables;
     }

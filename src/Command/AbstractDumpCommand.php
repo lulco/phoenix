@@ -33,7 +33,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         /** @var string $indentOption */
         $indentOption = $this->input->getOption('indent');
         $indent = $indenter->indent($indentOption);
-        $dumper = new Dumper($indent, 2);
+        $dumper = $this->createDumper($indent);
 
         /** @var string $migration */
         $migration = $this->input->getOption('migration') ?: $this->migrationDefaultName();
@@ -60,10 +60,11 @@ abstract class AbstractDumpCommand extends AbstractCommand
 
     abstract protected function migrationDefaultName(): string;
 
+    abstract protected function createDumper(string $indent): Dumper;
+
     abstract protected function sourceStructure(): Structure;
 
     abstract protected function targetStructure(): Structure;
-
 
     /**
      * @param MigrationTable[] $tables
@@ -93,15 +94,15 @@ abstract class AbstractDumpCommand extends AbstractCommand
         return $tables;
     }
 
-    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $type): string
+    private function createUpDown(Structure $sourceStructure, Structure $targetStructure, Dumper $dumper, string $dumpType): string
     {
         $tables = $this->getFilteredTables($sourceStructure, $targetStructure);
         $parts = [];
-        if ($type === 'down') {
+        if ($dumpType === 'down') {
             $parts[] = $dumper->dumpForeignKeys($tables);
         }
-        $parts[] = $dumper->dumpTables($tables);
-        if ($type === 'up') {
+        $parts[] = $dumper->dumpTables($tables, $dumpType);
+        if ($dumpType === 'up') {
             $parts[] = $dumper->dumpDataUp($this->loadData($tables));
             $parts[] = $dumper->dumpForeignKeys($tables);
         }

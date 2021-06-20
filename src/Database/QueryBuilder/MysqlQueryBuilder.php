@@ -222,7 +222,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
                 }
                 return $default . 'CURRENT_TIMESTAMP';
             }
-            return $default . "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";
+            return $default . "'" . $this->sanitizeSingleQuote($column->getSettings()->getDefault()) . "'";
         }
 
         return '';
@@ -327,7 +327,13 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($comment === null) {
             return '';
         }
+        $comment = $this->sanitizeSingleQuote($comment);
         return " COMMENT$glue'$comment'";
+    }
+
+    private function sanitizeSingleQuote(string $input): string
+    {
+        return str_replace("'", "\'", $input);
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table): string

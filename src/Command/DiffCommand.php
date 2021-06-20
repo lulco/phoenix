@@ -2,6 +2,7 @@
 
 namespace Phoenix\Command;
 
+use Dumper\Dumper;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Exception\InvalidArgumentValueException;
@@ -24,6 +25,11 @@ class DiffCommand extends AbstractDumpCommand
     protected function migrationDefaultName(): string
     {
         return 'Diff';
+    }
+
+    protected function createDumper(string $indent): Dumper
+    {
+        return new Dumper($indent, 2);
     }
 
     protected function sourceStructure(): Structure

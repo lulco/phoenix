@@ -38,6 +38,7 @@ class Column
     const TYPE_DOUBLE = 'double';
     const TYPE_ENUM = 'enum';
     const TYPE_SET = 'set';
+    const TYPE_YEAR = 'year';
     const TYPE_POINT = 'point';
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';

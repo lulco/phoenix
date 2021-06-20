@@ -12,6 +12,7 @@ Framework agnostic database migrations for PHP.
 ## Features
 - Validation all settings in migration before executing first query
 - Multiple migration directories
+- Support for views
 - Migrate up and down
 - Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
@@ -91,6 +92,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `migrate` - run migrations
 - `rollback` - rollback migrations
 - `dump` - create migration from existing database
+- `diff` - create migration as diff of two existing database structures
 - `status` - list of migrations already executed and list of migrations to execute
 - `test` - test next migration by executing migrate, rollback, migrate for it
 - `cleanup` - rollback all migrations and delete log table
@@ -252,6 +254,7 @@ All done. Took 0.0401s
 ### [Dump command](docs/commands/dump_command.md)
 Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
 If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
+It also helps you when you want to [change mysql to postgres or vice versa](docs/examples/how_to_change_mysql_to_pgsql.md)
 
 ### [Diff command](docs/commands/diff_command.md)
 Command `php vendor/bin/phoenix diff` creates migration as diff of two existing database structures.
@@ -315,4 +318,4 @@ Test finished successfully
 
 All done. Took 0.2840s
 ```
-Read more about commands [here](docs/commands/commands.md)
+Read more about commands [here](docs/commands/index.md)

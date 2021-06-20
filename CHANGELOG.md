@@ -2,6 +2,27 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
+- support for views
+
+#### Fixed
+- readme link (Thanks to [Niek Oost](https://github.com/niekoost))
+
+### [1.8.0] - 2021-06-01
+#### Added
+- year column type (year for mysql, numeric(4) for pgsql)
+- new options add-table-exists-check and auto-increment to Dumper command
+- documentation for primary keys
+- step by step tutorial for using dump command to change mysql to pgsql or vice versa
+
+#### Fixed
+- single quotes in comments
+- table comment in dump
+- transfer tinyint(1) to boolean in mysql only if it has default values 1 or 0 
+- dump command skip everything which is not of type "BASE TABLE" (VIEW, SYSTEM VIEW etc.)
+- dumping special values (null, true, false, strings with apostrophe)
+
 ### [1.7.0] - 2021-04-14
 #### Added
 - simple autowiring in migrations
@@ -251,7 +272,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.7.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.8.0...HEAD
+[1.8.0]: https://github.com/lulco/phoenix/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/lulco/phoenix/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/lulco/phoenix/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/lulco/phoenix/compare/1.4.0...1.5.0

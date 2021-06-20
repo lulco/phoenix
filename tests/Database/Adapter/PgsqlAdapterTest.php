@@ -384,8 +384,12 @@ class PgsqlAdapterTest extends TestCase
             'null' => true,
             'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz'],
         ]));
-        $this->checkColumn($table2, 'col_point', Column::TYPE_POINT, array_merge($defaultSettings, []));
-        $this->checkColumn($table2, 'col_line', Column::TYPE_LINE, array_merge($defaultSettings, []));
+        $this->checkColumn($table2, 'col_point', Column::TYPE_POINT, array_merge($defaultSettings, [
+            'comment' => 'Comment for "point"',
+        ]));
+        $this->checkColumn($table2, 'col_line', Column::TYPE_LINE, array_merge($defaultSettings, [
+            'comment' => "Line's comment",
+        ]));
         $this->checkColumn($table2, 'col_polygon', Column::TYPE_POLYGON, array_merge($defaultSettings, [
             'comment' => 'Polygon column comment',
         ]));
@@ -492,8 +496,8 @@ class PgsqlAdapterTest extends TestCase
         $migrationTable2->addColumn('col_date', 'date', ['null' => true]);
         $migrationTable2->addColumn('col_enum', 'enum', ['null' => true, 'values' => ['t2_enum_xxx', 't2_enum_yyy', 't2_enum_zzz']]);
         $migrationTable2->addColumn('col_set', 'set', ['null' => true, 'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz']]);
-        $migrationTable2->addColumn('col_point', 'point');
-        $migrationTable2->addColumn('col_line', 'line');
+        $migrationTable2->addColumn('col_point', 'point', ['comment' => 'Comment for "point"']);
+        $migrationTable2->addColumn('col_line', 'line', ['comment' => 'Line\'s comment']);
         $migrationTable2->addColumn('col_polygon', 'polygon', ['comment' => 'Polygon column comment']);
         $migrationTable2->addIndex(['col_string'], Index::TYPE_UNIQUE, Index::METHOD_BTREE, 'named_unique_index');
         $migrationTable2->addForeignKey('col_int', 'table_1', 'id', ForeignKey::SET_NULL, ForeignKey::CASCADE);

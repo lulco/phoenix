@@ -35,6 +35,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             Column::TYPE_DATE => 'date',
             Column::TYPE_DATETIME => 'timestamp(6)',
             Column::TYPE_TIMESTAMP => 'timestamp(6)',
+            Column::TYPE_YEAR => 'numeric(4)',
             Column::TYPE_TINY_TEXT => 'text',
             Column::TYPE_MEDIUM_TEXT => 'text',
             Column::TYPE_TEXT => 'text',
@@ -230,7 +231,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
-            $default = "'" . str_replace("'", "\'", $column->getSettings()->getDefault()) . "'";
+            $default = "'" . $this->sanitizeSingleQuote($column->getSettings()->getDefault()) . "'";
         }
 
         return $default;
@@ -330,11 +331,18 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createTableComment(MigrationTable $table): string
     {
-        return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
+        $comment = $this->sanitizeSingleQuote((string)$table->getComment());
+        return "COMMENT ON TABLE {$table->getName()} IS '$comment';";
     }
 
     private function createColumnComment(MigrationTable $table, Column $column): string
     {
-        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '{$column->getSettings()->getComment()}';";
+        $comment = $this->sanitizeSingleQuote((string)$column->getSettings()->getComment());
+        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '$comment';";
+    }
+
+    private function sanitizeSingleQuote(string $input): string
+    {
+        return str_replace("'", "''", $input);
     }
 }
