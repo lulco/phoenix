@@ -2,8 +2,11 @@
 
 ### [Unreleased][unreleased]
 
-#### Changed
-- add support for different operators in `$conditions` array
+#### Added
+- support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
+
+#### Fixed
+- readme link (Thanks to [Niek Oost](https://github.com/niekoost))
 
 ### [1.8.0] - 2021-06-01
 #### Added
