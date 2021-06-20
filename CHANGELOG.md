@@ -4,6 +4,7 @@
 
 #### Added
 - support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
+- support for views
 
 #### Fixed
 - readme link (Thanks to [Niek Oost](https://github.com/niekoost))
