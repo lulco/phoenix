@@ -238,7 +238,9 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function addCondition(string $key, $value): string
     {
-        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $value);
+        $columnNameAndOperator = $this->splitColumnNameAndOperator($key, $value);
+        $columnName = $columnNameAndOperator['columnName'];
+        $operator = $columnNameAndOperator['operator'];
         if (is_array($value)) {
             $inConditions = [];
             foreach (array_keys($value) as $index) {
@@ -384,7 +386,8 @@ abstract class PdoAdapter implements AdapterInterface
      */
     private function bindCondition(PDOStatement $statement, string $key, $condition): void
     {
-        [ $columnName, $operator ] = $this->splitColumnNameAndOperator($key, $condition);
+        $columnNameAndOperator = $this->splitColumnNameAndOperator($key, $condition);
+        $columnName = $columnNameAndOperator['columnName'];
         if (!is_array($condition)) {
             $statement->bindValue('where_' . $columnName, $condition);
             return;
@@ -411,7 +414,7 @@ abstract class PdoAdapter implements AdapterInterface
     /**
      * @param string $key
      * @param mixed $value
-     * @return array<string, string> [ columnName, operator ]
+     * @return array{'columnName': string, 'operator': string}
      */
     private function splitColumnNameAndOperator(string $key, $value): array
     {
@@ -426,32 +429,46 @@ abstract class PdoAdapter implements AdapterInterface
         }
 
         $columnName = trim($columnName);
-
-        if (is_null($value)) {
+        if ($value === null) {
             if ($operator === '=') {
-                return [ $columnName, 'IS' ];
+                return [
+                    'columnName' => $columnName,
+                    'operator' => 'IS',
+                ];
             }
-            if (in_array($operator, [ '!=', '<>' ])) {
-                return [ $columnName, 'IS NOT' ];
+            if (in_array($operator, ['!=', '<>'])) {
+                return [
+                    'columnName' => $columnName,
+                    'operator' => 'IS NOT',
+                ];
             }
             throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for NULL value');
         }
-        
+
         if (is_array($value)) {
             if ($operator === '=') {
-                return [ $columnName, 'IN' ];
+                return [
+                    'columnName' => $columnName,
+                    'operator' => 'IN',
+                ];
             }
-            if (in_array($operator, [ '!=', '<>' ])) {
-                return [ $columnName, 'NOT IN' ];
+            if (in_array($operator, ['!=', '<>'])) {
+                return [
+                    'columnName' => $columnName,
+                    'operator' => 'NOT IN',
+                ];
             }
             throw new UnexpectedValueException('Cannot accept "' . $operator . '" operator for list value');
         }
-        
+
         // always prefer '<>' to '!='
         if ($operator === '!=') {
             $operator = '<>';
         }
-        return [ $columnName, $operator ];
+        return [
+            'columnName' => $columnName,
+            'operator' => $operator
+        ];
     }
 
     /**
