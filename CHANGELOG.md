@@ -5,6 +5,7 @@
 #### Added
 - support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
 - support for views
+- support for PHP 8.1
 
 #### Fixed
 - readme link (Thanks to [Niek Oost](https://github.com/niekoost))
