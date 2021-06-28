@@ -4,7 +4,7 @@ Framework agnostic database migrations for PHP.
 [![PHP unit](https://github.com/lulco/phoenix/workflows/PHPunit/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3APHPunit)
 [![PHPStan level](https://img.shields.io/badge/PHPStan-level:%20max-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
 [![PHP static analysis](https://github.com/lulco/phoenix/workflows/PHP%20static%20analysis/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
+[![SensioLabsInsight](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
 [![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://github.com/lulco/phoenix/actions)
