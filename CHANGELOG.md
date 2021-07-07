@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.9.0] - 2021-07-07
 #### Added
 - support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
 - support for views
@@ -272,7 +273,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.8.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.9.0...HEAD
+[1.9.0]: https://github.com/lulco/phoenix/compare/1.8.0...1.9.0
 [1.8.0]: https://github.com/lulco/phoenix/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/lulco/phoenix/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/lulco/phoenix/compare/1.5.0...1.6.0
