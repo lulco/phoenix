@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [1.9.1] - 2021-08-18
 #### Fixed
 - Mysql: Use FIRST in combination with autoincrement generates wrong query
 
@@ -276,7 +277,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.9.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.9.1...HEAD
+[1.9.1]: https://github.com/lulco/phoenix/compare/1.9.0...1.9.1
 [1.9.0]: https://github.com/lulco/phoenix/compare/1.8.0...1.9.0
 [1.8.0]: https://github.com/lulco/phoenix/compare/1.7.0...1.8.0
 [1.7.0]: https://github.com/lulco/phoenix/compare/1.6.0...1.7.0
