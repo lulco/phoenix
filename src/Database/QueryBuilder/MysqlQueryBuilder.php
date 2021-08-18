@@ -193,9 +193,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createComment($column->getSettings()->getComment(), ' ');
         $col .= $this->createColumnDefault($column);
+        $col .= $column->getSettings()->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         $col .= $this->createColumnPosition($column);
 
-        $col .= $column->getSettings()->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }
 
