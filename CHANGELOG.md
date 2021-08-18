@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for PHP 8.1
+
 ### [1.9.1] - 2021-08-18
 #### Fixed
 - Mysql: Use FIRST in combination with autoincrement generates wrong query
@@ -10,7 +13,6 @@
 #### Added
 - support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
 - support for views
-- support for PHP 8.1
 
 #### Fixed
 - readme link (Thanks to [Niek Oost](https://github.com/niekoost))
