@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Mysql: Use FIRST in combination with autoincrement generates wrong query
+
 ### [1.9.0] - 2021-07-07
 #### Added
 - support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
