@@ -131,6 +131,7 @@ class PgsqlAdapter extends PdoAdapter
             'character varying' => Column::TYPE_STRING,
             'bytea' => Column::TYPE_BLOB,
             'timestamp without time zone' => Column::TYPE_DATETIME,
+            'timestamp with time zone' => Column::TYPE_TIMESTAMP_TZ,
             'USER-DEFINED' => Column::TYPE_ENUM,
             'ARRAY' => Column::TYPE_SET,
             'time without time zone' => Column::TYPE_TIME,
