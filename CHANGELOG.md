@@ -1,6 +1,8 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+#### Added
+- timestamptz (timestamp with time zone) column type for pgsql
 
 ### [1.9.1] - 2021-08-18
 #### Fixed
