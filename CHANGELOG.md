@@ -1,8 +1,10 @@
 ## Change Log
 
 ### [Unreleased][unreleased]
+
+### [1.10.0] - 2021-08-23
 #### Added
-- timestamptz (timestamp with time zone) column type for pgsql
+- timestamptz (timestamp with time zone) column type for pgsql (Thanks to [Taichi Inaba](https://github.com/chatii))
 
 ### [1.9.1] - 2021-08-18
 #### Fixed
@@ -279,7 +281,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.9.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.10.0...HEAD
+[1.10.0]: https://github.com/lulco/phoenix/compare/1.9.1...1.10.0
 [1.9.1]: https://github.com/lulco/phoenix/compare/1.9.0...1.9.1
 [1.9.0]: https://github.com/lulco/phoenix/compare/1.8.0...1.9.0
 [1.8.0]: https://github.com/lulco/phoenix/compare/1.7.0...1.8.0
