@@ -165,7 +165,7 @@ class MysqlAdapter extends PdoAdapter
             }
 
             $tablesIndexes[$tableName][$indexName]['columns'][$index['SEQ_IN_INDEX']] = new IndexColumn($index['COLUMN_NAME'], $indexColumnSettings);
-            $tablesIndexes[$tableName][$indexName]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$tableName][$indexName]['type'] = in_array($index['NON_UNIQUE'], [0, '0'], true) ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
             $tablesIndexes[$tableName][$indexName]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
         return $tablesIndexes;

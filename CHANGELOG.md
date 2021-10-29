@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for PHP 8.1
+
 ### [1.10.0] - 2021-08-23
 #### Added
 - timestamptz (timestamp with time zone) column type for pgsql (Thanks to [Taichi Inaba](https://github.com/chatii))
