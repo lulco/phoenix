@@ -1,6 +1,3 @@
-includes:
-    - phpstan-php8x.php
-
 parameters:
     earlyTerminatingMethodCalls:
         Phoenix\Database\Adapter\PdoAdapter:
