@@ -12,7 +12,7 @@ use Phoenix\Database\Element\MigrationView;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
-    /** @var array<string, mixed> */
+    /** @var array<string, int|array{int, int}> */
     protected $defaultLength = [];
 
     /** @var AdapterInterface */
@@ -26,15 +26,20 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     protected function createType(Column $column, MigrationTable $table): string
     {
         if (in_array($column->getType(), [Column::TYPE_NUMERIC, Column::TYPE_DECIMAL, Column::TYPE_FLOAT, Column::TYPE_DOUBLE], true)) {
+            /** @var array{?int, ?int} $lengthAndDecimals */
+            $lengthAndDecimals = $this->defaultLength[$column->getType()] ?? [null, null];
+            [$length, $decimals] = $lengthAndDecimals;
             return sprintf(
                 $this->remapType($column),
-                $column->getSettings()->getLength(isset($this->defaultLength[$column->getType()][0]) ? $this->defaultLength[$column->getType()][0] : null),
-                $column->getSettings()->getDecimals(isset($this->defaultLength[$column->getType()][1]) ? $this->defaultLength[$column->getType()][1] : null)
+                $column->getSettings()->getLength($length),
+                $column->getSettings()->getDecimals($decimals)
             );
         } elseif (in_array($column->getType(), [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
             return $this->createEnumSetColumn($column, $table);
         }
-        return sprintf($this->remapType($column), $column->getSettings()->getLength(isset($this->defaultLength[$column->getType()]) ? $this->defaultLength[$column->getType()] : null));
+        /** @var ?int $length */
+        $length = $this->defaultLength[$column->getType()] ?? null;
+        return sprintf($this->remapType($column), $column->getSettings()->getLength($length));
     }
 
     protected function remapType(Column $column): string

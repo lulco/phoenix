@@ -18,7 +18,7 @@ trait ColumnsToChangeBehavior
      * @param string $oldName
      * @param string $newName
      * @param string $type
-     * @param array<string, mixed> $settings
+     * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings
      * @return MigrationTable
      * @throws InvalidArgumentValueException
      */
