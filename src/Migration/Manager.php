@@ -110,7 +110,7 @@ class Manager
 
         $filesFinder = new FilesFinder();
         foreach ($this->config->getMigrationDirs() as $identifier => $directory) {
-            if (empty($dirs) || (!empty($dirs) && in_array($identifier, $dirs, true))) {
+            if (empty($dirs) || in_array($identifier, $dirs, true)) {
                 $filesFinder->addDirectory($directory);
             }
         }
@@ -123,7 +123,7 @@ class Manager
             /** @var class-string $className */
             $className = $classNameCreator->getClassName();
 
-            if (empty($classes) || (!empty($classes) && in_array($className, $classes, true))) {
+            if (empty($classes) || in_array($className, $classes, true)) {
                 $migrationIdentifier = $classNameCreator->getDatetime() . '|' . $className;
 
                 $reflection = new ReflectionClass($className);

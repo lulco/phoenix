@@ -4,6 +4,7 @@
 
 #### Added
 - support for PHP 8.1
+- support for `CURRENT_TIMESTAMP` for columns with type `datetime`
 
 ### [1.10.0] - 2021-08-23
 #### Added
