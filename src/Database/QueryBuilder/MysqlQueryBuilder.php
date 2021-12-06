@@ -216,7 +216,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             if (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
                 return $default . intval($column->getSettings()->getDefault());
             }
-            if ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+            if (($column->getType() === Column::TYPE_TIMESTAMP || $column->getType() === Column::TYPE_DATETIME) && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
                 if ($column->getSettings()->allowNull()) {
                     $default = ' NULL' . $default;
                 }
