@@ -268,6 +268,7 @@ abstract class AbstractMigration
                     $settings[ColumnSettings::SETTING_COLLATION] = $targetCollation;
                 }
                 if ($settings !== $actualSettings) {
+                    /** @var array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings */
                     $migrationTable->changeColumn($column->getName(), $column->getName(), $column->getType(), $settings);
                 }
             }
