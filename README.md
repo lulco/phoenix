@@ -2,7 +2,7 @@
 Framework agnostic database migrations for PHP.
 
 [![PHP unit](https://github.com/lulco/phoenix/workflows/PHPunit/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3APHPunit)
-[![PHPStan level](https://img.shields.io/badge/PHPStan-level:%20max-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
+[![PHPStan level](https://img.shields.io/badge/PHPStan-level:%208-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
 [![PHP static analysis](https://github.com/lulco/phoenix/workflows/PHP%20static%20analysis/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
 [![SensioLabsInsight](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
