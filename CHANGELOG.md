@@ -2,9 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+### [1.11.0] - 2021-12-06
 #### Added
 - support for PHP 8.1
-- support for `CURRENT_TIMESTAMP` for columns with type `datetime`
+- support for `CURRENT_TIMESTAMP` for columns with type `datetime` (Thanks to [Jared Cheney](https://github.com/jaredc))
 
 ### [1.10.0] - 2021-08-23
 #### Added
@@ -285,7 +286,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.10.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.11.0...HEAD
+[1.11.0]: https://github.com/lulco/phoenix/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/lulco/phoenix/compare/1.9.1...1.10.0
 [1.9.1]: https://github.com/lulco/phoenix/compare/1.9.0...1.9.1
 [1.9.0]: https://github.com/lulco/phoenix/compare/1.8.0...1.9.0
