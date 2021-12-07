@@ -2,8 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+### [1.11.1] - 2021-12-07
 #### Fixed
-- Removed phpspec/prophecy from replace
+- Removed phpspec/prophecy from misused replace in composer.json
 
 ### [1.11.0] - 2021-12-06
 #### Added
@@ -289,7 +290,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.11.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.11.1...HEAD
+[1.11.1]: https://github.com/lulco/phoenix/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/lulco/phoenix/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/lulco/phoenix/compare/1.9.1...1.10.0
 [1.9.1]: https://github.com/lulco/phoenix/compare/1.9.0...1.9.1
