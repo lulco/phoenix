@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Fixed
+- Removed phpspec/prophecy from replace
+
 ### [1.11.0] - 2021-12-06
 #### Added
 - support for PHP 8.1
