@@ -4,7 +4,7 @@
 
 ### [1.11.1] - 2021-12-07
 #### Fixed
-- Removed phpspec/prophecy from misused replace in composer.json
+- Removed phpspec/prophecy from misused replace in `composer.json`
 
 ### [1.11.0] - 2021-12-06
 #### Added
