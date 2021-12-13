@@ -15,6 +15,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function typeMap(): array
     {
         return [
+            Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'tinyint(%d)',
             Column::TYPE_SMALL_INTEGER => 'smallint(%d)',
             Column::TYPE_MEDIUM_INTEGER => 'mediumint(%d)',
@@ -51,6 +52,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     protected $defaultLength = [
         Column::TYPE_STRING => 255,
+        Column::TYPE_BIT => 32,
         Column::TYPE_TINY_INTEGER => 4,
         Column::TYPE_SMALL_INTEGER => 6,
         Column::TYPE_MEDIUM_INTEGER => 9,
@@ -191,9 +193,9 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         $col .= $column->getSettings()->allowNull() ? '' : ' NOT NULL';
         $col .= $this->createComment($column->getSettings()->getComment(), ' ');
         $col .= $this->createColumnDefault($column);
+        $col .= $column->getSettings()->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         $col .= $this->createColumnPosition($column);
 
-        $col .= $column->getSettings()->isAutoincrement() ? ' AUTO_INCREMENT' : '';
         return $col;
     }
 
@@ -208,16 +210,19 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
         if ($column->getSettings()->getDefault() !== null || $column->getType() === Column::TYPE_BOOLEAN) {
             $default = ' DEFAULT ';
-            if ($column->getType() === Column::TYPE_INTEGER) {
+            if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
                 return $default . $column->getSettings()->getDefault();
             }
-            if ($column->getType() === Column::TYPE_BOOLEAN) {
+            if (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
                 return $default . intval($column->getSettings()->getDefault());
             }
-            if ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+            if (($column->getType() === Column::TYPE_TIMESTAMP || $column->getType() === Column::TYPE_DATETIME) && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+                if ($column->getSettings()->allowNull()) {
+                    $default = ' NULL' . $default;
+                }
                 return $default . 'CURRENT_TIMESTAMP';
             }
-            return $default . "'" . $column->getSettings()->getDefault() . "'";
+            return $default . "'" . $this->sanitizeSingleQuote($column->getSettings()->getDefault()) . "'";
         }
 
         return '';
@@ -322,7 +327,13 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         if ($comment === null) {
             return '';
         }
+        $comment = $this->sanitizeSingleQuote($comment);
         return " COMMENT$glue'$comment'";
+    }
+
+    private function sanitizeSingleQuote(string $input): string
+    {
+        return str_replace("'", "\'", $input);
     }
 
     protected function createEnumSetColumn(Column $column, MigrationTable $table): string

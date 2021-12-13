@@ -77,7 +77,7 @@ class MigrationTable
     /**
      * @param string $name
      * @param string $type
-     * @param array<string, mixed> $settings
+     * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings
      * @return MigrationTable
      * @throws InvalidArgumentValueException
      */
@@ -196,6 +196,7 @@ class MigrationTable
     public function toTable(): Table
     {
         $table = new Table($this->getName());
+        $table->setAutoIncrement($this->getAutoIncrement());
         $table->setCharset($this->getCharset());
         $table->setCollation($this->getCollation());
         $table->setComment($this->getComment());

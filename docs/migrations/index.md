@@ -15,6 +15,8 @@ $this->table('users')
     ->create();
 ```
 
+Read more about [primary keys](primary_keys.md).
+
 #### Change table
 Add column, drop column, rename column, change column, add index, drop index, add foreign key, drop foreign key
 ```php
@@ -48,12 +50,7 @@ $this->table('users')
     ->rename('frontend_users');
 ```
 
-#### Add an autoincrement primary column to an existing table
-```php
-$this->table('table_without_primary_key')
-    ->addPrimaryColumns([new Column('id', 'integer', ['autoincrement' => true])])
-    ->save();
-```
+
 
 #### Check if table exists
 ```php
@@ -86,5 +83,41 @@ $this->execute('CREATE TABLE `first_table` (
         PRIMARY KEY (`id`),
         UNIQUE KEY `idx_first_table_url` (`url`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'
+);
+```
+
+### Fetch data
+`$this->fetch` and `$this->fetchAll` accept the following arguments:
+name|description|type|optional|default
+-|-|-|-|-
+table|The name of the table from which fetch the data|string|no|-
+fields|A list of column names to return|array|yes|`['*']`
+conditions|A list of condition, where the key of the associative array will be the column name and the value will be the compared value.<br><br>By default the operator of the comparison is '=' but you can specify the operator in the array key just after the column name preceded by a space (e.g. `column !=` or `column >`)|array|yes|`[]`
+groups|A list of column names to group by|array|yes|`[]`
+
+#### Fetch with conditions
+```php
+$trackableOrders = $this->fetchAll(
+    'orders',
+    [
+        'id'
+    ],
+    [
+        'user_id' => 12,
+        'tracking_id !=' => null
+    ]
+);
+```
+
+```php
+$orders = $this->fetchAll(
+    'orders',
+    [
+        'id'
+    ],
+    [
+        'user_id =' => 12,
+        'price >=' => 23.50
+    ]
 );
 ```

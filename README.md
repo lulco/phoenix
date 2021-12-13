@@ -2,9 +2,9 @@
 Framework agnostic database migrations for PHP.
 
 [![PHP unit](https://github.com/lulco/phoenix/workflows/PHPunit/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3APHPunit)
-[![PHPStan level](https://img.shields.io/badge/PHPStan-level:%20max-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
+[![PHPStan level](https://img.shields.io/badge/PHPStan-level:%208-brightgreen.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
 [![PHP static analysis](https://github.com/lulco/phoenix/workflows/PHP%20static%20analysis/badge.svg)](https://github.com/lulco/phoenix/actions?query=workflow%3A"PHP+static+analysis")
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.sensiolabs.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
+[![SensioLabsInsight](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0/mini.png)](https://insight.symfony.com/projects/dd8723c4-85ea-4c28-b489-9cc7937264d0)
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
 [![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://github.com/lulco/phoenix/actions)
@@ -12,6 +12,7 @@ Framework agnostic database migrations for PHP.
 ## Features
 - Validation all settings in migration before executing first query
 - Multiple migration directories
+- Support for views
 - Migrate up and down
 - Print executed queries (in debug mode -vvv)
 - Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
@@ -27,6 +28,7 @@ Framework agnostic database migrations for PHP.
 - PHPStorm suggestions (works even better with deep-assoc-completion plugin)
 - Change collation for all existing tables and columns
 - Turn foreign keys check on / off in migration
+- Simple autowiring in migrations
 
 ## Supported adapters
 - MySql
@@ -35,7 +37,7 @@ Framework agnostic database migrations for PHP.
 ## Installation
 
 ### Composer
-This library requires PHP 7.1 or later (7.2, 7.3, 7.4). It works also on PHP 8.0. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
+This library requires PHP 7.1 or later (7.2, 7.3, 7.4). It works also on PHP 8.0 and PHP 8.1. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
 
 ```
 composer require lulco/phoenix
@@ -90,6 +92,7 @@ To run commands, use command runner `vendor/bin/phoenix` or `vendor/lulco/phoeni
 - `migrate` - run migrations
 - `rollback` - rollback migrations
 - `dump` - create migration from existing database
+- `diff` - create migration as diff of two existing database structures
 - `status` - list of migrations already executed and list of migrations to execute
 - `test` - test next migration by executing migrate, rollback, migrate for it
 - `cleanup` - rollback all migrations and delete log table
@@ -251,6 +254,7 @@ All done. Took 0.0401s
 ### [Dump command](docs/commands/dump_command.md)
 Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
 If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
+It also helps you when you want to [change mysql to postgres or vice versa](docs/examples/how_to_change_mysql_to_pgsql.md)
 
 ### [Diff command](docs/commands/diff_command.md)
 Command `php vendor/bin/phoenix diff` creates migration as diff of two existing database structures.
@@ -314,4 +318,4 @@ Test finished successfully
 
 All done. Took 0.2840s
 ```
-Read more about commands [here](docs/commands/commands.md)
+Read more about commands [here](docs/commands/index.md)

@@ -4,6 +4,7 @@ namespace Phoenix\Database\QueryBuilder;
 
 use PDOStatement;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\MigrationView;
 
 interface QueryBuilderInterface
 {
@@ -43,6 +44,24 @@ interface QueryBuilderInterface
      */
     public function truncateTable(MigrationTable $table): array;
 
+    /**
+     * @param MigrationView $view
+     * @return string[] list of queries
+     */
+    public function createView(MigrationView $view): array;
+
+    /**
+     * @param MigrationView $view
+     * @return string[] list of queries
+     */
+    public function replaceView(MigrationView $view): array;
+
+    /**
+     * @param MigrationView $view
+     * @return string[] list of queries
+     */
+    public function dropView(MigrationView $view): array;
+    
     /**
      * @param string|null $string
      * @return string escaped string

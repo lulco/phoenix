@@ -49,7 +49,7 @@ class MysqlAdapter extends PdoAdapter
     protected function loadTables(string $database): array
     {
         /** @var array<string[]> $tables */
-        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
+        $tables = $this->query(sprintf("SELECT TABLE_NAME AS table_name, TABLE_COLLATION AS table_collation, TABLE_COMMENT as table_comment, AUTO_INCREMENT as auto_increment FROM information_schema.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '%s' ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
         return $tables;
     }
 
@@ -64,6 +64,9 @@ class MysqlAdapter extends PdoAdapter
         if ($table['table_comment']) {
             $migrationTable->setComment($table['table_comment']);
         }
+        if ($table['auto_increment']) {
+            $migrationTable->setAutoIncrement((int)$table['auto_increment']);
+        }
         return $migrationTable;
     }
 
@@ -71,6 +74,7 @@ class MysqlAdapter extends PdoAdapter
     {
         $types = [
             'int' => Column::TYPE_INTEGER,
+            'bit' => Column::TYPE_BIT,
             'tinyint' => Column::TYPE_TINY_INTEGER,
             'smallint' => Column::TYPE_SMALL_INTEGER,
             'mediumint' => Column::TYPE_MEDIUM_INTEGER,
@@ -100,11 +104,14 @@ class MysqlAdapter extends PdoAdapter
         $settings = $this->prepareSettings($column);
         if ($type === Column::TYPE_CHAR && $settings[ColumnSettings::SETTING_LENGTH] === 36) {
             $type = Column::TYPE_UUID;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
-        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1) {
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
+        } elseif ($type === Column::TYPE_TINY_INTEGER && $settings[ColumnSettings::SETTING_LENGTH] === 1 && in_array($settings[ColumnSettings::SETTING_DEFAULT], ['0', '1'], true)) {
             $type = Column::TYPE_BOOLEAN;
-            $settings[ColumnSettings::SETTING_LENGTH] = null;
             $settings[ColumnSettings::SETTING_DEFAULT] = (bool)$settings[ColumnSettings::SETTING_DEFAULT];
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
+            unset($settings[ColumnSettings::SETTING_SIGNED]);
+        } elseif ($type === Column::TYPE_YEAR) {
+            unset($settings[ColumnSettings::SETTING_LENGTH]);
         }
         $migrationTable->addColumn($column['COLUMN_NAME'], $type, $settings);
     }
@@ -158,7 +165,7 @@ class MysqlAdapter extends PdoAdapter
             }
 
             $tablesIndexes[$tableName][$indexName]['columns'][$index['SEQ_IN_INDEX']] = new IndexColumn($index['COLUMN_NAME'], $indexColumnSettings);
-            $tablesIndexes[$tableName][$indexName]['type'] = $index['NON_UNIQUE'] === '0' ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
+            $tablesIndexes[$tableName][$indexName]['type'] = in_array($index['NON_UNIQUE'], [0, '0'], true) ? Index::TYPE_UNIQUE : ($index['INDEX_TYPE'] === 'FULLTEXT' ? Index::TYPE_FULLTEXT : Index::TYPE_NORMAL);
             $tablesIndexes[$tableName][$indexName]['method'] = $index['INDEX_TYPE'] === 'FULLTEXT' ? Index::METHOD_DEFAULT : $index['INDEX_TYPE'];
         }
         return $tablesIndexes;
