@@ -10,17 +10,13 @@ use Phoenix\Exception\InvalidArgumentValueException;
 trait IndexBehavior
 {
     /** @var Index[] */
-    private $indexes = [];
+    private array $indexes = [];
 
     /** @var string[]  */
-    private $indexesToDrop = [];
+    private array $indexesToDrop = [];
 
     /**
      * @param string|string[]|IndexColumn|IndexColumn[] $columns name(s) of column(s) or IndexColumn instance(s)
-     * @param string $type type of index (unique, fulltext) default ''
-     * @param string $method method of index (btree, hash) default ''
-     * @param string $name name of index
-     * @return MigrationTable
      * @throws InvalidArgumentValueException if index type or index method is not allowed
      */
     public function addIndex($columns, string $type = Index::TYPE_NORMAL, string $method = Index::METHOD_DEFAULT, string $name = ''): MigrationTable

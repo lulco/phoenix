@@ -24,8 +24,7 @@ class CleanupCommand extends AbstractCommand
             $migration->rollback();
             $this->manager->removeExecution($migration);
 
-            $this->writeln('');
-            $this->writeln('<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>');
+            $this->writeln(['', '<info>Rollback for migration ' . $migration->getClassName() . ' executed</info>']);
             $executedMigrations[] = $this->addMigrationToList($migration);
         }
 
@@ -34,11 +33,10 @@ class CleanupCommand extends AbstractCommand
         $migration = new Init($this->adapter, $this->getConfig()->getLogTableName());
         $migration->rollback();
 
-        $this->writeln('');
-        $this->writeln('<info>Phoenix cleaned</info>');
+        $this->writeln(['', '<info>Phoenix cleaned</info>']);
         $this->outputData['message'] = 'Phoenix cleaned';
         $executedMigrations[] = $this->addMigrationToList($migration);
-        $this->writeln('');
+        $this->writeln(['']);
 
         if ($this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
             $this->outputData['executed_migrations'] = $executedMigrations;
@@ -52,7 +50,7 @@ class CleanupCommand extends AbstractCommand
     private function addMigrationToList(AbstractMigration $migration): array
     {
         $executedQueries = $migration->getExecutedQueries();
-        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln(['Executed queries:', OutputInterface::VERBOSITY_DEBUG]);
         $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
         $executedMigration = [

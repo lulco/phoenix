@@ -13,10 +13,9 @@ use Phoenix\Database\Element\MigrationView;
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
     /** @var array<string, int|array{int, int}> */
-    protected $defaultLength = [];
+    protected array $defaultLength = [];
 
-    /** @var AdapterInterface */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -64,7 +63,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @return string[]
      */
     protected function addColumns(MigrationTable $table): array
@@ -77,9 +75,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @param Column[] $columns
-     * @return string
      */
     protected function addColumnsQuery(MigrationTable $table, array $columns): string
     {
@@ -101,7 +97,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @return array<PDOStatement|string>
      */
     protected function addPrimaryKey(MigrationTable $table): array
@@ -146,7 +141,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @return string[]
      */
     protected function dropIndexes(MigrationTable $table): array
@@ -188,7 +182,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @return string[]
      */
     protected function addForeignKeys(MigrationTable $table): array
@@ -223,9 +216,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
-     * @param string $primaryKeyName
-     * @param string $foreignKeyPrefix
      * @return string[]
      */
     protected function dropKeys(MigrationTable $table, string $primaryKeyName, string $foreignKeyPrefix): array
@@ -246,7 +236,6 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @return PDOStatement[]
      */
     protected function copyAndAddData(MigrationTable $table): array
@@ -271,9 +260,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @param MigrationTable $table
      * @param array<array<string, mixed>> $oldData
-     * @return PDOStatement
      */
     private function createCopyAndAddDataQuery(MigrationTable $table, array $oldData): PDOStatement
     {

@@ -18,16 +18,13 @@ class Index
     const METHOD_HASH = 'HASH';
 
     /** @var IndexColumn[] */
-    private $columns = [];
+    private array $columns = [];
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var string */
-    private $method;
+    private string $method;
 
     /**
      * @param IndexColumn[] $columns

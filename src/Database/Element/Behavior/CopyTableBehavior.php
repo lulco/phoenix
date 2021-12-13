@@ -9,14 +9,11 @@ trait CopyTableBehavior
 {
     use ParamsCheckerBehavior;
 
-    /** @var string */
-    private $action;
+    private string $action;
 
-    /** @var string */
-    private $newName;
+    private string $newName;
 
-    /** @var string */
-    private $copyType;
+    private string $copyType;
 
     public function getCopyType(): string
     {

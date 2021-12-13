@@ -9,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TestCommand extends AbstractCommand
 {
-    /** @var array<int, array<string, mixed>> */
-    private $executedMigrations = [];
+    /** @var array<int, array{classname: string, type: string, execution_time: float}> */
+    private array $executedMigrations = [];
 
     protected function configure(): void
     {
@@ -22,12 +22,10 @@ class TestCommand extends AbstractCommand
 
     protected function runCommand(): void
     {
-        $this->writeln('');
-        $this->writeln('<comment>Test started...</comment>');
+        $this->writeln(['', '<comment>Test started...</comment>']);
 
         if ($this->migrate() === 0) {
-            $this->writeln('');
-            $this->writeln('<comment>Nothing to test</comment>');
+            $this->writeln(['', '<comment>Nothing to test</comment>']);
             $this->outputData['executed_migrations'] = $this->executedMigrations;
             return;
         }
@@ -38,8 +36,7 @@ class TestCommand extends AbstractCommand
             $this->rollback();
         }
 
-        $this->writeln('');
-        $this->writeln('<comment>Test finished successfully</comment>');
+        $this->writeln(['', '<comment>Test finished successfully</comment>']);
         $this->outputData['executed_migrations'] = $this->executedMigrations;
     }
 
@@ -47,13 +44,12 @@ class TestCommand extends AbstractCommand
     {
         $upMigrations = $this->manager->findMigrationsToExecute(Manager::TYPE_UP, Manager::TARGET_FIRST);
         foreach ($upMigrations as $upMigration) {
-            $this->writeln('');
-            $this->writeln('<info>Migration ' . $upMigration->getClassName() . ' executing...</info>');
+            $this->writeln(['', '<info>Migration ' . $upMigration->getClassName() . ' executing...</info>']);
             $start = microtime(true);
             $upMigration->migrate();
             $executionTime = microtime(true) - $start;
             $this->manager->logExecution($upMigration);
-            $this->writeln('<info>Migration ' . $upMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
+            $this->writeln(['<info>Migration ' . $upMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>']);
             $this->logMigration($upMigration, 'migrate', $executionTime);
         }
         return count($upMigrations);
@@ -63,13 +59,12 @@ class TestCommand extends AbstractCommand
     {
         $downMigrations = $this->manager->findMigrationsToExecute(Manager::TYPE_DOWN, Manager::TARGET_FIRST);
         foreach ($downMigrations as $downMigration) {
-            $this->writeln('');
-            $this->writeln('<info>Rollback for migration ' . $downMigration->getClassName() . ' executing...</info>');
+            $this->writeln(['', '<info>Rollback for migration ' . $downMigration->getClassName() . ' executing...</info>']);
             $start = microtime(true);
             $downMigration->rollback();
             $executionTime = microtime(true) - $start;
             $this->manager->removeExecution($downMigration);
-            $this->writeln('<info>Rollback for migration ' . $downMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
+            $this->writeln(['<info>Rollback for migration ' . $downMigration->getClassName() . ' executed.</info> <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>']);
             $this->logMigration($downMigration, 'rollback', $executionTime);
         }
     }
@@ -77,7 +72,7 @@ class TestCommand extends AbstractCommand
     private function logMigration(AbstractMigration $migration, string $type, float $executionTime): void
     {
         $executedQueries = $migration->getExecutedQueries();
-        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
         $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
         $executedMigration = [

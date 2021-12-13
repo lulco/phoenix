@@ -47,23 +47,20 @@ class MigrationTable
 
     const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
-    /** @var string */
-    private $action;
+    private string $action;
 
     /** @var mixed */
     private $tmpPrimaryKey;
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string|null */
-    private $newName;
+    private ?string $newName;
 
     /** @var Column[] */
-    private $columns = [];
+    private array $columns = [];
 
     /** @var string[] */
-    private $primaryColumnNames = [];
+    private array $primaryColumnNames = [];
 
     /**
      * @param mixed $primaryKey @see addPrimary()
@@ -75,10 +72,7 @@ class MigrationTable
     }
 
     /**
-     * @param string $name
-     * @param string $type
      * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings
-     * @return MigrationTable
      * @throws InvalidArgumentValueException
      */
     public function addColumn(string $name, string $type, array $settings = []): MigrationTable

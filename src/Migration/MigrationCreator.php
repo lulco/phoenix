@@ -6,11 +6,9 @@ use Phoenix\Templates\TemplateManager;
 
 class MigrationCreator
 {
-    /** @var MigrationNameCreator */
-    private $migrationNameCreator;
+    private MigrationNameCreator $migrationNameCreator;
 
-    /** @var TemplateManager */
-    private $templateManager;
+    private TemplateManager $templateManager;
 
     public function __construct(string $migration, string $indent, ?string $templatePath = null)
     {

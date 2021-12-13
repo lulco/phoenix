@@ -15,8 +15,7 @@ use Phoenix\Exception\DatabaseQueryExecuteException;
 
 class PgsqlAdapter extends PdoAdapter
 {
-    /** @var PgsqlQueryBuilder|null */
-    private $queryBuilder;
+    private ?PgsqlQueryBuilder $queryBuilder;
 
     public function getQueryBuilder(): PgsqlQueryBuilder
     {
@@ -140,9 +139,7 @@ class PgsqlAdapter extends PdoAdapter
     }
 
     /**
-     * @param string $type
      * @param array<string, mixed> $column
-     * @param string $table
      * @return array<string, mixed>
      * @throws DatabaseQueryExecuteException
      */
@@ -174,7 +171,6 @@ class PgsqlAdapter extends PdoAdapter
 
     /**
      * @param array<string, mixed> $column
-     * @param string $type
      * @return mixed
      */
     private function prepareDefault(array $column, string $type)

@@ -6,8 +6,7 @@ use Phoenix\Database\Element\MigrationTable;
 
 trait CommentBehavior
 {
-    /** @var string|null */
-    private $comment;
+    private ?string $comment;
 
     public function setComment(?string $comment): MigrationTable
     {

@@ -8,11 +8,9 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MigrateCommand extends AbstractRunCommand
 {
-    /** @var string */
-    protected $noMigrationsFoundMessage = 'Nothing to migrate';
+    protected string $noMigrationsFoundMessage = 'Nothing to migrate';
 
-    /** @var string */
-    protected $migrationInfoPrefix = 'Migration';
+    protected string $migrationInfoPrefix = 'Migration';
 
     protected function configure(): void
     {

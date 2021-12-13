@@ -7,14 +7,11 @@ use Phoenix\Migration\MigrationNameCreator;
 
 class TemplateManager
 {
-    /** @var MigrationNameCreator */
-    private $migrationNameCreator;
+    private MigrationNameCreator $migrationNameCreator;
 
-    /** @var string */
-    private $indent;
+    private string $indent;
 
-    /** @var string */
-    private $templatePath;
+    private string $templatePath;
 
     public function __construct(MigrationNameCreator $migrationNameCreator, string $indent, ?string $templatePath = null)
     {

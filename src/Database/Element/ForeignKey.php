@@ -16,27 +16,21 @@ class ForeignKey
     const SET_NULL = 'SET NULL';
 
     /** @var string[] */
-    private $columns = [];
+    private array $columns = [];
 
-    /** @var string */
-    private $referencedTable;
+    private string $referencedTable;
 
     /** @var string[] */
-    private $referencedColumns;
+    private array $referencedColumns;
 
-    /** @var string */
-    private $onDelete;
+    private string $onDelete;
 
-    /** @var string */
-    private $onUpdate;
+    private string $onUpdate;
 
     /**
      * ForeignKey constructor.
      * @param string[] $columns
-     * @param string $referencedTable
      * @param string[] $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
      * @throws InvalidArgumentValueException if onDelete action or onUpdate action is not allowed
      */
     public function __construct(array $columns, string $referencedTable, array $referencedColumns = ['id'], string $onDelete = self::DEFAULT_ACTION, string $onUpdate = self::DEFAULT_ACTION)

@@ -40,8 +40,7 @@ class CreateCommand extends AbstractCommand
         $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create(str_repeat($indent, 2), str_repeat($indent, 2), $migrationDir);
 
-        $this->writeln('');
-        $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
+        $this->writeln(['', '<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>']);
 
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;

@@ -7,7 +7,7 @@ class EnvironmentConfig
     /**
      * @var array<string, mixed>
      */
-    private $configuration;
+    private array $configuration;
 
     /**
      * @param array<string, mixed> $configuration

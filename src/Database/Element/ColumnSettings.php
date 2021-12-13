@@ -21,7 +21,7 @@ class ColumnSettings
     const SETTING_COMMENT = 'comment';
 
     /** @var array<string, array<callable>> */
-    private $allowedSettingsValues = [
+    private array $allowedSettingsValues = [
         self::SETTING_NULL => ['is_bool'],
         self::SETTING_DEFAULT => ['is_null', 'is_numeric', 'is_string', 'is_bool'],
         self::SETTING_LENGTH => ['is_null', 'is_int'],
@@ -39,7 +39,7 @@ class ColumnSettings
     const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 
     /** @var array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} */
-    private $settings;
+    private array $settings;
 
     /**
      * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings - list of settings
@@ -150,9 +150,7 @@ class ColumnSettings
     }
 
     /**
-     * @param string $setting
      * @param mixed $value
-     * @return string|null
      */
     private function getValueError(string $setting, $value): ?string
     {
