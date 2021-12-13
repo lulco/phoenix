@@ -3,11 +3,12 @@ Before start using phoenix you need to create configuration file. If you don't w
 
 Basically configuration is an array which is passed to phoenix commands. Files with extensions yml (yaml), neon and json are parsed, php configuration file is included. It means that php file has to return an configuration array directly.
 
-Configuration array consist of four parts:
-- `log_table_name` - string - default "phoenix_log"
+Configuration array can consist of five parts:
+- `log_table_name` - string - name of the table where executed migrations are stored, default "phoenix_log"
 - `migration_dirs` - array - list of migration directories where migrations can be stored in. Array keys are used as directory identifier, values are paths to directories.
 - `environments` - array - list of environment where migrations are executed, e.g. local, staging, production etc.
 - `default_environment` - string - environment which is used in phoenix command if `--environment` option is not set. It has to be one of keys from `environments` array. If no `default_environment` is set, first of `environments` is used.
+- `dependencies` - array - list of dependencies which can be used in __construct of Migration classes. Key is type of dependency (class or interface name which will be used in __construct) and value is object of this type
 
 ### Example
 Let's say you want to create configuration file, where `log_table_name` is "my_phoenix_log", you have two `migration_dirs` (first and second, which are located in the same directory as configuration file), also two `environments` both uses mysql adapter, and your `default_environment` is "local". Now we show you, how this config looks like using different type of configuration files:

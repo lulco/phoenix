@@ -38,11 +38,11 @@ class ColumnSettings
 
     const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 
-    /** @var array<string, mixed> */
-    private $settings = [];
+    /** @var array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} */
+    private $settings;
 
     /**
-     * @param array<string, mixed> $settings - list of settings, available keys: null, default, length, decimals, signed, autoincrement, after, first, charset, collation, values, comment
+     * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings - list of settings
      * @throws InvalidArgumentValueException if setting is not allowed
      */
     public function __construct(array $settings = [])
@@ -52,7 +52,7 @@ class ColumnSettings
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string}
      */
     public function getSettings(): array
     {
@@ -61,7 +61,7 @@ class ColumnSettings
 
     public function allowNull(): bool
     {
-        return isset($this->settings[self::SETTING_NULL]) ? $this->settings[self::SETTING_NULL] : false;
+        return $this->settings[self::SETTING_NULL] ?? false;
     }
 
     /**
@@ -69,47 +69,47 @@ class ColumnSettings
      */
     public function getDefault()
     {
-        return isset($this->settings[self::SETTING_DEFAULT]) ? $this->settings[self::SETTING_DEFAULT] : null;
+        return $this->settings[self::SETTING_DEFAULT] ?? null;
     }
 
     public function isSigned(): bool
     {
-        return isset($this->settings[self::SETTING_SIGNED]) ? $this->settings[self::SETTING_SIGNED] : true;
+        return $this->settings[self::SETTING_SIGNED] ?? true;
     }
 
     public function getLength(?int $default = null): ?int
     {
-        return isset($this->settings[self::SETTING_LENGTH]) ? $this->settings[self::SETTING_LENGTH] : $default;
+        return $this->settings[self::SETTING_LENGTH] ?? $default;
     }
 
     public function getDecimals(?int $default = null): ?int
     {
-        return isset($this->settings[self::SETTING_DECIMALS]) ? $this->settings[self::SETTING_DECIMALS] : $default;
+        return $this->settings[self::SETTING_DECIMALS] ?? $default;
     }
 
     public function isAutoincrement(): bool
     {
-        return isset($this->settings[self::SETTING_AUTOINCREMENT]) ? $this->settings[self::SETTING_AUTOINCREMENT] : false;
+        return $this->settings[self::SETTING_AUTOINCREMENT] ?? false;
     }
 
     public function getAfter(): ?string
     {
-        return isset($this->settings[self::SETTING_AFTER]) ? $this->settings[self::SETTING_AFTER] : null;
+        return $this->settings[self::SETTING_AFTER] ?? null;
     }
 
     public function isFirst(): bool
     {
-        return isset($this->settings[self::SETTING_FIRST]) ? $this->settings[self::SETTING_FIRST] : false;
+        return $this->settings[self::SETTING_FIRST] ?? false;
     }
 
     public function getCharset(): ?string
     {
-        return isset($this->settings[self::SETTING_CHARSET]) ? $this->settings[self::SETTING_CHARSET] : null;
+        return $this->settings[self::SETTING_CHARSET] ?? null;
     }
 
     public function getCollation(): ?string
     {
-        return isset($this->settings[self::SETTING_COLLATION]) ? $this->settings[self::SETTING_COLLATION] : null;
+        return $this->settings[self::SETTING_COLLATION] ?? null;
     }
 
     /**
@@ -117,12 +117,12 @@ class ColumnSettings
      */
     public function getValues(): ?array
     {
-        return isset($this->settings[self::SETTING_VALUES]) ? $this->settings[self::SETTING_VALUES] : null;
+        return $this->settings[self::SETTING_VALUES] ?? null;
     }
 
     public function getComment(): ?string
     {
-        return isset($this->settings[self::SETTING_COMMENT]) ? $this->settings[self::SETTING_COMMENT] : null;
+        return $this->settings[self::SETTING_COMMENT] ?? null;
     }
 
     /**

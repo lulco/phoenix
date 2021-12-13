@@ -6,6 +6,7 @@ use PDOStatement;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Database\Element\MigrationView;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
@@ -27,7 +28,7 @@ abstract class AbstractMigration
     /** @var string */
     private $fullClassName;
 
-    /** @var array<int, string|PDOStatement|MigrationTable> */
+    /** @var array<int, string|PDOStatement|MigrationTable|MigrationView> */
     private $queriesToExecute = [];
 
     /** @var string[] list of executed queries */
@@ -141,6 +142,13 @@ abstract class AbstractMigration
     final protected function getTable(string $name): ?Table
     {
         return $this->adapter->getStructure()->getTable($name);
+    }
+
+    final protected function view(string $name): MigrationView
+    {
+        $migrationView = new MigrationView($name);
+        $this->queriesToExecute[] = $migrationView;
+        return $migrationView;
     }
 
     /**
@@ -260,6 +268,7 @@ abstract class AbstractMigration
                     $settings[ColumnSettings::SETTING_COLLATION] = $targetCollation;
                 }
                 if ($settings !== $actualSettings) {
+                    /** @var array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings */
                     $migrationTable->changeColumn($column->getName(), $column->getName(), $column->getType(), $settings);
                 }
             }
@@ -313,12 +322,15 @@ abstract class AbstractMigration
         $queryBuilder = $this->adapter->getQueryBuilder();
         $queries = [];
         foreach ($this->queriesToExecute as $queryToExecute) {
-            if (!$queryToExecute instanceof MigrationTable) {
-                $queries[] = $queryToExecute;
+            if ($queryToExecute instanceof MigrationTable) {
+                $queries = array_merge($queries, $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder));
                 continue;
             }
-            $tableQueries = $this->prepareMigrationTableQueries($queryToExecute, $queryBuilder);
-            $queries = array_merge($queries, $tableQueries);
+            if ($queryToExecute instanceof MigrationView) {
+                $queries = array_merge($queries, $this->prepareMigrationViewQueries($queryToExecute, $queryBuilder));
+                continue;
+            }
+            $queries[] = $queryToExecute;
         }
         return $queries;
     }
@@ -345,5 +357,27 @@ abstract class AbstractMigration
             $tableQueries = $queryBuilder->truncateTable($table);
         }
         return $tableQueries;
+    }
+
+    /**
+     * @param MigrationView $view
+     * @param QueryBuilderInterface $queryBuilder
+     * @return array<string>
+     */
+    private function prepareMigrationViewQueries(MigrationView $view, QueryBuilderInterface $queryBuilder): array
+    {
+        if ($view->getAction() === MigrationView::ACTION_CREATE) {
+            return $queryBuilder->createView($view);
+        }
+
+        if ($view->getAction() === MigrationView::ACTION_REPLACE) {
+            return $queryBuilder->replaceView($view);
+        }
+
+        if ($view->getAction() === MigrationView::ACTION_DROP) {
+            return $queryBuilder->dropView($view);
+        }
+
+        return [];
     }
 }

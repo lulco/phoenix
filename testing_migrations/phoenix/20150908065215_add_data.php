@@ -118,6 +118,7 @@ class AddData extends AbstractMigration
             'col_set' => ['yyy', 'zzz'],
             'col_time' => '10:20:30',
             'col_timestamp' => new DateTime(),
+            'col_year' => 2020,
         ]);
 
         $this->insert('all_types', [
@@ -139,6 +140,7 @@ class AddData extends AbstractMigration
             'col_date' => (new DateTime())->format('Y-m-d'),
             'col_time' => '20:30:40',
             'col_timestamp' => null,
+            'col_year' => 2021,
         ]);
     }
 

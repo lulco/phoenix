@@ -17,6 +17,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     protected function typeMap() : array
     {
         return [
+            Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'int2',
             Column::TYPE_SMALL_INTEGER => 'int2',
             Column::TYPE_MEDIUM_INTEGER => 'int4',
@@ -34,6 +35,8 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             Column::TYPE_DATE => 'date',
             Column::TYPE_DATETIME => 'timestamp(6)',
             Column::TYPE_TIMESTAMP => 'timestamp(6)',
+            Column::TYPE_TIMESTAMP_TZ => 'timestamptz',
+            Column::TYPE_YEAR => 'numeric(4)',
             Column::TYPE_TINY_TEXT => 'text',
             Column::TYPE_MEDIUM_TEXT => 'text',
             Column::TYPE_TEXT => 'text',
@@ -53,6 +56,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     }
 
     protected $defaultLength = [
+        Column::TYPE_BIT => 32,
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
         Column::TYPE_NUMERIC => [10, 0],
@@ -221,14 +225,14 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function escapeDefault(Column $column): string
     {
-        if ($column->getType() === Column::TYPE_INTEGER) {
+        if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
             $default = $column->getSettings()->getDefault();
-        } elseif ($column->getType() === Column::TYPE_BOOLEAN) {
+        } elseif (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
-            $default = "'" . $column->getSettings()->getDefault() . "'";
+            $default = "'" . $this->sanitizeSingleQuote($column->getSettings()->getDefault()) . "'";
         }
 
         return $default;
@@ -328,11 +332,18 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
 
     private function createTableComment(MigrationTable $table): string
     {
-        return "COMMENT ON TABLE {$table->getName()} IS '{$table->getComment()}';";
+        $comment = $this->sanitizeSingleQuote((string)$table->getComment());
+        return "COMMENT ON TABLE {$table->getName()} IS '$comment';";
     }
 
     private function createColumnComment(MigrationTable $table, Column $column): string
     {
-        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '{$column->getSettings()->getComment()}';";
+        $comment = $this->sanitizeSingleQuote((string)$column->getSettings()->getComment());
+        return "COMMENT ON COLUMN {$table->getName()}.{$column->getName()} IS '$comment';";
+    }
+
+    private function sanitizeSingleQuote(string $input): string
+    {
+        return str_replace("'", "''", $input);
     }
 }

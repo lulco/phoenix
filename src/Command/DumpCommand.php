@@ -2,6 +2,7 @@
 
 namespace Phoenix\Command;
 
+use Dumper\Dumper;
 use Phoenix\Database\Element\Structure;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -11,8 +12,11 @@ class DumpCommand extends AbstractDumpCommand
     {
         $this->setName('dump')
             ->setDescription('Dump actual database structure to migration file')
+            ->addOption('add-table-exists-check', null, InputOption::VALUE_NONE, 'Add table exists condition around all tables to avoid multiple table creation')
+            ->addOption('auto-increment', null, InputOption::VALUE_NONE, 'Dump also auto increment value for tables')
             ->addOption('data', 'd', InputOption::VALUE_NONE, 'Dump structure and also data')
             ->addOption('ignore-data-tables', null, InputOption::VALUE_REQUIRED, 'Comma separated list of tables which will be exported without data (Option -d, --data is required to use this option)')
+
         ;
 
         parent::configure();
@@ -21,6 +25,13 @@ class DumpCommand extends AbstractDumpCommand
     protected function migrationDefaultName(): string
     {
         return 'Initialization';
+    }
+
+    protected function createDumper(string $indent): Dumper
+    {
+        $autoIncrement = (bool)$this->input->getOption('auto-increment');
+        $tableExistsCondition = (bool)$this->input->getOption('add-table-exists-check');
+        return new Dumper($indent, 2, $tableExistsCondition, $autoIncrement);
     }
 
     protected function sourceStructure(): Structure

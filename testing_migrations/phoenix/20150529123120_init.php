@@ -32,7 +32,7 @@ class Init extends AbstractMigration
             ->create();
 
         $this->table('table_3', false)
-            ->addColumn('identifier', 'uuid')
+            ->addColumn('identifier', 'uuid', ['comment' => 'Row\'s identifier'])
             ->addColumn('t1_fk', 'integer')
             ->addColumn('t2_fk', 'integer', ['null' => true])
             ->addForeignKey('t1_fk', 'table_1', 'id', ForeignKey::RESTRICT, ForeignKey::RESTRICT)
@@ -77,10 +77,12 @@ class Init extends AbstractMigration
             ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')
+            ->addColumn('col_bit', 'bit', ['length' => 5, 'default' => "B'10101'"])
             ->addColumn('col_datetime', 'datetime')
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
+            ->addColumn('col_year', 'year')
             ->addColumn('col_point', 'point', ['null' => true])
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])

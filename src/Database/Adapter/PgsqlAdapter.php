@@ -49,7 +49,7 @@ class PgsqlAdapter extends PdoAdapter
         $tables = $this->query(sprintf("
             SELECT *
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE table_catalog = '%s' AND table_schema='public'
+            WHERE table_type = 'BASE TABLE' AND table_catalog = '%s' AND table_schema='public'
             ORDER BY TABLE_NAME", $database))->fetchAll(PDO::FETCH_ASSOC);
         return $tables;
     }
@@ -131,6 +131,7 @@ class PgsqlAdapter extends PdoAdapter
             'character varying' => Column::TYPE_STRING,
             'bytea' => Column::TYPE_BLOB,
             'timestamp without time zone' => Column::TYPE_DATETIME,
+            'timestamp with time zone' => Column::TYPE_TIMESTAMP_TZ,
             'USER-DEFINED' => Column::TYPE_ENUM,
             'ARRAY' => Column::TYPE_SET,
             'time without time zone' => Column::TYPE_TIME,
@@ -149,7 +150,7 @@ class PgsqlAdapter extends PdoAdapter
     {
         $length = null;
         $decimals = null;
-        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR], true)) {
+        if (in_array($type, [Column::TYPE_STRING, Column::TYPE_CHAR, Column::TYPE_BIT], true)) {
             $length = $column['character_maximum_length'];
         } elseif (in_array($type, [Column::TYPE_NUMERIC], true)) {
             $length = $column['numeric_precision'];

@@ -6,8 +6,59 @@
 - Dropped support for unsupported PHP versions and added native typehints (BC break)
 
 
+
+### [1.11.1] - 2021-12-07
 #### Fixed
-- PHP 8.1 deprecation notice
+- Removed phpspec/prophecy from misused replace in composer.json
+
+### [1.11.0] - 2021-12-06
+#### Added
+- support for PHP 8.1
+- support for `CURRENT_TIMESTAMP` for columns with type `datetime` (Thanks to [Jared Cheney](https://github.com/jaredc))
+
+### [1.10.0] - 2021-08-23
+#### Added
+- timestamptz (timestamp with time zone) column type for pgsql (Thanks to [Taichi Inaba](https://github.com/chatii))
+
+### [1.9.1] - 2021-08-18
+#### Fixed
+- Mysql: Use FIRST in combination with autoincrement generates wrong query
+
+### [1.9.0] - 2021-07-07
+#### Added
+- support for different operators in `$conditions` array of PdoAdapter methods (Thanks to [Giuliano Collacchioni](https://github.com/Kal-Aster))
+- support for views
+
+#### Fixed
+- readme link (Thanks to [Niek Oost](https://github.com/niekoost))
+
+### [1.8.0] - 2021-06-01
+#### Added
+- year column type (year for mysql, numeric(4) for pgsql)
+- new options add-table-exists-check and auto-increment to Dumper command
+- documentation for primary keys
+- step by step tutorial for using dump command to change mysql to pgsql or vice versa
+
+#### Fixed
+- single quotes in comments
+- table comment in dump
+- transfer tinyint(1) to boolean in mysql only if it has default values 1 or 0 
+- dump command skip everything which is not of type "BASE TABLE" (VIEW, SYSTEM VIEW etc.)
+- dumping special values (null, true, false, strings with apostrophe)
+
+### [1.7.0] - 2021-04-14
+#### Added
+- simple autowiring in migrations
+
+### [1.6.0] - 2021-04-03
+#### Added
+- bit column type (Thanks to [Slava Ershov](https://github.com/fishus))
+
+#### Fixed
+- PHP 8.1 deprecation notice (Thanks to [Daniel Opitz](https://github.com/odan))
+- escaping column value in Dumper (Thanks to [Slava Ershov](https://github.com/fishus))
+- nullable timestamp field with default value
+- migrate / rollback commands option --class will work without starting backslash
 
 ### [1.5.0] - 2021-01-25
 #### Changed
@@ -65,7 +116,7 @@
 
 ### [1.1.0] - 2019-02-11
 #### Added
-- time column type
+- time column type (Thanks to [Tibor Mikóczy](https://github.com/mikoczy))
 - timestamp column type
 
 ### [1.0.0] - 2018-06-20
@@ -162,7 +213,7 @@
 
 ### [0.6.1] - 2016-12-13
 #### Fixed
-- support for changing column settings (allowNull, default) in pgsql
+- support for changing column settings (allowNull, default) in pgsql (Thanks to [Tibor Mikóczy](https://github.com/mikoczy))
 
 ### [0.6.0] - 2016-09-26
 #### Removed
@@ -244,7 +295,15 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.5.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.11.1...HEAD
+[1.11.1]: https://github.com/lulco/phoenix/compare/1.11.0...1.11.1
+[1.11.0]: https://github.com/lulco/phoenix/compare/1.10.0...1.11.0
+[1.10.0]: https://github.com/lulco/phoenix/compare/1.9.1...1.10.0
+[1.9.1]: https://github.com/lulco/phoenix/compare/1.9.0...1.9.1
+[1.9.0]: https://github.com/lulco/phoenix/compare/1.8.0...1.9.0
+[1.8.0]: https://github.com/lulco/phoenix/compare/1.7.0...1.8.0
+[1.7.0]: https://github.com/lulco/phoenix/compare/1.6.0...1.7.0
+[1.6.0]: https://github.com/lulco/phoenix/compare/1.5.0...1.6.0
 [1.5.0]: https://github.com/lulco/phoenix/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/lulco/phoenix/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/lulco/phoenix/compare/1.2.0...1.3.0

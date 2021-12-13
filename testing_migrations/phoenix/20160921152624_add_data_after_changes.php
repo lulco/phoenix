@@ -29,6 +29,7 @@ class AddDataAfterChanges extends AbstractMigration
             'col_date' => (new DateTime())->format('Y-m-d'),
             'col_enum' => 'qqq',
             'col_set' => ['yyy', 'qqq'],
+            'col_year' => 2000,
         ]);
     }
 

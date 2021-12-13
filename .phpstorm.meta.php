@@ -51,6 +51,8 @@ namespace PHPSTORM_META
         'longblob',
         'binary',
         'varbinary',
+        'bit',
+        'year',
         'point',
         'line',
         'polygon',
@@ -84,6 +86,8 @@ namespace PHPSTORM_META
         \Phoenix\Database\Element\Column::TYPE_LONG_BLOB,
         \Phoenix\Database\Element\Column::TYPE_BINARY,
         \Phoenix\Database\Element\Column::TYPE_VARBINARY,
+        \Phoenix\Database\Element\Column::TYPE_BIT,
+        \Phoenix\Database\Element\Column::TYPE_YEAR,
         \Phoenix\Database\Element\Column::TYPE_POINT,
         \Phoenix\Database\Element\Column::TYPE_LINE,
         \Phoenix\Database\Element\Column::TYPE_POLYGON
