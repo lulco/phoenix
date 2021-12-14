@@ -6,13 +6,14 @@
 - use utf8mb4 as default charset for mysql (fix but BC break)
 - dropped support for unsupported PHP versions and added native typehints (BC break)
 - changed autoload to PSR-4
-- moved namespace Dumper to Phoenix\Dumper (BC break)
-- moved namespace Comparator to Phoenix\Comparator (BC break)
+  - moved namespace Dumper to Phoenix\Dumper (BC break)
+  - moved namespace Comparator to Phoenix\Comparator (BC break)
+
 
 
 ### [1.11.1] - 2021-12-07
 #### Fixed
-- removed phpspec/prophecy from misused replace in composer.json
+- removed phpspec/prophecy from misused replace in `composer.json`
 
 ### [1.11.0] - 2021-12-06
 #### Added
