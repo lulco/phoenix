@@ -7,7 +7,7 @@ use Phoenix\Database\Element\MigrationTable;
 trait ColumnsToDropBehavior
 {
     /** @var string[] */
-    private $columnsToDrop = [];
+    private array $columnsToDrop = [];
 
     public function dropColumn(string $name): MigrationTable
     {

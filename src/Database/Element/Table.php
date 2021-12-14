@@ -8,29 +8,25 @@ class Table
 {
     use AutoIncrementBehavior;
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string|null */
-    private $charset;
+    private ?string $charset = null;
 
-    /** @var string|null */
-    private $collation;
+    private ?string $collation = null;
 
-    /** @var string|null */
-    private $comment;
+    private ?string $comment = null;
 
     /** @var Column[] */
-    private $columns = [];
+    private array $columns = [];
 
     /** @var string[] */
-    private $primaryColumns = [];
+    private array $primaryColumns = [];
 
     /** @var ForeignKey[] */
-    private $foreignKeys = [];
+    private array $foreignKeys = [];
 
     /** @var array<string, Index> */
-    private $indexes = [];
+    private array $indexes = [];
 
     public function __construct(string $name)
     {

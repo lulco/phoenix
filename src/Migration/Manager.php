@@ -21,11 +21,9 @@ class Manager
     const TARGET_FIRST = 'first';
     const TARGET_ALL = 'all';
 
-    /** @var Config */
-    private $config;
+    private Config $config;
 
-    /** @var AdapterInterface */
-    private $adapter;
+    private AdapterInterface $adapter;
 
     public function __construct(Config $config, AdapterInterface $adapter)
     {

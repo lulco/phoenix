@@ -4,14 +4,11 @@ namespace Phoenix\Database\Element;
 
 class IndexColumn
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var IndexColumnSettings */
-    private $columnSettings;
+    private IndexColumnSettings $columnSettings;
 
     /**
-     * @param string $name
      * @param array<string, int|string> $columnSettings
      */
     public function __construct(string $name, array $columnSettings = [])

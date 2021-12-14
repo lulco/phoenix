@@ -16,7 +16,7 @@ class IndexColumnSettings
     ];
 
     /** @var array<string, int|string> */
-    private $settings;
+    private array $settings;
 
     /**
      * @param array<string, int|string> $settings

@@ -7,8 +7,6 @@ use Phoenix\Database\Element\ColumnSettings;
 class SettingsComparator
 {
     /**
-     * @param ColumnSettings $sourceColumnSettings
-     * @param ColumnSettings $targetColumnSettings
      * @return array<string, mixed>
      */
     public function diff(ColumnSettings $sourceColumnSettings, ColumnSettings $targetColumnSettings): array

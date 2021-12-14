@@ -48,10 +48,9 @@ class StatusCommand extends AbstractCommand
      */
     private function printTable(array $headers, array $rows, string $header, string $noItemsText): void
     {
-        $this->writeln('');
-        $this->writeln("<comment>$header</comment>");
+        $this->writeln(['', "<comment>$header</comment>"]);
         if (empty($rows)) {
-            $this->writeln("<info>$noItemsText</info>");
+            $this->writeln(["<info>$noItemsText</info>"]);
             return;
         }
         $table = new Table($this->output);

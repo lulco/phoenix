@@ -50,7 +50,7 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         ];
     }
 
-    protected $defaultLength = [
+    protected array $defaultLength = [
         Column::TYPE_STRING => 255,
         Column::TYPE_BIT => 32,
         Column::TYPE_TINY_INTEGER => 4,

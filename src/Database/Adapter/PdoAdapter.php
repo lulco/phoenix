@@ -14,14 +14,11 @@ abstract class PdoAdapter implements AdapterInterface
 {
     use StructureBehavior;
 
-    /** @var PDO */
-    private $pdo;
+    private PDO $pdo;
 
-    /** @var string|null */
-    private $charset;
+    private ?string $charset = null;
 
-    /** @var string|null */
-    protected $version;
+    protected ?string $version;
 
     public function __construct(PDO $pdo, ?string $version = null)
     {

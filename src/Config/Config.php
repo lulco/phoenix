@@ -10,7 +10,7 @@ class Config
     /**
      * @var array<string, mixed>
      */
-    private $configuration = [
+    private array $configuration = [
         'log_table_name' => 'phoenix_log',
         'migration_dirs' => [],
         'environments' => [],
@@ -85,11 +85,9 @@ class Config
     }
 
     /**
-     * @param string $type
-     * @return mixed
      * @throws InvalidArgumentValueException
      */
-    public function getDependency(string $type)
+    public function getDependency(string $type): object
     {
         if (isset($this->configuration['dependencies'][$type])) {
             return $this->configuration['dependencies'][$type];

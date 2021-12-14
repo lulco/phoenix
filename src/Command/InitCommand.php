@@ -21,10 +21,9 @@ class InitCommand extends AbstractCommand
         $migration = new Init($this->adapter, $this->getConfig()->getLogTableName());
         $migration->migrate();
 
-        $this->writeln('');
         $executedQueries = $migration->getExecutedQueries();
-        $this->writeln('<info>Phoenix initialized</info>');
-        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln(['', '<info>Phoenix initialized</info>']);
+        $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
         $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
         $this->outputData['message'] = 'Phoenix initialized';

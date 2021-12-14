@@ -2,6 +2,11 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- Dropped support for unsupported PHP versions and added native typehints (BC break)
+
+
+
 ### [1.11.1] - 2021-12-07
 #### Fixed
 - Removed phpspec/prophecy from misused replace in composer.json

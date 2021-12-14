@@ -55,7 +55,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
         ];
     }
 
-    protected $defaultLength = [
+    protected array $defaultLength = [
         Column::TYPE_BIT => 32,
         Column::TYPE_STRING => 255,
         Column::TYPE_CHAR => 255,
@@ -64,7 +64,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     ];
 
     /** @var array<string, string> */
-    private $typeCastMap = [
+    private array $typeCastMap = [
         Column::TYPE_STRING => 'varchar',
     ];
 

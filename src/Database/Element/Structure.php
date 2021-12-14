@@ -5,7 +5,7 @@ namespace Phoenix\Database\Element;
 class Structure
 {
     /** @var Table[] */
-    private $tables = [];
+    private array $tables = [];
 
     public function update(MigrationTable $migrationTable): Structure
     {
