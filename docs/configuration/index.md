@@ -31,7 +31,7 @@ return [
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_db',
-            'charset' => 'utf8', // optional
+            'charset' => 'utf8mb4', // optional
         ],
         'production' => [
             'adapter' => 'mysql',
@@ -39,7 +39,7 @@ return [
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_production_db',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
     ],
     'default_environment ' => 'local',
@@ -62,14 +62,14 @@ environments:
     username: user
     password: pass
     db_name: my_db
-    charset: utf8 # optional
+    charset: utf8mb4 # optional
   production:
     adapter: mysql
     host: production_host
     username: user
     password: pass
     db_name: my_production_db
-    charset: utf8
+    charset: utf8mb4
 default_environment: local
 ```
 
@@ -88,14 +88,14 @@ environments:
         username: user
         password: pass
         db_name: my_db
-        charset: utf8 # optional
+        charset: utf8mb4 # optional
     production:
         adapter: mysql
         host: production_host
         username: user
         password: pass
         db_name: my_production_db
-        charset: utf8
+        charset: utf8mb4
 default_environment: local
 ```
 
@@ -118,7 +118,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
             "username": "user",
             "password": "pass",
             "db_name": "my_db",
-            "charset": "utf8"
+            "charset": "utf8mb4"
         },
         "production": {
             "adapter": "mysql",
@@ -126,7 +126,7 @@ Configuration files of types yml and neon are pretty similar. The only differenc
             "username": "user",
             "password": "pass",
             "db_name": "my_production_db",
-            "charset": "utf8"
+            "charset": "utf8mb4"
         }
     },
     "default_environment": "local"

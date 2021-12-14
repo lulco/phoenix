@@ -3,13 +3,14 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- Dropped support for unsupported PHP versions and added native typehints (BC break)
+- use utf8mb4 as default charset for mysql (fix but BC break)
+- dropped support for unsupported PHP versions and added native typehints (BC break)
 
 
 
 ### [1.11.1] - 2021-12-07
 #### Fixed
-- Removed phpspec/prophecy from misused replace in composer.json
+- removed phpspec/prophecy from misused replace in composer.json
 
 ### [1.11.0] - 2021-12-06
 #### Added
@@ -141,7 +142,7 @@
 - posibility to add an autoincrement primary key on an existing table
 
 #### Fixed
-- Add a primary key on an existing table
+- add a primary key on an existing table
 
 ### [0.12.1] - 2017-12-18
 #### Fixed

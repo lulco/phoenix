@@ -63,7 +63,7 @@ return [
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_db',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
         'production' => [
             'adapter' => 'mysql',
@@ -72,7 +72,7 @@ return [
             'username' => 'user',
             'password' => 'pass',
             'db_name' => 'my_production_db',
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
         ],
     ],
     'default_environment' => 'local',
@@ -144,7 +144,7 @@ CREATE TABLE `first_table` (
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_first_table_url` (`url`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
 You need to implement `up()` method in your migration class as below:
@@ -191,7 +191,7 @@ class MyFirstMigration extends AbstractMigration
                 `created_at` datetime NOT NULL,
                 PRIMARY KEY (`id`),
                 UNIQUE KEY `idx_first_table_url` (`url`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;'
         );
     }
 }

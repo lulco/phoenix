@@ -12,7 +12,7 @@ return [
             'username' => 'root',
             'password' => '123',
             'db_name' => 'phoenix',
-            'charset' => 'utf8', // optional
+            'charset' => 'utf8mb4', // optional
         ],
         'pgsql' => [
             'adapter' => 'pgsql',
