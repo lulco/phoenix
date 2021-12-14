@@ -7,8 +7,11 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
 
 class Formatter implements OutputFormatterInterface
 {
-    public function format(?string $message)
+    private bool $isDecorated = false;
+
+    public function format(?string $message): ?string
     {
+        return $message;
     }
 
     public function getStyle(string $name)
@@ -19,12 +22,14 @@ class Formatter implements OutputFormatterInterface
     {
     }
 
-    public function isDecorated()
+    public function isDecorated(): bool
     {
+        return $this->isDecorated;
     }
 
-    public function setDecorated(bool $decorated)
+    public function setDecorated(bool $decorated): void
     {
+        $this->isDecorated = $decorated;
     }
 
     public function setStyle(string $name, OutputFormatterStyleInterface $style)
