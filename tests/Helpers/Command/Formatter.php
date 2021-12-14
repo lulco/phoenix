@@ -7,15 +7,15 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
 
 class Formatter implements OutputFormatterInterface
 {
-    public function format($message)
+    public function format(?string $message)
     {
     }
 
-    public function getStyle($name)
+    public function getStyle(string $name)
     {
     }
 
-    public function hasStyle($name)
+    public function hasStyle(string $name)
     {
     }
 
@@ -23,11 +23,11 @@ class Formatter implements OutputFormatterInterface
     {
     }
 
-    public function setDecorated($decorated)
+    public function setDecorated(bool $decorated)
     {
     }
 
-    public function setStyle($name, OutputFormatterStyleInterface $style)
+    public function setStyle(string $name, OutputFormatterStyleInterface $style)
     {
     }
 }

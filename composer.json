@@ -18,10 +18,14 @@
         "ramsey/uuid": "^3.7|^4.0"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "psr-4": {
+            "Phoenix\\": "src/"
+        }
     },
     "autoload-dev": {
-        "classmap": ["tests/"]
+        "psr-4": {
+            "Phoenix\\Tests\\": "tests/"
+        }
     },
     "conflict": {
         "symfony/console": "3.4.31|4.3.4"

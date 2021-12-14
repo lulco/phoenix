@@ -2,13 +2,13 @@
 
 namespace Phoenix\Tests\Dumper;
 
-use Dumper\Dumper;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Dumper\Dumper;
 use PHPUnit\Framework\TestCase;
 
 class DumperTest extends TestCase

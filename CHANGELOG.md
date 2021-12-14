@@ -5,7 +5,9 @@
 #### Changed
 - use utf8mb4 as default charset for mysql (fix but BC break)
 - dropped support for unsupported PHP versions and added native typehints (BC break)
-
+- changed autoload to PSR-4
+- moved namespace Dumper to Phoenix\Dumper (BC break)
+- moved namespace Comparator to Phoenix\Comparator (BC break)
 
 
 ### [1.11.1] - 2021-12-07

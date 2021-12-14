@@ -2,7 +2,7 @@
 
 namespace Phoenix\Tests\Comparator;
 
-use Comparator\SettingsComparator;
+use Phoenix\Comparator\SettingsComparator;
 use Phoenix\Database\Element\ColumnSettings;
 use PHPUnit\Framework\TestCase;
 
