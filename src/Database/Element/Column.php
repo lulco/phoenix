@@ -44,18 +44,13 @@ class Column
     const TYPE_LINE = 'line';
     const TYPE_POLYGON = 'polygon';
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var string */
-    private $type;
+    private string $type;
 
-    /** @var ColumnSettings */
-    private $settings;
+    private ColumnSettings $settings;
 
     /**
-     * @param string $name name of column
-     * @param string $type type of column
      * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings - list of settings
      * @throws InvalidArgumentValueException if setting is not allowed
      */

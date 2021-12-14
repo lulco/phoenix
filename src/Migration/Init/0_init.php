@@ -4,12 +4,12 @@ namespace Phoenix\Migration\Init;
 
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
 class Init extends AbstractMigration
 {
-    /** @var string */
-    private $logTableName;
+    private string $logTableName;
 
     public function __construct(AdapterInterface $adapter, string $logTableName)
     {
@@ -17,6 +17,9 @@ class Init extends AbstractMigration
         $this->logTableName = $logTableName;
     }
 
+    /**
+     * @throws InvalidArgumentValueException
+     */
     protected function up(): void
     {
         $this->table($this->logTableName)

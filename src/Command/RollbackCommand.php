@@ -8,11 +8,9 @@ use Symfony\Component\Console\Input\InputOption;
 
 class RollbackCommand extends AbstractRunCommand
 {
-    /** @var string */
-    protected $noMigrationsFoundMessage = 'Nothing to rollback';
+    protected string $noMigrationsFoundMessage = 'Nothing to rollback';
 
-    /** @var string */
-    protected $migrationInfoPrefix = 'Rollback for migration';
+    protected string $migrationInfoPrefix = 'Rollback for migration';
 
     protected function configure(): void
     {

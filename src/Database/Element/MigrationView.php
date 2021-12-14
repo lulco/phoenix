@@ -10,17 +10,14 @@ class MigrationView
 
     const ACTION_DROP = 'drop';
 
-    /** @var string */
-    private $name;
+    private string $name;
 
     /** @var string[] */
-    private $columns = [];
+    private array $columns = [];
 
-    /** @var string */
-    private $sql;
+    private string $sql;
 
-    /** @var string */
-    private $action;
+    private string $action;
 
     public function __construct(string $name)
     {

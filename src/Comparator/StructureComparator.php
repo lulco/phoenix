@@ -9,8 +9,6 @@ use Phoenix\Database\Element\Table;
 class StructureComparator
 {
     /**
-     * @param Structure $sourceStructure
-     * @param Structure $targetStructure
      * @return MigrationTable[]
      */
     public function diff(Structure $sourceStructure, Structure $targetStructure): array

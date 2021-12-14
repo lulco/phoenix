@@ -10,20 +10,16 @@ use Phoenix\Database\Element\MigrationTable;
 
 class Dumper
 {
-    /** @var string */
-    private $indent;
+    private string $indent;
 
-    /** @var int  */
-    private $baseIndent;
+    private int $baseIndent;
 
-    /** @var bool */
-    private $tableExistCondition;
+    private bool $tableExistCondition;
 
-    /** @var bool */
-    private $autoIncrement;
+    private bool $autoIncrement;
 
     /** @var array<string, mixed> */
-    private $defaultSettings = [
+    private array $defaultSettings = [
         ColumnSettings::SETTING_AUTOINCREMENT => false,
         ColumnSettings::SETTING_NULL => false,
         ColumnSettings::SETTING_DEFAULT => null,
@@ -46,8 +42,6 @@ class Dumper
 
     /**
      * @param MigrationTable[] $tables
-     * @param string $dumpType up/down
-     * @return string
      */
     public function dumpTables(array $tables, string $dumpType): string
     {
@@ -117,7 +111,6 @@ class Dumper
 
     /**
      * @param MigrationTable[] $tables
-     * @return string
      */
     public function dumpForeignKeys(array $tables): string
     {
@@ -156,7 +149,6 @@ class Dumper
 
     /**
      * @param array<string, array<string, mixed>> $data data for migration in format table => rows
-     * @return string
      */
     public function dumpDataUp(array $data = []): string
     {
@@ -194,7 +186,6 @@ class Dumper
 
     /**
      * @param string[] $columns
-     * @return string
      */
     private function columnsToString(array $columns): string
     {
@@ -207,7 +198,6 @@ class Dumper
 
     /**
      * @param string[] $values
-     * @return string
      */
     private function valuesToString(array $values): string
     {
@@ -240,7 +230,6 @@ class Dumper
 
     /**
      * @param IndexColumn[] $indexColumns
-     * @return string
      */
     private function indexColumnsToString(array $indexColumns): string
     {
@@ -272,8 +261,6 @@ class Dumper
     }
 
     /**
-     * @param Column $column
-     * @param MigrationTable $table
      * @return array<string, mixed>
      */
     private function defaultSettings(Column $column, MigrationTable $table): array
@@ -298,9 +285,8 @@ class Dumper
 
     /**
      * @param mixed $value
-     * @return mixed
      */
-    private function transformValue($value)
+    private function transformValue($value): string
     {
         if (is_bool($value)) {
             $value = $value ? 'true' : 'false';
@@ -309,7 +295,7 @@ class Dumper
         } elseif (!is_numeric($value)) {
             $value = "'" . $this->sanitizeSingleQuote($value) . "'";
         }
-        return $value;
+        return (string)$value;
     }
 
     private function foreignKeyActions(ForeignKey $foreignKey): string

@@ -16,23 +16,19 @@ use ReflectionClass;
 
 abstract class AbstractMigration
 {
-    /** @var AdapterInterface */
-    private $adapter;
+    private AdapterInterface $adapter;
 
-    /** @var string */
-    private $datetime;
+    private string $datetime;
 
-    /** @var string */
-    private $className;
+    private string $className;
 
-    /** @var string */
-    private $fullClassName;
+    private string $fullClassName;
 
     /** @var array<int, string|PDOStatement|MigrationTable|MigrationView> */
-    private $queriesToExecute = [];
+    private array $queriesToExecute = [];
 
     /** @var string[] list of executed queries */
-    private $executedQueries = [];
+    private array $executedQueries = [];
 
     public function __construct(AdapterInterface $adapter)
     {
@@ -59,7 +55,6 @@ abstract class AbstractMigration
     }
 
     /**
-     * @param bool $dry
      * @return mixed[]
      * @throws DatabaseQueryExecuteException
      */
@@ -72,7 +67,6 @@ abstract class AbstractMigration
     }
 
     /**
-     * @param bool $dry
      * @return mixed[]
      * @throws DatabaseQueryExecuteException
      */
@@ -229,7 +223,6 @@ abstract class AbstractMigration
 
     /**
      * adds turn off checking foreign keys query to list of queries to execute
-     * @return void
      */
     final protected function checkForeignKeysOff(): void
     {
@@ -238,7 +231,6 @@ abstract class AbstractMigration
 
     /**
      * adds turn on checking foreign keys query to list of queries to execute
-     * @return void
      */
     final protected function checkForeignKeysOn(): void
     {
@@ -248,8 +240,6 @@ abstract class AbstractMigration
     /**
      * changes collation on all existing tables and columns
      *
-     * @param string $targetCollation
-     * @return void
      * @throws InvalidArgumentValueException
      */
     final protected function changeCollation(string $targetCollation): void
@@ -279,7 +269,6 @@ abstract class AbstractMigration
 
     /**
      * @param array<int, string|PDOStatement> $queries
-     * @param bool $dry
      * @return mixed[]
      * @throws DatabaseQueryExecuteException
      */
@@ -336,8 +325,6 @@ abstract class AbstractMigration
     }
 
     /**
-     * @param MigrationTable $table
-     * @param QueryBuilderInterface $queryBuilder
      * @return array<string|PDOStatement>
      */
     private function prepareMigrationTableQueries(MigrationTable $table, QueryBuilderInterface $queryBuilder): array
@@ -360,8 +347,6 @@ abstract class AbstractMigration
     }
 
     /**
-     * @param MigrationView $view
-     * @param QueryBuilderInterface $queryBuilder
      * @return array<string>
      */
     private function prepareMigrationViewQueries(MigrationView $view, QueryBuilderInterface $queryBuilder): array

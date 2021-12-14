@@ -10,13 +10,11 @@ use Phoenix\Database\Element\MigrationTable;
 trait PrimaryColumnsBehavior
 {
     /** @var Column[] */
-    private $primaryColumns = [];
+    private array $primaryColumns = [];
 
-    /** @var Closure|null */
-    private $primaryColumnsValuesFunction;
+    private ?Closure $primaryColumnsValuesFunction = null;
 
-    /** @var int|null */
-    private $dataChunkSize;
+    private ?int $dataChunkSize = null;
 
     /**
      * @param Column[] $primaryColumns
