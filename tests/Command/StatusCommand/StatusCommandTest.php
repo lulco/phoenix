@@ -54,7 +54,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][6]);
         $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][7]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][9]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][11]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][11]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
@@ -76,7 +76,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
         $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][2]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][4]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][6]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][6]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
@@ -98,9 +98,9 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                     </info>|<info> Executed at         </info>|' . "\n", $messages[0][3]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][8]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][10]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][10]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
@@ -129,7 +129,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|<info> Executed at         </info>|' . "\n", $messages[0][3]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][7 + $executedMigrationsCount]);
         $this->assertEquals('<info>No migrations to execute</info>' . "\n", $messages[0][8 + $executedMigrationsCount]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
