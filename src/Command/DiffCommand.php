@@ -2,9 +2,9 @@
 
 namespace Phoenix\Command;
 
-use Dumper\Dumper;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Dumper\Dumper;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;

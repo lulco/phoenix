@@ -2,11 +2,11 @@
 
 namespace Phoenix\Command;
 
-use Comparator\StructureComparator;
-use Dumper\Dumper;
-use Dumper\Indenter;
+use Phoenix\Comparator\StructureComparator;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Dumper\Dumper;
+use Phoenix\Dumper\Indenter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationCreator;
 use Symfony\Component\Console\Input\InputOption;

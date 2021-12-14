@@ -1,6 +1,6 @@
 <?php
 
-namespace Templates;
+namespace Phoenix\Tests\Templates;
 
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\MigrationNameCreator;

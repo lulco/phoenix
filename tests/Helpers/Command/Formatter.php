@@ -7,27 +7,32 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
 
 class Formatter implements OutputFormatterInterface
 {
-    public function format($message)
+    private bool $isDecorated = false;
+
+    public function format(?string $message): ?string
+    {
+        return $message;
+    }
+
+    public function getStyle(string $name)
     {
     }
 
-    public function getStyle($name)
+    public function hasStyle(string $name)
     {
     }
 
-    public function hasStyle($name)
+    public function isDecorated(): bool
     {
+        return $this->isDecorated;
     }
 
-    public function isDecorated()
+    public function setDecorated(bool $decorated): void
     {
+        $this->isDecorated = $decorated;
     }
 
-    public function setDecorated($decorated)
-    {
-    }
-
-    public function setStyle($name, OutputFormatterStyleInterface $style)
+    public function setStyle(string $name, OutputFormatterStyleInterface $style)
     {
     }
 }

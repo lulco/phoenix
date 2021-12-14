@@ -2,7 +2,7 @@
 
 namespace Phoenix\Command;
 
-use Dumper\Indenter;
+use Phoenix\Dumper\Indenter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationCreator;
 use Symfony\Component\Console\Input\InputArgument;

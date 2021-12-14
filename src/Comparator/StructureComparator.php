@@ -1,6 +1,6 @@
 <?php
 
-namespace Comparator;
+namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
