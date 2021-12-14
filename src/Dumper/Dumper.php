@@ -42,7 +42,6 @@ class Dumper
 
     /**
      * @param MigrationTable[] $tables
-     * @phpstan-param 'up'|'down'
      */
     public function dumpTables(array $tables, string $dumpType): string
     {

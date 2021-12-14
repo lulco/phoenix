@@ -42,7 +42,7 @@ abstract class AbstractRunCommand extends AbstractCommand
             $this->writeln(['<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>']);
 
             $executedQueries = $migration->getExecutedQueries();
-            $this->writeln(['Executed queries:', OutputInterface::VERBOSITY_DEBUG]);
+            $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
             $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
             $executedMigration = [

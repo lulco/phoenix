@@ -50,7 +50,7 @@ class CleanupCommand extends AbstractCommand
     private function addMigrationToList(AbstractMigration $migration): array
     {
         $executedQueries = $migration->getExecutedQueries();
-        $this->writeln(['Executed queries:', OutputInterface::VERBOSITY_DEBUG]);
+        $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
         $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
         $executedMigration = [

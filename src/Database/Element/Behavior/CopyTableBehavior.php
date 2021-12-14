@@ -9,9 +9,7 @@ trait CopyTableBehavior
 {
     use ParamsCheckerBehavior;
 
-    private string $action;
-
-    private string $newName;
+    private ?string $newName = null;
 
     private string $copyType;
 

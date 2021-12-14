@@ -4,7 +4,7 @@ namespace Phoenix\Database\Element\Behavior;
 
 trait AutoIncrementBehavior
 {
-    private ?int $autoIncrement;
+    private ?int $autoIncrement = null;
 
     public function setAutoIncrement(?int $autoIncrement): self
     {

@@ -12,9 +12,9 @@ trait PrimaryColumnsBehavior
     /** @var Column[] */
     private array $primaryColumns = [];
 
-    private ?Closure $primaryColumnsValuesFunction;
+    private ?Closure $primaryColumnsValuesFunction = null;
 
-    private ?int $dataChunkSize;
+    private ?int $dataChunkSize = null;
 
     /**
      * @param Column[] $primaryColumns

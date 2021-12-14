@@ -10,11 +10,11 @@ class Table
 
     private string $name;
 
-    private ?string $charset;
+    private ?string $charset = null;
 
-    private ?string $collation;
+    private ?string $collation = null;
 
-    private ?string $comment;
+    private ?string $comment = null;
 
     /** @var Column[] */
     private array $columns = [];

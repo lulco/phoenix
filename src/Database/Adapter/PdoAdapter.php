@@ -16,7 +16,7 @@ abstract class PdoAdapter implements AdapterInterface
 
     private PDO $pdo;
 
-    private ?string $charset;
+    private ?string $charset = null;
 
     protected ?string $version;
 

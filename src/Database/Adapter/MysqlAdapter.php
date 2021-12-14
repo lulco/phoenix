@@ -14,7 +14,7 @@ use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 
 class MysqlAdapter extends PdoAdapter
 {
-    private ?MysqlQueryBuilder $queryBuilder;
+    private ?MysqlQueryBuilder $queryBuilder = null;
 
     public function getQueryBuilder(): MysqlQueryBuilder
     {

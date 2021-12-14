@@ -15,7 +15,7 @@ use Phoenix\Exception\DatabaseQueryExecuteException;
 
 class PgsqlAdapter extends PdoAdapter
 {
-    private ?PgsqlQueryBuilder $queryBuilder;
+    private ?PgsqlQueryBuilder $queryBuilder = null;
 
     public function getQueryBuilder(): PgsqlQueryBuilder
     {

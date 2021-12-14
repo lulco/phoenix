@@ -47,14 +47,14 @@ class MigrationTable
 
     const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
-    private string $action;
+    private string $action = self::ACTION_ALTER;
 
     /** @var mixed */
     private $tmpPrimaryKey;
 
     private string $name;
 
-    private ?string $newName;
+    private ?string $newName = null;
 
     /** @var Column[] */
     private array $columns = [];
@@ -184,7 +184,7 @@ class MigrationTable
 
     public function getAction(): string
     {
-        return $this->action ?: self::ACTION_ALTER;
+        return $this->action;
     }
 
     public function toTable(): Table
