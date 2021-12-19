@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\QueryBuilder;
 
 use Phoenix\Database\Element\Column;
 
-class MysqlWithJsonQueryBuilder extends MysqlQueryBuilder
+final class MysqlWithJsonQueryBuilder extends MysqlQueryBuilder
 {
     protected function typeMap(): array
     {

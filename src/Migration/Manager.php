@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
 use DateTime;
@@ -11,7 +13,7 @@ use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 use ReflectionParameter;
 
-class Manager
+final class Manager
 {
     use ParamsCheckerBehavior;
 

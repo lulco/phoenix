@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
-class WrongCommandException extends PhoenixException
+final class WrongCommandException extends PhoenixException
 {
 }

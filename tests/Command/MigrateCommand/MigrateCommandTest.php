@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\MigrateCommand;
 
 use Phoenix\Command\CleanupCommand;
@@ -13,19 +15,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class MigrateCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new MigrateCommand();
         $this->assertEquals('migrate', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new MigrateCommand('my_migrate');
         $this->assertEquals('my_migrate', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new MigrateCommand();
         $this->expectException(ConfigException::class);
@@ -33,7 +35,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new MigrateCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -42,7 +44,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFile()
+    public function testUserConfigFile(): void
     {
         $command = new MigrateCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -55,7 +57,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testSetCustomConfig()
+    public function testSetCustomConfig(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -68,7 +70,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testMultipleMigration()
+    public function testMultipleMigration(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -85,7 +87,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testOnlyFirstMigration()
+    public function testOnlyFirstMigration(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -110,7 +112,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertGreaterThan(count($messagesFirst[0]), count($messagesAll[0]));
     }
 
-    public function testMigrateDir()
+    public function testMigrateDir(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -137,7 +139,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertGreaterThan(count($messagesFirst[0]), count($messagesAll[0]));
     }
 
-    public function testMigrateUnknownDir()
+    public function testMigrateUnknownDir(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -150,7 +152,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $command->run($input, $output);
     }
 
-    public function testDryRun()
+    public function testDryRun(): void
     {
         $initCommand = new InitCommand();
         $initCommand->setConfig($this->configuration);
@@ -176,7 +178,7 @@ abstract class MigrateCommandTest extends BaseCommandTest
         $this->assertEquals($dryQueries, $realRunMessages[OutputInterface::VERBOSITY_DEBUG]);
     }
 
-    public function testDryRunWithJsonOutput()
+    public function testDryRunWithJsonOutput(): void
     {
         $initCommand = new InitCommand();
         $initCommand->setConfig($this->configuration);

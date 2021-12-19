@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Adapter;
 
 use PDO;
@@ -56,14 +58,15 @@ class PgsqlAdapter extends PdoAdapter
     protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
-        /** @var string $comment */
+        /** @var string|false $comment */
         $comment = $this->query(sprintf("
             SELECT description
             FROM pg_description
             JOIN pg_class ON pg_description.objoid = pg_class.oid
             WHERE relname = '%s'", $table['table_name']))->fetchColumn();
-
-        $migrationTable->setComment($comment);
+        if ($comment) {
+            $migrationTable->setComment($comment);
+        }
         return $migrationTable;
     }
 
@@ -159,7 +162,7 @@ class PgsqlAdapter extends PdoAdapter
             ColumnSettings::SETTING_DEFAULT => $this->prepareDefault($column, $type),
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
-            ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
+            ColumnSettings::SETTING_AUTOINCREMENT => is_string($column['column_default']) && strpos($column['column_default'], 'nextval') === 0,
             ColumnSettings::SETTING_COMMENT => $column['comment'],
         ];
         if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET], true)) {

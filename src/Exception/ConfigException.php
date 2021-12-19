@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
-class ConfigException extends PhoenixException
+final class ConfigException extends PhoenixException
 {
 }

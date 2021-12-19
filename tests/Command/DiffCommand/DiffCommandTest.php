@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\DiffCommand;
 
 use Phoenix\Command\DiffCommand;
@@ -10,6 +12,7 @@ use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Exception\PhoenixException;
 use Phoenix\Migration\ClassNameCreator;
 use Phoenix\Tests\Command\BaseCommandTest;
+use Phoenix\Tests\Mock\Command\Input;
 use Phoenix\Tests\Mock\Command\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -17,19 +20,19 @@ use Symfony\Component\Finder\Finder;
 
 abstract class DiffCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new DiffCommand();
         $this->assertEquals('diff', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new DiffCommand('my_diff');
         $this->assertEquals('my_diff', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new DiffCommand();
         $this->expectException(ConfigException::class);
@@ -37,7 +40,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new DiffCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -46,7 +49,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testNonExistingTemplateFileException()
+    public function testNonExistingTemplateFileException(): void
     {
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -63,7 +66,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testSourceNotFound()
+    public function testSourceNotFound(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -91,7 +94,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testTargetNotFound()
+    public function testTargetNotFound(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -118,7 +121,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -147,7 +150,9 @@ abstract class DiffCommandTest extends BaseCommandTest
             $filePath = (string)$diffFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -158,7 +163,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         rmdir($diffMigrationDir);
     }
 
-    public function testDiffCommandAfterInit()
+    public function testDiffCommandAfterInit(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -188,7 +193,9 @@ abstract class DiffCommandTest extends BaseCommandTest
             $filePath = (string)$diffFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -208,7 +215,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         rmdir($diffMigrationDir);
     }
 
-    public function testDiffCommandAfterMigration()
+    public function testDiffCommandAfterMigration(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -240,7 +247,9 @@ abstract class DiffCommandTest extends BaseCommandTest
         foreach ($diffFiles as $diffFile) {
             $filePath = (string)$diffFile;
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
             $classNameCreator = new ClassNameCreator($filePath);
@@ -258,7 +267,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testDiffCommandJsonOutputAfterMigration()
+    public function testDiffCommandJsonOutputAfterMigration(): void
     {
         $diffMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($diffMigrationDir));
@@ -291,7 +300,9 @@ abstract class DiffCommandTest extends BaseCommandTest
         foreach ($diffFiles as $diffFile) {
             $filePath = (string)$diffFile;
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
             $classNameCreator = new ClassNameCreator($filePath);
@@ -315,7 +326,7 @@ abstract class DiffCommandTest extends BaseCommandTest
         $this->assertArrayHasKey('execution_time', $message);
     }
 
-    protected function createInput()
+    protected function createInput(): Input
     {
         $input = parent::createInput();
         $input->setOption('source', $this->getEnvironment());

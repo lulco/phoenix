@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 
 use Phoenix\Database\Adapter\MysqlAdapter;
@@ -9,9 +11,9 @@ use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class CreateTableTest extends TestCase
+final class CreateTableTest extends TestCase
 {
-    private $adapter;
+    private MysqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -23,7 +25,7 @@ class CreateTableTest extends TestCase
         $this->adapter = new MysqlAdapter($pdo);
     }
 
-    public function testSimpleCreate()
+    public function testSimpleCreate(): void
     {
         $table = new MigrationTable('simple');
         $table->addPrimary(true);

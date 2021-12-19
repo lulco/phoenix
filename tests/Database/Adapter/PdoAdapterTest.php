@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Adapter;
 
 use InvalidArgumentException;
@@ -10,9 +12,9 @@ use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class PdoAdapterTest extends TestCase
+final class PdoAdapterTest extends TestCase
 {
-    private $adapter;
+    private MysqlCleanupAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -24,7 +26,7 @@ class PdoAdapterTest extends TestCase
         $this->adapter = new MysqlCleanupAdapter($pdo);
     }
 
-    public function testTransaction()
+    public function testTransaction(): void
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
 
@@ -35,7 +37,7 @@ class PdoAdapterTest extends TestCase
         $this->assertTrue($this->adapter->commit());
     }
 
-    public function testInsert()
+    public function testInsert(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -44,20 +46,20 @@ class PdoAdapterTest extends TestCase
         $this->assertCount(2, $this->adapter->fetchAll('phoenix_test_table'));
     }
 
-    public function testInsertToNonExistingTable()
+    public function testInsertToNonExistingTable(): void
     {
         $this->expectException(DatabaseQueryExecuteException::class);
         $this->adapter->insert('phoenix_non_exist_test_table', ['id' => 1, 'title' => 'first']);
     }
 
-    public function testMultiInsert()
+    public function testMultiInsert(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(2, $this->adapter->insert('phoenix_test_table', [['id' => 1, 'title' => 'first'], ['id' => 2, 'title' => 'second']]));
         $this->assertCount(2, $this->adapter->fetchAll('phoenix_test_table'));
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -82,13 +84,13 @@ class PdoAdapterTest extends TestCase
         }
     }
 
-    public function testUpdateItemInNonExistingTable()
+    public function testUpdateItemInNonExistingTable(): void
     {
         $this->expectException(DatabaseQueryExecuteException::class);
         $this->adapter->update('phoenix_non_exist_test_table', ['id' => 1, 'title' => 'first']);
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -107,7 +109,7 @@ class PdoAdapterTest extends TestCase
         $this->adapter->select('INSERT INTO `phoenix_test_table` (`id`, `title`) VALUES (3, "third")');
     }
 
-    public function testFetchAll()
+    public function testFetchAll(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -122,7 +124,7 @@ class PdoAdapterTest extends TestCase
         }
     }
 
-    public function testFetchAllWithConditions()
+    public function testFetchAllWithConditions(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -154,7 +156,7 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('title', $item);
             $this->assertGreaterThan(1, $item['id']);
         }
-        
+
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id >=' => 1]);
         $this->assertCount(2, $items);
         foreach ($items as $item) {
@@ -163,7 +165,7 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('title', $item);
             $this->assertGreaterThanOrEqual(1, $item['id']);
         }
-        
+
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <' => 2]);
         $this->assertCount(1, $items);
         foreach ($items as $item) {
@@ -172,7 +174,7 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('title', $item);
             $this->assertLessThan(2, $item['id']);
         }
-        
+
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['id <=' => 2]);
         $this->assertCount(2, $items);
         foreach ($items as $item) {
@@ -181,13 +183,13 @@ class PdoAdapterTest extends TestCase
             $this->assertArrayHasKey('title', $item);
             $this->assertLessThanOrEqual(2, $item['id']);
         }
-        
+
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Cannot accept "<" operator for NULL value');
         $items = $this->adapter->fetchAll('phoenix_test_table', ['*'], ['title <' => NULL]);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->adapter->query('CREATE TABLE `phoenix_test_table` (`id` int NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,PRIMARY KEY (`id`));');
         $this->assertEquals(1, $this->adapter->insert('phoenix_test_table', ['id' => 1, 'title' => 'first']));
@@ -222,13 +224,13 @@ class PdoAdapterTest extends TestCase
         $this->adapter->delete('phoenix_test_table', ['id' => [1, 2]]);
     }
 
-    public function testDeleteFromNonExistingTable()
+    public function testDeleteFromNonExistingTable(): void
     {
         $this->expectException(DatabaseQueryExecuteException::class);
         $this->adapter->delete('phoenix_non_exist_test_table');
     }
 
-    public function testRollback()
+    public function testRollback(): void
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
 

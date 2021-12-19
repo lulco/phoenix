@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\Column;
 
-class ColumnComparator
+final class ColumnComparator
 {
     public function diff(Column $sourceColumn, Column $targetColumn): ?Column
     {

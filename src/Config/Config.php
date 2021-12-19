@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config;
 
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class Config
+final class Config
 {
     /**
      * @var array<string, mixed>
@@ -43,13 +45,16 @@ class Config
     }
 
     /**
-     * @return array<string, string>
+     * @return array<int|string, string>
      */
     public function getMigrationDirs(): array
     {
         return $this->configuration['migration_dirs'];
     }
 
+    /**
+     * @throws InvalidArgumentValueException
+     */
     public function getMigrationDir(?string $dir = null): string
     {
         if ($dir === null) {

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
-class IndexColumnSettings
+final class IndexColumnSettings
 {
     const SETTING_ORDER = 'order';
     const SETTING_LENGTH = 'length';

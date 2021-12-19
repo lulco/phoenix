@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Mock\Command;
 
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
-class Input implements InputInterface
+final class Input implements InputInterface
 {
     private array $arguments = [];
 
@@ -25,8 +27,9 @@ class Input implements InputInterface
         return $this->arguments;
     }
 
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
+        return null;
     }
 
     public function getOption(string $name)
@@ -53,9 +56,9 @@ class Input implements InputInterface
         return isset($this->options[$name]);
     }
 
-    public function hasParameterOption($values, bool $onlyParams = false)
+    public function hasParameterOption($values, bool $onlyParams = false): bool
     {
-
+        return false;
     }
 
     public function isInteractive(): bool

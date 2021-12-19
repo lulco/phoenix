@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
@@ -8,9 +10,9 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\Table;
 use PHPUnit\Framework\TestCase;
 
-class TableTest extends TestCase
+final class TableTest extends TestCase
 {
-    public function testConstructAndSetName()
+    public function testConstructAndSetName(): void
     {
         $table = new Table('test');
         $this->assertEquals('test', $table->getName());
@@ -18,7 +20,7 @@ class TableTest extends TestCase
         $this->assertEquals('new_test', $table->getName());
     }
 
-    public function testSimpleTable()
+    public function testSimpleTable(): void
     {
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('title', 'string')));
@@ -40,7 +42,7 @@ class TableTest extends TestCase
         $this->assertCount(0, $table->getForeignKeys());
     }
 
-    public function testComplexTable()
+    public function testComplexTable(): void
     {
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->setCharset('my_charset'));
@@ -70,7 +72,7 @@ class TableTest extends TestCase
         $this->assertCount(1, $table->getForeignKeys());
     }
 
-    public function testChangeTable()
+    public function testChangeTable(): void
     {
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->setCharset('my_charset'));
@@ -113,7 +115,7 @@ class TableTest extends TestCase
         $this->assertCount(0, $table->getForeignKeys());
     }
 
-    public function testGetColumn()
+    public function testGetColumn(): void
     {
         $table = new Table('test');
         $this->assertInstanceOf(Table::class, $table->addColumn(new Column('title', 'string')));

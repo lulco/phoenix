@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config\Parser;
 
 use Nette\Neon\Neon;
 use Phoenix\Exception\ConfigException;
 
-class NeonConfigParser implements ConfigParserInterface
+final class NeonConfigParser implements ConfigParserInterface
 {
     public function parse(string $filename): array
     {

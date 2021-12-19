@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\Init\Init;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitCommand extends AbstractCommand
+final class InitCommand extends AbstractCommand
 {
     protected function configure(): void
     {

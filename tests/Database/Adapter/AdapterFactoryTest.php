@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Config\EnvironmentConfig;
@@ -11,9 +13,9 @@ use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
-class AdapterFactoryTest extends TestCase
+final class AdapterFactoryTest extends TestCase
 {
-    public function testMysql()
+    public function testMysql(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -24,7 +26,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(MysqlQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
-    public function testMysqlVersion550()
+    public function testMysqlVersion550(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -36,7 +38,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(MysqlQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
-    public function testMysqlVersion508()
+    public function testMysqlVersion508(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -50,7 +52,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertNotInstanceOf(MysqlWithJsonQueryBuilder::class, $queryBuilder);
     }
 
-    public function testMysqlVersion578()
+    public function testMysqlVersion578(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -62,7 +64,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
-    public function testMysqlVersion8019()
+    public function testMysqlVersion8019(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'mysql',
@@ -74,7 +76,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
-    public function testPgsql()
+    public function testPgsql(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'pgsql',
@@ -84,7 +86,7 @@ class AdapterFactoryTest extends TestCase
         $this->assertInstanceOf(PgsqlAdapter::class, $adapter);
     }
 
-    public function testUnknown()
+    public function testUnknown(): void
     {
         $config = new EnvironmentConfig([
             'adapter' => 'unknown',

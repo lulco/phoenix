@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use InvalidArgumentException;
@@ -11,9 +13,9 @@ use Phoenix\Database\Element\Table;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
-class MigrationTableTest extends TestCase
+final class MigrationTableTest extends TestCase
 {
-    public function testDefaultConstruct()
+    public function testDefaultConstruct(): void
     {
         $table = new MigrationTable('test');
         $table->addPrimary(true);
@@ -46,7 +48,7 @@ class MigrationTableTest extends TestCase
         }
     }
 
-    public function testNoPrimaryKey()
+    public function testNoPrimaryKey(): void
     {
         $table = new MigrationTable('test', false);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
@@ -60,7 +62,7 @@ class MigrationTableTest extends TestCase
         $this->assertCount(0, $table->getPrimaryColumnNames());
     }
 
-    public function testStringPrimaryKey()
+    public function testStringPrimaryKey(): void
     {
         $table = new MigrationTable('test', 'identifier');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier', 'string'));
@@ -74,7 +76,7 @@ class MigrationTableTest extends TestCase
         $this->assertCount(1, $table->getPrimaryColumnNames());
     }
 
-    public function testMultiPrimaryKey()
+    public function testMultiPrimaryKey(): void
     {
         $table = new MigrationTable('test', ['identifier1', 'identifier2']);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('identifier1', 'string'));
@@ -89,7 +91,7 @@ class MigrationTableTest extends TestCase
         $this->assertCount(2, $table->getPrimaryColumnNames());
     }
 
-    public function testDropPrimaryKey()
+    public function testDropPrimaryKey(): void
     {
         $table = new MigrationTable('test');
         $this->assertFalse($table->hasPrimaryKeyToDrop());
@@ -97,7 +99,7 @@ class MigrationTableTest extends TestCase
         $this->assertTrue($table->hasPrimaryKeyToDrop());
     }
 
-    public function testColumns()
+    public function testColumns(): void
     {
         $table = new MigrationTable('test');
         $table->addPrimary(true);
@@ -119,7 +121,7 @@ class MigrationTableTest extends TestCase
         $this->assertCount(1, $table->getColumnsToDrop());
     }
 
-    public function testUnsupportedColumnType()
+    public function testUnsupportedColumnType(): void
     {
         $table = new MigrationTable('unsupported');
         $this->expectException(InvalidArgumentValueException::class);
@@ -127,7 +129,7 @@ class MigrationTableTest extends TestCase
         $table->addColumn('title', 'unsupported');
     }
 
-    public function testIndexes()
+    public function testIndexes(): void
     {
         $table = new MigrationTable('test');
         $this->assertCount(0, $table->getIndexes());
@@ -148,7 +150,7 @@ class MigrationTableTest extends TestCase
         $this->assertEquals('title_alias', $table->getIndexesToDrop()[1]);
     }
 
-    public function testForeignKeys()
+    public function testForeignKeys(): void
     {
         $table = new MigrationTable('test');
         $this->assertCount(0, $table->getForeignKeys());
@@ -164,7 +166,7 @@ class MigrationTableTest extends TestCase
         $this->assertEquals('first_column', $table->getForeignKeysToDrop()[0]);
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
@@ -190,7 +192,7 @@ class MigrationTableTest extends TestCase
         $this->assertNull($table->getColumn('unknown_column'));
     }
 
-    public function testCharsetCollationAndComment()
+    public function testCharsetCollationAndComment(): void
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->setCharset('my_charset'));
@@ -205,13 +207,12 @@ class MigrationTableTest extends TestCase
         $this->assertEquals('', $table->getComment());
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $table = new MigrationTable('test');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string'));
         $this->assertCount(0, $table->getPrimaryColumnNames());
-
-        $this->assertNull($table->create());
+        $table->create();
 
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getCharset());
@@ -235,61 +236,61 @@ class MigrationTableTest extends TestCase
         $this->assertCount(1, $table->getPrimaryColumnNames());
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
-        $this->assertNull($table->create());
+        $table->create();
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_CREATE, $table->getAction());
     }
 
-    public function testRename()
+    public function testRename(): void
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getNewName());
-        $this->assertNull($table->rename('new_test'));
+        $table->rename('new_test');
         $this->assertEquals(MigrationTable::ACTION_RENAME, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
     }
 
-    public function testDrop()
+    public function testDrop(): void
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_ALTER, $table->getAction());
-        $this->assertNull($table->drop());
+        $table->drop();
         $this->assertEquals('test', $table->getName());
         $this->assertEquals(MigrationTable::ACTION_DROP, $table->getAction());
     }
 
-    public function testCopy()
+    public function testCopy(): void
     {
         $table = new MigrationTable('test');
         $this->assertEquals('test', $table->getName());
         $this->assertNull($table->getNewName());
-        $this->assertNull($table->copy('new_test'));
+        $table->copy('new_test');
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_STRUCTURE));
+        $table->copy('new_test', MigrationTable::COPY_ONLY_STRUCTURE);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_STRUCTURE, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_ONLY_DATA));
+        $table->copy('new_test', MigrationTable::COPY_ONLY_DATA);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
         $this->assertEquals(MigrationTable::COPY_ONLY_DATA, $table->getCopyType());
 
-        $this->assertNull($table->copy('new_test', MigrationTable::COPY_STRUCTURE_AND_DATA));
+        $table->copy('new_test', MigrationTable::COPY_STRUCTURE_AND_DATA);
         $this->assertEquals(MigrationTable::ACTION_COPY, $table->getAction());
         $this->assertEquals('test', $table->getName());
         $this->assertEquals('new_test', $table->getNewName());
@@ -300,7 +301,7 @@ class MigrationTableTest extends TestCase
         $table->copy('new_test', 'unknown_copy_type');
     }
 
-    public function testToTable()
+    public function testToTable(): void
     {
         $migrationTable = new MigrationTable('test');
         $migrationTable->setCharset('my_charset');
@@ -331,7 +332,7 @@ class MigrationTableTest extends TestCase
         $this->assertEquals($migrationTable->getColumn('fk_table1_id'), $table->getColumn('fk_table1_id'));
     }
 
-    public function testTryingToAddPrimaryColumnAsStrings()
+    public function testTryingToAddPrimaryColumnAsStrings(): void
     {
         $table = new MigrationTable('add_primary_columns');
         $this->expectException(InvalidArgumentException::class);

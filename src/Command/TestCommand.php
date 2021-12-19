@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
@@ -7,7 +9,7 @@ use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TestCommand extends AbstractCommand
+final class TestCommand extends AbstractCommand
 {
     /** @var array<int, array{classname: string, type: string, execution_time: float}> */
     private array $executedMigrations = [];

@@ -8,6 +8,9 @@
 - changed autoload to PSR-4
   - moved namespace Dumper to Phoenix\Dumper (BC break)
   - moved namespace Comparator to Phoenix\Comparator (BC break)
+- added declare(strict_types=1); to all classes
+- all classes which can be final are final (BC break if there are some extensions)
+- all methods which can be final are final
 
 
 

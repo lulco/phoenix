@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Templates;
 
-use Phoenix\Exception\PhoenixException;
+use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationNameCreator;
 
-class TemplateManager
+final class TemplateManager
 {
     private MigrationNameCreator $migrationNameCreator;
 
@@ -19,7 +21,7 @@ class TemplateManager
         $this->indent = $indent;
         $templatePath = $templatePath ?: __DIR__ . '/DefaultTemplate.phoenix';
         if (!is_file($templatePath)) {
-            throw new PhoenixException('Template "' . $templatePath . '" not found');
+            throw new InvalidArgumentValueException('Template "' . $templatePath . '" not found');
         }
         $this->templatePath = $templatePath;
     }

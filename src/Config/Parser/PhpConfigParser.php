@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config\Parser;
 
 use Phoenix\Exception\ConfigException;
 
-class PhpConfigParser implements ConfigParserInterface
+final class PhpConfigParser implements ConfigParserInterface
 {
     public function parse(string $filename): array
     {

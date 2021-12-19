@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
-class InvalidArgumentValueException extends PhoenixException
+final class InvalidArgumentValueException extends PhoenixException
 {
 }

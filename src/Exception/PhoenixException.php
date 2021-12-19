@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
 use Exception;
 
-class PhoenixException extends Exception
+abstract class PhoenixException extends Exception
 {
 }

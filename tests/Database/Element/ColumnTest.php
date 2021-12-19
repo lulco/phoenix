@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
@@ -7,9 +9,9 @@ use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
-class ColumnTest extends TestCase
+final class ColumnTest extends TestCase
 {
-    public function testSimple()
+    public function testSimple(): void
     {
         $column = new Column('title', 'string');
         $this->assertEquals('title', $column->getName());
@@ -32,7 +34,7 @@ class ColumnTest extends TestCase
         $this->assertNull($column->getSettings()->getComment());
     }
 
-    public function testComplex()
+    public function testComplex(): void
     {
         $column = new Column('title', 'string', ['null' => true, 'default' => '', 'length' => 255, 'after' => 'id']);
         $this->assertEquals('title', $column->getName());
@@ -55,7 +57,7 @@ class ColumnTest extends TestCase
         $this->assertNull($column->getSettings()->getComment());
     }
 
-    public function testFullSettings()
+    public function testFullSettings(): void
     {
         $settings = [
             'null' => false,
@@ -93,21 +95,21 @@ class ColumnTest extends TestCase
         $this->assertEquals('My comment', $column->getSettings()->getComment());
     }
 
-    public function testUnsupportedColumnType()
+    public function testUnsupportedColumnType(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Type "unsupported" is not allowed');
         new Column('title', 'unsupported');
     }
 
-    public function testNotAllowedSetting()
+    public function testNotAllowedSetting(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Setting "not_allowed_setting" is not allowed.');
         new Column('title', 'string', ['not_allowed_setting' => true]);
     }
 
-    public function testNotAllowedSettingValue()
+    public function testNotAllowedSettingValue(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Value "123" is not allowed for setting "null".');

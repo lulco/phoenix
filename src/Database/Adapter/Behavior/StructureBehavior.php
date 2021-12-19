@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Adapter\Behavior;
 
 use Phoenix\Database\Element\IndexColumn;

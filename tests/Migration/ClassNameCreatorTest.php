@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Migration\ClassNameCreator;
 use PHPUnit\Framework\TestCase;
 
-class ClassNameCreatorTest extends TestCase
+final class ClassNameCreatorTest extends TestCase
 {
-    public function testClassName()
+    public function testClassName(): void
     {
         $filepath = __DIR__ . '/../fake/structure/migration_directory_1/20150428140909_first_migration.php';
         $creator = new ClassNameCreator($filepath);

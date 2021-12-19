@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
-class ClassNameCreator
+final class ClassNameCreator
 {
     private string $datetime = '';
 

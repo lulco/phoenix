@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Database\Adapter\AdapterFactory;
@@ -9,7 +11,7 @@ use Phoenix\Exception\InvalidArgumentValueException;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
-class DiffCommand extends AbstractDumpCommand
+final class DiffCommand extends AbstractDumpCommand
 {
     protected function configure(): void
     {

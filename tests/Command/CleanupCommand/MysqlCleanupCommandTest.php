@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\CleanupCommand;
 
 use Phoenix\Tests\Command\MysqlCommandBehavior;
 
-class MysqlCleanupCommandTest extends CleanupCommandTest
+final class MysqlCleanupCommandTest extends CleanupCommandTest
 {
     use MysqlCommandBehavior;
 }

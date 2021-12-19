@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Symfony\Component\Console\Helper\Table;
 
-class StatusCommand extends AbstractCommand
+final class StatusCommand extends AbstractCommand
 {
     protected function configure(): void
     {

@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
-class DatabaseQueryExecuteException extends PhoenixException
+final class DatabaseQueryExecuteException extends PhoenixException
 {
 }

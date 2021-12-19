@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\DumpCommand;
 
 use Phoenix\Command\DumpCommand;
@@ -16,19 +18,19 @@ use Symfony\Component\Finder\Finder;
 
 abstract class DumpCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new DumpCommand();
         $this->assertEquals('dump', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new DumpCommand('my_dump');
         $this->assertEquals('my_dump', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new DumpCommand();
         $this->expectException(ConfigException::class);
@@ -36,7 +38,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new DumpCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -45,7 +47,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testNonExistingTemplateFileException()
+    public function testNonExistingTemplateFileException(): void
     {
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -62,7 +64,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice(): void
     {
         $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
@@ -91,7 +93,9 @@ abstract class DumpCommandTest extends BaseCommandTest
             $filePath = (string)$dumpFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -102,7 +106,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         rmdir($dumpMigrationDir);
     }
 
-    public function testDumpCommandAfterInit()
+    public function testDumpCommandAfterInit(): void
     {
         $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
@@ -132,7 +136,9 @@ abstract class DumpCommandTest extends BaseCommandTest
             $filePath = (string)$dumpFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -152,7 +158,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         rmdir($dumpMigrationDir);
     }
 
-    public function testDumpCommandAfterMigration()
+    public function testDumpCommandAfterMigration(): void
     {
         $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
@@ -186,7 +192,9 @@ abstract class DumpCommandTest extends BaseCommandTest
         foreach ($dumpFiles as $dumpFile) {
             $filePath = (string)$dumpFile;
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
             $classNameCreator = new ClassNameCreator($filePath);
@@ -204,7 +212,7 @@ abstract class DumpCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testDumpCommandJsonOutputAfterMigration()
+    public function testDumpCommandJsonOutputAfterMigration(): void
     {
         $dumpMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($dumpMigrationDir));
@@ -239,7 +247,9 @@ abstract class DumpCommandTest extends BaseCommandTest
         foreach ($dumpFiles as $dumpFile) {
             $filePath = (string)$dumpFile;
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
             $classNameCreator = new ClassNameCreator($filePath);

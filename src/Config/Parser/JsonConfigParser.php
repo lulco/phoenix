@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config\Parser;
 
 use Phoenix\Exception\ConfigException;
 
-class JsonConfigParser implements ConfigParserInterface
+final class JsonConfigParser implements ConfigParserInterface
 {
     public function parse(string $filename): array
     {

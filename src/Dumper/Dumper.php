@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Dumper;
 
 use Phoenix\Database\Element\Column;
@@ -8,7 +10,7 @@ use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 
-class Dumper
+final class Dumper
 {
     private string $indent;
 
@@ -168,7 +170,7 @@ class Dumper
                     } elseif ($value === true) {
                         $dataMigration .= "{$this->indent(2)}'$column' => true,\n";
                     } else {
-                        $dataMigration .= "{$this->indent(2)}'$column' => '" . str_replace(["'"], ["\'"], $value) . "',\n";
+                        $dataMigration .= "{$this->indent(2)}'$column' => '" . $this->sanitizeSingleQuote((string)$value) . "',\n";
                     }
                 }
                 $dataMigration .= "{$this->indent(1)}],\n";
@@ -202,7 +204,7 @@ class Dumper
     private function valuesToString(array $values): string
     {
         $values = array_map(function ($value) {
-            return "'" . $this->sanitizeSingleQuote($value) . "'";
+            return "'" . $this->sanitizeSingleQuote((string)$value) . "'";
         }, $values);
         return '[' . implode(', ', $values) . ']';
     }

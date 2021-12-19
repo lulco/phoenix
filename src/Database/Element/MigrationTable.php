@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Database\Element\Behavior\AutoIncrementBehavior;
@@ -15,7 +17,7 @@ use Phoenix\Database\Element\Behavior\IndexBehavior;
 use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class MigrationTable
+final class MigrationTable
 {
     use AutoIncrementBehavior;
     use CharsetAndCollationBehavior;

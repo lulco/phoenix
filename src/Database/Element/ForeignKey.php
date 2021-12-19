@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class ForeignKey
+final class ForeignKey
 {
     use ParamsCheckerBehavior;
 

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputOption;
 
-class MigrateCommand extends AbstractRunCommand
+final class MigrateCommand extends AbstractRunCommand
 {
     protected string $noMigrationsFoundMessage = 'Nothing to migrate';
 

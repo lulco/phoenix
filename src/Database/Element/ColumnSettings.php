@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 
-class ColumnSettings
+final class ColumnSettings
 {
     const SETTING_NULL = 'null';
     const SETTING_DEFAULT = 'default';
