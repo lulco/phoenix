@@ -12,20 +12,19 @@ use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
-use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 
-class MysqlAdapter extends PdoAdapter
+final class MysqlAdapter extends PdoAdapter
 {
     private ?MysqlQueryBuilder $queryBuilder = null;
 
     public function getQueryBuilder(): MysqlQueryBuilder
     {
         if (!$this->queryBuilder) {
+            $features = [];
             if ($this->version && version_compare($this->version, '5.7.8', '>=')) {
-                $this->queryBuilder = new MysqlWithJsonQueryBuilder($this);
-            } else {
-                $this->queryBuilder = new MysqlQueryBuilder($this);
+                $features[] = MysqlQueryBuilder::FEATURE_JSON;
             }
+            $this->queryBuilder = new MysqlQueryBuilder($this, $features);
         }
         return $this->queryBuilder;
     }

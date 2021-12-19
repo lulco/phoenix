@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phoenix\Tests\Database\Adapter;
 
 use InvalidArgumentException;
+use Phoenix\Database\Adapter\MysqlAdapter;
 use UnexpectedValueException;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class PdoAdapterTest extends TestCase
 {
-    private MysqlCleanupAdapter $adapter;
+    private MysqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -23,7 +24,7 @@ final class PdoAdapterTest extends TestCase
         $adapter->cleanupDatabase();
 
         $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
-        $this->adapter = new MysqlCleanupAdapter($pdo);
+        $this->adapter = new MysqlAdapter($pdo);
     }
 
     public function testTransaction(): void

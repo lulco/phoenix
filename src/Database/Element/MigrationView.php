@@ -6,11 +6,11 @@ namespace Phoenix\Database\Element;
 
 final class MigrationView
 {
-    const ACTION_CREATE = 'create';
+    public const ACTION_CREATE = 'create';
 
-    const ACTION_REPLACE = 'replace';
+    public const ACTION_REPLACE = 'replace';
 
-    const ACTION_DROP = 'drop';
+    public const ACTION_DROP = 'drop';
 
     private string $name;
 

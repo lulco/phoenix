@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Config\Config;
+use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
@@ -18,7 +19,7 @@ final class ManagerTest extends TestCase
 {
     private Manager $manager;
 
-    private MysqlCleanupAdapter $adapter;
+    private MysqlAdapter $adapter;
 
     private Init $initMigration;
 
@@ -45,7 +46,7 @@ final class ManagerTest extends TestCase
         $adapter->cleanupDatabase();
 
         $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
-        $this->adapter = new MysqlCleanupAdapter($pdo);
+        $this->adapter = new MysqlAdapter($pdo);
 
         $this->initMigration = new Init($this->adapter, $config->getLogTableName());
         $this->initMigration->migrate();

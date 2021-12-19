@@ -15,7 +15,7 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
-class PgsqlAdapter extends PdoAdapter
+final class PgsqlAdapter extends PdoAdapter
 {
     private ?PgsqlQueryBuilder $queryBuilder = null;
 

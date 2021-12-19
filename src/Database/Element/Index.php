@@ -11,13 +11,13 @@ final class Index
 {
     use ParamsCheckerBehavior;
 
-    const TYPE_NORMAL = '';
-    const TYPE_UNIQUE = 'UNIQUE';
-    const TYPE_FULLTEXT = 'FULLTEXT';
+    public const TYPE_NORMAL = '';
+    public const TYPE_UNIQUE = 'UNIQUE';
+    public const TYPE_FULLTEXT = 'FULLTEXT';
 
-    const METHOD_DEFAULT = '';
-    const METHOD_BTREE = 'BTREE';
-    const METHOD_HASH = 'HASH';
+    public const METHOD_DEFAULT = '';
+    public const METHOD_BTREE = 'BTREE';
+    public const METHOD_HASH = 'HASH';
 
     /** @var IndexColumn[] */
     private array $columns = [];
