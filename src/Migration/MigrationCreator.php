@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
 use Phoenix\Templates\TemplateManager;
 
-class MigrationCreator
+final class MigrationCreator
 {
     private MigrationNameCreator $migrationNameCreator;
 

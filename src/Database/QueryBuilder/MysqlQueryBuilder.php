@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\QueryBuilder;
 
+use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Database\Element\Index;
@@ -10,11 +13,25 @@ use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Table;
 
-class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
+final class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
+    public const FEATURE_JSON = 'json';
+
+    /** @var string[] */
+    private array $features;
+
+    /**
+     * @param string[] $features
+     */
+    public function __construct(AdapterInterface $adapter, array $features = [])
+    {
+        parent::__construct($adapter);
+        $this->features = $features;
+    }
+
     protected function typeMap(): array
     {
-        return [
+        $typeMap = [
             Column::TYPE_BIT => 'bit(%d)',
             Column::TYPE_TINY_INTEGER => 'tinyint(%d)',
             Column::TYPE_SMALL_INTEGER => 'smallint(%d)',
@@ -48,6 +65,11 @@ class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
             Column::TYPE_LINE => 'linestring',
             Column::TYPE_POLYGON => 'polygon',
         ];
+
+        if (in_array(self::FEATURE_JSON, $this->features, true)) {
+            $typeMap[Column::TYPE_JSON] = 'json';
+        }
+        return $typeMap;
     }
 
     protected array $defaultLength = [

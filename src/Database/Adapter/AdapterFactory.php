@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Adapter;
 
 use PDO;
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class AdapterFactory
+final class AdapterFactory
 {
     public static function instance(EnvironmentConfig $config): AdapterInterface
     {

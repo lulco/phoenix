@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\InitCommand;
 
 use Phoenix\Tests\Command\PgsqlCommandBehavior;
 
-class PgsqlInitCommandTest extends InitCommandTest
+final class PgsqlInitCommandTest extends InitCommandTest
 {
     use PgsqlCommandBehavior;
 }

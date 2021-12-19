@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
-class IndexColumn
+final class IndexColumn
 {
     private string $name;
 

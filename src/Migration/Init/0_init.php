@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration\Init;
 
 use Phoenix\Database\Adapter\AdapterInterface;
@@ -7,7 +9,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 
-class Init extends AbstractMigration
+final class Init extends AbstractMigration
 {
     private string $logTableName;
 

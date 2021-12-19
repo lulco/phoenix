@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\CleanupCommand;
 
 use Phoenix\Command\CleanupCommand;
@@ -11,19 +13,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class CleanupCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new CleanupCommand();
         $this->assertEquals('cleanup', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new CleanupCommand('my_cleanup');
         $this->assertEquals('my_cleanup', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new CleanupCommand();
         $this->expectException(ConfigException::class);
@@ -31,7 +33,7 @@ abstract class CleanupCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new CleanupCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -40,7 +42,7 @@ abstract class CleanupCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFile()
+    public function testUserConfigFile(): void
     {
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -61,7 +63,7 @@ abstract class CleanupCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
-    public function testUserConfigFileAndJsonOutput()
+    public function testUserConfigFileAndJsonOutput(): void
     {
         $initCommand = new InitCommand();
         $input = $this->createInput();
@@ -88,7 +90,7 @@ abstract class CleanupCommandTest extends BaseCommandTest
         $this->assertArrayHasKey('execution_time', $message);
     }
 
-    public function testUserConfigFileAndJsonOutputAndDebugVerbosity()
+    public function testUserConfigFileAndJsonOutputAndDebugVerbosity(): void
     {
         $initCommand = new InitCommand();
         $input = $this->createInput();

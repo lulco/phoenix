@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\ColumnSettings;
 
-class SettingsComparator
+final class SettingsComparator
 {
     /**
      * @return array<string, mixed>

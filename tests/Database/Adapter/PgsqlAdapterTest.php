@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Database\Adapter\PgsqlAdapter;
@@ -17,9 +19,9 @@ use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class PgsqlAdapterTest extends TestCase
+final class PgsqlAdapterTest extends TestCase
 {
-    private $adapter;
+    private PgsqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -31,19 +33,19 @@ class PgsqlAdapterTest extends TestCase
         $this->adapter = new PgsqlAdapter($pdo);
     }
 
-    public function testGetQueryBuilder()
+    public function testGetQueryBuilder(): void
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
         $this->assertInstanceOf(PgsqlQueryBuilder::class, $this->adapter->getQueryBuilder());
     }
 
-    public function testForeignKeyQueries()
+    public function testForeignKeyQueries(): void
     {
         $this->assertEquals('SET session_replication_role = DEFAULT;', $this->adapter->buildCheckForeignKeysQuery());
         $this->assertEquals('SET session_replication_role = replica;', $this->adapter->buildDoNotCheckForeignKeysQuery());
     }
 
-    public function testGetEmptyStructureAndUpdate()
+    public function testGetEmptyStructureAndUpdate(): void
     {
         $structure = $this->adapter->getStructure();
         $this->assertInstanceOf(Structure::class, $structure);
@@ -70,7 +72,7 @@ class PgsqlAdapterTest extends TestCase
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
     }
 
-    public function testUniqueIndexWithLengthSpecified()
+    public function testUniqueIndexWithLengthSpecified(): void
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
 
@@ -134,7 +136,7 @@ class PgsqlAdapterTest extends TestCase
         ]);
     }
 
-    public function testIndexWithOrderSpecified()
+    public function testIndexWithOrderSpecified(): void
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
 
@@ -196,7 +198,7 @@ class PgsqlAdapterTest extends TestCase
         ], Index::TYPE_NORMAL, Index::METHOD_DEFAULT);
     }
 
-    public function testFullStructure()
+    public function testFullStructure(): void
     {
         $this->prepareStructure();
 
@@ -416,7 +418,7 @@ class PgsqlAdapterTest extends TestCase
         $this->assertEquals(ForeignKey::CASCADE, $foreignKey->getOnUpdate());
     }
 
-    private function prepareStructure()
+    private function prepareStructure(): void
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
 
@@ -526,7 +528,7 @@ class PgsqlAdapterTest extends TestCase
         $this->assertEquals($expectedSettings['comment'], $column->getSettings()->getComment());
     }
 
-    private function checkIndex(Table $table, $name, array $columns, $type, $method)
+    private function checkIndex(Table $table, string $name, array $columns, string $type, string $method): void
     {
         $index = $table->getIndex($name);
         $this->assertInstanceOf(Index::class, $index);

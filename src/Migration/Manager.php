@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
 use DateTime;
@@ -11,15 +13,15 @@ use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 use ReflectionParameter;
 
-class Manager
+final class Manager
 {
     use ParamsCheckerBehavior;
 
-    const TYPE_UP = 'up';
-    const TYPE_DOWN = 'down';
+    public const TYPE_UP = 'up';
+    public const TYPE_DOWN = 'down';
 
-    const TARGET_FIRST = 'first';
-    const TARGET_ALL = 'all';
+    public const TARGET_FIRST = 'first';
+    public const TARGET_ALL = 'all';
 
     private Config $config;
 

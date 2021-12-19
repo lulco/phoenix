@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Exception\InvalidArgumentValueException;

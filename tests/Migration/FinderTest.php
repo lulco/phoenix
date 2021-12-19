@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Migration;
 
 use InvalidArgumentException;
 use Phoenix\Migration\FilesFinder;
 use PHPUnit\Framework\TestCase;
 
-class FilesFinderTest extends TestCase
+final class FilesFinderTest extends TestCase
 {
-    public function testDirectories()
+    public function testDirectories(): void
     {
         $finder = new FilesFinder();
         $this->assertCount(0, $finder->getDirectories());
@@ -32,7 +34,7 @@ class FilesFinderTest extends TestCase
         $this->assertCount(0, $finder->getDirectories());
     }
 
-    public function testAddNotExistingDirectory()
+    public function testAddNotExistingDirectory(): void
     {
         $finder = new FilesFinder();
         $this->expectException(InvalidArgumentException::class);
@@ -40,7 +42,7 @@ class FilesFinderTest extends TestCase
         $finder->addDirectory('not_existing_directory');
     }
 
-    public function testAddFileAsDirectory()
+    public function testAddFileAsDirectory(): void
     {
         $finder = new FilesFinder();
         $this->expectException(InvalidArgumentException::class);
@@ -48,14 +50,14 @@ class FilesFinderTest extends TestCase
         $finder->addDirectory(__DIR__ . '/../fake/structure/migration_directory_1/20150428140909_first_migration.php');
     }
 
-    public function testRemoveNotAddedDirectory()
+    public function testRemoveNotAddedDirectory(): void
     {
         $finder = new FilesFinder();
         $this->expectException(InvalidArgumentException::class);
         $finder->removeDirectory('not_added_directory');
     }
 
-    public function testGetMigrationFiles()
+    public function testGetMigrationFiles(): void
     {
         $finder = new FilesFinder();
         $finder->addDirectory(__DIR__ . '/../fake/structure/migration_directory_1');

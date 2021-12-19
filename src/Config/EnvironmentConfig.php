@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config;
 
-class EnvironmentConfig
+final class EnvironmentConfig
 {
     /**
      * @var array<string, mixed>

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use Phoenix\Migration\AbstractMigration;
 
-class FourthAdd extends AbstractMigration
+final class FourthAdd extends AbstractMigration
 {
     public function up(): void
     {

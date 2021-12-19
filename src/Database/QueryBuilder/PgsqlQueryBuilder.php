@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\QueryBuilder;
 
 use InvalidArgumentException;
@@ -12,7 +14,7 @@ use Phoenix\Database\Element\IndexColumnSettings;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Table;
 
-class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
+final class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterface
 {
     protected function typeMap() : array
     {
@@ -226,7 +228,7 @@ class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilderInterf
     private function escapeDefault(Column $column): string
     {
         if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
-            $default = $column->getSettings()->getDefault();
+            $default = (string)$column->getSettings()->getDefault();
         } elseif (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
         } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {

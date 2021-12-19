@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 
-class ColumnSettings
+final class ColumnSettings
 {
-    const SETTING_NULL = 'null';
-    const SETTING_DEFAULT = 'default';
-    const SETTING_LENGTH = 'length';
-    const SETTING_DECIMALS = 'decimals';
-    const SETTING_SIGNED = 'signed';
-    const SETTING_AUTOINCREMENT = 'autoincrement';
-    const SETTING_AFTER = 'after';
-    const SETTING_FIRST = 'first';
-    const SETTING_CHARSET = 'charset';
-    const SETTING_COLLATION = 'collation';
-    const SETTING_VALUES = 'values';
-    const SETTING_COMMENT = 'comment';
+    public const SETTING_NULL = 'null';
+    public const SETTING_DEFAULT = 'default';
+    public const SETTING_LENGTH = 'length';
+    public const SETTING_DECIMALS = 'decimals';
+    public const SETTING_SIGNED = 'signed';
+    public const SETTING_AUTOINCREMENT = 'autoincrement';
+    public const SETTING_AFTER = 'after';
+    public const SETTING_FIRST = 'first';
+    public const SETTING_CHARSET = 'charset';
+    public const SETTING_COLLATION = 'collation';
+    public const SETTING_VALUES = 'values';
+    public const SETTING_COMMENT = 'comment';
 
     /** @var array<string, array<callable>> */
     private array $allowedSettingsValues = [
@@ -36,7 +38,7 @@ class ColumnSettings
         self::SETTING_COMMENT => ['is_null', 'is_string'],
     ];
 
-    const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
+    public const DEFAULT_VALUE_CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP';
 
     /** @var array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} */
     private array $settings;

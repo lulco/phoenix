@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\Config;
@@ -10,9 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidFactoryInterface;
 
-class ConfigTest extends TestCase
+final class ConfigTest extends TestCase
 {
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $config = new Config([
             'migration_dirs' => [
@@ -37,7 +39,7 @@ class ConfigTest extends TestCase
         $this->assertCount(3, $config->getConfiguration()['environments']);
     }
 
-    public function testOverridenDefaults()
+    public function testOverridenDefaults(): void
     {
         $config = new Config([
             'default_environment' => 'second',
@@ -59,7 +61,7 @@ class ConfigTest extends TestCase
         $this->assertNull($config->getEnvironmentConfig('not_existing_config'));
     }
 
-    public function testEmptyMigrationDirs()
+    public function testEmptyMigrationDirs(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Empty migration dirs');
@@ -70,7 +72,7 @@ class ConfigTest extends TestCase
         ]);
     }
 
-    public function testSelectTheOnlyMigrationDir()
+    public function testSelectTheOnlyMigrationDir(): void
     {
         $config = new Config([
             'default_environment' => 'second',
@@ -84,13 +86,13 @@ class ConfigTest extends TestCase
             ],
         ]);
         $this->assertEquals('first_dir', $config->getMigrationDir());
-        $this->assertEquals('first_dir', $config->getMigrationDir(0));
+        $this->assertEquals('first_dir', $config->getMigrationDir('0'));
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Directory "xxx" doesn\'t exist. Use: 0');
         $config->getMigrationDir('xxx');
     }
 
-    public function testSelectMigrationDir()
+    public function testSelectMigrationDir(): void
     {
         $config = new Config([
             'default_environment' => 'second',
@@ -105,14 +107,14 @@ class ConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('first_dir', $config->getMigrationDir(0));
-        $this->assertEquals('second_dir', $config->getMigrationDir(1));
+        $this->assertEquals('first_dir', $config->getMigrationDir('0'));
+        $this->assertEquals('second_dir', $config->getMigrationDir('1'));
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('There are more then 1 migration dirs. Use one of them: 0, 1');
         $config->getMigrationDir();
     }
 
-    public function testSelectTheOnlyNamedMigrationDir()
+    public function testSelectTheOnlyNamedMigrationDir(): void
     {
         $config = new Config([
             'default_environment' => 'second',
@@ -133,7 +135,7 @@ class ConfigTest extends TestCase
         $config->getMigrationDir('xxx');
     }
 
-    public function testSelectNamedMigrationDir()
+    public function testSelectNamedMigrationDir(): void
     {
         $config = new Config([
             'default_environment' => 'second',
@@ -155,7 +157,7 @@ class ConfigTest extends TestCase
         $config->getMigrationDir('xxx');
     }
 
-    public function testEmptyEnvironments()
+    public function testEmptyEnvironments(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Empty environments');
@@ -166,7 +168,7 @@ class ConfigTest extends TestCase
         ]);
     }
 
-    public function testDependencies()
+    public function testDependencies(): void
     {
         $config = new Config([
             'migration_dirs' => [

@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
-class IndexColumnSettings
+final class IndexColumnSettings
 {
-    const SETTING_ORDER = 'order';
-    const SETTING_LENGTH = 'length';
+    public const SETTING_ORDER = 'order';
+    public const SETTING_LENGTH = 'length';
 
-    const SETTING_ORDER_ASC = 'ASC';
-    const SETTING_ORDER_DESC = 'DESC';
+    public const SETTING_ORDER_ASC = 'ASC';
+    public const SETTING_ORDER_DESC = 'DESC';
 
-    const DEFAULT_SETTINGS = [
+    public const DEFAULT_SETTINGS = [
         self::SETTING_ORDER => self::SETTING_ORDER_ASC,
         self::SETTING_LENGTH => null,
     ];

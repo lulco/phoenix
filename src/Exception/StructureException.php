@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Exception;
 
-class StructureException extends PhoenixException
+final class StructureException extends PhoenixException
 {
 }

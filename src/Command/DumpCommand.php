@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Database\Element\Structure;
 use Phoenix\Dumper\Dumper;
 use Symfony\Component\Console\Input\InputOption;
 
-class DumpCommand extends AbstractDumpCommand
+final class DumpCommand extends AbstractDumpCommand
 {
     protected function configure(): void
     {

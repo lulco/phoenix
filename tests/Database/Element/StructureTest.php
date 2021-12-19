@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\Column;
@@ -8,16 +10,16 @@ use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use PHPUnit\Framework\TestCase;
 
-class StructureTest extends TestCase
+final class StructureTest extends TestCase
 {
-    public function testEmpty()
+    public function testEmpty(): void
     {
         $structure = new Structure();
         $this->assertEquals([], $structure->getTables());
         $this->assertNull($structure->getTable('some_table'));
     }
 
-    public function testAddSimpleTable()
+    public function testAddSimpleTable(): void
     {
         $structure = new Structure();
 

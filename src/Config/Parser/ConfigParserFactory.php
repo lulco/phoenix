@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config\Parser;
 
 use Phoenix\Exception\ConfigException;
 
-class ConfigParserFactory
+final class ConfigParserFactory
 {
     public static function instance(string $type): ConfigParserInterface
     {

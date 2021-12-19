@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\QueryBuilder\MysqlQueryBuilder;
 
 use Phoenix\Database\Adapter\MysqlAdapter;
@@ -9,9 +11,9 @@ use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class CopyTableTest extends TestCase
+final class CopyTableTest extends TestCase
 {
-    private $adapter;
+    private MysqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -23,7 +25,7 @@ class CopyTableTest extends TestCase
         $this->adapter = new MysqlAdapter($pdo);
     }
 
-    public function testCopyDefault()
+    public function testCopyDefault(): void
     {
         $table = new MigrationTable('copy_default');
         $table->copy('new_copy_default');
@@ -35,7 +37,7 @@ class CopyTableTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->copyTable($table));
     }
 
-    public function testCopyOnlyStructure()
+    public function testCopyOnlyStructure(): void
     {
         $table = new MigrationTable('copy_only_structure');
         $table->copy('new_copy_only_structure', MigrationTable::COPY_ONLY_STRUCTURE);
@@ -47,7 +49,7 @@ class CopyTableTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->copyTable($table));
     }
 
-    public function testCopyOnlyData()
+    public function testCopyOnlyData(): void
     {
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $table = new MigrationTable('copy_only_data');
@@ -67,7 +69,7 @@ class CopyTableTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->copyTable($table));
     }
 
-    public function testCopyStructureAndData()
+    public function testCopyStructureAndData(): void
     {
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $table = new MigrationTable('copy_structure_and_data');

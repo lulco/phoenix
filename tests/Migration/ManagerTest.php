@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Config\Config;
+use Phoenix\Database\Adapter\MysqlAdapter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Init\Init;
@@ -12,13 +15,13 @@ use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use Phoenix\Tests\Mock\Migration\FakeMigration;
 use PHPUnit\Framework\TestCase;
 
-class ManagerTest extends TestCase
+final class ManagerTest extends TestCase
 {
-    private $manager;
+    private Manager $manager;
 
-    private $adapter;
+    private MysqlAdapter $adapter;
 
-    private $initMigration;
+    private Init $initMigration;
 
     protected function setUp(): void
     {
@@ -43,7 +46,7 @@ class ManagerTest extends TestCase
         $adapter->cleanupDatabase();
 
         $pdo = new MysqlPdo(getenv('PHOENIX_MYSQL_DATABASE'));
-        $this->adapter = new MysqlCleanupAdapter($pdo);
+        $this->adapter = new MysqlAdapter($pdo);
 
         $this->initMigration = new Init($this->adapter, $config->getLogTableName());
         $this->initMigration->migrate();
@@ -51,7 +54,7 @@ class ManagerTest extends TestCase
         $this->manager = new Manager($config, $this->adapter);
     }
 
-    public function testMigrations()
+    public function testMigrations(): void
     {
         $executedMigrations = $this->manager->executedMigrations();
         $this->assertTrue(is_array($executedMigrations));
@@ -98,14 +101,14 @@ class ManagerTest extends TestCase
         $this->checkMigrations($downMigrations, 2, [0 => '20150518091732', 1 => '20150428140909']);
     }
 
-    public function testWrongType()
+    public function testWrongType(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Type "type" is not allowed.');
         $this->manager->findMigrationsToExecute('type');
     }
 
-    public function testSkippingNonExistingMigration()
+    public function testSkippingNonExistingMigration(): void
     {
         $executedMigrations = $this->manager->executedMigrations();
         $this->assertTrue(is_array($executedMigrations));
@@ -126,7 +129,7 @@ class ManagerTest extends TestCase
         $this->assertEmpty($migrations);
     }
 
-    public function testExecuteLatestMigrationFirst()
+    public function testExecuteLatestMigrationFirst(): void
     {
         $oldName = __DIR__ . '/../fake/structure/migration_directory_1/20150428140909_first_migration.php';
         $newName = __DIR__ . '/../fake/structure/migration_directory_2/20150428140909_first_migration.php';
@@ -154,7 +157,7 @@ class ManagerTest extends TestCase
         $this->initMigration->rollback();
     }
 
-    public function testMigrationsWithTarget()
+    public function testMigrationsWithTarget(): void
     {
         $executedMigrations = $this->manager->executedMigrations();
         $this->assertTrue(is_array($executedMigrations));
@@ -209,7 +212,7 @@ class ManagerTest extends TestCase
         }
     }
 
-    private function checkMigrations($migrations, $count, array $migrationDatetimes = [])
+    private function checkMigrations(array $migrations, int $count, array $migrationDatetimes = []): void
     {
         $this->assertTrue(is_array($migrations));
         $this->assertCount($count, $migrations);

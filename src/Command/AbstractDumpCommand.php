@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Comparator\StructureComparator;
@@ -78,9 +80,9 @@ abstract class AbstractDumpCommand extends AbstractCommand
      */
     private function getFilteredTables(Structure $sourceStructure, Structure $targetStructure): array
     {
-        /** @var string $ignoredTablesOption */
+        /** @var string|null $ignoredTablesOption */
         $ignoredTablesOption = $this->input->getOption('ignore-tables');
-        $ignoredTables = array_filter(array_map('trim', explode(',', $ignoredTablesOption)));
+        $ignoredTables = $ignoredTablesOption ? array_filter(array_map('trim', explode(',', $ignoredTablesOption))) : [];
         $structureComparator = new StructureComparator();
         $tables = [];
         $diffTables = $structureComparator->diff($sourceStructure, $targetStructure);

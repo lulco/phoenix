@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Database\Element\Behavior\AutoIncrementBehavior;
 
-class Table
+final class Table
 {
     use AutoIncrementBehavior;
 

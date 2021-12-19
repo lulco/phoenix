@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Mock\Command;
 
 use Phoenix\Tests\Helpers\Command\Formatter;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Output implements OutputInterface
+final class Output implements OutputInterface
 {
     private array $messages = [];
 

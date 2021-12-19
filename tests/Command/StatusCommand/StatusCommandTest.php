@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\StatusCommand;
 
 use Phoenix\Command\InitCommand;
@@ -12,19 +14,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class StatusCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new StatusCommand();
         $this->assertEquals('status', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new StatusCommand('my_status');
         $this->assertEquals('my_status', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new StatusCommand();
         $this->expectException(ConfigException::class);
@@ -32,7 +34,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new StatusCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -41,7 +43,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testStatusWithoutInitializing()
+    public function testStatusWithoutInitializing(): void
     {
         $command = new StatusCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -58,7 +60,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithInitializing()
+    public function testStatusWithInitializing(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -80,7 +82,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusAfterOneExecutedMigration()
+    public function testStatusAfterOneExecutedMigration(): void
     {
         $input = $this->createInput();
         $input->setOption('first', true);
@@ -104,7 +106,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusAfterAllMigrationsExecuted()
+    public function testStatusAfterAllMigrationsExecuted(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -135,7 +137,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithJsonOutputAfterOneExecutedMigration()
+    public function testStatusWithJsonOutputAfterOneExecutedMigration(): void
     {
         $input = $this->createInput();
         $input->setOption('first', true);
@@ -163,7 +165,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertNotEmpty($message['migrations_to_execute']);
     }
 
-    public function testStatusWithJsonOutputAfterAllMigrationsExecuted()
+    public function testStatusWithJsonOutputAfterAllMigrationsExecuted(): void
     {
         $input = $this->createInput();
         $output = new Output();

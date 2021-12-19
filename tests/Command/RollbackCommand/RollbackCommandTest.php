@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\RollbackCommand;
 
 use Phoenix\Command\InitCommand;
@@ -13,19 +15,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class RollbackCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new RollbackCommand();
         $this->assertEquals('rollback', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new RollbackCommand('my_rollback');
         $this->assertEquals('my_rollback', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new RollbackCommand();
         $this->expectException(ConfigException::class);
@@ -33,7 +35,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new RollbackCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -42,7 +44,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testNothingToRollbackWithoutInitializing()
+    public function testNothingToRollbackWithoutInitializing(): void
     {
         $command = new RollbackCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -56,7 +58,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testNothingToRollbackWithInitializing()
+    public function testNothingToRollbackWithInitializing(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -75,7 +77,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testMigrateAndRollback()
+    public function testMigrateAndRollback(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -106,7 +108,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testRollbackAll()
+    public function testRollbackAll(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -137,7 +139,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testRollbackDir()
+    public function testRollbackDir(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -170,7 +172,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testRollbackUnknownDir()
+    public function testRollbackUnknownDir(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -186,7 +188,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $command->run($input, $output);
     }
 
-    public function testDryRun()
+    public function testDryRun(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);
@@ -223,7 +225,7 @@ abstract class RollbackCommandTest extends BaseCommandTest
         $this->assertEquals($dryQueries, $messages[OutputInterface::VERBOSITY_DEBUG]);
     }
 
-    public function testDryRunWithJsonOutput()
+    public function testDryRunWithJsonOutput(): void
     {
         $command = new MigrateCommand();
         $command->setConfig($this->configuration);

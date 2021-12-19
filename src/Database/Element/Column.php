@@ -1,48 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Exception\InvalidArgumentValueException;
 use ReflectionClass;
 
-class Column
+final class Column
 {
-    const TYPE_STRING = 'string';
-    const TYPE_BIT = 'bit';
-    const TYPE_TINY_INTEGER = 'tinyinteger';
-    const TYPE_SMALL_INTEGER = 'smallinteger';
-    const TYPE_MEDIUM_INTEGER = 'mediuminteger';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_BIG_INTEGER = 'biginteger';
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_BINARY = 'binary';
-    const TYPE_VARBINARY = 'varbinary';
-    const TYPE_TINY_TEXT = 'tinytext';
-    const TYPE_MEDIUM_TEXT = 'mediumtext';
-    const TYPE_TEXT = 'text';
-    const TYPE_LONG_TEXT = 'longtext';
-    const TYPE_TINY_BLOB = 'tinyblob';
-    const TYPE_MEDIUM_BLOB = 'mediumblob';
-    const TYPE_BLOB = 'blob';
-    const TYPE_LONG_BLOB = 'longblob';
-    const TYPE_DATE = 'date';
-    const TYPE_TIME = 'time';
-    const TYPE_DATETIME = 'datetime';
-    const TYPE_TIMESTAMP = 'timestamp';
-    const TYPE_TIMESTAMP_TZ = 'timestamptz';
-    const TYPE_UUID = 'uuid';
-    const TYPE_JSON = 'json';
-    const TYPE_CHAR = 'char';
-    const TYPE_NUMERIC = 'numeric';
-    const TYPE_DECIMAL = 'decimal';
-    const TYPE_FLOAT = 'float';
-    const TYPE_DOUBLE = 'double';
-    const TYPE_ENUM = 'enum';
-    const TYPE_SET = 'set';
-    const TYPE_YEAR = 'year';
-    const TYPE_POINT = 'point';
-    const TYPE_LINE = 'line';
-    const TYPE_POLYGON = 'polygon';
+    public const TYPE_STRING = 'string';
+    public const TYPE_BIT = 'bit';
+    public const TYPE_TINY_INTEGER = 'tinyinteger';
+    public const TYPE_SMALL_INTEGER = 'smallinteger';
+    public const TYPE_MEDIUM_INTEGER = 'mediuminteger';
+    public const TYPE_INTEGER = 'integer';
+    public const TYPE_BIG_INTEGER = 'biginteger';
+    public const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_BINARY = 'binary';
+    public const TYPE_VARBINARY = 'varbinary';
+    public const TYPE_TINY_TEXT = 'tinytext';
+    public const TYPE_MEDIUM_TEXT = 'mediumtext';
+    public const TYPE_TEXT = 'text';
+    public const TYPE_LONG_TEXT = 'longtext';
+    public const TYPE_TINY_BLOB = 'tinyblob';
+    public const TYPE_MEDIUM_BLOB = 'mediumblob';
+    public const TYPE_BLOB = 'blob';
+    public const TYPE_LONG_BLOB = 'longblob';
+    public const TYPE_DATE = 'date';
+    public const TYPE_TIME = 'time';
+    public const TYPE_DATETIME = 'datetime';
+    public const TYPE_TIMESTAMP = 'timestamp';
+    public const TYPE_TIMESTAMP_TZ = 'timestamptz';
+    public const TYPE_UUID = 'uuid';
+    public const TYPE_JSON = 'json';
+    public const TYPE_CHAR = 'char';
+    public const TYPE_NUMERIC = 'numeric';
+    public const TYPE_DECIMAL = 'decimal';
+    public const TYPE_FLOAT = 'float';
+    public const TYPE_DOUBLE = 'double';
+    public const TYPE_ENUM = 'enum';
+    public const TYPE_SET = 'set';
+    public const TYPE_YEAR = 'year';
+    public const TYPE_POINT = 'point';
+    public const TYPE_LINE = 'line';
+    public const TYPE_POLYGON = 'polygon';
 
     private string $name;
 

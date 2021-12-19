@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\TestCommand;
 
 use Phoenix\Command\InitCommand;
@@ -12,19 +14,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class TestCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new TestCommand();
         $this->assertEquals('test', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new TestCommand('my_test');
         $this->assertEquals('my_test', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new TestCommand();
         $this->expectException(ConfigException::class);
@@ -32,7 +34,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new TestCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -41,7 +43,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testTestWithoutInitializing()
+    public function testTestWithoutInitializing(): void
     {
         $command = new TestCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -56,7 +58,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testTestWithoutInitializingWithCleanup()
+    public function testTestWithoutInitializingWithCleanup(): void
     {
         $command = new TestCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -72,7 +74,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testTestWithInitializing()
+    public function testTestWithInitializing(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -92,7 +94,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testTestAfterAllMigrationsExecuted()
+    public function testTestAfterAllMigrationsExecuted(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -119,7 +121,7 @@ abstract class TestCommandTest extends BaseCommandTest
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testTestWithJsonOutput()
+    public function testTestWithJsonOutput(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -151,7 +153,7 @@ abstract class TestCommandTest extends BaseCommandTest
         }
     }
 
-    public function testTestWithJsonOutputVeryVerbose()
+    public function testTestWithJsonOutputVeryVerbose(): void
     {
         $input = $this->createInput();
         $output = new Output();

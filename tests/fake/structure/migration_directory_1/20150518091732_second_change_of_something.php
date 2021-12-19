@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use Phoenix\Migration\AbstractMigration;
 
-class SecondChangeOfSomething extends AbstractMigration
+final class SecondChangeOfSomething extends AbstractMigration
 {
     public function up(): void
     {

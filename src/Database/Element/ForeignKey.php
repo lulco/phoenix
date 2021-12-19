@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Behavior\ParamsCheckerBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class ForeignKey
+final class ForeignKey
 {
     use ParamsCheckerBehavior;
 
-    const DEFAULT_ACTION = '';
-    const RESTRICT = 'RESTRICT';
-    const NO_ACTION = 'NO ACTION';
-    const CASCADE = 'CASCADE';
-    const SET_NULL = 'SET NULL';
+    public const DEFAULT_ACTION = '';
+    public const RESTRICT = 'RESTRICT';
+    public const NO_ACTION = 'NO ACTION';
+    public const CASCADE = 'CASCADE';
+    public const SET_NULL = 'SET NULL';
 
     /** @var string[] */
     private array $columns = [];

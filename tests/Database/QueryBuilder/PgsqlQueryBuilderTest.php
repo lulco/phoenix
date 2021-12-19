@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\QueryBuilder;
 
 use InvalidArgumentException;
@@ -11,9 +13,9 @@ use Phoenix\Tests\Helpers\Adapter\PgsqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class PgsqlQueryBuilderTest extends TestCase
+final class PgsqlQueryBuilderTest extends TestCase
 {
-    private $adapter;
+    private PgsqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -25,7 +27,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->adapter = new PgsqlAdapter($pdo);
     }
 
-    public function testSimpleCreate()
+    public function testSimpleCreate(): void
     {
         $table = new MigrationTable('simple');
         $table->addPrimary(true);
@@ -38,7 +40,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testMoreColumns()
+    public function testMoreColumns(): void
     {
         $table = new MigrationTable('more_columns');
         $table->addPrimary(true);
@@ -54,7 +56,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testAllTypes()
+    public function testAllTypes(): void
     {
         $table = new MigrationTable('all_types');
         $table->addPrimary('id');
@@ -105,7 +107,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testNoPrimaryKey()
+    public function testNoPrimaryKey(): void
     {
         $table = new MigrationTable('no_primary_key');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('title', 'string', ['null' => true]));
@@ -119,7 +121,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testOwnPrimaryKey()
+    public function testOwnPrimaryKey(): void
     {
         $table = new MigrationTable('own_primary_key');
         $table->addPrimary(new Column('identifier', 'string', ['length' => 32]));
@@ -132,7 +134,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testMoreOwnPrimaryKeys()
+    public function testMoreOwnPrimaryKeys(): void
     {
         $table = new MigrationTable('more_own_primary_keys');
         $table->addPrimary([new Column('identifier', 'string', ['length' => 32]), new Column('subidentifier', 'string', ['length' => 32])]);
@@ -145,7 +147,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testOneFieldAsPrimaryKey()
+    public function testOneFieldAsPrimaryKey(): void
     {
         $table = new MigrationTable('one_field_as_pk');
         $table->addPrimary('identifier');
@@ -159,7 +161,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testMoreFieldsAsPrimaryKeys()
+    public function testMoreFieldsAsPrimaryKeys(): void
     {
         $table = new MigrationTable('more_fields_as_pk');
         $table->addPrimary(['identifier', 'subidentifier']);
@@ -174,7 +176,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testCreateTableWithCommentOnColumn()
+    public function testCreateTableWithCommentOnColumn(): void
     {
         $table = new MigrationTable('table_with_column_comment');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('column_without_comment', 'string'));
@@ -189,7 +191,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testAddCommentToExistingColumn()
+    public function testAddCommentToExistingColumn(): void
     {
         $table = new MigrationTable('table_with_column_comment');
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('column_to_comment', 'column_to_comment', 'string', ['comment' => 'My comment']));
@@ -205,7 +207,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
-    public function testIndexes()
+    public function testIndexes(): void
     {
         $table = new MigrationTable('table_with_indexes');
         $table->addPrimary(true);
@@ -227,7 +229,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testForeignKeys()
+    public function testForeignKeys(): void
     {
         $table = new MigrationTable('table_with_foreign_keys');
         $table->addPrimary(true);
@@ -243,7 +245,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testIndexesAndForeignKeys()
+    public function testIndexesAndForeignKeys(): void
     {
         $table = new MigrationTable('table_with_indexes_and_foreign_keys');
         $table->addPrimary(true);
@@ -267,7 +269,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testDropMigrationTable()
+    public function testDropMigrationTable(): void
     {
         $table = new MigrationTable('drop');
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
@@ -278,7 +280,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->dropTable($table));
     }
 
-    public function testAlterMigrationTable()
+    public function testAlterMigrationTable(): void
     {
         // add columns
         $table = new MigrationTable('add_columns');
@@ -389,7 +391,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
-    public function testChangeColumn()
+    public function testChangeColumn(): void
     {
         $table = new MigrationTable('with_columns_to_change');
         $this->assertInstanceOf(MigrationTable::class, $table->changeColumn('old_name', 'new_name', 'integer'));
@@ -416,7 +418,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
-    public function testRenameMigrationTable()
+    public function testRenameMigrationTable(): void
     {
         $table = new MigrationTable('old_table_name');
         $table->rename('new_table_name');
@@ -427,7 +429,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->renameTable($table));
     }
 
-    public function testCreateTableWithComment()
+    public function testCreateTableWithComment(): void
     {
         $table = new MigrationTable('table_with_comment');
         $table->setComment('test table with comment');
@@ -441,7 +443,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testAddCommentToExistingTable()
+    public function testAddCommentToExistingTable(): void
     {
         $table = new MigrationTable('table_with_comment');
         $table->setComment('test table with comment');
@@ -453,7 +455,7 @@ class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
 
-    public function testAddPrimaryColumnsAndColumnNamesException()
+    public function testAddPrimaryColumnsAndColumnNamesException(): void
     {
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $table = new MigrationTable('add_primary_columns', false);

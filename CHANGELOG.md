@@ -3,12 +3,20 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- use utf8mb4 as default charset for mysql (fix but BC break)
+- use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')`)
 - dropped support for unsupported PHP versions and added native typehints (BC break)
 - changed autoload to PSR-4
   - moved namespace Dumper to Phoenix\Dumper (BC break)
   - moved namespace Comparator to Phoenix\Comparator (BC break)
+- added declare(strict_types=1); to all classes
+- all classes which can be final are final (BC break if there are some extensions)
+- all methods which can be final are final
 
+#### Removed
+- class MysqlWithJsonQueryBuilder (BC break)
+
+#### Added
+- visibility for constants
 
 
 ### [1.11.1] - 2021-12-07

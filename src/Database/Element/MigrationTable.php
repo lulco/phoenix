@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
 use Phoenix\Database\Element\Behavior\AutoIncrementBehavior;
@@ -15,7 +17,7 @@ use Phoenix\Database\Element\Behavior\IndexBehavior;
 use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-class MigrationTable
+final class MigrationTable
 {
     use AutoIncrementBehavior;
     use CharsetAndCollationBehavior;
@@ -29,23 +31,23 @@ class MigrationTable
     use IndexBehavior;
     use PrimaryColumnsBehavior;
 
-    const ACTION_CREATE = 'create';
+    public const ACTION_CREATE = 'create';
 
-    const ACTION_ALTER = 'alter';
+    public const ACTION_ALTER = 'alter';
 
-    const ACTION_RENAME = 'rename';
+    public const ACTION_RENAME = 'rename';
 
-    const ACTION_DROP = 'drop';
+    public const ACTION_DROP = 'drop';
 
-    const ACTION_COPY = 'copy';
+    public const ACTION_COPY = 'copy';
 
-    const ACTION_TRUNCATE = 'truncate';
+    public const ACTION_TRUNCATE = 'truncate';
 
-    const COPY_ONLY_STRUCTURE = 'only_structure';
+    public const COPY_ONLY_STRUCTURE = 'only_structure';
 
-    const COPY_ONLY_DATA = 'only_data';
+    public const COPY_ONLY_DATA = 'only_data';
 
-    const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
+    public const COPY_STRUCTURE_AND_DATA = 'structure_and_data';
 
     private string $action = self::ACTION_ALTER;
 

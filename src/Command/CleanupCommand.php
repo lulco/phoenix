@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
@@ -7,7 +9,7 @@ use Phoenix\Migration\Init\Init;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupCommand extends AbstractCommand
+final class CleanupCommand extends AbstractCommand
 {
     protected function configure(): void
     {

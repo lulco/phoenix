@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Exception\PhoenixException;
@@ -7,16 +9,16 @@ use Phoenix\Migration\MigrationCreator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
-class MigrationCreatorTest extends TestCase
+final class MigrationCreatorTest extends TestCase
 {
-    public function testTemplatePathNotFound()
+    public function testTemplatePathNotFound(): void
     {
         $this->expectException(PhoenixException::class);
         $this->expectExceptionMessage('Template "this-file-doesnt-exist" not found');
         new MigrationCreator('\Abc\Def', '    ', 'this-file-doesnt-exist');
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $migrationCreator = new MigrationCreator('\Abc\Def', '    ');
         $migrationDir = __DIR__ . '/temp';
@@ -29,11 +31,13 @@ class MigrationCreatorTest extends TestCase
         $expected = <<<MIGRATION
 <?php
 
+declare(strict_types=1);
+
 namespace Abc;
 
 use Phoenix\Migration\AbstractMigration;
 
-class Def extends AbstractMigration
+final class Def extends AbstractMigration
 {
     protected function up(): void
     {

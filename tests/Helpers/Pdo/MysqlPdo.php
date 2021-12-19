@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Helpers\Pdo;
 
 use PDO;
 
-class MysqlPdo extends PDO
+final class MysqlPdo extends PDO
 {
-    public function __construct($db = null)
+    public function __construct(?string $db = null)
     {
         $dsnParts = [];
         if ($db) {

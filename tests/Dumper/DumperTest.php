@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Dumper;
 
 use Phoenix\Database\Element\Column;
@@ -11,9 +13,9 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Dumper\Dumper;
 use PHPUnit\Framework\TestCase;
 
-class DumperTest extends TestCase
+final class DumperTest extends TestCase
 {
-    public function testIndent()
+    public function testIndent(): void
     {
         $migrationTable = (new MigrationTable('table_1', false))->addColumn('id', 'integer');
         $migrationTable->create();
@@ -32,7 +34,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
-    public function testBaseIndent()
+    public function testBaseIndent(): void
     {
         $migrationTable = (new MigrationTable('table_1', false))->addColumn('id', 'integer');
         $migrationTable->create();
@@ -51,28 +53,28 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
-    public function testDumpEmptyStructureUp()
+    public function testDumpEmptyStructureUp(): void
     {
         $dumper = new Dumper('    ');
         $this->assertEquals('', $dumper->dumpTables([], 'up'));
         $this->assertEquals('', $dumper->dumpTables([], 'up'));
     }
 
-    public function testDumpEmptyDataUp()
+    public function testDumpEmptyDataUp(): void
     {
         $dumper = new Dumper('    ');
         $this->assertEquals('', $dumper->dumpDataUp());
         $this->assertEquals('', $dumper->dumpDataUp([]));
     }
 
-    public function testDumpEmptyForeignKeysUp()
+    public function testDumpEmptyForeignKeysUp(): void
     {
         $dumper = new Dumper('    ');
         $this->assertEquals('', $dumper->dumpForeignKeys([]));
         $this->assertEquals('', $dumper->dumpForeignKeys([]));
     }
 
-    public function testDumpSimpleStructureUp()
+    public function testDumpSimpleStructureUp(): void
     {
         $migrationTable = (new MigrationTable('table_1'))
             ->addColumn('title', 'string');
@@ -88,7 +90,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
-    public function testDumpSimpleDataUp()
+    public function testDumpSimpleDataUp(): void
     {
         $data = [
             'table_1' => [
@@ -114,7 +116,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpDataUp($data));
     }
 
-    public function testDumpComplexStructureUp()
+    public function testDumpComplexStructureUp(): void
     {
         $tables = $this->createComplexStructure();
 
@@ -135,7 +137,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
-    public function testDumpComplexDataUp()
+    public function testDumpComplexDataUp(): void
     {
         $data = [
             'table_1' => [
@@ -176,7 +178,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpDataUp($data));
     }
 
-    public function testdumpForeignKeys()
+    public function testdumpForeignKeys(): void
     {
         $tables = $this->createComplexStructure();
 
@@ -191,21 +193,21 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpForeignKeys($tables));
     }
 
-    public function testDumpEmptyStructureDown()
+    public function testDumpEmptyStructureDown(): void
     {
         $dumper = new Dumper('    ');
         $this->assertEquals('', $dumper->dumpTables([], 'down'));
         $this->assertEquals('', $dumper->dumpTables([], 'down'));
     }
 
-    public function testDumpEmptyForeignKeysDown()
+    public function testDumpEmptyForeignKeysDown(): void
     {
         $dumper = new Dumper('    ');
         $this->assertEquals('', $dumper->dumpForeignKeys([]));
         $this->assertEquals('', $dumper->dumpForeignKeys([]));
     }
 
-    public function testDumpSimpleStructureDrop()
+    public function testDumpSimpleStructureDrop(): void
     {
         $migrationTable = (new MigrationTable('table_1'));
         $migrationTable->drop();
@@ -220,7 +222,7 @@ class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'down'));
     }
 
-    public function testComplexChanges()
+    public function testComplexChanges(): void
     {
         $tables = [
             (new MigrationTable('table_1'))

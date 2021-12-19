@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\Parser\ConfigParserFactory;
@@ -10,9 +12,9 @@ use Phoenix\Config\Parser\YamlConfigParser;
 use Phoenix\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
 
-class ConfigParserFactoryTest extends TestCase
+final class ConfigParserFactoryTest extends TestCase
 {
-    public function testInstance()
+    public function testInstance(): void
     {
         $this->assertInstanceOf(PhpConfigParser::class, ConfigParserFactory::instance('php'));
         $this->assertInstanceOf(PhpConfigParser::class, ConfigParserFactory::instance('PHP'));
@@ -34,7 +36,7 @@ class ConfigParserFactoryTest extends TestCase
         $this->assertInstanceOf(JsonConfigParser::class, ConfigParserFactory::instance('Json'));
     }
 
-    public function testUnknownType()
+    public function testUnknownType(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Unknown config type "asdf"');

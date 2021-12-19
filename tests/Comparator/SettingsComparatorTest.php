@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Comparator;
 
 use Phoenix\Comparator\SettingsComparator;
 use Phoenix\Database\Element\ColumnSettings;
 use PHPUnit\Framework\TestCase;
 
-class SettingsComparatorTest extends TestCase
+final class SettingsComparatorTest extends TestCase
 {
-    public function testSameEmpty()
+    public function testSameEmpty(): void
     {
         $settings1 = new ColumnSettings();
         $settings2 = new ColumnSettings();
@@ -16,7 +18,7 @@ class SettingsComparatorTest extends TestCase
         $this->assertEquals([], $settingsComparator->diff($settings1, $settings2));
     }
 
-    public function testSameNonEmpty()
+    public function testSameNonEmpty(): void
     {
         $settings1 = new ColumnSettings(['null' => true, 'default' => 10]);
         $settings2 = new ColumnSettings(['null' => true, 'default' => 10]);
@@ -24,7 +26,7 @@ class SettingsComparatorTest extends TestCase
         $this->assertEquals([], $settingsComparator->diff($settings1, $settings2));
     }
 
-    public function testSameEnumValues()
+    public function testSameEnumValues(): void
     {
         $settings1 = new ColumnSettings(['values' => ['a', 'b', 'c']]);
         $settings2 = new ColumnSettings(['values' => ['a', 'b', 'c']]);
@@ -32,7 +34,7 @@ class SettingsComparatorTest extends TestCase
         $this->assertEquals([], $settingsComparator->diff($settings1, $settings2));
     }
 
-    public function testSomeDifferentEnumValues()
+    public function testSomeDifferentEnumValues(): void
     {
         $settings1 = new ColumnSettings(['values' => ['a', 'b', 'c']]);
         $settings2 = new ColumnSettings(['values' => ['b', 'c', 'd']]);
@@ -40,7 +42,7 @@ class SettingsComparatorTest extends TestCase
         $this->assertEquals(['values' => ['b', 'c', 'd']], $settingsComparator->diff($settings1, $settings2));
     }
 
-    public function testCompletelyDifferentEnumValues()
+    public function testCompletelyDifferentEnumValues(): void
     {
         $settings1 = new ColumnSettings(['values' => ['a', 'b', 'c']]);
         $settings2 = new ColumnSettings(['values' => ['d', 'e', 'f']]);

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\MigrateCommand;
 
 use Phoenix\Tests\Command\MysqlCommandBehavior;
 
-class MysqlMigrateCommandTest extends MigrateCommandTest
+final class MysqlMigrateCommandTest extends MigrateCommandTest
 {
     use MysqlCommandBehavior;
 }

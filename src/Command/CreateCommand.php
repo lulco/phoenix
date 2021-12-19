@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Dumper\Indenter;
@@ -9,7 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CreateCommand extends AbstractCommand
+final class CreateCommand extends AbstractCommand
 {
     protected function configure(): void
     {

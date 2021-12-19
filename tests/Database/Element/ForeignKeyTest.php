@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
-class ForeignKeyTest extends TestCase
+final class ForeignKeyTest extends TestCase
 {
-    public function testSimple()
+    public function testSimple(): void
     {
         $foreignKey = new ForeignKey(['title'], 'ref_table');
         $this->assertEquals('title', $foreignKey->getName());
@@ -21,7 +23,7 @@ class ForeignKeyTest extends TestCase
         $this->assertEquals('', $foreignKey->getOnUpdate());
     }
 
-    public function testArray()
+    public function testArray(): void
     {
         $foreignKey = new ForeignKey(['title', 'alias'], 'ref_table', ['t', 'a']);
         $this->assertEquals('title_alias', $foreignKey->getName());
@@ -34,7 +36,7 @@ class ForeignKeyTest extends TestCase
         $this->assertEquals('', $foreignKey->getOnUpdate());
     }
 
-    public function testRestrict()
+    public function testRestrict(): void
     {
         $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'restrict', 'RESTRICT');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
@@ -47,7 +49,7 @@ class ForeignKeyTest extends TestCase
         $this->assertEquals('RESTRICT', $foreignKey->getOnUpdate());
     }
 
-    public function testSetNull()
+    public function testSetNull(): void
     {
         $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'set null', 'SET NULL');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
@@ -60,7 +62,7 @@ class ForeignKeyTest extends TestCase
         $this->assertEquals('SET NULL', $foreignKey->getOnUpdate());
     }
 
-    public function testCascadeAndNoAction()
+    public function testCascadeAndNoAction(): void
     {
         $foreignKey = new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'Cascade', 'No Action');
         $this->assertEquals('foreign_key_id', $foreignKey->getName());
@@ -73,14 +75,14 @@ class ForeignKeyTest extends TestCase
         $this->assertEquals('NO ACTION', $foreignKey->getOnUpdate());
     }
 
-    public function testUnknownAction()
+    public function testUnknownAction(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Action "unknown" is not allowed on delete');
         new ForeignKey(['foreign_key_id'], 'foreign_table', ['id'], 'unknown');
     }
 
-    public function testUnknownMethod()
+    public function testUnknownMethod(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Action "unknown" is not allowed on update');

@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\EnvironmentConfig;
 use PHPUnit\Framework\TestCase;
 
-class EnvironmentConfigTest extends TestCase
+final class EnvironmentConfigTest extends TestCase
 {
-    public function testAdapterAndConfiguredDsn()
+    public function testAdapterAndConfiguredDsn(): void
     {
         $config = [
             'adapter' => 'test_adapter',
@@ -22,7 +24,7 @@ class EnvironmentConfigTest extends TestCase
         $this->assertNull($environmentConfig->getPassword());
     }
 
-    public function testAdapterAndConfiguredDsnWithPortAndCharset()
+    public function testAdapterAndConfiguredDsnWithPortAndCharset(): void
     {
         $config = [
             'adapter' => 'test_adapter',
@@ -39,7 +41,7 @@ class EnvironmentConfigTest extends TestCase
         $this->assertNull($environmentConfig->getPassword());
     }
 
-    public function testPgsqlAdapterAndConfiguredDsnWithCharset()
+    public function testPgsqlAdapterAndConfiguredDsnWithCharset(): void
     {
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'pgsql',
@@ -53,7 +55,7 @@ class EnvironmentConfigTest extends TestCase
         $this->assertNull($environmentConfig->getPassword());
     }
 
-    public function testCustomDsn()
+    public function testCustomDsn(): void
     {
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'test_adapter',
@@ -65,7 +67,7 @@ class EnvironmentConfigTest extends TestCase
         $this->assertNull($environmentConfig->getPassword());
     }
 
-    public function testUsernameAndPassword()
+    public function testUsernameAndPassword(): void
     {
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'test_adapter',
@@ -80,7 +82,7 @@ class EnvironmentConfigTest extends TestCase
         $this->assertEquals('test_password', $environmentConfig->getPassword());
     }
 
-    public function testUsernameAndPasswordWithCustomDsn()
+    public function testUsernameAndPasswordWithCustomDsn(): void
     {
         $environmentConfig = new EnvironmentConfig([
             'adapter' => 'test_adapter',

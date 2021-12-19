@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Migration;
 
 use Phoenix\Migration\MigrationNameCreator;
 use PHPUnit\Framework\TestCase;
 
-class MigrationNameCreatorTest extends TestCase
+final class MigrationNameCreatorTest extends TestCase
 {
-    public function testCreateMigrationName()
+    public function testCreateMigrationName(): void
     {
         $className = 'AddSomethingToTable';
         $migrationNameCreator = new MigrationNameCreator($className);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\InitCommand;
 
 use Phoenix\Command\InitCommand;
@@ -10,19 +12,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class InitCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new InitCommand();
         $this->assertEquals('init', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new InitCommand('my_init');
         $this->assertEquals('my_init', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new InitCommand();
         $this->expectException(ConfigException::class);
@@ -30,7 +32,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new InitCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -39,7 +41,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFile()
+    public function testUserConfigFile(): void
     {
         $command = new InitCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -55,7 +57,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $oldPath = __DIR__ . '/../../../testing_migrations/config/phoenix.php';
         $newPath = __DIR__ . '/../../../phoenix.php';
@@ -77,7 +79,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
-    public function testSetCustomConfig()
+    public function testSetCustomConfig(): void
     {
         $command = new InitCommand();
         $command->setConfig($this->configuration);
@@ -92,7 +94,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertTrue(count($messages[OutputInterface::VERBOSITY_DEBUG]) > 0);
     }
 
-    public function testSetCustomConfigWithJsonOutput()
+    public function testSetCustomConfigWithJsonOutput(): void
     {
         $command = new InitCommand();
         $command->setConfig($this->configuration);
@@ -112,7 +114,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertArrayHasKey('execution_time', $message);
     }
 
-    public function testSetCustomConfigWithJsonOutputAndVerbosityDebug()
+    public function testSetCustomConfigWithJsonOutputAndVerbosityDebug(): void
     {
         $command = new InitCommand();
         $command->setConfig($this->configuration);
@@ -133,7 +135,7 @@ abstract class InitCommandTest extends BaseCommandTest
         $this->assertArrayHasKey('execution_time', $message);
     }
 
-    public function testMultipleInitialization()
+    public function testMultipleInitialization(): void
     {
         $command = new InitCommand();
         $command->setConfig($this->configuration);
