@@ -13,6 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
+        mysql: [ '5.7', '8.0' ]
 
     name: PHPunit PHP ${{ matrix.php }}
 
@@ -41,6 +42,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+
+      - name: Setup MySQL
+        uses: ankane/setup-mysql@v1
+        with:
+          mysql-version: ${{ matrix.mysql }}
 
       - name: Composer update
         run: composer update --no-progress --no-interaction
