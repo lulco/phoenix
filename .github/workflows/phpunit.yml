@@ -14,17 +14,9 @@ jobs:
       matrix:
         php: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
         mysql: [ '5.7', '8.0' ]
+        postgres: [ '10', '14' ]
 
-    name: PHPunit PHP ${{ matrix.php }} ${{ matrix.mysql }}
-
-    services:
-      postgres:
-        image: postgres:10
-        env:
-          POSTGRES_PASSWORD: 123
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
-        ports:
-          - 5432
+    name: PHPunit PHP ${{ matrix.php }}, MySQL ${{ matrix.mysql }}, Postgres ${{ matrix.postgres }}
 
     steps:
       - name: Checkout code
@@ -39,6 +31,13 @@ jobs:
         uses: ankane/setup-mysql@v1
         with:
           mysql-version: ${{ matrix.mysql }}
+          database: phoenix
+
+      - name: Setup Postgres
+        uses: ankane/setup-postgres@v1
+        with:
+          postgres-version: ${{ matrix.postgres }}
+          database: phoenix
 
       - name: Composer update
         run: composer update --no-progress --no-interaction
