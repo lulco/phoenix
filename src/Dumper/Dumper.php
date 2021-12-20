@@ -63,6 +63,8 @@ class Dumper
             $primaryColumns = $table->getPrimaryColumnNames();
             if ($primaryColumns) {
                 $tableMigration .= ", " . $this->columnsToString($primaryColumns);
+            } elseif ($table->getAction() === MigrationTable::ACTION_CREATE) {
+                $tableMigration .= ", false";
             }
             $tableMigration .= ")\n";
             if ($table->getAutoIncrement() && $table->getAutoIncrement() !== 1 && $this->autoIncrement) {
