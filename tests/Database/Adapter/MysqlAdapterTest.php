@@ -196,7 +196,6 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table1, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'null' => true,
             'length' => 6,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -269,7 +268,6 @@ class MysqlAdapterTest extends TestCase
             'null' => true,
             'length' => 13,
             'decimals' => 1,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_boolean', Column::TYPE_BOOLEAN, array_merge($defaultSettings, [
             'default' => true,
@@ -472,7 +470,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_uuid', 'uuid', ['null' => true]);
         $migrationTable1->addColumn('col_bit', 'bit', ['length' => 32, 'default' => "b'0'"]);
         $migrationTable1->addColumn('col_tinyint', 'tinyinteger', ['null' => true]);
-        $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true, 'signed' => false]);
+        $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true]);
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
         $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50, 'signed' => false]);
         $migrationTable1->addColumn('col_bigint', 'biginteger');
@@ -492,7 +490,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]);
         $migrationTable1->addColumn('col_decimal', 'decimal', ['length' => 11, 'decimals' => 2]);
         $migrationTable1->addColumn('col_float', 'float', ['null' => true, 'length' => 12, 'decimals' => 4]);
-        $migrationTable1->addColumn('col_double', 'double', ['null' => true, 'length' => 13, 'decimals' => 1, 'signed' => false]);
+        $migrationTable1->addColumn('col_double', 'double', ['null' => true, 'length' => 13, 'decimals' => 1]);
         $migrationTable1->addColumn('col_boolean', 'boolean', ['default' => true]);
         $migrationTable1->addColumn('col_datetime', 'datetime');
         $migrationTable1->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP]);
