@@ -128,7 +128,7 @@ class MysqlAdapter extends PdoAdapter
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
         list($length, $decimals) = $this->getLengthAndDecimals($matches[2] ?? null);
-        if ($column[DATA_TYPE] === Column::TYPE_INTEGER && $length ===  null) {
+        if ($column['DATA_TYPE'] === 'int' && $length ===  null) {
             $length = 11;   // Mysql 8 ignores length for integers
         }
 
