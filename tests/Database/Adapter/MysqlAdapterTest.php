@@ -416,7 +416,7 @@ class MysqlAdapterTest extends TestCase
             'null' => true
         ]));
         $this->checkColumn($table2, 'col_timestamp', Column::TYPE_TIMESTAMP, array_merge($defaultSettings, [
-            'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP,
+            'null' => true
         ]));
         $this->checkColumn($table2, 'col_date', Column::TYPE_DATE, array_merge($defaultSettings, [
             'null' => true
@@ -541,7 +541,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->addColumn('col_double', 'double');
         $migrationTable2->addColumn('col_boolean', 'boolean');
         $migrationTable2->addColumn('col_datetime', 'datetime', ['null' => true]);
-        $migrationTable2->addColumn('col_timestamp', 'timestamp');
+        $migrationTable2->addColumn('col_timestamp', 'timestamp', ['null' => true]);
         $migrationTable2->addColumn('col_date', 'date', ['null' => true]);
         $migrationTable2->addColumn('col_enum', 'enum', ['null' => true, 'values' => ['t2_enum_xxx', 't2_enum_yyy', 't2_enum_zzz']]);
         $migrationTable2->addColumn('col_set', 'set', ['null' => true, 'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz']]);
