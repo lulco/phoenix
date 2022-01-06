@@ -14,7 +14,7 @@ jobs:
       matrix:
         php: [ '7.4', '8.0', '8.1' ]
 
-    name: Composer outdated PHP ${{ matrix.php }}
+    name: Composer outdated - PHP ${{ matrix.php }}
 
     steps:
       - name: Checkout code
