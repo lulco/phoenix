@@ -135,7 +135,6 @@ class MysqlAdapter extends PdoAdapter
                 $length = 11;
             } elseif ($column['DATA_TYPE'] === 'bigint') {
                 $length = 20;
-
             } elseif ($column['DATA_TYPE'] === 'tinyint') {
                 $length = 4;
             } elseif ($column['DATA_TYPE'] === 'smallint') {
