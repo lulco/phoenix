@@ -14,11 +14,15 @@ final class TestCommand extends AbstractCommand
     /** @var array<int, array{classname: string, type: string, execution_time: float}> */
     private array $executedMigrations = [];
 
+    public function __construct(string $name = 'test')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('test')
-            ->addOption('cleanup', null, InputOption::VALUE_NONE, 'Cleanup after test (rollback migration at the end)')
+        $this->addOption('cleanup', null, InputOption::VALUE_NONE, 'Cleanup after test (rollback migration at the end)')
             ->setDescription('Test next migration');
     }
 

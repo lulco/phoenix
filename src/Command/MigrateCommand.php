@@ -14,11 +14,15 @@ final class MigrateCommand extends AbstractRunCommand
 
     protected string $migrationInfoPrefix = 'Migration';
 
+    public function __construct(string $name = 'migrate')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('migrate')
-            ->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
+        $this->addOption('first', null, InputOption::VALUE_NONE, 'Run only first migrations')
             ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Datetime of last migration which should be executed')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to migrate', [])
             ->addOption('class', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Class to migrate', [])

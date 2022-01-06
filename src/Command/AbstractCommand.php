@@ -38,18 +38,6 @@ abstract class AbstractCommand extends Command
      */
     protected array $outputData = [];
 
-    /**
-     * @param string $name
-     * @return self|Command
-     */
-    public function setName(string $name)
-    {
-        if (!$this->getName()) {
-            return parent::setName($name);
-        }
-        return $this;
-    }
-
     protected function configure(): void
     {
         $this->addOption('environment', 'e', InputOption::VALUE_REQUIRED, 'Environment');

@@ -11,10 +11,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CleanupCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'cleanup')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('cleanup')
-            ->setDescription('Rollback all migrations and delete log table');
+        $this->setDescription('Rollback all migrations and delete log table');
         parent::configure();
     }
 

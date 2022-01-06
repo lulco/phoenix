@@ -9,10 +9,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class InitCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'init')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('init')
-            ->setDescription('Initialize phoenix');
+        $this->setDescription('Initialize phoenix');
         parent::configure();
     }
 
