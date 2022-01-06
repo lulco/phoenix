@@ -24,7 +24,7 @@
 
 
 #### Fixed
-- Dumper - table with no primary keys 
+- Dumper - table with no primary keys
 
 ### [1.11.1] - 2021-12-07
 #### Fixed

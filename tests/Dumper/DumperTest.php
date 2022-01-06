@@ -22,15 +22,15 @@ final class DumperTest extends TestCase
         $tables = [$migrationTable];
 
         $dumper = new Dumper('    ');
-        $output = "\$this->table('table_1')\n    ->addColumn('id', 'integer')\n    ->create();";
+        $output = "\$this->table('table_1', false)\n    ->addColumn('id', 'integer')\n    ->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
-        $output = "\$this->table('table_1')\n\t->addColumn('id', 'integer')\n\t->create();";
+        $output = "\$this->table('table_1', false)\n\t->addColumn('id', 'integer')\n\t->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper('custom_indent');
-        $output = "\$this->table('table_1')\ncustom_indent->addColumn('id', 'integer')\ncustom_indent->create();";
+        $output = "\$this->table('table_1', false)\ncustom_indent->addColumn('id', 'integer')\ncustom_indent->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
@@ -41,15 +41,15 @@ final class DumperTest extends TestCase
         $tables = [$migrationTable];
 
         $dumper = new Dumper('    ', 2);
-        $output = "        \$this->table('table_1')\n            ->addColumn('id', 'integer')\n            ->create();";
+        $output = "        \$this->table('table_1', false)\n            ->addColumn('id', 'integer')\n            ->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t", 2);
-        $output = "\t\t\$this->table('table_1')\n\t\t\t->addColumn('id', 'integer')\n\t\t\t->create();";
+        $output = "\t\t\$this->table('table_1', false)\n\t\t\t->addColumn('id', 'integer')\n\t\t\t->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper('custom_indent', 2);
-        $output = "custom_indentcustom_indent\$this->table('table_1')\ncustom_indentcustom_indentcustom_indent->addColumn('id', 'integer')\ncustom_indentcustom_indentcustom_indent->create();";
+        $output = "custom_indentcustom_indent\$this->table('table_1', false)\ncustom_indentcustom_indentcustom_indent->addColumn('id', 'integer')\ncustom_indentcustom_indentcustom_indent->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
