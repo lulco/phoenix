@@ -19,6 +19,10 @@
 - visibility for constants
 
 
+
+#### Fixed
+- Dumper - table with no primary keys
+
 ### [1.11.1] - 2021-12-07
 #### Fixed
 - removed phpspec/prophecy from misused replace in `composer.json`
