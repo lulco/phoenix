@@ -8,10 +8,14 @@ use Symfony\Component\Console\Helper\Table;
 
 final class StatusCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'status')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('status')
-            ->setDescription('List of migrations already executed and list of migrations to execute');
+        $this->setDescription('List of migrations already executed and list of migrations to execute');
         parent::configure();
     }
 

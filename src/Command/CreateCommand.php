@@ -13,11 +13,15 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class CreateCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'create')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('create')
-            ->setDescription('Create migration')
+        $this->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
             ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')

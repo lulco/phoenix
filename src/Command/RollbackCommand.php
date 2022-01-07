@@ -14,11 +14,15 @@ final class RollbackCommand extends AbstractRunCommand
 
     protected string $migrationInfoPrefix = 'Rollback for migration';
 
+    public function __construct(string $name = 'rollback')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('rollback')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
+        $this->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
             ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Datetime of last migration which should be rollbacked')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to rollback', [])
             ->addOption('class', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Class to rollback', [])
