@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
-class ClassNameCreator
+final class ClassNameCreator
 {
-    /** @var string */
-    private $datetime = '';
+    private string $datetime = '';
 
-    /** @var string */
-    private $className = '';
+    private string $className = '';
 
     public function __construct(string $filepath)
     {

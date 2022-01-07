@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command;
 
 use Phoenix\Config\Parser\PhpConfigParser;
@@ -7,20 +9,15 @@ use Phoenix\Tests\Helpers\Adapter\CleanupInterface;
 use Phoenix\Tests\Mock\Command\Input;
 use Phoenix\Tests\Mock\Command\Output;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 abstract class BaseCommandTest extends TestCase
 {
-    /** @var InputInterface */
-    protected $input;
+    protected Input $input;
 
-    /** @var OutputInterface */
-    protected $output;
+    protected Output $output;
 
-    /** @var array */
-    protected $configuration;
+    protected array $configuration;
 
     protected function setUp(): void
     {
@@ -51,23 +48,14 @@ abstract class BaseCommandTest extends TestCase
         $this->output = new Output();
     }
 
-    /**
-     * @return InputInterface
-     */
-    protected function createInput()
+    protected function createInput(): Input
     {
         $input = new Input();
         $input->setOption('environment', $this->getEnvironment());
         return $input;
     }
 
-    /**
-     * @return string
-     */
-    abstract protected function getEnvironment();
+    abstract protected function getEnvironment(): string;
 
-    /**
-     * @return CleanupInterface
-     */
-    abstract protected function getAdapter();
+    abstract protected function getAdapter(): CleanupInterface;
 }

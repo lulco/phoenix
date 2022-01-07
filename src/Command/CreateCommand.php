@@ -1,21 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
-use Dumper\Indenter;
+use Phoenix\Dumper\Indenter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationCreator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class CreateCommand extends AbstractCommand
+final class CreateCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'create')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('create')
-            ->setDescription('Create migration')
+        $this->setDescription('Create migration')
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
             ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')
@@ -40,8 +46,7 @@ class CreateCommand extends AbstractCommand
         $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create(str_repeat($indent, 2), str_repeat($indent, 2), $migrationDir);
 
-        $this->writeln('');
-        $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
+        $this->writeln(['', '<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>']);
 
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config\Parser;
 
 use Phoenix\Exception\ConfigException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlConfigParser implements ConfigParserInterface
+final class YamlConfigParser implements ConfigParserInterface
 {
     public function parse(string $filename): array
     {

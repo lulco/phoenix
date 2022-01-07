@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Config;
 
 use Exception;
@@ -7,9 +9,9 @@ use Phoenix\Config\Parser\ConfigParserFactory;
 use Phoenix\Exception\ConfigException;
 use PHPUnit\Framework\TestCase;
 
-class ConfigParsersTest extends TestCase
+final class ConfigParsersTest extends TestCase
 {
-    public function testParser()
+    public function testParser(): void
     {
         $configs = [
             'php' => [
@@ -31,7 +33,8 @@ class ConfigParsersTest extends TestCase
         foreach ($configs as $type => $configuration) {
             $configParser = ConfigParserFactory::instance($type);
             $filename = __DIR__ . '/../../config_example/' . $configuration['file'];
-            $classname = isset($configuration['class']) ? $configuration['class'] : null;
+            $classname = $configuration['class'] ?? null;
+            $config = [];
             if ($classname && class_exists($classname)) {
                 $config = $configParser->parse($filename);
             } else {
@@ -49,7 +52,7 @@ class ConfigParsersTest extends TestCase
         }
     }
 
-    public function testConfigFileNotFound()
+    public function testConfigFileNotFound(): void
     {
         $configs = [
             'php' => [

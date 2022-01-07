@@ -1,15 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Symfony\Component\Console\Helper\Table;
 
-class StatusCommand extends AbstractCommand
+final class StatusCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'status')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('status')
-            ->setDescription('List of migrations already executed and list of migrations to execute');
+        $this->setDescription('List of migrations already executed and list of migrations to execute');
         parent::configure();
     }
 
@@ -48,10 +54,9 @@ class StatusCommand extends AbstractCommand
      */
     private function printTable(array $headers, array $rows, string $header, string $noItemsText): void
     {
-        $this->writeln('');
-        $this->writeln("<comment>$header</comment>");
+        $this->writeln(['', "<comment>$header</comment>"]);
         if (empty($rows)) {
-            $this->writeln("<info>$noItemsText</info>");
+            $this->writeln(["<info>$noItemsText</info>"]);
             return;
         }
         $table = new Table($this->output);

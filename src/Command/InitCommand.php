@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\Init\Init;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InitCommand extends AbstractCommand
+final class InitCommand extends AbstractCommand
 {
+    public function __construct(string $name = 'init')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('init')
-            ->setDescription('Initialize phoenix');
+        $this->setDescription('Initialize phoenix');
         parent::configure();
     }
 
@@ -21,10 +27,9 @@ class InitCommand extends AbstractCommand
         $migration = new Init($this->adapter, $this->getConfig()->getLogTableName());
         $migration->migrate();
 
-        $this->writeln('');
         $executedQueries = $migration->getExecutedQueries();
-        $this->writeln('<info>Phoenix initialized</info>');
-        $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+        $this->writeln(['', '<info>Phoenix initialized</info>']);
+        $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
         $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
         $this->outputData['message'] = 'Phoenix initialized';

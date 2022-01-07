@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Database\Element\MigrationTable;
 
 trait CharsetAndCollationBehavior
 {
-    /** @var string|null */
-    private $charset;
+    private ?string $charset = null;
 
-    /** @var string|null */
-    private $collation;
+    private ?string $collation = null;
 
     public function setCharset(?string $charset): MigrationTable
     {

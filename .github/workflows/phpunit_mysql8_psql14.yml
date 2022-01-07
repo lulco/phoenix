@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
+        php: [ '7.4', '8.0', '8.1' ]
 
-    name: PHPunit PHP ${{ matrix.php }}
+    name: PHPunit - PHP ${{ matrix.php }}
 
     services:
       mysql:
@@ -23,8 +23,8 @@ jobs:
           MYSQL_DATABASE: phoenix
           MYSQL_ROOT_PASSWORD: 123
           MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
-          MYSQL_CHARACTER_SET: utf8
-          MYSQL_COLLATE: utf8_general_ci
+          MYSQL_CHARACTER_SET: utf8mb4
+          MYSQL_COLLATE: utf8mb4_general_ci
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3

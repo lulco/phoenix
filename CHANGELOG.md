@@ -2,12 +2,32 @@
 
 ### [Unreleased][unreleased]
 
+#### Changed
+- use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')` to change all tables and fields to it)
+- dropped support for unsupported PHP versions and added native typehints (BC break)
+- changed autoload to PSR-4
+  - moved namespace Dumper to Phoenix\Dumper (BC break)
+  - moved namespace Comparator to Phoenix\Comparator (BC break)
+- added `declare(strict_types=1);` to all classes
+- all classes which can be final are final (BC break if there are some extensions)
+- all methods which can be final are final
+- moved default command names from configure to __construct
+
+#### Removed
+- class MysqlWithJsonQueryBuilder (BC break)
+- method setName from AbstractCommand (BC break - if setName() is called after name is already set, it will be changed)
+- dropped support symfony libs (console, finder and yaml) 3.x and 4.x (BC break)
+
+#### Added
+- visibility for constants
+- support for symfony libs (console, finder and yaml) 6.x
+
 ### [1.12.0] - 2022-01-07
 #### Added
 - support MySql 8 and PostgreSQL 14
 
 #### Fixed
-- table with no primary keys in Dumper  
+- table with no primary keys in Dumper
 
 ### [1.11.1] - 2021-12-07
 #### Fixed
@@ -143,7 +163,7 @@
 - posibility to add an autoincrement primary key on an existing table
 
 #### Fixed
-- Add a primary key on an existing table
+- add a primary key on an existing table
 
 ### [0.12.1] - 2017-12-18
 #### Fixed

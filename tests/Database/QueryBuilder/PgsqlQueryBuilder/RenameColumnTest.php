@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\QueryBuilder\PgsqlQueryBuilder;
 
 use Phoenix\Database\Adapter\PgsqlAdapter;
@@ -8,9 +10,9 @@ use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Tests\Helpers\Pdo\PgsqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class RenameColumnTest extends TestCase
+final class RenameColumnTest extends TestCase
 {
-    private $adapter;
+    private PgsqlAdapter $adapter;
 
     protected function setUp(): void
     {
@@ -18,7 +20,7 @@ class RenameColumnTest extends TestCase
         $this->adapter = new PgsqlAdapter($pdo);
     }
 
-    public function testSimpleRenameColumn()
+    public function testSimpleRenameColumn(): void
     {
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
 

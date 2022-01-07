@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
-class Structure
+final class Structure
 {
     /** @var Table[] */
-    private $tables = [];
+    private array $tables = [];
 
     public function update(MigrationTable $migrationTable): Structure
     {

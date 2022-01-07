@@ -12,7 +12,7 @@ You can use full config array:
         'host' => 'localhost',
         'username' => 'root',
         'password' => '123',
-        'charset' => 'utf8',
+        'charset' => 'utf8mb4',
     ],
 ],
 ```
@@ -21,7 +21,7 @@ or dsn:
 'environments' => [
     'env2' => [
         'adapter' => 'mysql',
-        'dsn' => 'mysql:dbname=phoenix;host=localhost;charset=utf8',
+        'dsn' => 'mysql:dbname=phoenix;host=localhost;charset=utf8mb4',
         'username' => 'root',
         'password' => '123',
     ],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use InvalidArgumentException;
@@ -18,41 +20,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractCommand extends Command
 {
-    /** @var Config|null  */
-    protected $config = null;
+    protected ?Config $config = null;
 
-    /** @var AdapterInterface */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
-    /** @var Manager */
-    protected $manager;
+    protected Manager $manager;
 
-    /** @var InputInterface */
-    protected $input;
+    protected InputInterface $input;
 
-    /** @var OutputInterface */
-    protected $output;
+    protected OutputInterface $output;
 
-    /** @var double */
-    protected $start;
+    protected float $start;
 
     /**
      * output data used for json output format
      * @var array<string, mixed>
      */
-    protected $outputData = [];
-
-    /**
-     * @param string $name
-     * @return self|Command
-     */
-    public function setName($name)
-    {
-        if (!$this->getName()) {
-            return parent::setName($name);
-        }
-        return $this;
-    }
+    protected array $outputData = [];
 
     protected function configure(): void
     {
@@ -97,11 +81,10 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param string|string[] $messages
+     * @param string[] $messages
      */
-    protected function writeln($messages, int $options = 0): void
+    protected function writeln(array $messages, int $options = 0): void
     {
-        $messages = is_array($messages) ? $messages : [$messages];
         foreach ($messages as $message) {
             $this->output->writeln($message, $this->isDefaultOutput() ? $options : -1);
         }

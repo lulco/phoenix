@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Comparator;
 
-use Comparator\StructureComparator;
+use Phoenix\Comparator\StructureComparator;
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\Index;
+use Phoenix\Database\Element\IndexColumn;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use PHPUnit\Framework\TestCase;
 
-class StructureComparatorTest extends TestCase
+final class StructureComparatorTest extends TestCase
 {
-    public function testAddColumn()
+    public function testAddColumn(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('comparator_test'))->addColumn(new Column('title', 'string')));
@@ -29,7 +32,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testDropColumn()
+    public function testDropColumn(): void
     {
         $sourceStructure = new Structure();
         $sourceTable = (new Table('comparator_test'))
@@ -45,7 +48,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testAddTable()
+    public function testAddTable(): void
     {
         $sourceStructure = new Structure();
         $sourceTable = (new Table('table1'))
@@ -64,7 +67,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testDropTable()
+    public function testDropTable(): void
     {
         $sourceStructure = new Structure();
         $sourceTable = (new Table('table1'))
@@ -83,7 +86,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testChangeColumn()
+    public function testChangeColumn(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('comparator_test'))->addColumn(new Column('title', 'string')));
@@ -98,7 +101,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testAddIndex()
+    public function testAddIndex(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('comparator_test'))
@@ -109,7 +112,7 @@ class StructureComparatorTest extends TestCase
         $targetStructure->add((new Table('comparator_test'))
             ->addColumn(new Column('title', 'string'))
             ->addColumn(new Column('sorting', 'integer'))
-            ->addIndex(new Index(['sorting'], 'idx_comparator_test_sorting'))
+            ->addIndex(new Index([new IndexColumn('sorting')], 'idx_comparator_test_sorting'))
         );
 
         $structureComparator = new StructureComparator();
@@ -117,13 +120,13 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testDropIndex()
+    public function testDropIndex(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('comparator_test'))
             ->addColumn(new Column('title', 'string'))
             ->addColumn(new Column('sorting', 'integer'))
-            ->addIndex(new Index(['sorting'], 'idx_comparator_test_sorting'))
+            ->addIndex(new Index([new IndexColumn('sorting')], 'idx_comparator_test_sorting'))
         );
         $targetStructure = new Structure();
         $targetStructure->add((new Table('comparator_test'))
@@ -136,7 +139,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testAddForeignKey()
+    public function testAddForeignKey(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('table_1'))
@@ -170,7 +173,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testDropForeignKey()
+    public function testDropForeignKey(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add((new Table('table_1'))
@@ -205,7 +208,7 @@ class StructureComparatorTest extends TestCase
         $this->assertEquals($expectedDiff, $structureComparator->diff($sourceStructure, $targetStructure));
     }
 
-    public function testMoreComplexChanges()
+    public function testMoreComplexChanges(): void
     {
         $sourceStructure = new Structure();
         $sourceStructure->add(
@@ -232,7 +235,7 @@ class StructureComparatorTest extends TestCase
             ->addColumn(new Column('alias', 'string'))
             ->addColumn(new Column('sorting', 'integer', ['default' => 100]))
             ->addColumn(new Column('description', 'text'))
-            ->addIndex(new Index(['alias'], 'idx_table_1_alias', Index::TYPE_UNIQUE, Index::METHOD_DEFAULT))
+            ->addIndex(new Index([new IndexColumn('alias')], 'idx_table_1_alias', Index::TYPE_UNIQUE, Index::METHOD_DEFAULT))
         );
         $targetStructure->add((new Table('table_2'))
             ->addColumn(new Column('title', 'string'))

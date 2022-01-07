@@ -1,26 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element;
 
-class MigrationView
+final class MigrationView
 {
-    const ACTION_CREATE = 'create';
+    public const ACTION_CREATE = 'create';
 
-    const ACTION_REPLACE = 'replace';
+    public const ACTION_REPLACE = 'replace';
 
-    const ACTION_DROP = 'drop';
+    public const ACTION_DROP = 'drop';
 
-    /** @var string */
-    private $name;
+    private string $name;
 
     /** @var string[] */
-    private $columns = [];
+    private array $columns = [];
 
-    /** @var string */
-    private $sql;
+    private string $sql;
 
-    /** @var string */
-    private $action;
+    private string $action;
 
     public function __construct(string $name)
     {

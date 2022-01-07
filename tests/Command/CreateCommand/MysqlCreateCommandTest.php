@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\CreateCommand;
 
 use Phoenix\Tests\Command\MysqlCommandBehavior;
 
-class MysqlCreateCommandTest extends CreateCommandTest
+final class MysqlCreateCommandTest extends CreateCommandTest
 {
     use MysqlCommandBehavior;
 }

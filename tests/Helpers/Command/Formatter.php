@@ -1,33 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Helpers\Command;
 
+use Symfony\Component\Console\Formatter\NullOutputFormatterStyle;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
 
-class Formatter implements OutputFormatterInterface
+final class Formatter implements OutputFormatterInterface
 {
-    public function format($message)
+    private bool $isDecorated = false;
+
+    public function format(?string $message): ?string
     {
+        return $message;
     }
 
-    public function getStyle($name)
+    public function getStyle(string $name): OutputFormatterStyleInterface
     {
+        return new NullOutputFormatterStyle();
     }
 
-    public function hasStyle($name)
+    public function hasStyle(string $name): bool
     {
+        return false;
     }
 
-    public function isDecorated()
+    public function isDecorated(): bool
     {
+        return $this->isDecorated;
     }
 
-    public function setDecorated($decorated)
+    public function setDecorated(bool $decorated): void
     {
+        $this->isDecorated = $decorated;
     }
 
-    public function setStyle($name, OutputFormatterStyleInterface $style)
+    public function setStyle(string $name, OutputFormatterStyleInterface $style): void
     {
     }
 }

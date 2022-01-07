@@ -1,24 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputOption;
 
-class RollbackCommand extends AbstractRunCommand
+final class RollbackCommand extends AbstractRunCommand
 {
-    /** @var string */
-    protected $noMigrationsFoundMessage = 'Nothing to rollback';
+    protected string $noMigrationsFoundMessage = 'Nothing to rollback';
 
-    /** @var string */
-    protected $migrationInfoPrefix = 'Rollback for migration';
+    protected string $migrationInfoPrefix = 'Rollback for migration';
+
+    public function __construct(string $name = 'rollback')
+    {
+        parent::__construct($name);
+    }
 
     protected function configure(): void
     {
         parent::configure();
-        $this->setName('rollback')
-            ->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
+        $this->addOption('all', null, InputOption::VALUE_NONE, 'Rollback all migrations')
             ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Datetime of last migration which should be rollbacked')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Directory to rollback', [])
             ->addOption('class', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Class to rollback', [])

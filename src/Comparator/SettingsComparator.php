@@ -1,14 +1,14 @@
 <?php
 
-namespace Comparator;
+declare(strict_types=1);
+
+namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\ColumnSettings;
 
-class SettingsComparator
+final class SettingsComparator
 {
     /**
-     * @param ColumnSettings $sourceColumnSettings
-     * @param ColumnSettings $targetColumnSettings
      * @return array<string, mixed>
      */
     public function diff(ColumnSettings $sourceColumnSettings, ColumnSettings $targetColumnSettings): array

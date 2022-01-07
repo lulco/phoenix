@@ -1,8 +1,10 @@
 <?php
 
-namespace Dumper;
+declare(strict_types=1);
 
-class Indenter
+namespace Phoenix\Dumper;
+
+final class Indenter
 {
     public function indent(string $identifier = '4spaces'): string
     {

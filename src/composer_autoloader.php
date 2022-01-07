@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return function () {
     $files = [
         __DIR__ . '/../../../autoload.php',  // composer dependency

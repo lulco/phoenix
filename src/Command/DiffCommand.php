@@ -1,20 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
-use Dumper\Dumper;
 use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Dumper\Dumper;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 
-class DiffCommand extends AbstractDumpCommand
+final class DiffCommand extends AbstractDumpCommand
 {
+    public function __construct(string $name = 'diff')
+    {
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
-        $this->setName('diff')
-            ->setDescription('Makes diff of source and target database or diff of migrations and database')
+        $this->setDescription('Makes diff of source and target database or diff of migrations and database')
             ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source environment from config. If not set, migrations are used as source.')
             ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Target environment from config. If not set, migrations are used as target.')
         ;

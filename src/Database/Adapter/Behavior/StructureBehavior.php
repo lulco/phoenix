@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Adapter\Behavior;
 
 use Phoenix\Database\Element\IndexColumn;
@@ -31,7 +33,6 @@ trait StructureBehavior
 
     /**
      * @param array<string, string> $table
-     * @return MigrationTable
      */
     protected function createMigrationTable(array $table): MigrationTable
     {
@@ -39,7 +40,6 @@ trait StructureBehavior
     }
 
     /**
-     * @param MigrationTable $migrationTable
      * @param array<array<string, mixed>> $columns
      */
     protected function addColumns(MigrationTable $migrationTable, array $columns): void
@@ -52,37 +52,31 @@ trait StructureBehavior
     abstract protected function loadDatabase(): string;
 
     /**
-     * @param string $database
      * @return array<string[]>
      */
     abstract protected function loadTables(string $database): array;
 
     /**
-     * @param string $database
      * @return array<string, array<int, mixed>>
      */
     abstract protected function loadColumns(string $database): array;
 
     /**
-     * @param string $database
      * @return array<string, array<string, array<string, mixed>>>
      */
     abstract protected function loadIndexes(string $database): array;
 
     /**
-     * @param string $database
      * @return array<string, array<string, array<string, mixed>>>
      */
     abstract protected function loadForeignKeys(string $database): array;
 
     /**
-     * @param MigrationTable $migrationTable
      * @param array<string, mixed> $column
      */
     abstract protected function addColumn(MigrationTable $migrationTable, array $column): void;
 
     /**
-     * @param MigrationTable $migrationTable
      * @param array<string, array<string, mixed>> $indexes
      * @throws InvalidArgumentValueException
      */
@@ -103,7 +97,6 @@ trait StructureBehavior
     }
 
     /**
-     * @param MigrationTable $migrationTable
      * @param array<string, array<string, mixed>> $foreignKeys
      */
     private function addForeignKeys(MigrationTable $migrationTable, array $foreignKeys): void

@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
-class MigrationNameCreator
+final class MigrationNameCreator
 {
-    /** @var string */
-    private $namespace;
+    private string $namespace;
 
-    /** @var string */
-    private $className;
+    private string $className;
 
-    /** @var string */
-    private $fileName;
+    private string $fileName;
 
     public function __construct(string $fullClassName)
     {

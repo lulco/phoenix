@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Database\Element\MigrationTable;
 
 trait DropPrimaryKeyBehavior
 {
-    /** @var bool */
-    private $dropPrimaryKey = false;
+    private bool $dropPrimaryKey = false;
 
     public function dropPrimaryKey(): MigrationTable
     {

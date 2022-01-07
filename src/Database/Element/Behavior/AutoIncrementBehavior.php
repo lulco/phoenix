@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 trait AutoIncrementBehavior
 {
-    /** @var int|null */
-    private $autoIncrement;
+    private ?int $autoIncrement = null;
 
     public function setAutoIncrement(?int $autoIncrement): self
     {

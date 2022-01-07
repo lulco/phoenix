@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Comparator;
 
-use Comparator\ColumnComparator;
+use Phoenix\Comparator\ColumnComparator;
 use Phoenix\Database\Element\Column;
 use PHPUnit\Framework\TestCase;
 
-class ColumnComparatorTest extends TestCase
+final class ColumnComparatorTest extends TestCase
 {
-    public function testSameWithEmptySettings()
+    public function testSameWithEmptySettings(): void
     {
         $column1 = new Column('a', 'string');
         $column2 = new Column('a', 'string');
@@ -16,7 +18,7 @@ class ColumnComparatorTest extends TestCase
         $this->assertEquals(null, $columnComparator->diff($column1, $column2));
     }
 
-    public function testSameWithSameSettings()
+    public function testSameWithSameSettings(): void
     {
         $column1 = new Column('b', 'integer', ['null' => true, 'default' => 10]);
         $column2 = new Column('b', 'integer', ['null' => true, 'default' => 10]);
@@ -24,7 +26,7 @@ class ColumnComparatorTest extends TestCase
         $this->assertEquals(null, $columnComparator->diff($column1, $column2));
     }
 
-    public function testChangeType()
+    public function testChangeType(): void
     {
         $column1 = new Column('a', 'string');
         $column2 = new Column('a', 'integer');
@@ -32,7 +34,7 @@ class ColumnComparatorTest extends TestCase
         $this->assertEquals(new Column('a', 'integer'), $columnComparator->diff($column1, $column2));
     }
 
-    public function testEnumWithDifferentSettings()
+    public function testEnumWithDifferentSettings(): void
     {
         $column1 = new Column('e', 'enum', ['null' => true, 'values' => ['a', 'b', 'c']]);
         $column2 = new Column('e', 'enum', ['null' => false, 'values' => ['d', 'e', 'f']]);

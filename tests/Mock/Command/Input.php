@@ -1,90 +1,86 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Mock\Command;
 
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 
-class Input implements InputInterface
+final class Input implements InputInterface
 {
-    private $arguments = [];
-    
-    private $options = [];
-    
-    public function bind(InputDefinition $definition)
+    private array $arguments = [];
+
+    private array $options = [];
+
+    public function bind(InputDefinition $definition): void
     {
-        
     }
 
-    public function getArgument($name)
+    public function getArgument(string $name)
     {
-        return isset($this->arguments[$name]) ? $this->arguments[$name] : null;
+        return $this->arguments[$name] ?? null;
     }
 
-    public function getArguments()
+    public function getArguments(): array
     {
         return $this->arguments;
     }
 
-    public function getFirstArgument()
+    public function getFirstArgument(): ?string
     {
-        
+        return null;
     }
 
-    public function getOption($name)
+    public function getOption(string $name)
     {
-        return isset($this->options[$name]) ? $this->options[$name] : null;
+        return $this->options[$name] ?? null;
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
     public function getParameterOption($values, $default = false, $onlyParams = false)
     {
-        
     }
 
-    public function hasArgument($name)
+    public function hasArgument(string $name): bool
     {
         return isset($this->arguments[$name]);
     }
 
-    public function hasOption($name)
+    public function hasOption(string $name): bool
     {
         return isset($this->options[$name]);
     }
 
-    public function hasParameterOption($values, $onlyParams = false)
+    public function hasParameterOption($values, bool $onlyParams = false): bool
     {
-        
+        return false;
     }
 
-    public function isInteractive()
+    public function isInteractive(): bool
     {
-
+        return false;
     }
 
-    public function setArgument($name, $value)
+    public function setArgument(string $name, $value): void
     {
         $this->arguments[$name] = $value;
-        return $this;
     }
 
-    public function setInteractive($interactive)
+    public function setInteractive(bool $interactive): void
     {
-        
     }
 
-    public function setOption($name, $value)
+    public function setOption(string $name, $value): void
     {
         $this->options[$name] = $value;
-        return $this;
     }
 
-    public function validate()
+    public function validate(): void
     {
-        return true;
     }
 }

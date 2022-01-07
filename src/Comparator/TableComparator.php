@@ -1,6 +1,8 @@
 <?php
 
-namespace Comparator;
+declare(strict_types=1);
+
+namespace Phoenix\Comparator;
 
 use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
@@ -8,7 +10,7 @@ use Phoenix\Database\Element\Index;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Table;
 
-class TableComparator
+final class TableComparator
 {
     public function diff(Table $sourceTable, Table $targetTable): ?MigrationTable
     {

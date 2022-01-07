@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
-use Comparator\StructureComparator;
-use Dumper\Dumper;
-use Dumper\Indenter;
+use Phoenix\Comparator\StructureComparator;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
+use Phoenix\Dumper\Dumper;
+use Phoenix\Dumper\Indenter;
 use Phoenix\Exception\InvalidArgumentValueException;
 use Phoenix\Migration\MigrationCreator;
 use Symfony\Component\Console\Input\InputOption;
@@ -52,8 +54,7 @@ abstract class AbstractDumpCommand extends AbstractCommand
         $migrationDir = $this->chooseMigrationDir($dir);
         $migrationPath = $migrationCreator->create($up, $down, $migrationDir);
 
-        $this->writeln('');
-        $this->writeln('<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>');
+        $this->writeln(['', '<info>Migration "' . $migration . '" created in "' . $migrationPath . '"</info>']);
         $this->outputData['migration_name'] = $migration;
         $this->outputData['migration_filepath'] = $migrationPath;
     }
@@ -79,9 +80,9 @@ abstract class AbstractDumpCommand extends AbstractCommand
      */
     private function getFilteredTables(Structure $sourceStructure, Structure $targetStructure): array
     {
-        /** @var string $ignoredTablesOption */
+        /** @var string|null $ignoredTablesOption */
         $ignoredTablesOption = $this->input->getOption('ignore-tables');
-        $ignoredTables = array_filter(array_map('trim', explode(',', $ignoredTablesOption)));
+        $ignoredTables = $ignoredTablesOption ? array_filter(array_map('trim', explode(',', $ignoredTablesOption))) : [];
         $structureComparator = new StructureComparator();
         $tables = [];
         $diffTables = $structureComparator->diff($sourceStructure, $targetStructure);

@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Migration;
 
 use Phoenix\Templates\TemplateManager;
 
-class MigrationCreator
+final class MigrationCreator
 {
-    /** @var MigrationNameCreator */
-    private $migrationNameCreator;
+    private MigrationNameCreator $migrationNameCreator;
 
-    /** @var TemplateManager */
-    private $templateManager;
+    private TemplateManager $templateManager;
 
     public function __construct(string $migration, string $indent, ?string $templatePath = null)
     {

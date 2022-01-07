@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\StatusCommand;
 
 use Phoenix\Command\InitCommand;
@@ -12,19 +14,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class StatusCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new StatusCommand();
         $this->assertEquals('status', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new StatusCommand('my_status');
         $this->assertEquals('my_status', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new StatusCommand();
         $this->expectException(ConfigException::class);
@@ -32,7 +34,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new StatusCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -41,7 +43,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testStatusWithoutInitializing()
+    public function testStatusWithoutInitializing(): void
     {
         $command = new StatusCommand();
         $this->input->setOption('config', __DIR__ . '/../../../testing_migrations/config/phoenix.php');
@@ -54,11 +56,11 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][6]);
         $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][7]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][9]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][11]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][11]);
         $this->assertArrayHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithInitializing()
+    public function testStatusWithInitializing(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -76,11 +78,11 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
         $this->assertEquals('<info>No executed migrations</info>' . "\n", $messages[0][2]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][4]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][6]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][6]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusAfterOneExecutedMigration()
+    public function testStatusAfterOneExecutedMigration(): void
     {
         $input = $this->createInput();
         $input->setOption('first', true);
@@ -98,13 +100,13 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                     </info>|<info> Executed at         </info>|' . "\n", $messages[0][3]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][8]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|' . "\n", $messages[0][10]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|' . "\n", $messages[0][10]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusAfterAllMigrationsExecuted()
+    public function testStatusAfterAllMigrationsExecuted(): void
     {
         $input = $this->createInput();
         $output = new Output();
@@ -129,13 +131,13 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertTrue(is_array($messages));
         $this->assertArrayHasKey(0, $messages);
         $this->assertEquals('<comment>Executed migrations</comment>' . "\n", $messages[0][1]);
-        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name </info>|<info> Executed at </info>|' . "\n", $messages[0][3]);
+        $this->assertEquals('|<info> Migration datetime </info>|<info> Class name                                    </info>|<info> Executed at         </info>|' . "\n", $messages[0][3]);
         $this->assertEquals('<comment>Migrations to execute</comment>' . "\n", $messages[0][7 + $executedMigrationsCount]);
         $this->assertEquals('<info>No migrations to execute</info>' . "\n", $messages[0][8 + $executedMigrationsCount]);
         $this->assertArrayNotHasKey(OutputInterface::VERBOSITY_DEBUG, $messages);
     }
 
-    public function testStatusWithJsonOutputAfterOneExecutedMigration()
+    public function testStatusWithJsonOutputAfterOneExecutedMigration(): void
     {
         $input = $this->createInput();
         $input->setOption('first', true);
@@ -163,7 +165,7 @@ abstract class StatusCommandTest extends BaseCommandTest
         $this->assertNotEmpty($message['migrations_to_execute']);
     }
 
-    public function testStatusWithJsonOutputAfterAllMigrationsExecuted()
+    public function testStatusWithJsonOutputAfterAllMigrationsExecuted(): void
     {
         $input = $this->createInput();
         $output = new Output();

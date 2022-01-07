@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Config;
 
-class EnvironmentConfig
+final class EnvironmentConfig
 {
     /**
      * @var array<string, mixed>
      */
-    private $configuration;
+    private array $configuration;
 
     /**
      * @param array<string, mixed> $configuration
@@ -35,12 +37,13 @@ class EnvironmentConfig
         if ($this->checkConfigValue('dsn')) {
             return $this->configuration['dsn'];
         }
-        $dsn = $this->configuration['adapter'] . ':dbname=' . $this->configuration['db_name'] . ';host=' . $this->configuration['host'];
+        $adapter = $this->getAdapter();
+        $dsn = $adapter . ':dbname=' . $this->configuration['db_name'] . ';host=' . $this->configuration['host'];
         if ($this->checkConfigValue('port')) {
             $dsn .= ';port=' . $this->configuration['port'];
         }
         if ($this->checkConfigValue('charset')) {
-            if ($this->configuration['adapter'] === 'pgsql') {
+            if ($adapter === 'pgsql') {
                 $dsn .= ';options=\'--client_encoding=' . $this->configuration['charset'] . '\'';
             } else {
                 $dsn .= ';charset=' . $this->configuration['charset'];
@@ -61,7 +64,7 @@ class EnvironmentConfig
 
     public function getCharset(): string
     {
-        return $this->configuration['charset'] ?? 'utf8';
+        return $this->configuration['charset'] ?? ($this->getAdapter() === 'mysql' ? 'utf8mb4' : 'utf8');
     }
 
     public function getVersion(): ?string

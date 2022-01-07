@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Element;
 
 use Phoenix\Database\Element\ColumnSettings;
 use Phoenix\Exception\InvalidArgumentValueException;
 use PHPUnit\Framework\TestCase;
 
-class ColumnSettingsTest extends TestCase
+final class ColumnSettingsTest extends TestCase
 {
-    public function testSimple()
+    public function testSimple(): void
     {
         $columnSettings = new ColumnSettings();
         $this->assertEquals([], $columnSettings->getSettings());
@@ -28,7 +30,7 @@ class ColumnSettingsTest extends TestCase
         $this->assertNull($columnSettings->getComment());
     }
 
-    public function testComplex()
+    public function testComplex(): void
     {
         $columnSettings = new ColumnSettings(['null' => true, 'default' => '', 'length' => 255, 'after' => 'id']);
         $this->assertEquals(['null' => true, 'default' => '', 'length' => 255, 'after' => 'id'], $columnSettings->getSettings());
@@ -48,7 +50,7 @@ class ColumnSettingsTest extends TestCase
         $this->assertNull($columnSettings->getComment());
     }
 
-    public function testFullSettings()
+    public function testFullSettings(): void
     {
         $settings = [
             'null' => false,
@@ -83,14 +85,14 @@ class ColumnSettingsTest extends TestCase
         $this->assertEquals('My comment', $columnSettings->getComment());
     }
 
-    public function testNotAllowedSetting()
+    public function testNotAllowedSetting(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Setting "not_allowed_setting" is not allowed.');
         new ColumnSettings(['not_allowed_setting' => true]);
     }
 
-    public function testNotAllowedSettingValue()
+    public function testNotAllowedSettingValue(): void
     {
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Value "123" is not allowed for setting "null".');

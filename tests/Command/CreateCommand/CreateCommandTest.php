@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Command\CreateCommand;
 
 use Phoenix\Command\CreateCommand;
@@ -15,19 +17,19 @@ use Symfony\Component\Finder\Finder;
 
 abstract class CreateCommandTest extends BaseCommandTest
 {
-    public function testDefaultName()
+    public function testDefaultName(): void
     {
         $command = new CreateCommand();
         $this->assertEquals('create', $command->getName());
     }
 
-    public function testCustomName()
+    public function testCustomName(): void
     {
         $command = new CreateCommand('my_create');
         $this->assertEquals('my_create', $command->getName());
     }
 
-    public function testMissingDefaultConfig()
+    public function testMissingDefaultConfig(): void
     {
         $command = new CreateCommand();
         $this->expectException(ConfigException::class);
@@ -35,7 +37,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testUserConfigFileNotFound()
+    public function testUserConfigFileNotFound(): void
     {
         $command = new CreateCommand();
         $this->input->setOption('config', 'xyz.neon');
@@ -44,7 +46,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testNonExistingTemplateFileException()
+    public function testNonExistingTemplateFileException(): void
     {
         $command = new CreateCommand();
         $command->setConfig($this->configuration);
@@ -57,7 +59,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         $command->run($this->input, $this->output);
     }
 
-    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice()
+    public function testMoreThanOneMigrationDirsAvailableWithCommandChoice(): void
     {
         $createMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($createMigrationDir));
@@ -80,7 +82,9 @@ abstract class CreateCommandTest extends BaseCommandTest
             $filePath = (string)$createFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -91,7 +95,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         rmdir($createMigrationDir);
     }
 
-    public function testCreateMigrationInNewDirectory()
+    public function testCreateMigrationInNewDirectory(): void
     {
         $createMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($createMigrationDir));
@@ -122,7 +126,9 @@ abstract class CreateCommandTest extends BaseCommandTest
             $filePath = (string)$createFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringNotContainsString("\t", $migrationContent);
             $this->assertStringContainsString("    ", $migrationContent);
 
@@ -143,7 +149,7 @@ abstract class CreateCommandTest extends BaseCommandTest
         rmdir($createMigrationDir);
     }
 
-    public function testCreateMigrationInNewDirectoryWithTabIndent()
+    public function testCreateMigrationInNewDirectoryWithTabIndent(): void
     {
         $createMigrationDir = __DIR__ . '/../../../testing_migrations/new';
         $this->assertFalse(is_dir($createMigrationDir));
@@ -174,7 +180,9 @@ abstract class CreateCommandTest extends BaseCommandTest
             $filePath = (string)$createFile;
 
             $migrationContent = file_get_contents($filePath);
-            $this->assertStringStartsWith('<?php', $migrationContent);
+            $this->assertStringStartsWith('<?php
+
+declare(strict_types=1);', $migrationContent);
             $this->assertStringContainsString("\t", $migrationContent);
             $this->assertStringNotContainsString("    ", $migrationContent);
 

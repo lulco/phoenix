@@ -10,7 +10,7 @@
             "username": "root",
             "password": "123",
             "db_name": "phoenix",
-            "charset": "utf8"
+            "charset": "utf8mb4"
         },
         "pgsql": {
             "adapter": "pgsql",

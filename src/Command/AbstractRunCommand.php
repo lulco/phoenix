@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Command;
 
 use Phoenix\Exception\InvalidArgumentValueException;
@@ -9,11 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractRunCommand extends AbstractCommand
 {
-    /** @var string */
-    protected $noMigrationsFoundMessage = '';
+    protected string $noMigrationsFoundMessage = '';
 
-    /** @var string */
-    protected $migrationInfoPrefix = '';
+    protected string $migrationInfoPrefix = '';
 
     protected function configure(): void
     {
@@ -30,23 +30,21 @@ abstract class AbstractRunCommand extends AbstractCommand
 
         $migrations = $this->findMigrations();
         if (empty($migrations)) {
-            $this->writeln('');
-            $this->writeln('<info>' . $this->noMigrationsFoundMessage . '</info>');
+            $this->writeln(['', '<info>' . $this->noMigrationsFoundMessage . '</info>']);
         }
 
         $executedMigrations = [];
         /** @var AbstractMigration $migration */
         foreach ($migrations as $migration) {
-            $this->writeln('');
-            $this->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executing</info>');
+            $this->writeln(['', '<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executing</info>']);
 
             $start = microtime(true);
             $this->runMigration($migration, $dry);
             $executionTime = microtime(true) - $start;
-            $this->writeln('<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>');
+            $this->writeln(['<info>' . $this->migrationInfoPrefix . ' ' . $migration->getClassName() . ' executed</info>. <comment>Took ' . sprintf('%.4fs', $executionTime) . '</comment>']);
 
             $executedQueries = $migration->getExecutedQueries();
-            $this->writeln('Executed queries:', OutputInterface::VERBOSITY_DEBUG);
+            $this->writeln(['Executed queries:'], OutputInterface::VERBOSITY_DEBUG);
             $this->writeln($executedQueries, OutputInterface::VERBOSITY_DEBUG);
 
             $executedMigration = [

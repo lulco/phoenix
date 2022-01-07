@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Database\Element\MigrationTable;
@@ -7,7 +9,7 @@ use Phoenix\Database\Element\MigrationTable;
 trait ColumnsToDropBehavior
 {
     /** @var string[] */
-    private $columnsToDrop = [];
+    private array $columnsToDrop = [];
 
     public function dropColumn(string $name): MigrationTable
     {

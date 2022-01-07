@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Behavior\ParamsCheckerBehavior;
@@ -9,14 +11,9 @@ trait CopyTableBehavior
 {
     use ParamsCheckerBehavior;
 
-    /** @var string */
-    private $action;
+    private ?string $newName = null;
 
-    /** @var string */
-    private $newName;
-
-    /** @var string */
-    private $copyType;
+    private string $copyType;
 
     public function getCopyType(): string
     {

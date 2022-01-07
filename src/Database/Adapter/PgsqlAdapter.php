@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Adapter;
 
 use PDO;
@@ -13,10 +15,9 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\QueryBuilder\PgsqlQueryBuilder;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 
-class PgsqlAdapter extends PdoAdapter
+final class PgsqlAdapter extends PdoAdapter
 {
-    /** @var PgsqlQueryBuilder|null */
-    private $queryBuilder;
+    private ?PgsqlQueryBuilder $queryBuilder = null;
 
     public function getQueryBuilder(): PgsqlQueryBuilder
     {
@@ -57,14 +58,15 @@ class PgsqlAdapter extends PdoAdapter
     protected function createMigrationTable(array $table): MigrationTable
     {
         $migrationTable = parent::createMigrationTable($table);
-        /** @var string $comment */
+        /** @var string|false $comment */
         $comment = $this->query(sprintf("
             SELECT description
             FROM pg_description
             JOIN pg_class ON pg_description.objoid = pg_class.oid
             WHERE relname = '%s'", $table['table_name']))->fetchColumn();
-
-        $migrationTable->setComment($comment);
+        if ($comment) {
+            $migrationTable->setComment($comment);
+        }
         return $migrationTable;
     }
 
@@ -140,9 +142,7 @@ class PgsqlAdapter extends PdoAdapter
     }
 
     /**
-     * @param string $type
      * @param array<string, mixed> $column
-     * @param string $table
      * @return array<string, mixed>
      * @throws DatabaseQueryExecuteException
      */
@@ -162,7 +162,7 @@ class PgsqlAdapter extends PdoAdapter
             ColumnSettings::SETTING_DEFAULT => $this->prepareDefault($column, $type),
             ColumnSettings::SETTING_LENGTH => $length,
             ColumnSettings::SETTING_DECIMALS => $decimals,
-            ColumnSettings::SETTING_AUTOINCREMENT => strpos($column['column_default'], 'nextval') === 0,
+            ColumnSettings::SETTING_AUTOINCREMENT => is_string($column['column_default']) && strpos($column['column_default'], 'nextval') === 0,
             ColumnSettings::SETTING_COMMENT => $column['comment'],
         ];
         if (in_array($type, [Column::TYPE_ENUM, Column::TYPE_SET], true)) {
@@ -174,7 +174,6 @@ class PgsqlAdapter extends PdoAdapter
 
     /**
      * @param array<string, mixed> $column
-     * @param string $type
      * @return mixed
      */
     private function prepareDefault(array $column, string $type)

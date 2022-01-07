@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Tests\Database\Adapter;
 
 use Phoenix\Database\Adapter\MysqlAdapter;
@@ -12,22 +14,22 @@ use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Database\Element\Table;
 use Phoenix\Database\QueryBuilder\MysqlQueryBuilder;
-use Phoenix\Database\QueryBuilder\MysqlWithJsonQueryBuilder;
 use Phoenix\Database\QueryBuilder\QueryBuilderInterface;
 use Phoenix\Exception\DatabaseQueryExecuteException;
 use Phoenix\Tests\Helpers\Adapter\MysqlCleanupAdapter;
 use Phoenix\Tests\Helpers\Pdo\MysqlPdo;
 use PHPUnit\Framework\TestCase;
 
-class MysqlAdapterTest extends TestCase
+final class MysqlAdapterTest extends TestCase
 {
-    private $pdo;
+    private MysqlPdo $pdo;
 
-    private $adapter;
+    private MysqlAdapter $adapter;
 
     protected function setUp(): void
     {
         $pdo = new MysqlPdo();
+
         $adapter = new MysqlCleanupAdapter($pdo);
         $adapter->cleanupDatabase();
 
@@ -35,31 +37,19 @@ class MysqlAdapterTest extends TestCase
         $this->adapter = new MysqlAdapter($this->pdo);
     }
 
-    public function testGetQueryBuilder()
+    public function testGetQueryBuilder(): void
     {
         $this->assertInstanceOf(QueryBuilderInterface::class, $this->adapter->getQueryBuilder());
         $this->assertInstanceOf(MysqlQueryBuilder::class, $this->adapter->getQueryBuilder());
-
-        $adapter = new MysqlAdapter($this->pdo, '5.6.5');
-        $this->assertInstanceOf(MysqlQueryBuilder::class, $adapter->getQueryBuilder());
-
-        $adapter = new MysqlAdapter($this->pdo, '5.7.8');
-        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
-
-        $adapter = new MysqlAdapter($this->pdo, '5.7.29');
-        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
-
-        $adapter = new MysqlAdapter($this->pdo, '8.0.19');
-        $this->assertInstanceOf(MysqlWithJsonQueryBuilder::class, $adapter->getQueryBuilder());
     }
 
-    public function testForeignKeyQueries()
+    public function testForeignKeyQueries(): void
     {
         $this->assertEquals('SET FOREIGN_KEY_CHECKS = 1;', $this->adapter->buildCheckForeignKeysQuery());
         $this->assertEquals('SET FOREIGN_KEY_CHECKS = 0;', $this->adapter->buildDoNotCheckForeignKeysQuery());
     }
 
-    public function testGetEmptyStructureAndUpdate()
+    public function testGetEmptyStructureAndUpdate(): void
     {
         $structure = $this->adapter->getStructure();
         $this->assertInstanceOf(Structure::class, $structure);
@@ -86,7 +76,7 @@ class MysqlAdapterTest extends TestCase
         $this->assertInstanceOf(Table::class, $structure->getTable('structure_test'));
     }
 
-    public function testUniqueIndexWithLengthSpecified()
+    public function testUniqueIndexWithLengthSpecified(): void
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
 
@@ -143,7 +133,7 @@ class MysqlAdapterTest extends TestCase
         ]);
     }
 
-    public function testFullStructure()
+    public function testFullStructure(): void
     {
         $this->prepareStructure();
 
@@ -455,7 +445,7 @@ class MysqlAdapterTest extends TestCase
         $this->assertEquals(ForeignKey::CASCADE, $foreignKey->getOnUpdate());
     }
 
-    private function prepareStructure()
+    private function prepareStructure(): void
     {
         $queryBuilder = $this->adapter->getQueryBuilder();
 
@@ -549,7 +539,7 @@ class MysqlAdapterTest extends TestCase
         }
     }
 
-    private function checkColumn(Table $table, $name, $type, array $expectedSettings)
+    private function checkColumn(Table $table, string $name, string $type, array $expectedSettings): void
     {
         $column = $table->getColumn($name);
         $this->assertInstanceOf(Column::class, $column);
@@ -566,7 +556,7 @@ class MysqlAdapterTest extends TestCase
         $this->assertEquals($expectedSettings['comment'], $column->getSettings()->getComment());
     }
 
-    private function checkIndex(Table $table, $name, array $columns, $type, $method)
+    private function checkIndex(Table $table, string $name, array $columns, string $type, string $method): void
     {
         $index = $table->getIndex($name);
         $this->assertInstanceOf(Index::class, $index);

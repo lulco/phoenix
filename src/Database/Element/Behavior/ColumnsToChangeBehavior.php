@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Database\Element\Column;
@@ -9,17 +11,13 @@ use Phoenix\Exception\InvalidArgumentValueException;
 trait ColumnsToChangeBehavior
 {
     /** @var array<string, Column> */
-    private $columns = [];
+    private array $columns = [];
 
     /** @var array<string, Column> */
-    private $columnsToChange = [];
+    private array $columnsToChange = [];
 
     /**
-     * @param string $oldName
-     * @param string $newName
-     * @param string $type
      * @param array{null?: bool, default?: mixed, length?: int, decimals?: int, signed?: bool, autoincrement?: bool, after?: string, first?: bool, charset?: string, collation?: string, values?: array<int|string, int|string>, comment?: string} $settings
-     * @return MigrationTable
      * @throws InvalidArgumentValueException
      */
     public function changeColumn(string $oldName, string $newName, string $type, array $settings = []): MigrationTable

@@ -1,25 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Phoenix\Database\Element\Behavior;
 
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
+use Phoenix\Exception\InvalidArgumentValueException;
 
 trait ForeignKeyBehavior
 {
     /** @var ForeignKey[] */
-    private $foreignKeys = [];
+    private array $foreignKeys = [];
 
     /** @var string[] */
-    private $foreignKeysToDrop = [];
+    private array $foreignKeysToDrop = [];
 
     /**
      * @param string|string[] $columns
-     * @param string $referencedTable
      * @param string|string[] $referencedColumns
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @return MigrationTable
+     * @throws InvalidArgumentValueException
      */
     public function addForeignKey($columns, string $referencedTable, $referencedColumns = ['id'], string $onDelete = ForeignKey::DEFAULT_ACTION, string $onUpdate = ForeignKey::DEFAULT_ACTION): MigrationTable
     {
