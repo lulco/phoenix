@@ -16,6 +16,7 @@
 #### Removed
 - class MysqlWithJsonQueryBuilder (BC break)
 - method setName from AbstractCommand (BC break - if setName() is called after name is already set, it will be changed)
+- dropped support symfony libs (console, finder and yaml) 3.x and 4.x (BC break)
 
 #### Added
 - visibility for constants
