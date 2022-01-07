@@ -11,12 +11,16 @@
 - added `declare(strict_types=1);` to all classes
 - all classes which can be final are final (BC break if there are some extensions)
 - all methods which can be final are final
+- moved default command names from configure to __construct
 
 #### Removed
 - class MysqlWithJsonQueryBuilder (BC break)
+- method setName from AbstractCommand (BC break - if setName() is called after name is already set, it will be changed)
+- dropped support symfony libs (console, finder and yaml) 3.x and 4.x (BC break)
 
 #### Added
 - visibility for constants
+- support for symfony libs (console, finder and yaml) 6.x
 
 ### [1.12.0] - 2022-01-07
 #### Added

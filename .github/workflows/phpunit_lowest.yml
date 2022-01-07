@@ -1,4 +1,4 @@
-name: PHPunit Mysql 5.7, Postgres 10
+name: PHPunit with lowest dependencies
 
 on:
   push:
@@ -14,16 +14,14 @@ jobs:
       matrix:
         php: [ '7.4', '8.0', '8.1' ]
 
-    name: PHPunit - PHP ${{ matrix.php }}
+    name: PHPunit with lowest dependencies PHP ${{ matrix.php }}
 
     services:
       mysql:
-        image: bitnami/mysql:5.7
+        image: mysql:5.7
         env:
           MYSQL_DATABASE: phoenix
           MYSQL_ROOT_PASSWORD: 123
-          MYSQL_CHARACTER_SET: utf8
-          MYSQL_COLLATE: utf8_general_ci
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -45,7 +43,7 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Composer update
-        run: composer update --no-progress --no-interaction
+        run: composer update --prefer-lowest --no-progress --no-interaction
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text
