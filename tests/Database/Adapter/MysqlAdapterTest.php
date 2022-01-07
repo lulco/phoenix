@@ -116,7 +116,6 @@ class MysqlAdapterTest extends TestCase
             'length' => null,
             'decimals' => null,
             'autoincrement' => false,
-            'signed' => true,
             'values' => null,
             'comment' => null,
         ];
@@ -169,7 +168,6 @@ class MysqlAdapterTest extends TestCase
             'length' => null,
             'decimals' => null,
             'autoincrement' => false,
-            'signed' => true,
             'values' => null,
             'comment' => null,
         ];
@@ -205,7 +203,6 @@ class MysqlAdapterTest extends TestCase
             'default' => 50,
             'null' => true,
             'length' => 11,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
             'length' => 20,
@@ -326,14 +323,12 @@ class MysqlAdapterTest extends TestCase
         ]));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'length' => 4,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'length' => 6,
         ]));
         $this->checkColumn($table2, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
             'length' => 9,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_int', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -343,7 +338,6 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table2, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
             'null' => true,
             'length' => 20,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_string', Column::TYPE_STRING, array_merge($defaultSettings, [
             'charset' => 'utf16',
@@ -472,7 +466,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_tinyint', 'tinyinteger', ['null' => true]);
         $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true]);
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
-        $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50, 'signed' => false]);
+        $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50]);
         $migrationTable1->addColumn('col_bigint', 'biginteger');
         $migrationTable1->addColumn('col_string', 'string', ['default' => "I'll meet you at midnight"]);
         $migrationTable1->addColumn('col_char', 'char', ['length' => 50, 'charset' => 'utf16']);
@@ -515,11 +509,11 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
         $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'10101'"]);
-        $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
+        $migrationTable2->addColumn('col_tinyint', 'tinyinteger');
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
-        $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
+        $migrationTable2->addColumn('col_mediumint', 'mediuminteger');
         $migrationTable2->addColumn('col_int', 'integer', ['null' => true]);
-        $migrationTable2->addColumn('col_bigint', 'biginteger', ['null' => true, 'signed' => false]);
+        $migrationTable2->addColumn('col_bigint', 'biginteger', ['null' => true]);
         $migrationTable2->addColumn('col_string', 'string', ['null' => true, 'length' => 50, 'default' => 'He said: "Hello world"', 'collation' => 'utf16_slovak_ci']);
         $migrationTable2->addColumn('col_char', 'char');
         $migrationTable2->addColumn('col_binary', 'binary', ['null' => true, 'length' => 50]);
@@ -568,7 +562,6 @@ class MysqlAdapterTest extends TestCase
         $this->assertEquals($expectedSettings['length'], $column->getSettings()->getLength());
         $this->assertEquals($expectedSettings['decimals'], $column->getSettings()->getDecimals());
         $this->assertEquals($expectedSettings['autoincrement'], $column->getSettings()->isAutoincrement());
-        $this->assertEquals($expectedSettings['signed'], $column->getSettings()->isSigned());
         $this->assertEquals($expectedSettings['values'], $column->getSettings()->getValues());
         $this->assertEquals($expectedSettings['comment'], $column->getSettings()->getComment());
     }
