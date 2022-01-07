@@ -128,6 +128,22 @@ class MysqlAdapter extends PdoAdapter
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
         list($length, $decimals) = $this->getLengthAndDecimals($matches[2] ?? null);
+
+        // Mysql 8 ignores length for integers
+        if ($length === null) {
+            if ($column['DATA_TYPE'] === 'int') {
+                $length = 11;
+            } elseif ($column['DATA_TYPE'] === 'bigint') {
+                $length = 20;
+            } elseif ($column['DATA_TYPE'] === 'tinyint') {
+                $length = 4;
+            } elseif ($column['DATA_TYPE'] === 'smallint') {
+                $length = 6;
+            } elseif ($column['DATA_TYPE'] === 'mediumint') {
+                $length = 9;
+            }
+        }
+
         return [
             ColumnSettings::SETTING_AUTOINCREMENT => $column['EXTRA'] === 'auto_increment',
             ColumnSettings::SETTING_NULL => $column['IS_NULLABLE'] === 'YES',

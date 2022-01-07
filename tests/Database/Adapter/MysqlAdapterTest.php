@@ -116,7 +116,6 @@ class MysqlAdapterTest extends TestCase
             'length' => null,
             'decimals' => null,
             'autoincrement' => false,
-            'signed' => true,
             'values' => null,
             'comment' => null,
         ];
@@ -169,7 +168,6 @@ class MysqlAdapterTest extends TestCase
             'length' => null,
             'decimals' => null,
             'autoincrement' => false,
-            'signed' => true,
             'values' => null,
             'comment' => null,
         ];
@@ -196,7 +194,6 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table1, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'null' => true,
             'length' => 6,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -206,7 +203,6 @@ class MysqlAdapterTest extends TestCase
             'default' => 50,
             'null' => true,
             'length' => 11,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
             'length' => 20,
@@ -269,7 +265,6 @@ class MysqlAdapterTest extends TestCase
             'null' => true,
             'length' => 13,
             'decimals' => 1,
-            'signed' => false,
         ]));
         $this->checkColumn($table1, 'col_boolean', Column::TYPE_BOOLEAN, array_merge($defaultSettings, [
             'default' => true,
@@ -328,14 +323,12 @@ class MysqlAdapterTest extends TestCase
         ]));
         $this->checkColumn($table2, 'col_tinyint', Column::TYPE_TINY_INTEGER, array_merge($defaultSettings, [
             'length' => 4,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_smallint', Column::TYPE_SMALL_INTEGER, array_merge($defaultSettings, [
             'length' => 6,
         ]));
         $this->checkColumn($table2, 'col_mediumint', Column::TYPE_MEDIUM_INTEGER, array_merge($defaultSettings, [
             'length' => 9,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_int', Column::TYPE_INTEGER, array_merge($defaultSettings, [
             'null' => true,
@@ -345,7 +338,6 @@ class MysqlAdapterTest extends TestCase
         $this->checkColumn($table2, 'col_bigint', Column::TYPE_BIG_INTEGER, array_merge($defaultSettings, [
             'null' => true,
             'length' => 20,
-            'signed' => false,
         ]));
         $this->checkColumn($table2, 'col_string', Column::TYPE_STRING, array_merge($defaultSettings, [
             'charset' => 'utf16',
@@ -416,7 +408,7 @@ class MysqlAdapterTest extends TestCase
             'null' => true
         ]));
         $this->checkColumn($table2, 'col_timestamp', Column::TYPE_TIMESTAMP, array_merge($defaultSettings, [
-            'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP,
+            'null' => true
         ]));
         $this->checkColumn($table2, 'col_date', Column::TYPE_DATE, array_merge($defaultSettings, [
             'null' => true
@@ -472,9 +464,9 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_uuid', 'uuid', ['null' => true]);
         $migrationTable1->addColumn('col_bit', 'bit', ['length' => 32, 'default' => "b'0'"]);
         $migrationTable1->addColumn('col_tinyint', 'tinyinteger', ['null' => true]);
-        $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true, 'signed' => false]);
+        $migrationTable1->addColumn('col_smallint', 'smallinteger', ['null' => true]);
         $migrationTable1->addColumn('col_mediumint', 'mediuminteger', ['null' => true]);
-        $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50, 'signed' => false]);
+        $migrationTable1->addColumn('col_int', 'integer', ['null' => true, 'default' => 50]);
         $migrationTable1->addColumn('col_bigint', 'biginteger');
         $migrationTable1->addColumn('col_string', 'string', ['default' => "I'll meet you at midnight"]);
         $migrationTable1->addColumn('col_char', 'char', ['length' => 50, 'charset' => 'utf16']);
@@ -492,7 +484,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable1->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3]);
         $migrationTable1->addColumn('col_decimal', 'decimal', ['length' => 11, 'decimals' => 2]);
         $migrationTable1->addColumn('col_float', 'float', ['null' => true, 'length' => 12, 'decimals' => 4]);
-        $migrationTable1->addColumn('col_double', 'double', ['null' => true, 'length' => 13, 'decimals' => 1, 'signed' => false]);
+        $migrationTable1->addColumn('col_double', 'double', ['null' => true, 'length' => 13, 'decimals' => 1]);
         $migrationTable1->addColumn('col_boolean', 'boolean', ['default' => true]);
         $migrationTable1->addColumn('col_datetime', 'datetime');
         $migrationTable1->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP]);
@@ -517,11 +509,11 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->setComment('Comment for table_2');
         $migrationTable2->addColumn('col_uuid', 'uuid');
         $migrationTable2->addColumn('col_bit', 'bit', ['null' => true, 'length' => 32, 'default' => "b'10101'"]);
-        $migrationTable2->addColumn('col_tinyint', 'tinyinteger', ['signed' => false]);
+        $migrationTable2->addColumn('col_tinyint', 'tinyinteger');
         $migrationTable2->addColumn('col_smallint', 'smallinteger');
-        $migrationTable2->addColumn('col_mediumint', 'mediuminteger', ['signed' => false]);
+        $migrationTable2->addColumn('col_mediumint', 'mediuminteger');
         $migrationTable2->addColumn('col_int', 'integer', ['null' => true]);
-        $migrationTable2->addColumn('col_bigint', 'biginteger', ['null' => true, 'signed' => false]);
+        $migrationTable2->addColumn('col_bigint', 'biginteger', ['null' => true]);
         $migrationTable2->addColumn('col_string', 'string', ['null' => true, 'length' => 50, 'default' => 'He said: "Hello world"', 'collation' => 'utf16_slovak_ci']);
         $migrationTable2->addColumn('col_char', 'char');
         $migrationTable2->addColumn('col_binary', 'binary', ['null' => true, 'length' => 50]);
@@ -541,7 +533,7 @@ class MysqlAdapterTest extends TestCase
         $migrationTable2->addColumn('col_double', 'double');
         $migrationTable2->addColumn('col_boolean', 'boolean');
         $migrationTable2->addColumn('col_datetime', 'datetime', ['null' => true]);
-        $migrationTable2->addColumn('col_timestamp', 'timestamp');
+        $migrationTable2->addColumn('col_timestamp', 'timestamp', ['null' => true]);
         $migrationTable2->addColumn('col_date', 'date', ['null' => true]);
         $migrationTable2->addColumn('col_enum', 'enum', ['null' => true, 'values' => ['t2_enum_xxx', 't2_enum_yyy', 't2_enum_zzz']]);
         $migrationTable2->addColumn('col_set', 'set', ['null' => true, 'values' => ['t2_set_xxx', 't2_set_yyy', 't2_set_zzz']]);
@@ -570,7 +562,6 @@ class MysqlAdapterTest extends TestCase
         $this->assertEquals($expectedSettings['length'], $column->getSettings()->getLength());
         $this->assertEquals($expectedSettings['decimals'], $column->getSettings()->getDecimals());
         $this->assertEquals($expectedSettings['autoincrement'], $column->getSettings()->isAutoincrement());
-        $this->assertEquals($expectedSettings['signed'], $column->getSettings()->isSigned());
         $this->assertEquals($expectedSettings['values'], $column->getSettings()->getValues());
         $this->assertEquals($expectedSettings['comment'], $column->getSettings()->getComment());
     }

@@ -1,4 +1,4 @@
-name: PHPunit
+name: PHPunit Mysql 5.7, Postgres 10
 
 on:
   push:
@@ -18,10 +18,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: bitnami/mysql:5.7
         env:
           MYSQL_DATABASE: phoenix
           MYSQL_ROOT_PASSWORD: 123
+          MYSQL_CHARACTER_SET: utf8
+          MYSQL_COLLATE: utf8_general_ci
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
