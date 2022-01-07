@@ -3,12 +3,12 @@
 ### [Unreleased][unreleased]
 
 #### Changed
-- use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')`)
+- use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')` to change all tables and fields to it)
 - dropped support for unsupported PHP versions and added native typehints (BC break)
 - changed autoload to PSR-4
   - moved namespace Dumper to Phoenix\Dumper (BC break)
   - moved namespace Comparator to Phoenix\Comparator (BC break)
-- added declare(strict_types=1); to all classes
+- added `declare(strict_types=1);` to all classes
 - all classes which can be final are final (BC break if there are some extensions)
 - all methods which can be final are final
 
@@ -18,10 +18,12 @@
 #### Added
 - visibility for constants
 
-
+### [1.12.0] - 2022-01-07
+#### Added
+- support MySql 8 and PostgreSQL 14
 
 #### Fixed
-- Dumper - table with no primary keys
+- table with no primary keys in Dumper
 
 ### [1.11.1] - 2021-12-07
 #### Fixed
@@ -311,7 +313,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.11.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/1.12.0...HEAD
+[1.12.0]: https://github.com/lulco/phoenix/compare/1.11.1...1.12.0
 [1.11.1]: https://github.com/lulco/phoenix/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/lulco/phoenix/compare/1.10.0...1.11.0
 [1.10.0]: https://github.com/lulco/phoenix/compare/1.9.1...1.10.0
