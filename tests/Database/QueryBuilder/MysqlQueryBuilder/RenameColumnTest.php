@@ -41,7 +41,7 @@ final class RenameColumnTest extends TestCase
         $table->renameColumn('asdf', 'alias');
 
         $expectedQueries = [
-            'ALTER TABLE `test_table` CHANGE COLUMN `asdf` `alias` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;',
+            'ALTER TABLE `test_table` CHANGE COLUMN `asdf` `alias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
     }
