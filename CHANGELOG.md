@@ -2,6 +2,7 @@
 
 ### [Unreleased][unreleased]
 
+### [2.0.0] - 2022-01-24
 #### Changed
 - use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')` to change all tables and fields to it)
 - dropped support for unsupported PHP versions and added native typehints (BC break)
@@ -317,7 +318,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/1.12.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/lulco/phoenix/compare/1.12.0...2.0.0
 [1.12.0]: https://github.com/lulco/phoenix/compare/1.11.1...1.12.0
 [1.11.1]: https://github.com/lulco/phoenix/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/lulco/phoenix/compare/1.10.0...1.11.0
