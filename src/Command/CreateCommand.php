@@ -32,13 +32,13 @@ final class CreateCommand extends AbstractCommand
     {
         $indenter = new Indenter();
         /** @var string $indentOption */
-        $indentOption = $this->input->getOption('indent') ?: $this->config->getIndent();
+        $indentOption = $this->input->getOption('indent') ?: $this->getConfig()->getIndent();
         $indent = $indenter->indent($indentOption);
 
         /** @var string $migration */
         $migration = $this->input->getArgument('migration');
         /** @var string $template */
-        $template = $this->input->getOption('template') ?: $this->config->getTemplate();
+        $template = $this->input->getOption('template') ?: $this->getConfig()->getTemplate();
         $migrationCreator = new MigrationCreator($migration, $indent, $template);
 
         /** @var string|null $dir */
