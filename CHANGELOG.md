@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- config options template and indent
+
 ### [2.0.0] - 2022-01-24
 #### Changed
 - use utf8mb4 as default charset for mysql (fix but BC break, use e.g. `$this->changeCollation('utf8mb4_general_ci')` to change all tables and fields to it)
