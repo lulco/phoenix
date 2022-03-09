@@ -9,6 +9,8 @@ Configuration array can consist of five parts:
 - `environments` - array - list of environment where migrations are executed, e.g. local, staging, production etc.
 - `default_environment` - string - environment which is used in phoenix command if `--environment` option is not set. It has to be one of keys from `environments` array. If no `default_environment` is set, first of `environments` is used.
 - `dependencies` - array - list of dependencies which can be used in __construct of Migration classes. Key is type of dependency (class or interface name which will be used in __construct) and value is object of this type
+- `template` - string - path to template file for migrations (used in create, dump and diff commands)
+- `indent` - string - indentation in created migrations. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab [default: 4spaces]
 
 ### Example
 Let's say you want to create configuration file, where `log_table_name` is "my_phoenix_log", you have two `migration_dirs` (first and second, which are located in the same directory as configuration file), also two `environments` both uses mysql adapter, and your `default_environment` is "local". Now we show you, how this config looks like using different type of configuration files:

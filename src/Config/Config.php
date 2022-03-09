@@ -18,6 +18,8 @@ final class Config
         'environments' => [],
         'default_environment' => '',
         'dependencies' => [],
+        'template' => __DIR__ . '/../Templates/DefaultTemplate.phoenix',
+        'indent' => '4spaces',
     ];
 
     /**
@@ -98,5 +100,15 @@ final class Config
             return $this->configuration['dependencies'][$type];
         }
         throw new InvalidArgumentValueException('Dependency for type "' . $type . '" not found. Register it via $configuration[\'dependencies\'][\'' . $type . '\']');
+    }
+
+    public function getTemplate(): string
+    {
+        return $this->configuration['template'];
+    }
+
+    public function getIndent(): string
+    {
+        return $this->configuration['indent'];
     }
 }

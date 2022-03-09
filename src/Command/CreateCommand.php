@@ -25,20 +25,20 @@ final class CreateCommand extends AbstractCommand
             ->addArgument('migration', InputArgument::REQUIRED, 'Name of migration')
             ->addArgument('dir', InputArgument::OPTIONAL, 'Directory to create migration in')
             ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Path to template')
-            ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab', '4spaces');
+            ->addOption('indent', 'i', InputOption::VALUE_REQUIRED, 'Indentation. Available values: 2spaces, 3spaces, 4spaces, 5spaces, tab');
     }
 
     protected function runCommand(): void
     {
         $indenter = new Indenter();
         /** @var string $indentOption */
-        $indentOption = $this->input->getOption('indent');
+        $indentOption = $this->input->getOption('indent') ?: $this->getConfig()->getIndent();
         $indent = $indenter->indent($indentOption);
 
         /** @var string $migration */
         $migration = $this->input->getArgument('migration');
-        /** @var string|null $template */
-        $template = $this->input->getOption('template');
+        /** @var string $template */
+        $template = $this->input->getOption('template') ?: $this->getConfig()->getTemplate();
         $migrationCreator = new MigrationCreator($migration, $indent, $template);
 
         /** @var string|null $dir */
