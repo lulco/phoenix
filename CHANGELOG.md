@@ -4,6 +4,7 @@
 
 #### Added
 - config options template and indent
+- method tableIndexExists
 
 ### [2.0.0] - 2022-01-24
 #### Changed
