@@ -126,7 +126,15 @@ class Check extends AbstractMigration
             throw new Exception('non_existing_table.some_column exists!');
         }
 
+        if ($this->tableIndexExists('non_existing_table', 'some_column')) {
+            throw new Exception('non_existing_table.some_column exists!');
+        }
+
         if ($this->tableColumnExists('table_2', 'non_existing_column')) {
+            throw new Exception('table_2.non_existing_column exists!');
+        }
+
+        if ($this->tableIndexExists('table_2', 'non_existing_column')) {
             throw new Exception('table_2.non_existing_column exists!');
         }
 

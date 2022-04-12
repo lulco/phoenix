@@ -135,6 +135,15 @@ abstract class AbstractMigration
         return $table->getColumn($columnName) !== null;
     }
 
+    final protected function tableIndexExists(string $tableName, string $indexName): bool
+    {
+        $table = $this->getTable($tableName);
+        if ($table === null) {
+            return false;
+        }
+        return $table->getIndex($indexName) !== null;
+    }
+
     final protected function getTable(string $name): ?Table
     {
         return $this->adapter->getStructure()->getTable($name);
