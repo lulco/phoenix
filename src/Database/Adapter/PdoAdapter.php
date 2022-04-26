@@ -20,6 +20,8 @@ abstract class PdoAdapter implements AdapterInterface
 
     private ?string $charset = null;
 
+    private ?string $collation = null;
+
     protected ?string $version;
 
     public function __construct(PDO $pdo, ?string $version = null)
@@ -332,6 +334,17 @@ abstract class PdoAdapter implements AdapterInterface
     public function getCharset(): ?string
     {
         return $this->charset;
+    }
+
+    public function setCollation(?string $collation): AdapterInterface
+    {
+        $this->collation = $collation;
+        return $this;
+    }
+
+    public function getCollation(): ?string
+    {
+        return $this->collation;
     }
 
     /**

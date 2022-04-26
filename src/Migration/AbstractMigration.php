@@ -115,7 +115,7 @@ abstract class AbstractMigration
     {
         $table = new MigrationTable($name, $primaryKey);
         $table->setCharset($charset ?: $this->adapter->getCharset());
-        $table->setCollation($collation);
+        $table->setCollation($collation ?: $this->adapter->getCollation());
 
         $this->queriesToExecute[] = $table;
         return $table;

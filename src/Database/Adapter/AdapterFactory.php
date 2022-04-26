@@ -29,6 +29,7 @@ final class AdapterFactory
             throw new InvalidArgumentValueException('Unknown adapter "' . $config->getAdapter() . '". Use one of value: "mysql", "pgsql".');
         }
         $adapter->setCharset($config->getCharset());
+        $adapter->setCollation($config->getCollation());
         return $adapter;
     }
 }

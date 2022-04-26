@@ -102,5 +102,9 @@ interface AdapterInterface
 
     public function getCharset(): ?string;
 
+    public function setCollation(?string $collation): AdapterInterface;
+
+    public function getCollation(): ?string;
+
     public function getStructure(): Structure;
 }
