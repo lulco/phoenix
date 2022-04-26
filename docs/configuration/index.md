@@ -34,6 +34,7 @@ return [
             'password' => 'pass',
             'db_name' => 'my_db',
             'charset' => 'utf8mb4', // optional
+            'collation' => 'utf8mb4_general_ci', // optional
         ],
         'production' => [
             'adapter' => 'mysql',
@@ -42,6 +43,7 @@ return [
             'password' => 'pass',
             'db_name' => 'my_production_db',
             'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_general_ci', // optional
         ],
     ],
     'default_environment ' => 'local',
@@ -65,13 +67,15 @@ environments:
     password: pass
     db_name: my_db
     charset: utf8mb4 # optional
+    collation: utf8mb4_general_ci # optional
   production:
     adapter: mysql
     host: production_host
     username: user
     password: pass
     db_name: my_production_db
-    charset: utf8mb4
+    charset: utf8mb4 # optional
+    collation: utf8mb4_general_ci # optional
 default_environment: local
 ```
 
@@ -91,13 +95,15 @@ environments:
         password: pass
         db_name: my_db
         charset: utf8mb4 # optional
+        collation: utf8mb4_general_ci # optional
     production:
         adapter: mysql
         host: production_host
         username: user
         password: pass
         db_name: my_production_db
-        charset: utf8mb4
+        charset: utf8mb4 # optional
+        collation: utf8mb4_general_ci # optional
 default_environment: local
 ```
 
@@ -120,7 +126,8 @@ Configuration files of types yml and neon are pretty similar. The only differenc
             "username": "user",
             "password": "pass",
             "db_name": "my_db",
-            "charset": "utf8mb4"
+            "charset": "utf8mb4",  // optional
+            "collation": "utf8mb4_general_ci"  // optional
         },
         "production": {
             "adapter": "mysql",
@@ -128,7 +135,8 @@ Configuration files of types yml and neon are pretty similar. The only differenc
             "username": "user",
             "password": "pass",
             "db_name": "my_production_db",
-            "charset": "utf8mb4"
+            "charset": "utf8mb4",  // optional
+            "collation": "utf8mb4_general_ci"  // optional
         }
     },
     "default_environment": "local"

@@ -35,6 +35,7 @@ final class EnvironmentConfigTest extends TestCase
         ];
         $environmentConfig = new EnvironmentConfig($config);
         $this->assertEquals($config, $environmentConfig->getConfiguration());
+        $this->assertNull($environmentConfig->getCollation());
         $this->assertEquals('test_adapter', $environmentConfig->getAdapter());
         $this->assertEquals('test_adapter:dbname=test_db_name;host=test_host;port=port;charset=utf8', $environmentConfig->getDsn());
         $this->assertNull($environmentConfig->getUsername());
@@ -94,5 +95,32 @@ final class EnvironmentConfigTest extends TestCase
         $this->assertEquals('custom_dsn', $environmentConfig->getDsn());
         $this->assertEquals('test_username', $environmentConfig->getUsername());
         $this->assertEquals('test_password', $environmentConfig->getPassword());
+    }
+
+    public function testAdapterCharsetAndCollation(): void
+    {
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'mysql',
+            'username' => 'test_username',
+            'password' => 'test_password',
+        ]);
+        $this->assertEquals('mysql', $environmentConfig->getAdapter());
+        $this->assertEquals('test_username', $environmentConfig->getUsername());
+        $this->assertEquals('test_password', $environmentConfig->getPassword());
+        $this->assertEquals('utf8mb4', $environmentConfig->getCharset());
+        $this->assertNull($environmentConfig->getCollation());
+
+        $environmentConfig = new EnvironmentConfig([
+            'adapter' => 'mysql',
+            'username' => 'test_username',
+            'password' => 'test_password',
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+        ]);
+        $this->assertEquals('mysql', $environmentConfig->getAdapter());
+        $this->assertEquals('test_username', $environmentConfig->getUsername());
+        $this->assertEquals('test_password', $environmentConfig->getPassword());
+        $this->assertEquals('utf8', $environmentConfig->getCharset());
+        $this->assertEquals('utf8_general_ci', $environmentConfig->getCollation());
     }
 }

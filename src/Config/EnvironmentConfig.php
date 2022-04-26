@@ -69,11 +69,7 @@ final class EnvironmentConfig
 
     public function getCollation(): ?string
     {
-        $collation = $this->configuration['collation'] ?? null;
-        if ($collation === null && $this->getAdapter() === 'mysql') {
-            $collation = $this->getCharset() . '_general_ci';
-        }
-        return $collation;
+        return $this->configuration['collation'] ?? null;
     }
 
     public function getVersion(): ?string
