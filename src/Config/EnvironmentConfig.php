@@ -67,6 +67,15 @@ final class EnvironmentConfig
         return $this->configuration['charset'] ?? ($this->getAdapter() === 'mysql' ? 'utf8mb4' : 'utf8');
     }
 
+    public function getCollation(): ?string
+    {
+        $collation = $this->configuration['collation'] ?? null;
+        if ($collation === null && $this->getAdapter() === 'mysql') {
+            $collation = $this->getCharset() . '_general_ci';
+        }
+        return $collation;
+    }
+
     public function getVersion(): ?string
     {
         return $this->configuration['version'] ?? null;
