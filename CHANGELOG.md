@@ -2,6 +2,10 @@
 
 ### [Unreleased][unreleased]
 
+### [2.2.0] - 2022-04-26
+#### Added
+- support for default collation for mysql in config
+
 ### [2.1.0] - 2022-04-14
 #### Added
 - config options template and indent
@@ -323,7 +327,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/2.1.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/lulco/phoenix/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/lulco/phoenix/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/lulco/phoenix/compare/1.12.0...2.0.0
 [1.12.0]: https://github.com/lulco/phoenix/compare/1.11.1...1.12.0
