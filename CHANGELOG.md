@@ -2,8 +2,12 @@
 
 ### [Unreleased][unreleased]
 
+### [2.3.0] - 2022-11-08
 #### Added
 - support for PHP 8.2
+
+#### Fixed
+- creates migration dir if doesn't exist
 
 ### [2.2.0] - 2022-04-26
 #### Added
