@@ -2,6 +2,9 @@
 
 ### [Unreleased][unreleased]
 
+#### Added
+- support for PHP 8.2
+
 ### [2.2.0] - 2022-04-26
 #### Added
 - support for default collation for mysql in config

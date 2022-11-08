@@ -37,7 +37,7 @@ Framework agnostic database migrations for PHP.
 ## Installation
 
 ### Composer
-This library requires PHP 7.4 or later. It works also on PHP 8.0 and PHP 8.1. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
+This library requires PHP 7.4 or later. It works also on PHP 8.0, PHP 8.1 and PHP 8.2. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
 
 ```
 composer require lulco/phoenix

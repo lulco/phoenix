@@ -269,7 +269,7 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
                 $indexColumns[] = new IndexColumn($tableColumns[$tableName][$ordinalPosition]['column_name'], $indexColumnSettings);
             }
 
-            $indexes[$tableName][$substringIndexRow['index_name']] = [
+            $indexes[$tableName][(string)$substringIndexRow['index_name']] = [
                 'columns' => $indexColumns,
                 'type' => $substringIndexRow['indisunique'] ? Index::TYPE_UNIQUE : Index::TYPE_NORMAL,
                 'method' => Index::METHOD_DEFAULT,
