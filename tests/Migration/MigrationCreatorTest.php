@@ -22,12 +22,6 @@ final class MigrationCreatorTest extends TestCase
     {
         $migrationCreator = new MigrationCreator('\Abc\Def', '    ');
         $migrationDir = __DIR__ . '/temp';
-        if (!is_dir($migrationDir)) {
-            mkdir($migrationDir, 0707, true);
-        }
-        if (!is_writable($migrationDir)) {
-            chmod($migrationDir, 0777);
-        }
         $this->removeTempDir($migrationDir);
         mkdir($migrationDir);
         $migrationFullPath = $migrationCreator->create('', '', $migrationDir);
