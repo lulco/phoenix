@@ -210,6 +210,10 @@ final class MigrationTable
         foreach ($this->getForeignKeys() as $foreignKey) {
             $table->addForeignKey($foreignKey);
         }
+        foreach ($this->getUniqueConstraints() as $uniqueConstraint) {
+            $table->addUniqueConstraint($uniqueConstraint);
+        }
+
         return $table;
     }
 }

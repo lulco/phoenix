@@ -96,10 +96,26 @@ final class Dumper
             foreach ($table->getColumns() as $column) {
                 $tableMigration .= $this->indent($indentMultiplier + 1) . "->addColumn('{$column->getName()}', '{$column->getType()}'" . $this->settingsToString($column, $table) . ")\n";
             }
+            foreach ($table->getUniqueConstraintsToDrop() as $uniqueConstraintName) {
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->dropUniqueConstraint('$uniqueConstraintName')\n";
+            }
+            foreach ($table->getUniqueConstraints() as $uniqueConstraint) {
+                $uniqueConstraintName = $uniqueConstraint->getName();
+                $columns = $uniqueConstraint->getColumns();
+                $uniqueConstraintColumns = count($columns) > 1 ? '[' . "'" . implode("', '", $columns) . "'" . ']' : "'" . implode('', $columns) . "'";
+                $tableMigration .= $this->indent($indentMultiplier + 1) . "->addUniqueConstraint($uniqueConstraintColumns, '$uniqueConstraintName')\n";
+            }
             foreach ($table->getIndexesToDrop() as $indexName) {
+                if (in_array($indexName, $table->getUniqueConstraintsToDrop(), true)) {
+                    continue;
+                }
                 $tableMigration .= $this->indent($indentMultiplier + 1) . "->dropIndexByName('$indexName')\n";
             }
+            $uniqueConstraintNames = array_map(fn($value): string => $value->getName(), $table->getUniqueConstraints());
             foreach ($table->getIndexes() as $index) {
+                if (in_array($index->getName(), $uniqueConstraintNames, true)) {
+                    continue;
+                }
                 $tableMigration .= $this->indent($indentMultiplier + 1) . "->addIndex(";
                 $tableMigration .= $this->indexColumnsToString($index->getColumns()) . ", '" . strtolower($index->getType()) . "', '" . strtolower($index->getMethod()) . "', '{$index->getName()}')\n";
             }

@@ -310,13 +310,19 @@ final class MigrationTableTest extends TestCase
         $migrationTable->addColumn('title', 'string');
         $migrationTable->addColumn('alias', 'string');
         $migrationTable->addColumn('fk_table1_id', 'integer');
+        $migrationTable->addColumn('sku', 'string');
+        $migrationTable->addColumn('name', 'string');
+        $migrationTable->addColumn('option', 'string');
         $migrationTable->addIndex('alias', Index::TYPE_UNIQUE);
         $migrationTable->addForeignKey('fk_table1_id', 'table1');
+        $migrationTable->addUniqueConstraint('sku', 'u_sku');
+        $migrationTable->addUniqueConstraint(['name', 'option'], 'u_name_option');
         $migrationTable->create();
         $table = $migrationTable->toTable();
-        $this->assertCount(4, $migrationTable->getColumns());
+        $this->assertCount(7, $migrationTable->getColumns());
         $this->assertCount(1, $migrationTable->getIndexes());
         $this->assertCount(1, $migrationTable->getForeignKeys());
+        $this->assertCount(2, $migrationTable->getUniqueConstraints());
         $this->assertInstanceOf(Table::class, $table);
         $this->assertEquals($migrationTable->getName(), $table->getName());
         $this->assertEquals($migrationTable->getCharset(), $table->getCharset());
@@ -326,10 +332,14 @@ final class MigrationTableTest extends TestCase
         $this->assertCount(count($migrationTable->getColumns()), $table->getColumns());
         $this->assertCount(count($migrationTable->getIndexes()), $table->getIndexes());
         $this->assertCount(count($migrationTable->getForeignKeys()), $table->getForeignKeys());
+        $this->assertCount(count($migrationTable->getUniqueConstraints()), $table->getUniqueConstraints());
         $this->assertEquals($migrationTable->getColumn('id'), $table->getColumn('id'));
         $this->assertEquals($migrationTable->getColumn('title'), $table->getColumn('title'));
         $this->assertEquals($migrationTable->getColumn('alias'), $table->getColumn('alias'));
         $this->assertEquals($migrationTable->getColumn('fk_table1_id'), $table->getColumn('fk_table1_id'));
+        $this->assertEquals($migrationTable->getColumn('sku'), $table->getColumn('sku'));
+        $this->assertEquals($migrationTable->getColumn('name'), $table->getColumn('name'));
+        $this->assertEquals($migrationTable->getColumn('option'), $table->getColumn('option'));
     }
 
     public function testTryingToAddPrimaryColumnAsStrings(): void

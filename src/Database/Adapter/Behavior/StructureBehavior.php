@@ -19,12 +19,14 @@ trait StructureBehavior
         $columns = $this->loadColumns($database);
         $indexes = $this->loadIndexes($database);
         $foreignKeys = $this->loadForeignKeys($database);
+        $uniqueConstraints = $this->loadUniqueConstraints($database);
         foreach ($tables as $table) {
             $tableName = $table['table_name'];
             $migrationTable = $this->createMigrationTable($table);
             $this->addColumns($migrationTable, $columns[$tableName] ?? []);
             $this->addIndexes($migrationTable, $indexes[$tableName] ?? []);
             $this->addForeignKeys($migrationTable, $foreignKeys[$tableName] ?? []);
+            $this->addUniqueConstraints($migrationTable, $uniqueConstraints[$tableName] ?? []);
             $migrationTable->create();
             $structure->update($migrationTable);
         }
@@ -72,6 +74,11 @@ trait StructureBehavior
     abstract protected function loadForeignKeys(string $database): array;
 
     /**
+     * @return array<string, array<string, array<string, mixed>>>
+     */
+    abstract protected function loadUniqueConstraints(string $database): array;
+
+    /**
      * @param array<string, mixed> $column
      */
     abstract protected function addColumn(MigrationTable $migrationTable, array $column): void;
@@ -112,6 +119,21 @@ trait StructureBehavior
                 array_values($referencedColumns),
                 $foreignKey['on_delete'],
                 $foreignKey['on_update']
+            );
+        }
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $uniqueConstraints
+     */
+    private function addUniqueConstraints(MigrationTable $migrationTable, array $uniqueConstraints): void
+    {
+        foreach ($uniqueConstraints as $name => $uniqueConstraint) {
+            $columns = $uniqueConstraint['columns'];
+            ksort($columns);
+            $migrationTable->addUniqueConstraint(
+                array_values($columns),
+                $name
             );
         }
     }
