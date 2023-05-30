@@ -101,6 +101,7 @@ final class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
         $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createIndexes($table);
         $query .= $this->createForeignKeys($table);
+        $query .= $this->createUniqueConstraints($table);
         $query .= ')';
         $query .= $this->createTableCharset($table);
         $query .= $this->createTableComment($table);
@@ -163,8 +164,12 @@ final class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
+        if ($table->getUniqueConstraintsToDrop()) {
+            $queries[] = $this->dropUniqueConstraints($table);
+        }
         $queries = array_merge($queries, $this->addColumns($table));
         $queries = array_merge($queries, $this->addPrimaryKey($table));
+        $queries = array_merge($queries, $this->addUniqueConstraints($table));
         if (!empty($table->getIndexes())) {
             $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
             $indexes = [];

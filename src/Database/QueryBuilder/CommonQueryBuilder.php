@@ -11,6 +11,7 @@ use Phoenix\Database\Element\Column;
 use Phoenix\Database\Element\ForeignKey;
 use Phoenix\Database\Element\MigrationTable;
 use Phoenix\Database\Element\MigrationView;
+use Phoenix\Database\Element\UniqueConstraint;
 
 abstract class CommonQueryBuilder implements QueryBuilderInterface
 {
@@ -60,6 +61,7 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         $primaryKey = $this->createPrimaryKey($table);
         $query .= $primaryKey ? ',' . $primaryKey : '';
         $query .= $this->createForeignKeys($table);
+        $query .= $this->createUniqueConstraints($table);
         $query .= ');';
         return $query;
     }
@@ -183,6 +185,20 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
         return ',' . implode(',', $foreignKeys);
     }
 
+    protected function createUniqueConstraints(MigrationTable $table): string
+    {
+        if (!$table->getUniqueConstraints()) {
+            return '';
+        }
+
+        $uniqueConstraints = [];
+        foreach ($table->getUniqueConstraints() as $uniqueConstraint) {
+            $uniqueConstraints[] = $this->createUniqueConstraint($uniqueConstraint);
+        }
+
+        return ',' . implode(',', $uniqueConstraints);
+    }
+
     /**
      * @return string[]
      */
@@ -220,6 +236,32 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
     /**
      * @return string[]
      */
+    protected function addUniqueConstraints(MigrationTable $table): array
+    {
+        $queries = [];
+        foreach ($table->getUniqueConstraints() as $uniqueConstraint) {
+            $queries[] = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ADD ' . $this->createUniqueConstraint($uniqueConstraint) . ';';
+        }
+
+        return $queries;
+    }
+
+    protected function createUniqueConstraint(UniqueConstraint $uniqueConstraint): string
+    {
+        $columns = [];
+        foreach ($uniqueConstraint->getColumns() as $column) {
+            $columns[] = $this->escapeString($column);
+        }
+
+        $constraint = 'CONSTRAINT ' . $this->escapeString($uniqueConstraint->getName());
+        $constraint .= ' UNIQUE (' . implode(',', $columns) . ')';
+
+        return $constraint;
+    }
+
+    /**
+     * @return string[]
+     */
     protected function dropKeys(MigrationTable $table, string $primaryKeyName, string $foreignKeyPrefix): array
     {
         $queries = [];
@@ -230,6 +272,18 @@ abstract class CommonQueryBuilder implements QueryBuilderInterface
             $queries[] = $this->dropKeyQuery($table, $foreignKeyPrefix . ' ' . $this->escapeString($table->getName() . '_' . $foreignKey));
         }
         return $queries;
+    }
+
+    protected function dropUniqueConstraints(MigrationTable $table): string
+    {
+        $query = 'ALTER TABLE ' . $this->escapeString($table->getName()) . ' ';
+        $constraints = [];
+        foreach ($table->getUniqueConstraintsToDrop() as $uniqueConstraint) {
+            $constraints[] =  'DROP CONSTRAINT ' . $this->escapeString($uniqueConstraint);
+        }
+        $query .= implode(',', $constraints) . ';';
+
+        return $query;
     }
 
     protected function dropKeyQuery(MigrationTable $table, string $key): string
