@@ -245,7 +245,21 @@ final class PgsqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testIndexesAndForeignKeys(): void
+    public function testUniqueConstraint(): void
+    {
+        $table = new MigrationTable('table_with_unique_constraints');
+        $table->addPrimary(true);
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
+
+        $queryBuilder = new PgsqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            'CREATE TABLE "table_with_unique_constraints" ("id" serial NOT NULL,"sku" varchar(255) NOT NULL,CONSTRAINT "table_with_unique_constraints_pkey" PRIMARY KEY ("id"),CONSTRAINT "u_sku" UNIQUE ("sku"));'
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testIndexesAndForeignKeysAndUniqueConstraint(): void
     {
         $table = new MigrationTable('table_with_indexes_and_foreign_keys');
         $table->addPrimary(true);
@@ -253,15 +267,17 @@ final class PgsqlQueryBuilderTest extends TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_table_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', 'btree', 'table_with_indexes_and_foreign_keys_sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'table_with_indexes_and_foreign_keys_title_alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'table_with_indexes_and_foreign_keys_bodytext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
-            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL);',
+            'CREATE TABLE "table_with_indexes_and_foreign_keys" ("id" serial NOT NULL,"title" varchar(255) NOT NULL,"alias" varchar(255) NOT NULL,"sorting" int4 NOT NULL,"bodytext" text NOT NULL,"sku" varchar(255) NOT NULL,"foreign_table_id" int4 NOT NULL,CONSTRAINT "table_with_indexes_and_foreign_keys_pkey" PRIMARY KEY ("id"),CONSTRAINT "table_with_indexes_and_foreign_keys_foreign_table_id" FOREIGN KEY ("foreign_table_id") REFERENCES "second_table" ("foreign_id") ON DELETE SET NULL ON UPDATE SET NULL,CONSTRAINT "u_sku" UNIQUE ("sku"));',
             'CREATE INDEX "table_with_indexes_and_foreign_keys_sorting" ON "table_with_indexes_and_foreign_keys" USING BTREE ("sorting");',
             'CREATE UNIQUE INDEX "table_with_indexes_and_foreign_keys_title_alias" ON "table_with_indexes_and_foreign_keys" ("title","alias");',
             'CREATE FULLTEXT INDEX "table_with_indexes_and_foreign_keys_bodytext" ON "table_with_indexes_and_foreign_keys" USING HASH ("bodytext");',
@@ -327,18 +343,21 @@ final class PgsqlQueryBuilderTest extends TestCase
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
 
-        // add foreign key, index, columns
+        // add foreign key, index, columns, unique constraint
         $table = new MigrationTable('add_columns_index_foreign_key');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'add_columns_index_foreign_key_sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
-            'ALTER TABLE "add_columns_index_foreign_key" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
+            'ALTER TABLE "add_columns_index_foreign_key" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL,ADD COLUMN "sku" varchar(255) NOT NULL;',
             'CREATE INDEX "add_columns_index_foreign_key_sorting" ON "add_columns_index_foreign_key" ("sorting");',
             'ALTER TABLE "add_columns_index_foreign_key" ADD CONSTRAINT "add_columns_index_foreign_key_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id");',
+            'ALTER TABLE "add_columns_index_foreign_key" ADD CONSTRAINT "u_sku" UNIQUE ("sku");',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
 
@@ -348,24 +367,29 @@ final class PgsqlQueryBuilderTest extends TestCase
 
         // remove foreign key
 
-        // combination of add / remove column, add / remove index, add / remove foreign key
+        // combination of add / remove column, add / remove index, add / remove foreign key, add / remove unique constraint
         $table = new MigrationTable('all_in_one');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropColumn('title'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'all_in_one_sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropIndex('alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropUniqueConstraint('unique_constraint_to_drop_name'));
 
         $queryBuilder = new PgsqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'DROP INDEX "idx_all_in_one_alias";',
             'ALTER TABLE "all_in_one" DROP CONSTRAINT "all_in_one_foreign_key_to_drop_id";',
+            'ALTER TABLE "all_in_one" DROP CONSTRAINT "unique_constraint_to_drop_name";',
             'ALTER TABLE "all_in_one" DROP COLUMN "title";',
-            'ALTER TABLE "all_in_one" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL;',
+            'ALTER TABLE "all_in_one" ADD COLUMN "foreign_key_id" int4 NOT NULL,ADD COLUMN "sorting" int4 NOT NULL,ADD COLUMN "sku" varchar(255) NOT NULL;',
             'CREATE INDEX "all_in_one_sorting" ON "all_in_one" ("sorting");',
             'ALTER TABLE "all_in_one" ADD CONSTRAINT "all_in_one_foreign_key_id" FOREIGN KEY ("foreign_key_id") REFERENCES "referenced_table" ("id");',
+            'ALTER TABLE "all_in_one" ADD CONSTRAINT "u_sku" UNIQUE ("sku");',
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->alterTable($table));
 

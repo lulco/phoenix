@@ -128,6 +128,9 @@ final class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
     {
         $queries = $this->dropIndexes($table);
         $queries = array_merge($queries, $this->dropKeys($table, 'CONSTRAINT ' . $this->escapeString($table->getName() . '_pkey'), 'CONSTRAINT'));
+        if ($table->getUniqueConstraintsToDrop()) {
+            $queries[] = $this->dropUniqueConstraints($table);
+        }
         if (!empty($table->getColumnsToDrop())) {
             $queries[] = $this->dropColumns($table);
         }
@@ -181,6 +184,7 @@ final class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
 
         $queries = array_merge($queries, $this->addPrimaryKey($table));
         $queries = array_merge($queries, $this->addForeignKeys($table));
+        $queries = array_merge($queries, $this->addUniqueConstraints($table));
         if ($table->getComment() !== null) {
             $queries[] = $this->createTableComment($table);
         }

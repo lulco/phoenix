@@ -29,4 +29,4 @@ jobs:
         run: composer update --no-progress --no-interaction
 
       - name: Composer outdated
-        run: composer outdated -D --strict --ignore symfony/console --ignore symfony/finder --ignore symfony/yaml
+        run: composer outdated -D --strict --ignore symfony/console --ignore symfony/finder --ignore symfony/yaml --ignore phpunit/phpunit

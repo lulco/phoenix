@@ -18,3 +18,4 @@ Framework agnostic database migrations for PHP.
   - [indexes](migrations/indexes.md)
   - [namespaces](migrations/namespaces.md)
   - [custom template](migrations/custom_template.md)
+  - [unique_constraints](migrations/unique_constraints.md)

@@ -305,6 +305,28 @@ WHERE pg_attribute.attname = 'substring'")->fetchAll(PDO::FETCH_ASSOC);
         return $foreignKeys;
     }
 
+    protected function loadUniqueConstraints(string $database): array
+    {
+        $query = "SELECT tc.constraint_name, tc.table_name, kcu.column_name
+                  FROM information_schema.table_constraints AS tc
+                  JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+                  WHERE tc.constraint_type = 'UNIQUE'
+                  AND tc.constraint_schema = 'public'";
+
+        /** @var array<mixed[]> $uniqueConstraintKeys */
+        $uniqueConstraintKeys = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $uniqueConstraints = [];
+        foreach ($uniqueConstraintKeys as $uniqueConstraintKey) {
+            /** @var string $tableName */
+            $tableName = $uniqueConstraintKey['table_name'];
+            /** @var string $constraintName */
+            $constraintName = $uniqueConstraintKey['constraint_name'];
+            $uniqueConstraints[$tableName][$constraintName]['columns'][] = $uniqueConstraintKey['column_name'];
+        }
+
+        return $uniqueConstraints;
+    }
+
     private function remapForeignKeyAction(string $action): string
     {
         $actionMap = [

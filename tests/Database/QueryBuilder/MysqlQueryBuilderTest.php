@@ -240,7 +240,21 @@ final class MysqlQueryBuilderTest extends TestCase
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
 
-    public function testIndexesAndForeignKeys(): void
+    public function testUniqueConstraint(): void
+    {
+        $table = new MigrationTable('table_with_unique_constraints');
+        $table->addPrimary(true);
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
+
+        $queryBuilder = new MysqlQueryBuilder($this->adapter);
+        $expectedQueries = [
+            "CREATE TABLE `table_with_unique_constraints` (`id` int(11) NOT NULL AUTO_INCREMENT,`sku` varchar(255) NOT NULL,PRIMARY KEY (`id`),CONSTRAINT `u_sku` UNIQUE (`sku`));"
+        ];
+        $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
+    }
+
+    public function testIndexesAndForeignKeysAndUniqueConstraint(): void
     {
         $table = new MigrationTable('table_with_indexes_and_foreign_keys');
         $table->addPrimary(true);
@@ -248,15 +262,17 @@ final class MysqlQueryBuilderTest extends TestCase
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('alias', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('bodytext', 'text'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_table_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_table_id', 'second_table', 'foreign_id', 'set null', 'set null'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', 'btree', 'sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex(['title', 'alias'], 'unique', '', 'title_alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('bodytext', 'fulltext', 'hash', 'bodytext'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
 
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $expectedQueries = [
-            "CREATE TABLE `table_with_indexes_and_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH,CONSTRAINT `table_with_indexes_and_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`foreign_id`) ON DELETE SET NULL ON UPDATE SET NULL);"
+            "CREATE TABLE `table_with_indexes_and_foreign_keys` (`id` int(11) NOT NULL AUTO_INCREMENT,`title` varchar(255) NOT NULL,`alias` varchar(255) NOT NULL,`sorting` int(11) NOT NULL,`bodytext` text NOT NULL,`sku` varchar(255) NOT NULL,`foreign_table_id` int(11) NOT NULL,PRIMARY KEY (`id`),INDEX `sorting` (`sorting`) USING BTREE,UNIQUE INDEX `title_alias` (`title`,`alias`),FULLTEXT INDEX `bodytext` (`bodytext`) USING HASH,CONSTRAINT `table_with_indexes_and_foreign_keys_foreign_table_id` FOREIGN KEY (`foreign_table_id`) REFERENCES `second_table` (`foreign_id`) ON DELETE SET NULL ON UPDATE SET NULL,CONSTRAINT `u_sku` UNIQUE (`sku`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
@@ -322,12 +338,15 @@ final class MysqlQueryBuilderTest extends TestCase
         $table = new MigrationTable('add_columns_index_foreign_key');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
 
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $expectedQueries = [
-            'ALTER TABLE `add_columns_index_foreign_key` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL;',
+            'ALTER TABLE `add_columns_index_foreign_key` ADD COLUMN `foreign_key_id` int(11) NOT NULL,ADD COLUMN `sorting` int(11) NOT NULL,ADD COLUMN `sku` varchar(255) NOT NULL;',
+            'ALTER TABLE `add_columns_index_foreign_key` ADD CONSTRAINT `u_sku` UNIQUE (`sku`);',
             'ALTER TABLE `add_columns_index_foreign_key` ADD INDEX `sorting` (`sorting`);',
             'ALTER TABLE `add_columns_index_foreign_key` ADD CONSTRAINT `add_columns_index_foreign_key_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`);',
         ];
@@ -339,22 +358,27 @@ final class MysqlQueryBuilderTest extends TestCase
 
         // remove foreign key
 
-        // combination of add / remove column, add / remove index, add / remove foreign key
+        // combination of add / remove column, add / remove index, add / remove foreign key, add / remove unique constraint
         $table = new MigrationTable('all_in_one');
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('foreign_key_id', 'integer', ['after' => 'column_before']));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sorting', 'integer'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('sku', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropColumn('title'));
         $this->assertInstanceOf(MigrationTable::class, $table->addIndex('sorting', '', '', 'sorting'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropIndex('alias'));
         $this->assertInstanceOf(MigrationTable::class, $table->addForeignKey('foreign_key_id', 'referenced_table'));
         $this->assertInstanceOf(MigrationTable::class, $table->dropForeignKey('foreign_key_to_drop_id'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addUniqueConstraint('sku', 'u_sku'));
+        $this->assertInstanceOf(MigrationTable::class, $table->dropUniqueConstraint('unique_constraint_to_drop_name'));
 
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $expectedQueries = [
             'ALTER TABLE `all_in_one` DROP INDEX `idx_all_in_one_alias`;',
             'ALTER TABLE `all_in_one` DROP FOREIGN KEY `all_in_one_foreign_key_to_drop_id`;',
             'ALTER TABLE `all_in_one` DROP COLUMN `title`;',
-            'ALTER TABLE `all_in_one` ADD COLUMN `foreign_key_id` int(11) NOT NULL AFTER `column_before`,ADD COLUMN `sorting` int(11) NOT NULL;',
+            'ALTER TABLE `all_in_one` DROP CONSTRAINT `unique_constraint_to_drop_name`;',
+            'ALTER TABLE `all_in_one` ADD COLUMN `foreign_key_id` int(11) NOT NULL AFTER `column_before`,ADD COLUMN `sorting` int(11) NOT NULL,ADD COLUMN `sku` varchar(255) NOT NULL;',
+            'ALTER TABLE `all_in_one` ADD CONSTRAINT `u_sku` UNIQUE (`sku`);',
             'ALTER TABLE `all_in_one` ADD INDEX `sorting` (`sorting`);',
             'ALTER TABLE `all_in_one` ADD CONSTRAINT `all_in_one_foreign_key_id` FOREIGN KEY (`foreign_key_id`) REFERENCES `referenced_table` (`id`);',
         ];

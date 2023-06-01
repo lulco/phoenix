@@ -15,6 +15,7 @@ use Phoenix\Database\Element\Behavior\DropPrimaryKeyBehavior;
 use Phoenix\Database\Element\Behavior\ForeignKeyBehavior;
 use Phoenix\Database\Element\Behavior\IndexBehavior;
 use Phoenix\Database\Element\Behavior\PrimaryColumnsBehavior;
+use Phoenix\Database\Element\Behavior\UniqueConstraintBehavior;
 use Phoenix\Exception\InvalidArgumentValueException;
 
 final class MigrationTable
@@ -30,6 +31,7 @@ final class MigrationTable
     use ForeignKeyBehavior;
     use IndexBehavior;
     use PrimaryColumnsBehavior;
+    use UniqueConstraintBehavior;
 
     public const ACTION_CREATE = 'create';
 
@@ -208,6 +210,10 @@ final class MigrationTable
         foreach ($this->getForeignKeys() as $foreignKey) {
             $table->addForeignKey($foreignKey);
         }
+        foreach ($this->getUniqueConstraints() as $uniqueConstraint) {
+            $table->addUniqueConstraint($uniqueConstraint);
+        }
+
         return $table;
     }
 }

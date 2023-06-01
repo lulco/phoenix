@@ -37,6 +37,9 @@ final class Structure
             foreach ($migrationTable->getForeignKeysToDrop() as $foreignKey) {
                 $table->removeForeignKey($foreignKey);
             }
+            foreach ($migrationTable->getUniqueConstraintsToDrop() as $uniqueConstraint) {
+                $table->removeUniqueConstraint($uniqueConstraint);
+            }
             foreach ($migrationTable->getColumnsToChange() as $oldName => $column) {
                 $table->changeColumn($oldName, $column);
             }
@@ -51,6 +54,9 @@ final class Structure
             }
             foreach ($migrationTable->getForeignKeys() as $foreignKey) {
                 $table->addForeignKey($foreignKey);
+            }
+            foreach ($migrationTable->getUniqueConstraints() as $uniqueConstraint) {
+                $table->addUniqueConstraint($uniqueConstraint);
             }
         }
 

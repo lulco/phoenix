@@ -121,19 +121,19 @@ final class DumperTest extends TestCase
         $tables = $this->createComplexStructure();
 
         $dumper = new Dumper('    ');
-        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addColumn('price', 'decimal')\n    ->addColumn('sorting', 'biginteger')\n    ->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n    ->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addColumn('price', 'decimal')\n    ->addColumn('sorting', 'biginteger')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint('sku', 'u_sku')\n    ->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n    ->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['length' => 100])\n    ->addColumn('is_active', 'boolean', ['default' => true])\n    ->addColumn('fk_table_1_id', 'integer')\n    ->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n    ->addColumn('fk_table_1_id', 'integer', ['null' => true])\n    ->create();\n\n";
-        $output .= "\$this->table('table_4', 'identifier')\n    ->addColumn('identifier', 'uuid')\n    ->addColumn('col_integer', 'integer')\n    ->addColumn('col_string', 'string')\n    ->addColumn('col_char', 'char')\n    ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n    ->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n    ->create();";
+        $output .= "\$this->table('table_4', 'identifier')\n    ->addColumn('identifier', 'uuid')\n    ->addColumn('col_integer', 'integer')\n    ->addColumn('col_string', 'string')\n    ->addColumn('col_char', 'char')\n    ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n    ->addColumn('alias', 'string')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n    ->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n    ->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
-        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal')\n\t->addColumn('sorting', 'biginteger')\n\t->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n\t->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal')\n\t->addColumn('sorting', 'biginteger')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint('sku', 'u_sku')\n\t->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n\t->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['length' => 100])\n\t->addColumn('is_active', 'boolean', ['default' => true])\n\t->addColumn('fk_table_1_id', 'integer')\n\t->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n\t->addColumn('fk_table_1_id', 'integer', ['null' => true])\n\t->create();\n\n";
-        $output .= "\$this->table('table_4', 'identifier')\n\t->addColumn('identifier', 'uuid')\n\t->addColumn('col_integer', 'integer')\n\t->addColumn('col_string', 'string')\n\t->addColumn('col_char', 'char')\n\t->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n\t->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n\t->create();";
+        $output .= "\$this->table('table_4', 'identifier')\n\t->addColumn('identifier', 'uuid')\n\t->addColumn('col_integer', 'integer')\n\t->addColumn('col_string', 'string')\n\t->addColumn('col_char', 'char')\n\t->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n\t->addColumn('alias', 'string')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n\t->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n\t->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
@@ -178,7 +178,7 @@ final class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpDataUp($data));
     }
 
-    public function testdumpForeignKeys(): void
+    public function testDumpForeignKeys(): void
     {
         $tables = $this->createComplexStructure();
 
@@ -230,6 +230,11 @@ final class DumperTest extends TestCase
                 ->changeColumn('sorting', 'sorting', 'integer', ['default' => 100])
                 ->addPrimaryColumns([new Column('id', 'integer', ['autoincrement' => true])])
                 ->addColumn('description', 'text')
+                ->addColumn('sku', 'string')
+                ->addColumn('name', 'string')
+                ->addColumn('option', 'string')
+                ->addUniqueConstraint('sku', 'u_sku')
+                ->addUniqueConstraint(['name', 'option'], 'u_name_option')
                 ->addIndex('alias', Index::TYPE_UNIQUE),
             (new MigrationTable('table_2'))
                 ->dropPrimaryKey()
@@ -241,7 +246,7 @@ final class DumperTest extends TestCase
         ];
 
         $dumper = new Dumper('    ');
-        $output = "\$this->table('table_1')\n    ->dropColumn('created_at')\n    ->changeColumn('sorting', 'sorting', 'integer', ['default' => 100])\n    ->addPrimaryColumns([new \\Phoenix\\Database\\Element\\Column('id', 'integer', ['autoincrement' => true])])\n    ->addColumn('description', 'text')\n    ->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n    ->save();\n\n";
+        $output = "\$this->table('table_1')\n    ->dropColumn('created_at')\n    ->changeColumn('sorting', 'sorting', 'integer', ['default' => 100])\n    ->addPrimaryColumns([new \\Phoenix\\Database\\Element\\Column('id', 'integer', ['autoincrement' => true])])\n    ->addColumn('description', 'text')\n    ->addColumn('sku', 'string')\n    ->addColumn('name', 'string')\n    ->addColumn('option', 'string')\n    ->addUniqueConstraint('sku', 'u_sku')\n    ->addUniqueConstraint(['name', 'option'], 'u_name_option')\n    ->addIndex('alias', 'unique', '', 'idx_table_1_alias')\n    ->save();\n\n";
         $output .= "\$this->table('table_2')\n    ->dropPrimaryKey()\n    ->changeColumn('description', 'description', 'text')\n    ->addColumn('table_1_fk', 'integer', ['null' => true])\n    ->dropIndexByName('idx_table_2_alias')\n    ->save();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
@@ -261,7 +266,9 @@ final class DumperTest extends TestCase
         $table1->addColumn('bodytext', 'text');
         $table1->addColumn('price', 'decimal');
         $table1->addColumn('sorting', 'biginteger');
+        $table1->addColumn('sku', 'string');
         $table1->addIndex(new IndexColumn('alias', ['length' => 10]), 'unique');
+        $table1->addUniqueConstraint('sku', 'u_sku');
         $table1->create();
         $migrationTables[] = $table1;
 
@@ -287,7 +294,10 @@ final class DumperTest extends TestCase
         $table4->addColumn('col_string', 'string');
         $table4->addColumn('col_char', 'char');
         $table4->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP]);
+        $table4->addColumn('alias', 'string');
+        $table4->addColumn('sku', 'string');
         $table4->addIndex([new IndexColumn('col_string', ['order' => 'DESC']), new IndexColumn('col_integer', ['order' => 'DESC'])]);
+        $table4->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku');
         $table4->create();
         $migrationTables[] = $table4;
 

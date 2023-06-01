@@ -210,6 +210,11 @@ WHERE information_schema.KEY_COLUMN_USAGE.TABLE_SCHEMA = "%s";', $database);
         return $foreignKeys;
     }
 
+    protected function loadUniqueConstraints(string $database): array
+    {
+        return [];
+    }
+
     protected function escapeString(string $string): string
     {
         return '`' . $string . '`';

@@ -27,6 +27,9 @@ final class Table
     /** @var ForeignKey[] */
     private array $foreignKeys = [];
 
+    /** @var UniqueConstraint[] */
+    private array $uniqueConstraints = [];
+
     /** @var array<string, Index> */
     private array $indexes = [];
 
@@ -160,6 +163,21 @@ final class Table
         return $this;
     }
 
+    /**
+     * @return UniqueConstraint[]
+     */
+    public function getUniqueConstraints(): array
+    {
+        return $this->uniqueConstraints;
+    }
+
+    public function addUniqueConstraint(UniqueConstraint $uniqueConstraint): Table
+    {
+        $this->uniqueConstraints[$uniqueConstraint->getName()] = $uniqueConstraint;
+
+        return $this;
+    }
+
     public function getForeignKey(string $name): ?ForeignKey
     {
         return isset($this->foreignKeys[$name]) ? $this->foreignKeys[$name] : null;
@@ -176,6 +194,13 @@ final class Table
     public function removeForeignKey(string $foreignKeyName): Table
     {
         unset($this->foreignKeys[$foreignKeyName]);
+        return $this;
+    }
+
+    public function removeUniqueConstraint(string $uniqueConstraintName): Table
+    {
+        unset($this->uniqueConstraints[$uniqueConstraintName]);
+
         return $this;
     }
 
@@ -198,6 +223,10 @@ final class Table
         foreach ($table->getForeignKeys() as $foreignKey) {
             $migrationTable->addForeignKey($foreignKey->getColumns(), $foreignKey->getReferencedTable(), $foreignKey->getReferencedColumns(), $foreignKey->getOnDelete(), $foreignKey->getOnUpdate());
         }
+        foreach ($table->getUniqueConstraints() as $uniqueConstraint) {
+            $migrationTable->addUniqueConstraint($uniqueConstraint->getColumns(), $uniqueConstraint->getName());
+        }
+
         return $migrationTable;
     }
 }
