@@ -2,3 +2,9 @@ parameters:
     earlyTerminatingMethodCalls:
         Phoenix\Database\Adapter\PdoAdapter:
             - throwError
+
+    symfony:
+        consoleApplicationLoader: src/console_application.php
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon

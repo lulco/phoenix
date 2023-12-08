@@ -15,7 +15,9 @@
         "nette/neon": "^2.3|^3.0",
         "symfony/yaml": "^5.0|^6.0",
         "phpunit/phpunit": "^9.5.11",
-        "ramsey/uuid": "^3.7|^4.0"
+        "ramsey/uuid": "^3.7|^4.0",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-symfony": "^1.3"
     },
     "autoload": {
         "psr-4": {

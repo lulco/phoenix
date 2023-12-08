@@ -7,6 +7,7 @@ namespace Phoenix\Command;
 use Phoenix\Migration\AbstractMigration;
 use Phoenix\Migration\Manager;
 use Symfony\Component\Console\Input\InputOption;
+use function PHPStan\dumpType;
 
 final class RollbackCommand extends AbstractRunCommand
 {
@@ -31,6 +32,9 @@ final class RollbackCommand extends AbstractRunCommand
 
     protected function findMigrations(): array
     {
+        dumpType($this->input->getOption('all'));
+        dumpType($this->input->getOption('target'));
+
         /** @var string|null $targetOption */
         $targetOption = $this->input->getOption('target');
         $target = $targetOption ? str_pad($targetOption, 14, '0', STR_PAD_RIGHT) : ($this->input->getOption('all') ? Manager::TARGET_ALL : Manager::TARGET_FIRST);
