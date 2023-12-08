@@ -2,6 +2,12 @@
 
 ## [Unreleased][unreleased]
 
+### Added
+- support for PHP 8.3
+
+### Fixed
+- default for integer column types
+
 ## [2.4.0] - 2023-06-01
 ### Added
 - unique constraints support (Thanks to [Anton Khainak](https://github.com/aksafan))

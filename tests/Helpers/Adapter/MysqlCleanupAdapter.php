@@ -19,7 +19,10 @@ final class MysqlCleanupAdapter implements CleanupInterface
     public function cleanupDatabase(): void
     {
         $database = getenv('PHOENIX_MYSQL_DATABASE');
+        $charset = getenv('PHOENIX_MYSQL_CHARSET');
+        $collate = getenv('PHOENIX_MYSQL_COLLATE');
+
         $this->mysqlAdapter->query(sprintf('DROP DATABASE IF EXISTS `%s`', $database));
-        $this->mysqlAdapter->query(sprintf('CREATE DATABASE `%s`', $database));
+        $this->mysqlAdapter->query(sprintf('CREATE DATABASE `%s` DEFAULT CHARACTER SET %s DEFAULT COLLATE %s', $database, $charset, $collate));
     }
 }
