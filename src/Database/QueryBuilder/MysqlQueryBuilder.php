@@ -237,7 +237,7 @@ final class MysqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
 
         if ($column->getSettings()->getDefault() !== null || $column->getType() === Column::TYPE_BOOLEAN) {
             $default = ' DEFAULT ';
-            if (in_array($column->getType(), [Column::TYPE_INTEGER, Column::TYPE_BIT], true)) {
+            if (in_array($column->getType(), [Column::TYPE_TINY_INTEGER, Column::TYPE_SMALL_INTEGER, Column::TYPE_MEDIUM_INTEGER, Column::TYPE_INTEGER, Column::TYPE_BIG_INTEGER, Column::TYPE_BIT], true)) {
                 return $default . $column->getSettings()->getDefault();
             }
             if (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {

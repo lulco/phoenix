@@ -65,12 +65,12 @@ final class MysqlQueryBuilderTest extends TestCase
         $table = new MigrationTable('all_types');
         $table->addPrimary(true);
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_uuid', 'uuid'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_bit', 'bit'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_tinyint', 'tinyinteger'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_smallint', 'smallinteger'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_mediumint', 'mediuminteger'));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_int', 'integer', ['signed' => false]));
-        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_bigint', 'biginteger'));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_bit', 'bit', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_tinyint', 'tinyinteger', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_smallint', 'smallinteger', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_mediumint', 'mediuminteger', ['default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_int', 'integer', ['signed' => false, 'default' => 0]));
+        $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_bigint', 'biginteger', ['default' => 0]));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_string', 'string'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_char', 'char'));
         $this->assertInstanceOf(MigrationTable::class, $table->addColumn('col_binary', 'binary'));
@@ -103,7 +103,7 @@ final class MysqlQueryBuilderTest extends TestCase
 
         $queryBuilder = new MysqlQueryBuilder($this->adapter);
         $expectedQueries = [
-            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_bit` bit(32) NOT NULL,`col_tinyint` tinyint(4) NOT NULL,`col_smallint` smallint(6) NOT NULL,`col_mediumint` mediumint(9) NOT NULL,`col_int` int(11) unsigned NOT NULL,`col_bigint` bigint(20) NOT NULL,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_binary` binary(255) NOT NULL,`col_varbinary` varbinary(255) NOT NULL,`col_tinytext` tinytext NOT NULL,`col_mediumtext` mediumtext NOT NULL,`col_text` text NOT NULL,`col_longtext` longtext NOT NULL,`col_tinyblob` tinyblob NOT NULL,`col_mediumblob` mediumblob NOT NULL,`col_blob` blob NOT NULL,`col_longblob` longblob NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL DEFAULT 0,`col_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,`col_point` point DEFAULT NULL,`col_line` linestring DEFAULT NULL,`col_polygon` polygon DEFAULT NULL,`col_time` time DEFAULT NULL,`col_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,`col_null_timestamp` timestamp NULL DEFAULT NULL,`col_year` year NOT NULL,PRIMARY KEY (`id`));"
+            "CREATE TABLE `all_types` (`id` int(11) NOT NULL AUTO_INCREMENT,`col_uuid` char(36) NOT NULL,`col_bit` bit(32) NOT NULL DEFAULT 0,`col_tinyint` tinyint(4) NOT NULL DEFAULT 0,`col_smallint` smallint(6) NOT NULL DEFAULT 0,`col_mediumint` mediumint(9) NOT NULL DEFAULT 0,`col_int` int(11) unsigned NOT NULL DEFAULT 0,`col_bigint` bigint(20) NOT NULL DEFAULT 0,`col_string` varchar(255) NOT NULL,`col_char` char(255) NOT NULL,`col_binary` binary(255) NOT NULL,`col_varbinary` varbinary(255) NOT NULL,`col_tinytext` tinytext NOT NULL,`col_mediumtext` mediumtext NOT NULL,`col_text` text NOT NULL,`col_longtext` longtext NOT NULL,`col_tinyblob` tinyblob NOT NULL,`col_mediumblob` mediumblob NOT NULL,`col_blob` blob NOT NULL,`col_longblob` longblob NOT NULL,`col_json` text NOT NULL,`col_numeric` decimal(10,3) NOT NULL,`col_decimal` decimal(10,3) NOT NULL,`col_float` float(10,3) NOT NULL,`col_double` double(10,3) NOT NULL,`col_boolean` tinyint(1) NOT NULL DEFAULT 0,`col_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,`col_date` date NOT NULL,`col_enum` enum('xxx','yyy','zzz') NOT NULL,`col_set` set('xxx','yyy','zzz') NOT NULL,`col_point` point DEFAULT NULL,`col_line` linestring DEFAULT NULL,`col_polygon` polygon DEFAULT NULL,`col_time` time DEFAULT NULL,`col_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,`col_null_timestamp` timestamp NULL DEFAULT NULL,`col_year` year NOT NULL,PRIMARY KEY (`id`));"
         ];
         $this->assertEquals($expectedQueries, $queryBuilder->createTable($table));
     }
