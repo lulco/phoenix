@@ -44,6 +44,7 @@ final class Input implements InputInterface
 
     public function getParameterOption($values, $default = false, $onlyParams = false)
     {
+        return null;
     }
 
     public function hasArgument(string $name): bool
@@ -82,5 +83,10 @@ final class Input implements InputInterface
 
     public function validate(): void
     {
+    }
+
+    public function __toString(): string
+    {
+        return '';
     }
 }

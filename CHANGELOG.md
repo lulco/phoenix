@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased][unreleased]
+### Added
+- support for Symfony 7
 
 ## [2.5.0] - 2023-12-08
 ### Added
