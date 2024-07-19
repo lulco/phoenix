@@ -8,36 +8,35 @@ Framework agnostic database migrations for PHP.
 [![Latest Stable Version](https://img.shields.io/packagist/v/lulco/phoenix.svg)](https://packagist.org/packages/lulco/phoenix)
 [![Total Downloads](https://img.shields.io/packagist/dt/lulco/phoenix.svg?style=flat-square)](https://packagist.org/packages/lulco/phoenix)
 [![PHP 7 supported](http://php7ready.timesplinter.ch/lulco/phoenix/master/badge.svg)](https://github.com/lulco/phoenix/actions)
-
 ## Features
-- Validation all settings in migration before executing first query
-- Multiple migration directories
-- Support for views
-- Migrate up and down
-- Print executed queries (in debug mode -vvv)
-- Dry run - executing up or down migrations without real executing queries. Command just prints queries which will be executed in non-dry mode
-- Add an autoincrement primary column to an existing table
-- Dump command for creating migration from existing database
-- Diff command for creating diff migration from two existing databases
-- Test command for testing new migration executing migrate, rollback, migrate
-- Status command that shows list of executed migrations and list of migrations to execute
-- json output format for all commands
-- Namespaces in migration classes
-- Own migration templates
-- Easy integration to any PHP application
-- PHPStorm suggestions (works even better with deep-assoc-completion plugin)
-- Change collation for all existing tables and columns
-- Turn foreign keys check on / off in migration
-- Simple autowiring in migrations
+- **Comprehensive Validation**: Validate all settings in your migrations before executing the first query, ensuring error-free operations.
+- **Multiple Directories**: Manage multiple migration directories with ease, enhancing organizational capabilities.
+- **View Support**: Full support for database views, extending the flexibility of your migrations.
+- **Bidirectional Migrations**: Seamlessly migrate both up and down, allowing for smooth transitions and rollbacks.
+- **Query Debugging**: Print executed queries in debug mode (`-vvv`), providing transparency and aiding in troubleshooting.
+- **Dry Run Mode**: Execute migrations in a dry run mode to preview changes without making any actual modifications, ensuring safe deployments.
+- **Auto-Increment Columns**: Effortlessly add an autoincrement primary column to an existing table, simplifying schema modifications.
+- **Database Dump**: Use the dump command to create migrations from an existing database, facilitating easy migration setup.
+- **Database Diffing**: Generate diff migrations between two existing databases, making it simple to synchronize changes.
+- **Migration Testing**: Test new migrations with commands that execute, rollback, and re-execute migrations, ensuring reliability before deployment.
+- **Migration Status**: View a detailed status report of executed and pending migrations, keeping track of your migration history.
+- **JSON Output**: Get outputs in JSON format for all commands, enabling easy integration with other tools and workflows.
+- **Namespace Support**: Use namespaces in migration classes for better organization and code management.
+- **Custom Templates**: Create and use your own migration templates, tailoring the process to fit your specific needs.
+- **Framework Agnostic**: Easily integrate with any PHP application, offering a seamless migration experience.
+- **Enhanced PHPStorm Integration**: Enjoy PHPStorm suggestions, with enhanced support when using the deep-assoc-completion plugin.
+- **Collation Management**: Change collation for all existing tables and columns, providing full control over character set settings.
+- **Foreign Key Control**: Toggle foreign key checks on and off within migrations, offering flexibility during complex schema changes.
+- **Simple Autowiring**: Benefit from simple autowiring in migrations, reducing boilerplate code and enhancing productivity.
 
-## Supported adapters
-- MySql
+### Supported adapters
+- MySQL
 - PostgreSQL
 
 ## Installation
 
 ### Composer
-This library requires PHP 7.4 or later. It works also on PHP 8.0, PHP 8.1 and PHP 8.2. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
+This library requires PHP 7.4 or later. It works also on PHP 8.0+. The fastest and recommended way to install Phoenix is to add it to your project using Composer (https://getcomposer.org/).
 
 ```
 composer require lulco/phoenix
@@ -253,15 +252,22 @@ Nothing to rollback
 All done. Took 0.0401s
 ```
 
-### [Dump command](docs/commands/dump_command.md)
-Command `php vendor/bin/phoenix dump` dumps actual database structure into migration file.
-If you don't use Phoenix yet and you have some tables in your database, this command helps you to start using Phoenix easier.
-It also helps you when you want to [change mysql to postgres or vice versa](docs/examples/how_to_change_mysql_to_pgsql.md)
+### [Dump Command](docs/commands/dump_command.md)
 
-### [Diff command](docs/commands/diff_command.md)
-Command `php vendor/bin/phoenix diff` creates migration as diff of two existing database structures.
-This command can be used when upgrading some system to newer version and you know the structure of both old and new version. 
+The `php vendor/bin/phoenix dump` command generates a migration file from your current database structure, making it easy to start using Phoenix with existing tables. It’s particularly useful for transitioning between MySQL and PostgreSQL.
 
+Key benefits:
+- Quickly create migration files from existing databases.
+- Simplify Phoenix onboarding.
+- Facilitate database engine transitions.
+
+For detailed usage, see the [Dump Command documentation](docs/commands/dump_command.md) and our [guide on switching databases](docs/examples/how_to_change_mysql_to_pgsql.md).
+
+### [Diff Command](docs/commands/diff_command.md)
+
+The `php vendor/bin/phoenix diff` command generates a migration by comparing two existing database structures. This is ideal for system upgrades where you have both the old and new version schemas.
+
+For detailed usage, see the [Diff Command documentation](docs/commands/diff_command.md).
 ### [Status command](docs/commands/status_command.md)
 Run `php vendor/bin/phoenix status` and show list of migrations already executed and list of migrations to execute. Output is like this:
 
