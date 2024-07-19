@@ -17,7 +17,7 @@ final class Input implements InputInterface
     {
     }
 
-    public function getArgument(string $name): ?string
+    public function getArgument(string $name)
     {
         return $this->arguments[$name] ?? null;
     }
@@ -32,7 +32,7 @@ final class Input implements InputInterface
         return null;
     }
 
-    public function getOption(string $name): ?string
+    public function getOption(string $name)
     {
         return $this->options[$name] ?? null;
     }
@@ -42,7 +42,7 @@ final class Input implements InputInterface
         return $this->options;
     }
 
-    public function getParameterOption($values, $default = false, $onlyParams = false): ?string
+    public function getParameterOption($values, $default = false, $onlyParams = false)
     {
         return null;
     }
