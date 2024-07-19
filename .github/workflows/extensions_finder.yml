@@ -19,7 +19,7 @@ jobs:
         run: composer update --no-progress --no-interaction
 
       - name: Install PHP extensions finder as dev dependency
-        run: composer require efabrica/php-extensions-finder --dev
+        run: composer require efabrica/php-extensions-finder --dev -W
 
       - name: PHP extensions finder
         run: vendor/bin/php-extensions-finder check src tests
