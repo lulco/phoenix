@@ -121,7 +121,7 @@ final class DumperTest extends TestCase
         $tables = $this->createComplexStructure();
 
         $dumper = new Dumper('    ');
-        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addColumn('price', 'decimal')\n    ->addColumn('sorting', 'biginteger')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint('sku', 'u_sku')\n    ->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n    ->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n    ->setCharset('utf8')\n    ->setCollation('utf8_general_ci')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n    ->addColumn('alias', 'string')\n    ->addColumn('bodytext', 'text')\n    ->addColumn('price', 'decimal', ['default' => 0.01])\n    ->addColumn('sorting', 'biginteger')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint('sku', 'u_sku')\n    ->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n    ->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['length' => 100])\n    ->addColumn('is_active', 'boolean', ['default' => true])\n    ->addColumn('fk_table_1_id', 'integer')\n    ->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n    ->addColumn('fk_table_1_id', 'integer', ['null' => true])\n    ->create();\n\n";
@@ -129,7 +129,7 @@ final class DumperTest extends TestCase
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
-        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal')\n\t->addColumn('sorting', 'biginteger')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint('sku', 'u_sku')\n\t->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n\t->create();\n\n";
+        $output = "\$this->table('table_1', 'id')\n\t->setCharset('utf8')\n\t->setCollation('utf8_general_ci')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['charset' => 'utf16', 'collation' => 'utf16_general_ci'])\n\t->addColumn('alias', 'string')\n\t->addColumn('bodytext', 'text')\n\t->addColumn('price', 'decimal', ['default' => 0.01])\n\t->addColumn('sorting', 'biginteger')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint('sku', 'u_sku')\n\t->addIndex(new \Phoenix\Database\Element\IndexColumn('alias', ['length' => 10]), 'unique', '', 'idx_table_1_alias_l10')\n\t->create();\n\n";
         $output .= "\$this->table('table_2', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['length' => 100])\n\t->addColumn('is_active', 'boolean', ['default' => true])\n\t->addColumn('fk_table_1_id', 'integer')\n\t->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n\t->addColumn('fk_table_1_id', 'integer', ['null' => true])\n\t->create();\n\n";
@@ -264,7 +264,7 @@ final class DumperTest extends TestCase
         $table1->addColumn('title', 'string', ['length' => 255, 'charset' => 'utf16', 'collation' => 'utf16_general_ci']);
         $table1->addColumn('alias', 'string', ['charset' => 'utf8', 'collation' => 'utf8_general_ci']);
         $table1->addColumn('bodytext', 'text');
-        $table1->addColumn('price', 'decimal');
+        $table1->addColumn('price', 'decimal', ['default' => 0.01]);
         $table1->addColumn('sorting', 'biginteger');
         $table1->addColumn('sku', 'string');
         $table1->addIndex(new IndexColumn('alias', ['length' => 10]), 'unique');

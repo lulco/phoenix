@@ -73,7 +73,7 @@ class Init extends AbstractMigration
             ->addColumn('col_longblob', 'longblob', ['null' => true])
             ->addColumn('col_json', 'json')
             ->addColumn('col_numeric', 'numeric', ['length' => 10, 'decimals' => 3])
-            ->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3])
+            ->addColumn('col_decimal', 'decimal', ['length' => 10, 'decimals' => 3, 'default' => 0.001])
             ->addColumn('col_float', 'float', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')

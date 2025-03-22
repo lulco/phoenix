@@ -2,6 +2,9 @@
 
 ## [Unreleased][unreleased]
 
+### Fixed
+- decimal, float, double default values
+
 ## [2.6.0] - 2024-07-19
 ### Added
 - support for Symfony 7
