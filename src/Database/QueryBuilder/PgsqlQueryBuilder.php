@@ -245,7 +245,10 @@ final class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
             $default = (string)$column->getSettings()->getDefault();
         } elseif (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
-        } elseif ($column->getType() === Column::TYPE_TIMESTAMP && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
+        } elseif (in_array($column->getType(), [
+            Column::TYPE_TIMESTAMP,
+            Column::TYPE_DATETIME
+        ], true) && $column->getSettings()->getDefault() === ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP) {
             $default = 'CURRENT_TIMESTAMP';
         } else {
             $default = "'" . $this->sanitizeSingleQuote($column->getSettings()->getDefault()) . "'";
