@@ -14,7 +14,7 @@
     "require-dev": {
         "nette/neon": "^2.3|^3.0",
         "symfony/yaml": "^5.0|^6.0|^7.0",
-        "phpunit/phpunit": "^9.5.11",
+        "phpunit/phpunit": "^9.5.11|^10.0|^11.0|^12.0",
         "ramsey/uuid": "^3.7|^4.0"
     },
     "autoload": {
