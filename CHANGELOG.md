@@ -4,6 +4,7 @@
 
 ### Fixed
 - decimal, float, double default values
+- allow DEFAULT_VALUE_CURRENT_TIMESTAMP for datetime column in psql
 
 ## [2.6.0] - 2024-07-19
 ### Added
