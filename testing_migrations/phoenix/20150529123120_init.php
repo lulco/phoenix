@@ -78,7 +78,7 @@ class Init extends AbstractMigration
             ->addColumn('col_double', 'double', ['length' => 10, 'decimals' => 3])
             ->addColumn('col_boolean', 'boolean')
             ->addColumn('col_bit', 'bit', ['length' => 5, 'default' => "B'10101'"])
-            ->addColumn('col_datetime', 'datetime')
+            ->addColumn('col_datetime', 'datetime', ['default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
             ->addColumn('col_date', 'date')
             ->addColumn('col_enum', 'enum', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
             ->addColumn('col_set', 'set', ['values' => ['xxx', 'yyy', 'zzz'], 'null' => true])
@@ -87,7 +87,7 @@ class Init extends AbstractMigration
             ->addColumn('col_line', 'line', ['null' => true])
             ->addColumn('col_polygon', 'polygon', ['null' => true])
             ->addColumn('col_time', 'time', ['null' => true])
-            ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
+            ->addColumn('col_timestamp', 'timestamp', ['default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
             ->addIndex([new IndexColumn('col_string', ['order' => 'DESC']), new IndexColumn('col_integer', ['order' => 'DESC'])])
             ->addForeignKey('col_smallinteger', 'table_5', 'id', ForeignKey::CASCADE, ForeignKey::CASCADE)
             ->create();
