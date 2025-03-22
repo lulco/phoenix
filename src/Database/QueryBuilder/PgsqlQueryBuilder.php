@@ -231,7 +231,17 @@ final class PgsqlQueryBuilder extends CommonQueryBuilder implements QueryBuilder
 
     private function escapeDefault(Column $column): string
     {
-        if (in_array($column->getType(), [Column::TYPE_TINY_INTEGER, Column::TYPE_SMALL_INTEGER, Column::TYPE_MEDIUM_INTEGER, Column::TYPE_INTEGER, Column::TYPE_BIG_INTEGER, Column::TYPE_BIT], true)) {
+        if (in_array($column->getType(), [
+            Column::TYPE_TINY_INTEGER,
+            Column::TYPE_SMALL_INTEGER,
+            Column::TYPE_MEDIUM_INTEGER,
+            Column::TYPE_INTEGER,
+            Column::TYPE_BIG_INTEGER,
+            Column::TYPE_DECIMAL,
+            Column::TYPE_FLOAT,
+            Column::TYPE_DOUBLE,
+            Column::TYPE_BIT
+        ], true)) {
             $default = (string)$column->getSettings()->getDefault();
         } elseif (in_array($column->getType(), [Column::TYPE_BOOLEAN], true)) {
             $default = $column->getSettings()->getDefault() ? 'true' : 'false';
