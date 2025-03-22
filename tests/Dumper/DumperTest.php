@@ -125,7 +125,7 @@ final class DumperTest extends TestCase
         $output .= "\$this->table('table_2', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string', ['length' => 100])\n    ->addColumn('is_active', 'boolean', ['default' => true])\n    ->addColumn('fk_table_1_id', 'integer')\n    ->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n    ->addColumn('id', 'integer', ['autoincrement' => true])\n    ->addColumn('title', 'string')\n    ->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n    ->addColumn('fk_table_1_id', 'integer', ['null' => true])\n    ->create();\n\n";
-        $output .= "\$this->table('table_4', 'identifier')\n    ->addColumn('identifier', 'uuid')\n    ->addColumn('col_integer', 'integer')\n    ->addColumn('col_string', 'string')\n    ->addColumn('col_char', 'char')\n    ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n    ->addColumn('alias', 'string')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n    ->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n    ->create();";
+        $output .= "\$this->table('table_4', 'identifier')\n    ->addColumn('identifier', 'uuid')\n    ->addColumn('col_integer', 'integer')\n    ->addColumn('col_string', 'string', ['default' => ''])\n    ->addColumn('col_char', 'char')\n    ->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n    ->addColumn('alias', 'string')\n    ->addColumn('sku', 'string')\n    ->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n    ->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n    ->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
 
         $dumper = new Dumper("\t");
@@ -133,7 +133,7 @@ final class DumperTest extends TestCase
         $output .= "\$this->table('table_2', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string', ['length' => 100])\n\t->addColumn('is_active', 'boolean', ['default' => true])\n\t->addColumn('fk_table_1_id', 'integer')\n\t->create();\n\n";
 
         $output .= "\$this->table('table_3', 'id')\n\t->addColumn('id', 'integer', ['autoincrement' => true])\n\t->addColumn('title', 'string')\n\t->addColumn('status', 'enum', ['values' => ['new', 'processed', 'done'], 'default' => 'new'])\n\t->addColumn('fk_table_1_id', 'integer', ['null' => true])\n\t->create();\n\n";
-        $output .= "\$this->table('table_4', 'identifier')\n\t->addColumn('identifier', 'uuid')\n\t->addColumn('col_integer', 'integer')\n\t->addColumn('col_string', 'string')\n\t->addColumn('col_char', 'char')\n\t->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n\t->addColumn('alias', 'string')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n\t->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n\t->create();";
+        $output .= "\$this->table('table_4', 'identifier')\n\t->addColumn('identifier', 'uuid')\n\t->addColumn('col_integer', 'integer')\n\t->addColumn('col_string', 'string', ['default' => ''])\n\t->addColumn('col_char', 'char')\n\t->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => 'CURRENT_TIMESTAMP'])\n\t->addColumn('alias', 'string')\n\t->addColumn('sku', 'string')\n\t->addUniqueConstraint(['alias', 'sku'], 'u_alias_sku')\n\t->addIndex([new \Phoenix\Database\Element\IndexColumn('col_string', ['order' => 'DESC']), new \Phoenix\Database\Element\IndexColumn('col_integer', ['order' => 'DESC'])], '', '', 'idx_table_4_col_string_odesc_col_integer_odesc')\n\t->create();";
         $this->assertEquals($output, $dumper->dumpTables($tables, 'up'));
     }
 
@@ -291,7 +291,7 @@ final class DumperTest extends TestCase
         $table4 = new MigrationTable('table_4', 'identifier');
         $table4->addColumn('identifier', 'uuid');
         $table4->addColumn('col_integer', 'integer');
-        $table4->addColumn('col_string', 'string');
+        $table4->addColumn('col_string', 'string', ['default' => '']);
         $table4->addColumn('col_char', 'char');
         $table4->addColumn('col_timestamp', 'timestamp', ['null' => true, 'default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP]);
         $table4->addColumn('alias', 'string');
