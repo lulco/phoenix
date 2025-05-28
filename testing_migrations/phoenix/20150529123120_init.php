@@ -88,6 +88,7 @@ class Init extends AbstractMigration
             ->addColumn('col_polygon', 'polygon', ['null' => true])
             ->addColumn('col_time', 'time', ['null' => true])
             ->addColumn('col_timestamp', 'timestamp', ['default' => ColumnSettings::DEFAULT_VALUE_CURRENT_TIMESTAMP])
+            ->addColumn('short_string', 'string', ['length' => 2, 'default' => null])
             ->addIndex([new IndexColumn('col_string', ['order' => 'DESC']), new IndexColumn('col_integer', ['order' => 'DESC'])])
             ->addForeignKey('col_smallinteger', 'table_5', 'id', ForeignKey::CASCADE, ForeignKey::CASCADE)
             ->create();
