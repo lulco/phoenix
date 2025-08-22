@@ -2,6 +2,7 @@
 
 ## [Unreleased][unreleased]
 
+## [2.6.1] - 2025-08-22
 ### Fixed
 - decimal, float, double default values
 - allow DEFAULT_VALUE_CURRENT_TIMESTAMP for datetime column in psql
@@ -353,7 +354,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/2.6.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/2.6.1...HEAD
+[2.6.1]: https://github.com/lulco/phoenix/compare/2.6.0...2.6.1
 [2.6.0]: https://github.com/lulco/phoenix/compare/2.5.0...2.6.0
 [2.5.0]: https://github.com/lulco/phoenix/compare/2.4.0...2.5.0
 [2.4.0]: https://github.com/lulco/phoenix/compare/2.3.0...2.4.0
