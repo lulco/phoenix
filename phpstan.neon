@@ -5,8 +5,5 @@ parameters:
 
     ignoreErrors:
         -
-            message: '#^Offset 2 might not exist on array\{0\?: string, 1\?: string, 2\?: string, 3\?: string\}\.$#'
-            path: src/Database/Adapter/MysqlAdapter.php
-        -
             message: '#^Instanceof between Phoenix\\Database\\Element\\Column and Phoenix\\Database\\Element\\Column will always evaluate to true\.$#'
             path: src/Database/Element/Behavior/PrimaryColumnsBehavior.php
