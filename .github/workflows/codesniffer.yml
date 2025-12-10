@@ -9,11 +9,22 @@ on:
 jobs:
   codesniffer:
     runs-on: ubuntu-latest
-    name: PHP code sniffer
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.4' ]
+
+    name: PHP ${{ matrix.php }} code sniffer
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none # disable xdebug, pcov
 
       - name: Composer update
         run: composer update --no-progress --no-interaction
