@@ -1,6 +1,8 @@
 # Change Log
 
-## [Unreleased][unreleased]
+## [Unreleased]
+### Changed
+- updated symfony/console library & upgraded PHP to version 8.4
 
 ## [2.6.1] - 2025-08-22
 ### Fixed
