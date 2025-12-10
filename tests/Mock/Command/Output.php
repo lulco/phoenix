@@ -99,4 +99,9 @@ final class Output implements OutputInterface
     {
         return self::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
     }
+
+    public function isSilent(): bool
+    {
+        return false;
+    }
 }
