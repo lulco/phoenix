@@ -46,7 +46,7 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Composer update
-        run: composer update --prefer-lowest --no-progress --no-interaction && composer require "symfony/console:<7.0.0"
+        run: composer update --prefer-lowest --no-progress --no-interaction
 
       - name: PHPunit
         run: vendor/bin/phpunit --coverage-text
