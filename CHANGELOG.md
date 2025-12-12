@@ -1,10 +1,12 @@
 # Change Log
 
 ## [Unreleased]
+
+## [3.0.0] - 2025-12-12
 ### Changed
 - updated symfony/console library 
-- upgraded PHP to version 8.4
-- added support for PHP 8.5
+- added support for PHP 8.4 and 8.5
+- dopped support for PHP 7.4, 8.0, 8.1, 8.2, 8.3
 
 ## [2.6.1] - 2025-08-22
 ### Fixed
@@ -358,7 +360,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/2.6.1...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/lulco/phoenix/compare/2.6.1...3.0.0
 [2.6.1]: https://github.com/lulco/phoenix/compare/2.6.0...2.6.1
 [2.6.0]: https://github.com/lulco/phoenix/compare/2.5.0...2.6.0
 [2.5.0]: https://github.com/lulco/phoenix/compare/2.4.0...2.5.0
