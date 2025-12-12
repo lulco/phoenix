@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 ### Changed
-- updated symfony/console library & upgraded PHP to version 8.4
+- updated symfony/console library 
+- upgraded PHP to version 8.4
+- added support for PHP 8.5
 
 ## [2.6.1] - 2025-08-22
 ### Fixed
