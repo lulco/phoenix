@@ -122,7 +122,7 @@ final class Config
     public function getAdapterFactoryClass(): string
     {
         $class = $this->configuration['adapter_factory_class'];
-        if (!is_subclass_of($class, AdapterFactoryInterface::class) && $class !== AdapterFactory::class) {
+        if (!is_subclass_of($class, AdapterFactoryInterface::class)) {
             throw new InvalidArgumentValueException('Adapter factory class "' . $class . '" must implement ' . AdapterFactoryInterface::class);
         }
         return $class;
