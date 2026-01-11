@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Phoenix\Config;
 
+use Phoenix\Database\Adapter\AdapterFactory;
+use Phoenix\Database\Adapter\AdapterFactoryInterface;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
 
@@ -20,6 +22,7 @@ final class Config
         'dependencies' => [],
         'template' => __DIR__ . '/../Templates/DefaultTemplate.phoenix',
         'indent' => '4spaces',
+        'adapter_factory_class' => AdapterFactory::class,
     ];
 
     /**
@@ -110,5 +113,13 @@ final class Config
     public function getIndent(): string
     {
         return $this->configuration['indent'];
+    }
+
+    /**
+     * @return class-string<AdapterFactoryInterface>
+     */
+    public function getAdapterFactoryClass(): string
+    {
+        return $this->configuration['adapter_factory_class'];
     }
 }

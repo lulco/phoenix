@@ -191,4 +191,34 @@ final class ConfigTest extends TestCase
         $this->expectExceptionMessage('Dependency for type "Ramsey\Uuid\UuidFactory" not found. Register it via $configuration[\'dependencies\'][\'Ramsey\Uuid\UuidFactory\']');
         $config->getDependency(UuidFactory::class);
     }
+
+    public function testDefaultAdapterFactoryClass(): void
+    {
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+            ],
+            'environments' => [
+                'first' => [],
+            ],
+        ]);
+
+        $this->assertEquals(\Phoenix\Database\Adapter\AdapterFactory::class, $config->getAdapterFactoryClass());
+    }
+
+    public function testCustomAdapterFactoryClass(): void
+    {
+        $customAdapterFactoryClass = 'My\Custom\AdapterFactory';
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+            ],
+            'environments' => [
+                'first' => [],
+            ],
+            'adapter_factory_class' => $customAdapterFactoryClass,
+        ]);
+
+        $this->assertEquals($customAdapterFactoryClass, $config->getAdapterFactoryClass());
+    }
 }
