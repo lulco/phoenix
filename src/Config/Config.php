@@ -117,9 +117,14 @@ final class Config
 
     /**
      * @return class-string<AdapterFactoryInterface>
+     * @throws InvalidArgumentValueException
      */
     public function getAdapterFactoryClass(): string
     {
-        return $this->configuration['adapter_factory_class'];
+        $class = $this->configuration['adapter_factory_class'];
+        if (!is_subclass_of($class, AdapterFactoryInterface::class) && $class !== AdapterFactory::class) {
+            throw new InvalidArgumentValueException('Adapter factory class "' . $class . '" must implement ' . AdapterFactoryInterface::class);
+        }
+        return $class;
     }
 }
