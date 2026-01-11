@@ -8,7 +8,7 @@ use PDO;
 use Phoenix\Config\EnvironmentConfig;
 use Phoenix\Exception\InvalidArgumentValueException;
 
-final class AdapterFactory
+final class AdapterFactory implements AdapterFactoryInterface
 {
     public static function instance(EnvironmentConfig $config): AdapterInterface
     {
