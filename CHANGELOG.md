@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- added support for PHP 8.6
+
 ## [3.0.0] - 2025-12-12
 ### Changed
 - updated symfony/console library 
