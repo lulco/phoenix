@@ -124,7 +124,7 @@ final class MysqlAdapter extends PdoAdapter
     {
         preg_match('/(.*?)\((.*?)\)(.*)/', $column['COLUMN_TYPE'], $matches);
         $values = null;
-        if ($column['DATA_TYPE'] === Column::TYPE_ENUM || $column['DATA_TYPE'] === Column::TYPE_SET) {
+        if (($column['DATA_TYPE'] === Column::TYPE_ENUM || $column['DATA_TYPE'] === Column::TYPE_SET) && isset($matches[2])) {
             $values = explode('\',\'', substr($matches[2], 1, -1));
         }
         list($length, $decimals) = $this->getLengthAndDecimals($matches[2] ?? null);
