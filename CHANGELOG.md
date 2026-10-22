@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-22
 ### Added
 - added support for PHP 8.6
 
@@ -363,7 +364,8 @@
 - supported methods in migrations: addColumn, addIndex, addForeignKey, dropColumn, dropIndex, dropForeignKey
 - supported column types: string, integer, boolean, text, datetime, uuid, json, char
 
-[unreleased]: https://github.com/lulco/phoenix/compare/3.0.0...HEAD
+[unreleased]: https://github.com/lulco/phoenix/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/lulco/phoenix/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/lulco/phoenix/compare/2.6.1...3.0.0
 [2.6.1]: https://github.com/lulco/phoenix/compare/2.6.0...2.6.1
 [2.6.0]: https://github.com/lulco/phoenix/compare/2.5.0...2.6.0
