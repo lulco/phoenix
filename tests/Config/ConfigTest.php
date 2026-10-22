@@ -6,8 +6,10 @@ namespace Phoenix\Tests\Config;
 
 use Phoenix\Config\Config;
 use Phoenix\Config\EnvironmentConfig;
+use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\InvalidArgumentValueException;
+use Phoenix\Tests\Mock\Database\Adapter\MockAdapterFactory;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidFactory;
 use Ramsey\Uuid\UuidFactoryInterface;
@@ -190,5 +192,51 @@ final class ConfigTest extends TestCase
         $this->expectException(InvalidArgumentValueException::class);
         $this->expectExceptionMessage('Dependency for type "Ramsey\Uuid\UuidFactory" not found. Register it via $configuration[\'dependencies\'][\'Ramsey\Uuid\UuidFactory\']');
         $config->getDependency(UuidFactory::class);
+    }
+
+    public function testDefaultAdapterFactoryClass(): void
+    {
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+            ],
+            'environments' => [
+                'first' => [],
+            ],
+        ]);
+
+        $this->assertEquals(AdapterFactory::class, $config->getAdapterFactoryClass());
+    }
+
+    public function testInvalidAdapterFactoryClass(): void
+    {
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+            ],
+            'environments' => [
+                'first' => [],
+            ],
+            'adapter_factory_class' => 'Invalid\NonExistent\Class',
+        ]);
+
+        $this->expectException(InvalidArgumentValueException::class);
+        $this->expectExceptionMessage('Adapter factory class "Invalid\NonExistent\Class" must implement Phoenix\Database\Adapter\AdapterFactoryInterface');
+        $config->getAdapterFactoryClass();
+    }
+
+    public function testCustomAdapterFactoryClass(): void
+    {
+        $config = new Config([
+            'migration_dirs' => [
+                'first_dir',
+            ],
+            'environments' => [
+                'first' => [],
+            ],
+            'adapter_factory_class' => MockAdapterFactory::class,
+        ]);
+
+        $this->assertEquals(MockAdapterFactory::class, $config->getAdapterFactoryClass());
     }
 }

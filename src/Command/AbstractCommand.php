@@ -7,7 +7,6 @@ namespace Phoenix\Command;
 use InvalidArgumentException;
 use Phoenix\Config\Config;
 use Phoenix\Config\Parser\ConfigParserFactory;
-use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Adapter\AdapterInterface;
 use Phoenix\Exception\ConfigException;
 use Phoenix\Exception\DatabaseQueryExecuteException;
@@ -69,7 +68,8 @@ abstract class AbstractCommand extends Command
         if (!$environmentConfig) {
             throw new InvalidArgumentException('Environment ' . $environment . ' doesn\'t exist');
         }
-        $this->adapter = AdapterFactory::instance($environmentConfig);
+        $adapterFactoryClass = $this->getConfig()->getAdapterFactoryClass();
+        $this->adapter = $adapterFactoryClass::instance($environmentConfig);
 
         $this->manager = new Manager($this->getConfig(), $this->adapter);
         $this->check();

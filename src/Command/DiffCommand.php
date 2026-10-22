@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Phoenix\Command;
 
-use Phoenix\Database\Adapter\AdapterFactory;
 use Phoenix\Database\Element\Structure;
 use Phoenix\Dumper\Dumper;
 use Phoenix\Exception\InvalidArgumentValueException;
@@ -66,7 +65,8 @@ final class DiffCommand extends AbstractDumpCommand
             throw new InvalidArgumentValueException(ucfirst($type) . ' environment "' . $env . '" doesn\'t exist in config');
         }
 
-        $adapter = AdapterFactory::instance($config);
+        $adapterFactoryClass = $this->getConfig()->getAdapterFactoryClass();
+        $adapter = $adapterFactoryClass::instance($config);
         return $adapter->getStructure();
     }
 
